@@ -2,6 +2,7 @@ use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::str::FromStr;
 use std::fmt;
+use factorio_lib_rs_derive::ModSetting;
 
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
@@ -59,7 +60,7 @@ trait ModSetting: Prototype {
     fn setting_type(&self) -> ModSettingType;
 }
 
-#[derive(Debug)]
+#[derive(Debug, ModSetting)]
 struct BoolModSetting<'a> {
     name: String,
     localised_name: Option<LocalisedString<'a>>,
@@ -76,20 +77,12 @@ impl Prototype for BoolModSetting<'_> {
     fn name(&self) -> String { self.name.clone() }
 }
 
-impl ModSetting for BoolModSetting<'_> {
-    fn localised_name(&self) -> Option<LocalisedString> { self.localised_name.clone() }
-    fn localised_description(&self) -> Option<LocalisedString> { self.localised_description.clone() }
-    fn order(&self) -> Option<String> { self.order.clone() }
-    fn hidden(&self) -> Option<bool> { self.hidden }
-    fn setting_type(&self) -> ModSettingType { self.setting_type.clone() }
-}
-
 impl BoolModSetting<'_> {
     fn default_value(&self) -> bool { self.default_value }
     fn forced_value(&self) -> Option<bool> { self.forced_value }
 }
 
-#[derive(Debug)]
+#[derive(Debug, ModSetting)]
 struct IntModSetting<'a> {
     name: String,
     localised_name: Option<LocalisedString<'a>>,
@@ -107,15 +100,6 @@ impl Prototype for IntModSetting<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::IntSetting }
     fn name(&self) -> String { self.name.clone() }
 }
-
-impl ModSetting for IntModSetting<'_> {
-    fn localised_name(&self) -> Option<LocalisedString> { self.localised_name.clone() }
-    fn localised_description(&self) -> Option<LocalisedString> { self.localised_description.clone() }
-    fn order(&self) -> Option<String> { self.order.clone() }
-    fn hidden(&self) -> Option<bool> { self.hidden }
-    fn setting_type(&self) -> ModSettingType { self.setting_type.clone() }
-}
-
 impl IntModSetting<'_> {
     fn default_value(&self) -> i64 { self.default_value }
     fn minimum_value(&self) -> Option<i64> { self.minimum_value }
@@ -123,7 +107,7 @@ impl IntModSetting<'_> {
     fn allowed_values(&self) -> Option<Vec<i64>> { self.allowed_values.clone() }
 }
 
-#[derive(Debug)]
+#[derive(Debug, ModSetting)]
 struct DoubleModSetting<'a> {
     name: String,
     localised_name: Option<LocalisedString<'a>>,
@@ -142,14 +126,6 @@ impl Prototype for DoubleModSetting<'_> {
     fn name(&self) -> String { self.name.clone() }
 }
 
-impl ModSetting for DoubleModSetting<'_> {
-    fn localised_name(&self) -> Option<LocalisedString> { self.localised_name.clone() }
-    fn localised_description(&self) -> Option<LocalisedString> { self.localised_description.clone() }
-    fn order(&self) -> Option<String> { self.order.clone() }
-    fn hidden(&self) -> Option<bool> { self.hidden }
-    fn setting_type(&self) -> ModSettingType { self.setting_type.clone() }
-}
-
 impl DoubleModSetting<'_> {
     fn default_value(&self) -> f64 { self.default_value }
     fn minimum_value(&self) -> Option<f64> { self.minimum_value }
@@ -157,7 +133,7 @@ impl DoubleModSetting<'_> {
     fn allowed_values(&self) -> Option<Vec<f64>> { self.allowed_values.clone() }
 }
 
-#[derive(Debug)]
+#[derive(Debug, ModSetting)]
 struct StringModSetting<'a> {
     name: String,
     localised_name: Option<LocalisedString<'a>>,
@@ -174,14 +150,6 @@ struct StringModSetting<'a> {
 impl Prototype for StringModSetting<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::StringSetting }
     fn name(&self) -> String { self.name.clone() }
-}
-
-impl ModSetting for StringModSetting<'_> {
-    fn localised_name(&self) -> Option<LocalisedString> { self.localised_name.clone() }
-    fn localised_description(&self) -> Option<LocalisedString> { self.localised_description.clone() }
-    fn order(&self) -> Option<String> { self.order.clone() }
-    fn hidden(&self) -> Option<bool> { self.hidden }
-    fn setting_type(&self) -> ModSettingType { self.setting_type.clone() }
 }
 
 impl StringModSetting<'_> {

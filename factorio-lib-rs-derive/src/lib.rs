@@ -13,7 +13,7 @@ pub fn mod_setting_macro_derive(input: TokenStream) -> TokenStream {
 fn impl_mod_setting_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
-        impl ModSetting for #name {
+        impl ModSetting for #name<'_> {
             fn localised_name(&self) -> Option<LocalisedString> { self.localised_name.clone() }
             fn localised_description(&self) -> Option<LocalisedString> { self.localised_description.clone() }
             fn order(&self) -> Option<String> { self.order.clone() }
