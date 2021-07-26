@@ -51,7 +51,7 @@ impl LocaleHandler {
 // The input type for functions that accept LocalisedString
 // Also used in LocalisedString itself
 #[derive(Debug, Clone)]
-enum LocalisedStringEntry<'a> {
+pub enum LocalisedStringEntry<'a> {
     String(String),                 // Just a string
     LocString(LocalisedString<'a>), // Table / LocalisedString
 }

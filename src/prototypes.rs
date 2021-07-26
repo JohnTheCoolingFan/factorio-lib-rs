@@ -17,13 +17,13 @@ pub struct DataTable {
 
 // Prototype
 // Contains all values (accessors) for every prototype in the game
-trait Prototype: fmt::Debug {
+pub trait Prototype: fmt::Debug {
     fn r#type(&self) -> PrototypeType;
     fn name(&self) -> String;
 }
 
 #[derive(Debug, Clone)]
-enum ModSettingType {
+pub enum ModSettingType {
     Startup,
     RuntimeGlobal,
     RuntimePerUser,
@@ -52,7 +52,7 @@ impl FromStr for ModSettingType {
     }
 }
 
-trait ModSetting: Prototype {
+pub trait ModSetting: Prototype {
     fn localised_name(&self) -> Option<LocalisedString>;
     fn localised_description(&self) -> Option<LocalisedString>;
     fn order(&self) -> Option<String>;
@@ -61,7 +61,7 @@ trait ModSetting: Prototype {
 }
 
 #[derive(Debug, ModSetting)]
-struct BoolModSetting<'a> {
+pub struct BoolModSetting<'a> {
     name: String,
     localised_name: Option<LocalisedString<'a>>,
     localised_description: Option<LocalisedString<'a>>,
@@ -78,12 +78,12 @@ impl Prototype for BoolModSetting<'_> {
 }
 
 impl BoolModSetting<'_> {
-    fn default_value(&self) -> bool { self.default_value }
-    fn forced_value(&self) -> Option<bool> { self.forced_value }
+    pub fn default_value(&self) -> bool { self.default_value }
+    pub fn forced_value(&self) -> Option<bool> { self.forced_value }
 }
 
 #[derive(Debug, ModSetting)]
-struct IntModSetting<'a> {
+pub struct IntModSetting<'a> {
     name: String,
     localised_name: Option<LocalisedString<'a>>,
     localised_description: Option<LocalisedString<'a>>,
@@ -100,15 +100,16 @@ impl Prototype for IntModSetting<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::IntSetting }
     fn name(&self) -> String { self.name.clone() }
 }
+
 impl IntModSetting<'_> {
-    fn default_value(&self) -> i64 { self.default_value }
-    fn minimum_value(&self) -> Option<i64> { self.minimum_value }
-    fn maximum_value(&self) -> Option<i64> { self.maximum_value }
-    fn allowed_values(&self) -> Option<Vec<i64>> { self.allowed_values.clone() }
+    pub fn default_value(&self) -> i64 { self.default_value }
+    pub fn minimum_value(&self) -> Option<i64> { self.minimum_value }
+    pub fn maximum_value(&self) -> Option<i64> { self.maximum_value }
+    pub fn allowed_values(&self) -> Option<Vec<i64>> { self.allowed_values.clone() }
 }
 
 #[derive(Debug, ModSetting)]
-struct DoubleModSetting<'a> {
+pub struct DoubleModSetting<'a> {
     name: String,
     localised_name: Option<LocalisedString<'a>>,
     localised_description: Option<LocalisedString<'a>>,
@@ -127,14 +128,14 @@ impl Prototype for DoubleModSetting<'_> {
 }
 
 impl DoubleModSetting<'_> {
-    fn default_value(&self) -> f64 { self.default_value }
-    fn minimum_value(&self) -> Option<f64> { self.minimum_value }
-    fn maximum_value(&self) -> Option<f64> { self.maximum_value }
-    fn allowed_values(&self) -> Option<Vec<f64>> { self.allowed_values.clone() }
+    pub fn default_value(&self) -> f64 { self.default_value }
+    pub fn minimum_value(&self) -> Option<f64> { self.minimum_value }
+    pub fn maximum_value(&self) -> Option<f64> { self.maximum_value }
+    pub fn allowed_values(&self) -> Option<Vec<f64>> { self.allowed_values.clone() }
 }
 
 #[derive(Debug, ModSetting)]
-struct StringModSetting<'a> {
+pub struct StringModSetting<'a> {
     name: String,
     localised_name: Option<LocalisedString<'a>>,
     localised_description: Option<LocalisedString<'a>>,
@@ -153,15 +154,15 @@ impl Prototype for StringModSetting<'_> {
 }
 
 impl StringModSetting<'_> {
-    fn default_value(&self) -> String { self.default_value.clone() }
-    fn allow_blank(&self) -> Option<bool> { self.allow_blank }
-    fn auto_trim(&self) -> Option<bool> {self.auto_trim }
-    fn allowed_values(&self) -> Option<Vec<String>> { self.allowed_values.clone() }
+    pub fn default_value(&self) -> String { self.default_value.clone() }
+    pub fn allow_blank(&self) -> Option<bool> { self.allow_blank }
+    pub fn auto_trim(&self) -> Option<bool> {self.auto_trim }
+    pub fn allowed_values(&self) -> Option<Vec<String>> { self.allowed_values.clone() }
 }
 
 // Enum for all prototype types
 #[derive(Debug)]
-enum PrototypeType {
+pub enum PrototypeType {
     // General prototypes
     AmbientSound,
     Animation,
