@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::str::FromStr;
