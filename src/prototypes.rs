@@ -160,6 +160,54 @@ impl StringModSetting<'_> {
     pub fn allowed_values(&self) -> Option<Vec<String>> { self.allowed_values.clone() }
 }
 
+pub type FileName = String;
+
+// https://wiki.factorio.com/Types/Sound
+#[derive(Debug)]
+pub struct Sound {
+    aggregation: Option<SoundAggregation>,
+    allow_random_repeat: Option<bool>,
+    audible_distance_modifier: Option<f64>,
+    variations: Vec<SoundVariation> // If variations table not present, use the same table, but construct single variation.
+}
+
+#[derive(Debug)]
+pub struct SoundAggregation {
+    max_count: u32,
+    progress_threshold: Option<f32>,
+    remove: bool,
+    count_already_playing: Option<bool>
+}
+
+#[derive(Debug)]
+pub struct SoundVariation {
+    filename: FileName,
+    volume: Option<f32>,
+    preload: Option<bool>,
+    speed: Option<f32>,
+    min_speed: Option<f32>, // >= 1/64, Ignored if speed is present
+    max_speed: Option<f32>  // Mandatory if min_speed is present, >= min_speed
+}
+
+#[derive(Debug)]
+pub struct AmbientSoundPrototype {
+    name: String,
+    sound: Sound,
+    track_type: String,
+    weight: Option<f64>
+}
+
+impl Prototype for AmbientSoundPrototype {
+    fn r#type(&self) -> PrototypeType { PrototypeType::AmbientSound }
+    fn name(&self) -> String { self.name.clone() }
+}
+
+impl AmbientSoundPrototype {
+    pub fn sound(&self) -> &Sound { &self.sound }
+    pub fn track_type(&self) -> String { self.track_type.clone() }
+    pub fn weight(&self) -> Option<f64> { self.weight }
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
