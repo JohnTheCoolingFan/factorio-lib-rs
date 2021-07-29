@@ -16,6 +16,10 @@ pub struct DataTable {
 // For prototypes: https://wiki.factorio.com/Prototype_definitions
 // For settings: https://wiki.factorio.com/Tutorial:Mod_settings
 
+// TODO: replace optional properties that have default values with non-optional
+// TODO: Some prototypes/types have different configuration variations that are documented with
+// attribute priority or incompatiblity. This can be done with enums.
+
 // Prototype
 // Contains all values (accessors) for every prototype in the game
 pub trait Prototype: fmt::Debug {
