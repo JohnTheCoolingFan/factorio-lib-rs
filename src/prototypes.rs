@@ -1,3 +1,4 @@
+use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::str::FromStr;
@@ -206,6 +207,338 @@ impl AmbientSoundPrototype {
     pub fn sound(&self) -> &Sound { &self.sound }
     pub fn track_type(&self) -> String { self.track_type.clone() }
     pub fn weight(&self) -> Option<f64> { self.weight }
+}
+
+#[derive(Debug)]
+pub struct AnimationPrototype {
+    name: String,
+    layers: Vec<AnimationType> // If lua table doesn;t have layers, use same table for constructing just one
+}
+
+#[derive(Debug)]
+pub enum AnimationType {
+    Layers(Vec<AnimationType>),
+    Animation(Animation)
+}
+
+pub type Factorio2DVector = (f64, f64);
+
+#[derive(Debug)]
+pub enum AnimationDrawAs {
+    DrawAsShadow,
+    DrawAsGlow,
+    DrawAsLight
+}
+
+impl AnimationDrawAs {
+    pub fn new(draw_as_shadow: bool, draw_as_glow: bool, draw_as_light: bool) -> Option<Self> {
+        if draw_as_shadow {
+            Some(Self::DrawAsShadow)
+        } else if draw_as_glow {
+            Some(Self::DrawAsGlow)
+        } else if draw_as_light {
+            Some(Self::DrawAsLight)
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub struct SpriteFlags(u32);
+
+impl SpriteFlags {
+    pub const NO_CROP: SpriteFlags = SpriteFlags(1);
+    pub const NOT_COMPRESSED: SpriteFlags = SpriteFlags(1 << 1);
+    pub const ALWAYS_COMPRESSED: SpriteFlags = SpriteFlags(1 << 2);
+    pub const MIPMAP: SpriteFlags = SpriteFlags(1 << 3);
+    pub const LINEAR_MINIFICATION: SpriteFlags = SpriteFlags(1 << 4);
+    pub const LINEAR_MAGNIFICATION: SpriteFlags = SpriteFlags(1 << 5);
+    pub const LINEAR_MIP_LEVEL: SpriteFlags = SpriteFlags(1 << 6);
+    pub const ALPHA_MASK: SpriteFlags = SpriteFlags(1 << 7);
+    pub const NO_SCALE: SpriteFlags = SpriteFlags(1 << 8);
+    pub const MASK: SpriteFlags = SpriteFlags(1 << 9);
+    pub const ICON: SpriteFlags = SpriteFlags(1 << 10);
+    pub const GUI: SpriteFlags = SpriteFlags(1 << 11);
+    pub const GUI_ICON: SpriteFlags = SpriteFlags(1 << 12);
+    pub const LIGHT: SpriteFlags = SpriteFlags(1 << 13);
+    pub const TERRAIN: SpriteFlags = SpriteFlags(1 << 14);
+    pub const TERRAIN_EFFECT_MAP: SpriteFlags = SpriteFlags(1 << 15);
+    pub const SHADOW: SpriteFlags = SpriteFlags(1 << 16);
+    pub const SMOKE: SpriteFlags = SpriteFlags(1 << 17);
+    pub const DECAL: SpriteFlags = SpriteFlags(1 << 18);
+    pub const LOW_OBJECT: SpriteFlags = SpriteFlags(1 << 19);
+    pub const TRILINEAR_FILTERING: SpriteFlags = SpriteFlags(1 << 20);
+    pub const GROUP_NONE: SpriteFlags = SpriteFlags(1 << 21);
+    pub const GROUP_TERRAIN: SpriteFlags = SpriteFlags(1 << 22);
+    pub const GROUP_TERRAIN_EFFECT_MAP: SpriteFlags = SpriteFlags(1 << 23);
+    pub const GROUP_SHADOW: SpriteFlags = SpriteFlags(1 << 24);
+    pub const GROUP_SMOKE: SpriteFlags = SpriteFlags(1 << 25);
+    pub const GROUP_DECAL: SpriteFlags = SpriteFlags(1 << 26);
+    pub const GROUP_LOW_OBJECT: SpriteFlags = SpriteFlags(1 << 27);
+    pub const GROUP_GUI: SpriteFlags = SpriteFlags(1 << 28);
+    pub const GROUP_ICON: SpriteFlags = SpriteFlags(1 << 29);
+    pub const GROUP_ICON_BACKGROUND: SpriteFlags = SpriteFlags(1 << 30);
+    pub const COMPRESSED: SpriteFlags = SpriteFlags(1 << 31);
+}
+
+impl From<Vec<&str>> for SpriteFlags {
+    fn from(flags: Vec<&str>) -> Self {
+        let mut result = Self(0);
+        for flag in flags {
+            match flag {
+                "no-crop" => result |= SpriteFlags::NO_CROP,
+                "not-compressed" => result |= SpriteFlags::NOT_COMPRESSED,
+                "always-compressed" => result |= SpriteFlags::ALWAYS_COMPRESSED,
+                "mipmap" => result |= SpriteFlags::MIPMAP,
+                "linear-minification" => result |= SpriteFlags::LINEAR_MINIFICATION,
+                "linear-maginfication" => result |= SpriteFlags::LINEAR_MAGNIFICATION,
+                "linear-mip-level" => result |= SpriteFlags::LINEAR_MIP_LEVEL,
+                "alpha-mask" => result |= SpriteFlags::ALPHA_MASK,
+                "no-scale" => result |= SpriteFlags::NO_SCALE,
+                "mask" => result |= SpriteFlags::MASK | SpriteFlags::GROUP_NONE,
+                "icon" => result |= SpriteFlags::ICON |
+                    SpriteFlags::NO_CROP |
+                    SpriteFlags::NO_SCALE |
+                    SpriteFlags::MIPMAP |
+                    SpriteFlags::LINEAR_MINIFICATION |
+                    SpriteFlags::LINEAR_MAGNIFICATION |
+                    SpriteFlags::LINEAR_MIP_LEVEL |
+                    SpriteFlags::NOT_COMPRESSED |
+                    SpriteFlags::GROUP_ICON,
+                "gui" => result |= SpriteFlags::GUI |
+                    SpriteFlags::NO_CROP |
+                    SpriteFlags::NO_SCALE |
+                    SpriteFlags::MIPMAP |
+                    SpriteFlags::LINEAR_MINIFICATION |
+                    SpriteFlags::LINEAR_MAGNIFICATION |
+                    SpriteFlags::LINEAR_MIP_LEVEL |
+                    SpriteFlags::NOT_COMPRESSED |
+                    SpriteFlags::GROUP_GUI,
+                "gui-icon" => result |= SpriteFlags::GUI_ICON |
+                    SpriteFlags::NO_CROP |
+                    SpriteFlags::NO_SCALE |
+                    SpriteFlags::MIPMAP |
+                    SpriteFlags::LINEAR_MINIFICATION |
+                    SpriteFlags::LINEAR_MAGNIFICATION |
+                    SpriteFlags::LINEAR_MIP_LEVEL |
+                    SpriteFlags::NOT_COMPRESSED |
+                    SpriteFlags::GROUP_ICON,
+                "light" => result |= SpriteFlags::LIGHT |
+                    SpriteFlags::MIPMAP |
+                    SpriteFlags::LINEAR_MIP_LEVEL |
+                    SpriteFlags::LINEAR_MINIFICATION |
+                    SpriteFlags::LINEAR_MAGNIFICATION |
+                    SpriteFlags::GROUP_NONE,
+                "terrain" => result |= SpriteFlags::TERRAIN |
+                    SpriteFlags::MIPMAP |
+                    SpriteFlags::LINEAR_MIP_LEVEL |
+                    SpriteFlags::LINEAR_MINIFICATION |
+                    SpriteFlags::NO_CROP |
+                    SpriteFlags::GROUP_TERRAIN,
+                "terrain-effect-map" => result |= SpriteFlags::TERRAIN_EFFECT_MAP |
+                    SpriteFlags::MIPMAP |
+                    SpriteFlags::LINEAR_MIP_LEVEL |
+                    SpriteFlags::LINEAR_MINIFICATION |
+                    SpriteFlags::NO_CROP |
+                    SpriteFlags::GROUP_TERRAIN_EFFECT_MAP,
+                "shadow" => result |= SpriteFlags::SHADOW,
+                "smoke" => result |= SpriteFlags::SMOKE |
+                    SpriteFlags::MIPMAP |
+                    SpriteFlags::LINEAR_MINIFICATION |
+                    SpriteFlags::LINEAR_MAGNIFICATION |
+                    SpriteFlags::GROUP_SMOKE,
+                "decal" => result |= SpriteFlags::DECAL |
+                    SpriteFlags::GROUP_DECAL,
+                "low-object" => result |= SpriteFlags::LOW_OBJECT,
+                "trilinear-filtering" => result |= SpriteFlags::TRILINEAR_FILTERING,
+                // Apparently group flags can't be set from mods.
+                // TODO
+                "group=none" => result |= SpriteFlags::GROUP_NONE,
+                "group=terrain" => result |= SpriteFlags::GROUP_TERRAIN,
+                "group=terrain-effect-map" => result |= SpriteFlags::GROUP_TERRAIN_EFFECT_MAP,
+                "group=shadow" => result |= SpriteFlags::GROUP_SHADOW,
+                "group=smoke" => result |= SpriteFlags::GROUP_SMOKE,
+                "group=decal" => result |= SpriteFlags::GROUP_DECAL,
+                "group=low-object" => result |= SpriteFlags::GROUP_LOW_OBJECT,
+                "group=gui" => result |= SpriteFlags::GROUP_GUI,
+                "group=icon" => result |= SpriteFlags::GROUP_ICON,
+                "group=icon-background" => result |= SpriteFlags::GROUP_ICON_BACKGROUND,
+                "compressed" => result |= SpriteFlags::COMPRESSED,
+                _ => {}
+            }
+        }
+        result
+    }
+}
+
+impl BitAnd for SpriteFlags {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        SpriteFlags(self.0 & rhs.0)
+    }
+}
+
+impl BitAndAssign for SpriteFlags {
+    fn bitand_assign(&mut self, rhs: Self) {
+        *self = SpriteFlags(self.0 & rhs.0)
+    }
+}
+
+impl BitOr for SpriteFlags {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self::Output {
+        SpriteFlags(self.0 | rhs.0)
+    }
+}
+
+impl BitOrAssign for SpriteFlags {
+    fn bitor_assign(&mut self, rhs: Self) {
+        *self = SpriteFlags(self.0 | rhs.0)
+    }
+}
+
+impl BitXor for SpriteFlags {
+    type Output = Self;
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        SpriteFlags(self.0 ^ rhs.0)
+    }
+}
+
+impl BitXorAssign for SpriteFlags {
+    fn bitxor_assign(&mut self, rhs: Self) {
+        *self = SpriteFlags(self.0 ^ rhs.0)
+    }
+}
+
+#[derive(Debug)]
+pub struct Animation {
+    hr_version: Option<HRAnimation>,
+    filename: Option<FileName>, // Mandatory if "stripes" is not specified
+    priority: Option<SpritePriority>, // Dfeault Medium
+    flags: Option<SpriteFlags>,
+    size: Option<SpriteSize>,
+    // Automatically converted to size
+    // width
+    // height
+    position: Option<SpritePosition>,
+    // Automatically converted to position
+    // x
+    // y
+    shift: Option<Factorio2DVector>,
+    scale: Option<f64>,
+    draw_as: Option<AnimationDrawAs>, // Aggregates draw_as_* attributes
+    mipmap_count: Option<u8>, // Loaded if this is an icon
+    apply_runtime_tint: Option<bool>, // false by default
+    tint: Option<Color>,
+    blend_mode: Option<BlendMode>, // Default is "normal"
+    load_in_minimal_mode: Option<bool>, // Default: false
+    premul_alpha: bool, // Default: true
+    generate_sdf: bool, // Unused, Default: false
+    run_mode: RunMode, // Default: "forward"
+    frame_count: u32, // Default: 1, can't be 0
+    line_length: u32, // Default: 0
+    animation_speed: f32, // Default: 1.0
+    max_advance: f32, // Default: MAX_FLOAT
+    repeat_count: u8, // Default: 1, can't be 0
+    // What are these???
+    dice: Option<u8>,
+    dice_x: Option<u8>,
+    dice_y: Option<u8>,
+    frame_sequence: Option<AnimationFrameSequence>,
+    stripes: Option<Vec<Stripe>>
+}
+
+#[derive(Debug)]
+pub struct HRAnimation {
+    filename: Option<FileName>, // Mandatory if "stripes" is not specified
+    priority: Option<SpritePriority>, // Dfeault Medium
+    flags: Option<SpriteFlags>,
+    size: Option<SpriteSize>,
+    // Automatically converted to size
+    // width
+    // height
+    position: Option<SpritePosition>,
+    // Automatically converted to position
+    // x
+    // y
+    shift: Option<Factorio2DVector>,
+    scale: Option<f64>,
+    draw_as: Option<AnimationDrawAs>, // Aggregates draw_as_* attributes
+    mipmap_count: Option<u8>, // Loaded if this is an icon
+    apply_runtime_tint: Option<bool>, // false by default
+    tint: Option<Color>,
+    blend_mode: Option<BlendMode>, // Default is "normal"
+    load_in_minimal_mode: Option<bool>, // Default: false
+    premul_alpha: bool, // Default: true
+    generate_sdf: bool, // Unused, Default: false
+    run_mode: RunMode, // Default: "forward"
+    frame_count: u32, // Default: 1, can't be 0
+    line_length: u32, // Default: 0
+    animation_speed: f32, // Default: 1.0
+    max_advance: f32, // Default: MAX_FLOAT
+    repeat_count: u8, // Default: 1, can't be 0
+    // What are these???
+    dice: Option<u8>,
+    dice_x: Option<u8>,
+    dice_y: Option<u8>,
+    frame_sequence: Option<AnimationFrameSequence>,
+    stripes: Option<Vec<Stripe>>
+}
+
+pub type AnimationFrameSequence = Vec<u16>;
+pub type SpriteSize = (i16, i16);
+pub type SpritePosition = (i16, i16);
+
+// TODO: fromstr
+#[derive(Debug)]
+pub enum BlendMode {
+    Normal,
+    Additive,
+    AdditiveSoft,
+    Multiplicative,
+    Overwrite
+}
+
+// TODO: fromstr
+#[derive(Debug)]
+pub enum RunMode {
+    Forward,
+    Backward,
+    ForwardThenBackward
+}
+
+#[derive(Debug)]
+pub struct Stripe {
+    width_in_frames: u32,
+    height_in_frames: u32,
+    filename: FileName,
+    x: Option<u32>,
+    y: Option<u32>
+}
+
+#[derive(Debug)]
+pub struct Color(f32, f32, f32, f32);
+
+impl Color {
+    pub fn new_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
+        Self(r, g, b, a)
+    }
+
+    pub fn new_rgb(r: f32, g: f32, b: f32) -> Self { // r, g, b default is 0
+        Self(r, g, b, 1.0)
+    }
+}
+
+#[derive(Debug)]
+pub enum SpritePriority {
+    ExtraHighNoScale,
+    ExtraHigh,
+    High,
+    Medium,
+    Low,
+    VeryLow,
+    NoAtlas
 }
 
 // Enum for all prototype types
