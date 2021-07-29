@@ -356,8 +356,7 @@ impl From<Vec<&str>> for SpriteFlags {
                     SpriteFlags::GROUP_DECAL,
                 "low-object" => result |= SpriteFlags::LOW_OBJECT,
                 "trilinear-filtering" => result |= SpriteFlags::TRILINEAR_FILTERING,
-                // Apparently group flags can't be set from mods.
-                // TODO
+                /*
                 "group=none" => result |= SpriteFlags::GROUP_NONE,
                 "group=terrain" => result |= SpriteFlags::GROUP_TERRAIN,
                 "group=terrain-effect-map" => result |= SpriteFlags::GROUP_TERRAIN_EFFECT_MAP,
@@ -367,7 +366,7 @@ impl From<Vec<&str>> for SpriteFlags {
                 "group=low-object" => result |= SpriteFlags::GROUP_LOW_OBJECT,
                 "group=gui" => result |= SpriteFlags::GROUP_GUI,
                 "group=icon" => result |= SpriteFlags::GROUP_ICON,
-                "group=icon-background" => result |= SpriteFlags::GROUP_ICON_BACKGROUND,
+                "group=icon-background" => result |= SpriteFlags::GROUP_ICON_BACKGROUND, */
                 "compressed" => result |= SpriteFlags::COMPRESSED,
                 _ => {}
             }
