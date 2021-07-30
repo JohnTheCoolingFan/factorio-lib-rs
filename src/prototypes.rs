@@ -61,7 +61,7 @@ pub trait ModSetting: Prototype {
     fn localised_name(&self) -> Option<LocalisedString>;
     fn localised_description(&self) -> Option<LocalisedString>;
     fn order(&self) -> Option<String>;
-    fn hidden(&self) -> Option<bool>;
+    fn hidden(&self) -> bool; // Default: false
     fn setting_type(&self) -> ModSettingType;
 }
 
@@ -71,7 +71,7 @@ pub struct BoolModSetting<'a> {
     localised_name: Option<LocalisedString<'a>>,
     localised_description: Option<LocalisedString<'a>>,
     order: Option<String>,
-    hidden: Option<bool>,
+    hidden: bool,
     setting_type: ModSettingType,
     default_value: bool,
     forced_value: Option<bool>,
@@ -93,7 +93,7 @@ pub struct IntModSetting<'a> {
     localised_name: Option<LocalisedString<'a>>,
     localised_description: Option<LocalisedString<'a>>,
     order: Option<String>,
-    hidden: Option<bool>,
+    hidden: bool,
     setting_type: ModSettingType,
     default_value: i64,
     minimum_value: Option<i64>,
@@ -119,7 +119,7 @@ pub struct DoubleModSetting<'a> {
     localised_name: Option<LocalisedString<'a>>,
     localised_description: Option<LocalisedString<'a>>,
     order: Option<String>,
-    hidden: Option<bool>,
+    hidden: bool,
     setting_type: ModSettingType,
     default_value: f64,
     minimum_value: Option<f64>,
@@ -145,7 +145,7 @@ pub struct StringModSetting<'a> {
     localised_name: Option<LocalisedString<'a>>,
     localised_description: Option<LocalisedString<'a>>,
     order: Option<String>,
-    hidden: Option<bool>,
+    hidden: bool,
     setting_type: ModSettingType,
     default_value: String,
     allow_blank: Option<bool>,

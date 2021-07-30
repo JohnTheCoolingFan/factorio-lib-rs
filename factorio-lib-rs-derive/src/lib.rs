@@ -17,7 +17,7 @@ fn impl_mod_setting_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn localised_name(&self) -> Option<LocalisedString> { self.localised_name.clone() }
             fn localised_description(&self) -> Option<LocalisedString> { self.localised_description.clone() }
             fn order(&self) -> Option<String> { self.order.clone() }
-            fn hidden(&self) -> Option<bool> { self.hidden }
+            fn hidden(&self) -> bool { self.hidden }
             fn setting_type(&self) -> ModSettingType { self.setting_type.clone() }
         }
     };
