@@ -590,6 +590,11 @@ pub struct Font {
     border_color: Option<Color>
 }
 
+impl Prototype for Font {
+    fn r#type(&self) -> PrototypeType { PrototypeType::Font }
+    fn name(&self) -> String { self.name.clone() }
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
