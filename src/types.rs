@@ -450,7 +450,7 @@ pub struct MapGenPresetDefault {
 #[derive(Debug)]
 pub struct MapGenPresetNonDefault {
     order: String,
-    // Shoukd these be optional or just have defaults? TODO
+    // Should these be optional or just have defaults? TODO
     basic_settings: Option<MapGenPresetBasicSettings>,
     advanced_settings: Option<MapGenPresetAdvancedSettings>
 }
@@ -502,7 +502,7 @@ pub struct MapGenPresetBasicSettings {
     water: MapGenSize, // Same here
     default_enable_all_autoplace_controls: bool, // Default: true
     autoplace_controls: HashMap<String, MapGenAutoplaceControl>, // key is AutoplaceControl name
-    // autoplace_settings // TODO: UNDOCUMENTED // "Types/table", reffuses to elaborate further
+    // autoplace_settings // TODO: UNDOCUMENTED // "Types/table", refuses to elaborate further
     property_expression_names: HashMap<String, String>, // Map property name to noise expression name
     starting_points: Position,
     seed: u32,
