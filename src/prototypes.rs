@@ -898,4 +898,8 @@ pub enum PrototypesErr {
     InvalidDifficultySettingStr(String),
     #[error("Invalid ResearchQueueSetting string: {0}")]
     InvalidResearchQueueSettingStr(String),
+    #[error("Invalid BlendMode string: {0}")]
+    InvalidBlendModeStr(String),
+    #[error("Invalid RunMode string: {0}")]
+    InvalidRunModeStr(String),
 }

@@ -205,7 +205,6 @@ impl AnimationDrawAs {
     }
 }
 
-// TODO: fromstr
 #[derive(Debug)]
 pub enum BlendMode {
     Normal,
@@ -215,12 +214,39 @@ pub enum BlendMode {
     Overwrite
 }
 
-// TODO: fromstr
+impl FromStr for BlendMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "normal" => Ok(Self::Normal),
+            "additive" => Ok(Self::Additive),
+            "additive-soft" => Ok(Self::AdditiveSoft),
+            "multiplicative" => Ok(Self::Multiplicative),
+            "overwrite" => Ok(Self::Overwrite),
+            _ => Err(PrototypesErr::InvalidBlendModeStr(String::from(s)))
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum RunMode {
     Forward,
     Backward,
     ForwardThenBackward
+}
+
+impl FromStr for RunMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "forward" => Ok(Self::Forward),
+            "backward" => Ok(Self::Backward),
+            "forward-then-backward" => Ok(Self::ForwardThenBackward),
+            _ => Err(PrototypesErr::InvalidRunModeStr(String::from(s)))
+        }
+    }
 }
 
 #[derive(Debug)]
