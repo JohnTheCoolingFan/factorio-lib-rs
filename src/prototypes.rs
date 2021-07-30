@@ -795,6 +795,139 @@ impl FromStr for ResearchQueueSetting {
     }
 }
 
+#[derive(Debug)]
+pub struct MapSettings {
+    name: String, // Must be "map-settings"
+    pollution: MapPollutionSettings,
+    steering: MapSteering, // ???
+    enemy_evolution: MapEnemyEvolution,
+    enemy_expansion: MapEnemyExpansion,
+    unit_group: MapUnitGroup,
+    path_finder: MapPathFinder,
+    max_ffailed_behavior_count: u32,
+    difficulty_settings: MapDifficultySettings
+}
+
+impl Prototype for MapSettings {
+    fn r#type(&self) -> PrototypeType { PrototypeType::MapSettings }
+    fn name(&self) -> String { self.name.clone() }
+}
+
+#[derive(Debug)]
+pub struct MapPollutionSettings {
+    enabled: bool,
+    diffusion_ratio: f64,
+    min_to_diffuse: f64,
+    ageing: f64,
+    expected_max_per_chunk: f64,
+    min_to_show_per_chunk: f64,
+    min_pollution_to_damage_trees: f64,
+    pollution_with_max_forest_damage: f64,
+    pollution_restored_per_tree_damage: f64,
+    pollution_per_tree_damage: f64,
+    max_pollution_to_restore_trees: f64,
+    enemy_attack_pollution_consumption_modifier: f64
+}
+
+#[derive(Debug)]
+pub struct MapSteering {
+    default: MapSteeringSettings,
+    moving: MapSteeringSettings
+}
+
+#[derive(Debug)]
+pub struct MapSteeringSettings {
+    radius: f64,
+    separation_factor: f64,
+    separation_force: f64,
+    force_unit_fuzzy_goto_behavior: bool
+}
+
+#[derive(Debug)]
+pub struct MapEnemyEvolution {
+    enabled: bool,
+    time_factor: f64,
+    destroy_factor: f64,
+    pollution_factor: f64
+}
+
+#[derive(Debug)]
+pub struct MapUnitGroup {
+    min_group_gathering_time: u32,
+    max_group_gathering_time: u32,
+    max_wait_time_for_late_members: u32,
+    max_group_radius: f64,
+    min_group_radius: f64,
+    max_member_speedup_when_behind: f64,
+    max_member_slowdown_when_ahead: f64,
+    max_group_slowdown_facor: f64,
+    max_group_member_fallback_factor: f64,
+    member_disown_distance: f64,
+    tick_tolerance_when_member_arrives: u32,
+    max_gathering_unit_groups: u32,
+    max_unit_group_size: u32
+}
+
+#[derive(Debug)]
+pub struct MapEnemyExpansion {
+    enabled: bool,
+    max_expansion_distance: u32,
+    friendly_base_influence_radius: u32,
+    enemy_building_influence_radius: u32,
+    building_coefficient: f64,
+    other_base_coefficient: f64,
+    neighbouring_chunk_coefficient: f64,
+    neighbouring_base_chunk_coefficient: f64,
+    max_colliding_tiles_coefficient: f64,
+    settler_group_min_size: u32,
+    settler_group_max_size: u32,
+    min_expansion_cooldown: u32,
+    max_expansion_cooldown: u32
+}
+
+#[derive(Debug)]
+pub struct MapPathFinder {
+    fwd2bwd_ratio: i32,
+    goal_pressure_ratio: f64,
+    use_path_cache: bool,
+    max_steps_worked_per_tick: f64,
+    max_work_done_per_tick: u32,
+    short_cache_size: u32,
+    short_cache_min_cacheable_distance: f64,
+    short_cache_min_algo_steps_to_cache: u32,
+    long_cache_min_cacheable_distance: f64,
+    cache_max_connect_to_cache_steps_multiplier: u32,
+    cache_accept_path_start_distance_ratio: f64,
+    cache_accept_path_end_distance_ratio: f64,
+    negative_cache_accept_path_start_distance_ratio: f64,
+    negative_cache_accept_path_end_distance_ratio: f64,
+    cache_path_start_distance_rating_multiplier: f64,
+    cache_path_end_distance_rating_multiplier: f64,
+    stale_enemy_with_same_destination_collision_penalty: f64,
+    ignore_moving_enemy_collision_distance: f64,
+    enemy_with_different_destination_collision_penalty: f64,
+    general_entity_collision_penalty: f64,
+    general_entity_subsequent_collision_penalty: f64,
+    extended_collision_penalty: f64,
+    max_clients_to_accept_any_new_request: u32,
+    max_clients_to_accept_short_new_request: u32,
+    direct_distance_to_consider_short_request: u32,
+    short_request_max_steps: u32,
+    short_request_ratio: f64,
+    min_steps_to_check_path_find_termination: u32,
+    start_to_goal_cost_multiplier_to_terminate_path_find: f64,
+    overload_levels: Vec<u32>,
+    overload_multipliers: Vec<f64>
+}
+
+#[derive(Debug)]
+pub struct MapDifficultySettings {
+    recipe_difficulty: DifficultySetting,
+    technology_difficulty: DifficultySetting,
+    technology_price_multiplier: f64, // Default: 1.0 // Must be >= 0.001 and <= 1000.0
+    research_queue_setting: Option<ResearchQueueSetting>
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
@@ -805,7 +938,7 @@ pub enum PrototypeType {
     Font,
     GodController,
     MapGenPresets,
-    MapGenSettings,
+    MapSettings,
     MouseCursor,
     Sound,
     SpectatorController,
@@ -1009,7 +1142,7 @@ impl fmt::Display for PrototypeType {
             PrototypeType::Font => "font",
             PrototypeType::GodController => "god-controller",
             PrototypeType::MapGenPresets => "map-gen-settings",
-            PrototypeType::MapGenSettings => "map-settings",
+            PrototypeType::MapSettings => "map-settings",
             PrototypeType::MouseCursor => "mouse-cursor",
             PrototypeType::Sound => "sound",
             PrototypeType::SpectatorController => "spectator-controller",
@@ -1216,7 +1349,7 @@ impl FromStr for PrototypeType {
             "font" => Ok(PrototypeType::Font),
             "god-controller" => Ok(PrototypeType::GodController),
             "map-gen-settings" => Ok(PrototypeType::MapGenPresets),
-            "map-settings" => Ok(PrototypeType::MapGenSettings),
+            "map-settings" => Ok(PrototypeType::MapSettings),
             "mouse-cursor" => Ok(PrototypeType::MouseCursor),
             "sound" => Ok(PrototypeType::Sound),
             "spectator-controller" => Ok(PrototypeType::SpectatorController),
