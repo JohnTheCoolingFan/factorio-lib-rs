@@ -544,6 +544,52 @@ pub enum SpritePriority {
     NoAtlas
 }
 
+pub type ItemStackIndex = u16;
+
+#[derive(Debug)]
+pub struct EditorController {
+    name: String, // Must be "default"
+    inventory_size: ItemStackIndex,
+    gun_inventory_size: ItemStackIndex,
+    movement_speed: f64, // Must be >= 0.34375
+    item_pickup_distance: f64,
+    loot_pickup_distance: f64,
+    mining_speed: f64,
+    enable_flash_light: bool,
+    adjust_speed_based_off_zoom: bool,
+    render_as_day: bool,
+    instant_blueprint_building: bool,
+    instant_deconstruction: bool,
+    instant_upgrading: bool,
+    instant_rail_planner: bool,
+    show_status_icons: bool,
+    show_hidden_entities: bool,
+    show_entity_tags: bool,
+    show_entity_health_bars: bool,
+    show_additional_entity_info_gui: bool,
+    generate_neighbour_chunks: bool,
+    fill_built_entity_energy_buffers: bool,
+    show_character_tab_in_controller_gui: bool,
+    show_infinity_filter_in_controller_gui: bool,
+    placed_corpses_never_expire: bool
+}
+
+impl Prototype for EditorController {
+    fn r#type(&self) -> PrototypeType { PrototypeType::EditorController }
+    fn name(&self) -> String { self.name.clone() }
+}
+
+#[derive(Debug)]
+pub struct Font {
+    name: String,
+    size: i32,
+    from: String,
+    spacing: f32, // Default 0.0
+    border: bool, // Default fase
+    filtered: bool, // Default false
+    border_color: Option<Color>
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
