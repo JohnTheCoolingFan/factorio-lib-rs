@@ -595,6 +595,23 @@ impl Prototype for Font {
     fn name(&self) -> String { self.name.clone() }
 }
 
+#[derive(Debug)]
+pub struct GodController {
+    name: String, // Must be "default"
+    inventory_size: ItemStackIndex,
+    movement_speed: f64, // Must be >= 0.34375
+    item_pickup_distance: f64,
+    loot_pickup_distance: f64,
+    mining_speed: f64,
+    crafting_categories: Option<Vec<String>>,
+    mining_categories: Option<Vec<String>>
+}
+
+impl Prototype for GodController {
+    fn r#type(&self) -> PrototypeType { PrototypeType::GodController }
+    fn name(&self) -> String { self.name.clone() }
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
