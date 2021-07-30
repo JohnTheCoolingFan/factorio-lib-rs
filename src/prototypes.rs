@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use crate::concepts::LocalisedString;
 use thiserror::Error;
@@ -610,6 +611,188 @@ pub struct GodController {
 impl Prototype for GodController {
     fn r#type(&self) -> PrototypeType { PrototypeType::GodController }
     fn name(&self) -> String { self.name.clone() }
+}
+
+#[derive(Debug)]
+pub struct MapGenPresets {
+    name: String,
+    presets: HashMap<String, MapGenPreset>
+}
+
+impl Prototype for MapGenPresets {
+    fn r#type(&self) -> PrototypeType { PrototypeType::MapGenPresets }
+    fn name(&self) -> String { self.name.clone() }
+}
+
+#[derive(Debug)]
+pub enum MapGenPreset {
+    // Decided by `default` field
+    Default(MapGenPresetDefault),
+    NonDefault(MapGenPresetNonDefault)
+}
+
+#[derive(Debug)]
+pub struct MapGenPresetDefault {
+    order: String
+}
+
+#[derive(Debug)]
+pub struct MapGenPresetNonDefault {
+    order: String,
+    // Shoukd these be optional or just have defaults? TODO
+    basic_settings: Option<MapGenPresetBasicSettings>,
+    advanced_settings: Option<MapGenPresetAdvancedSettings>
+}
+
+#[derive(Debug)]
+pub struct MapGenSize(f64); // Exact type is unknown, so slap an f64
+
+impl FromStr for MapGenSize {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "none" => Ok(Self(0.0)),
+            "very-low" | "very-small" | "very-poor" => Ok(Self(0.5)),
+            "low" | "small" | "poor" => Ok(Self(1.0 / (2.0 as f64).sqrt())),
+            "normal" | "medium" | "regular" => Ok(Self(1.0)),
+            "high" | "big" | "good" => Ok(Self((2.0 as f64).sqrt())),
+            "very-high" | "very-big" | "very-good" => Ok(Self(2.0)),
+            _ => Err(PrototypesErr::InvalidMapGenSizeStr(String::from(s)))
+        }
+    }
+}
+
+impl MapGenSize {
+    pub fn new(size: f64) -> Self {
+        Self(size)
+    }
+}
+
+#[derive(Debug)]
+pub struct MapGenAutoplaceControl {
+    frequency: Option<MapGenSize>,
+    size: Option<MapGenSize>,
+    rechness: Option<MapGenSize>,
+}
+
+#[derive(Debug)]
+pub struct Position(i32, i32);
+
+impl Position {
+    pub fn new(x: i32, y: i32) -> Self {
+        Self(x, y)
+    }
+}
+
+#[derive(Debug)]
+pub struct CliffPlacementSettings {
+    name: String, // Name of the cliff prototype
+    cliff_elevation_0: f32, // Default 10.0
+    cliff_elevation_interval: f32,
+    richness: MapGenSize
+}
+
+#[derive(Debug)]
+pub struct MapGenPresetBasicSettings {
+    // Defaults are not documented for some f'ing reason
+    terain_segmentation: MapGenSize, // Default is... Unknown
+    water: MapGenSize, // Same here
+    default_enable_all_autoplace_controls: bool, // Default: true
+    autoplace_controls: HashMap<String, MapGenAutoplaceControl>, // key is AutoplaceControl name
+    // autoplace_settings // TODO: UNDOCUMENTED // "Types/table", reffuses to elaborate further
+    property_expression_names: HashMap<String, String>, // Map property name to noise expression name
+    starting_points: Position,
+    seed: u32,
+    width: u32,
+    height: u32,
+    starting_area: MapGenSize,
+    peaceful_mode: bool,
+    cliff_settings: CliffPlacementSettings
+}
+
+#[derive(Debug)]
+pub struct MapGenPresetAdvancedSettings {
+    // Defaults are not documented too
+    pollution: MapGenPollution,
+    enemy_evolution: MapGenEnemyEvolution,
+    enemy_expansion: MapGenEnemyExpansion,
+    difficulty_settings: MapGenDifficultySettings
+}
+
+#[derive(Debug)]
+pub struct MapGenPollution {
+    enabled: bool,
+    diffusion_ratio: f64, // Must be <= 0.25
+    ageing: f64, // Must be >= 0.5
+    enemy_attack_pollution_consumption_modifier: f64,
+    min_pollution_to_damage_trees: f64,
+    pollution_restored_per_tree_damage: f64
+}
+
+#[derive(Debug)]
+pub struct MapGenEnemyEvolution {
+    enabled: bool,
+    time_factor: f64,
+    destroy_factor: f64,
+    pollution_factor: f64
+}
+
+#[derive(Debug)]
+pub struct MapGenEnemyExpansion {
+    enabled: bool,
+    // Oddly satisfying how lines strings line up
+    max_expansion_distance: f64,
+    settler_group_min_size: f64,
+    settler_group_max_size: f64,
+    max_expansion_cooldown: f64,
+    min_expansion_cooldown: f64
+}
+
+#[derive(Debug)]
+pub struct MapGenDifficultySettings {
+    recipe_difficulty: DifficultySetting,
+    technology_difficulty: DifficultySetting,
+    technology_price_multiplier: f64,
+    research_queue_setting: ResearchQueueSetting
+}
+
+#[derive(Debug)]
+pub enum DifficultySetting {
+    Normal,
+    Expensive
+}
+
+impl FromStr for DifficultySetting {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "normal" => Ok(Self::Normal),
+            "expensive" => Ok(Self::Expensive),
+            _ => Err(PrototypesErr::InvalidDifficultySettingStr(String::from(s)))
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum ResearchQueueSetting {
+    AfterVictory,
+    Always,
+    Never
+}
+
+impl FromStr for ResearchQueueSetting {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "after-victory" => Ok(Self::AfterVictory),
+            "always" => Ok(Self::Always),
+            "never" => Ok(Self::Never),
+            _ => Err(PrototypesErr::InvalidResearchQueueSettingStr(String::from(s)))
+        }
+    }
 }
 
 // Enum for all prototype types
@@ -1236,4 +1419,10 @@ pub enum PrototypesErr {
     InvalidPrototypeType(String),
     #[error("Invalid mod setting type: {0}")]
     InvalidModSettingType(String),
+    #[error("Invalid MapGenSize string: {0}")]
+    InvalidMapGenSizeStr(String),
+    #[error("Invalid DifficultySetting string: {0}")]
+    InvalidDifficultySettingStr(String),
+    #[error("Invalid ResearchQueueSetting string: {0}")]
+    InvalidResearchQueueSettingStr(String),
 }
