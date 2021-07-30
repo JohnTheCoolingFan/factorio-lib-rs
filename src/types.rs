@@ -28,6 +28,14 @@ impl Color {
         Self(r, g, b, a)
     }
 
+    pub fn new_rgba_opt(r: Option<f32>, g: Option<f32>, b: Option<f32>, a: Option<f32>) -> Self {
+        let r = r.or(Some(0.0 as f32)).unwrap();
+        let g = g.or(Some(0.0 as f32)).unwrap();
+        let b = b.or(Some(0.0 as f32)).unwrap();
+        let a = a.or(Some(0.0 as f32)).unwrap();
+        Self(r, g, b, a)
+    }
+
     pub fn new_rgb(r: f32, g: f32, b: f32) -> Self { // r, g, b default is 0
         Self(r, g, b, 1.0)
     }
