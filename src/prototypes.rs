@@ -17,7 +17,8 @@ use crate::types::{
     Color,
     ItemStackIndex,
     AnimationType,
-    Sound};
+    Sound,
+    MouseCursorType};
 
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
@@ -265,6 +266,17 @@ pub struct MapSettings {
 
 impl Prototype for MapSettings {
     fn r#type(&self) -> PrototypeType { PrototypeType::MapSettings }
+    fn name(&self) -> String { self.name.clone() }
+}
+
+#[derive(Debug)]
+pub struct MouseCursor {
+    name: String,
+    cursor: MouseCursorType
+}
+
+impl Prototype for MouseCursor {
+    fn r#type(&self) -> PrototypeType { PrototypeType::MouseCursor }
     fn name(&self) -> String { self.name.clone() }
 }
 
@@ -902,4 +914,6 @@ pub enum PrototypesErr {
     InvalidBlendModeStr(String),
     #[error("Invalid RunMode string: {0}")]
     InvalidRunModeStr(String),
+    #[error("Invalid SystemCursor string: {0}")]
+    InvalidSystemCursorStr(String),
 }

@@ -674,3 +674,43 @@ pub struct MapDifficultySettings {
     research_queue_setting: Option<ResearchQueueSetting>
 }
 
+#[derive(Debug)]
+pub enum MouseCursorType {
+    SystemCursor(SystemCursor),
+    CustomCursor(CustomCursor)
+}
+
+#[derive(Debug)]
+pub enum SystemCursor {
+    Arrow,
+    IBeam,
+    Crosshair,
+    WaitArrow,
+    SizeAll,
+    No,
+    Hand
+}
+
+impl FromStr for SystemCursor {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "arrow" => Ok(Self::Arrow),
+            "i-beam" => Ok(Self::IBeam),
+            "crosshair" => Ok(Self::Crosshair),
+            "wait-arrow" => Ok(Self::WaitArrow),
+            "size-all" => Ok(Self::SizeAll),
+            "no" => Ok(Self::No),
+            "hand" => Ok(Self::Hand),
+            _ => Err(PrototypesErr::InvalidSystemCursorStr(String::from(s)))
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct CustomCursor {
+    filename: FileName,
+    hot_pixel_x: i16,
+    hot_pixel_y: i16
+}
