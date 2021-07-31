@@ -280,6 +280,17 @@ impl Prototype for MouseCursor {
     fn name(&self) -> String { self.name.clone() }
 }
 
+#[derive(Debug)]
+pub struct SoundPrototype {
+    name: String,
+    sound: Sound
+}
+
+impl Prototype for SoundPrototype {
+    fn r#type(&self) -> PrototypeType { PrototypeType::Sound }
+    fn name(&self) -> String { self.name.clone() }
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
