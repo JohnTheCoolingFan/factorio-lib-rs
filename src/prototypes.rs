@@ -368,6 +368,14 @@ impl Prototype for WindSound {
     fn name(&self) -> String { self.name.clone() }
 }
 
+// PrototypeBase starts here
+
+trait PrototypeBase: Prototype {
+    fn localised_description(&self) -> Option<LocalisedString>;
+    fn localised_name(&self) -> Option<LocalisedString>;
+    fn order(&self) -> String; // Default: ""
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
