@@ -336,6 +336,17 @@ impl Prototype for TileEffect {
     fn name(&self) -> String { self.name.clone() }
 }
 
+#[derive(Debug)]
+pub struct TipsAndTricksItemCategory {
+    name: String,
+    order: String
+}
+
+impl Prototype for TipsAndTricksItemCategory {
+    fn r#type(&self) -> PrototypeType { PrototypeType::TipsAndTricksItemCategory }
+    fn name(&self) -> String { self.name.clone() }
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
