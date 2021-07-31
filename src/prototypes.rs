@@ -291,6 +291,17 @@ impl Prototype for SoundPrototype {
     fn name(&self) -> String { self.name.clone() }
 }
 
+#[derive(Debug)]
+pub struct SpectatorController {
+    name: String,
+    movement_speed: f64 // Must be >= 0.34375
+}
+
+impl Prototype for SpectatorController {
+    fn r#type(&self) -> PrototypeType { PrototypeType::SpectatorController }
+    fn name(&self) -> String { self.name.clone() }
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
