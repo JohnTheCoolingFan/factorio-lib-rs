@@ -8,7 +8,7 @@ pub type FileName = String;
 pub type ItemStackIndex = u16;
 pub type Factorio2DVector = (f64, f64);
 pub type AnimationFrameSequence = Vec<u16>;
-pub type SpriteSize = (i16, i16);
+pub type SpriteSize = (i16, i16); // sidth, then height
 pub type SpritePosition = (i16, i16);
 
 #[derive(Debug)]
@@ -160,9 +160,9 @@ pub struct AnimationSpec {
     // Automatically converted to position
     // x
     // y
-    shift: Option<Factorio2DVector>,
+    shift: Factorio2DVector, // (0, 0) by default
     scale: Option<f64>,
-    draw_as: Option<AnimationDrawAs>, // Aggregates draw_as_* attributes
+    draw_as: DrawAs, // Aggregates draw_as_* attributes // Default: all false
     mipmap_count: Option<u8>, // Loaded if this is an icon
     apply_runtime_tint: Option<bool>, // false by default
     tint: Option<Color>,
@@ -185,22 +185,66 @@ pub struct AnimationSpec {
 }
 
 #[derive(Debug)]
-pub enum AnimationDrawAs {
-    DrawAsShadow,
-    DrawAsGlow,
-    DrawAsLight
+pub struct Sprite {
+    layers: Vec<SpriteLayer>
 }
 
-impl AnimationDrawAs {
-    pub fn new(draw_as_shadow: bool, draw_as_glow: bool, draw_as_light: bool) -> Option<Self> {
+#[derive(Debug)]
+pub struct SpriteLayer {
+    regular: SpriteSpec,
+    hr_version: Option<SpriteSpec>
+}
+
+#[derive(Debug)]
+pub struct SpriteSpec {
+    slice: Slice, // AKA dice // _y and _x are converted into this
+    priority: SpritePriority,
+    flags: Option<SpriteFlags>,
+    size: Option<SpriteSize>,
+    position: Option<SpritePosition>,
+    shift: Factorio2DVector, // (0, 0) by default
+    scale: f64, // 1 by default,
+    draw_as: DrawAs, // all false by default
+    mipmap_count: u8, // Default: 0
+    apply_runtime_tint: bool, // Default: false
+    tint: Color, // Default: (1, 1, 1, 1) (white)
+    blend_mode: BlendMode, // Default: "normal"
+    load_in_minimal_mode: bool, //Default: false
+    premul_alpha: bool, // Default: true
+    generate_sfd: bool // Default: false // Unused (Then why it is documented?)
+}
+
+#[derive(Debug)]
+pub struct Slice(i16, i16);
+
+impl Slice {
+    pub fn new(n: i16) -> Self {
+        Self(n, n)
+    }
+
+    pub fn new_xy(x: i16, y: i16) -> Self {
+        Self(x, y)
+    }
+}
+
+#[derive(Debug)]
+pub enum DrawAs {
+    DrawAsShadow,
+    DrawAsGlow,
+    DrawAsLight,
+    None
+}
+
+impl DrawAs {
+    pub fn new(draw_as_shadow: bool, draw_as_glow: bool, draw_as_light: bool) -> Self {
         if draw_as_shadow {
-            Some(Self::DrawAsShadow)
+            Self::DrawAsShadow
         } else if draw_as_glow {
-            Some(Self::DrawAsGlow)
+            Self::DrawAsGlow
         } else if draw_as_light {
-            Some(Self::DrawAsLight)
+            Self::DrawAsLight
         } else {
-            None
+            Self::None
         }
     }
 }
