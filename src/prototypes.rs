@@ -347,6 +347,16 @@ impl Prototype for TipsAndTricksItemCategory {
     fn name(&self) -> String { self.name.clone() }
 }
 
+#[derive(Debug)]
+pub struct TriggerTargetType {
+    name: String
+}
+
+impl Prototype for TriggerTargetType {
+    fn r#type(&self) -> PrototypeType { PrototypeType::TriggerTargetType }
+    fn name(&self) -> String { self.name.clone() }
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
