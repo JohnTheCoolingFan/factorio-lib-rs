@@ -314,6 +314,28 @@ impl Prototype for SpritePrototype {
     fn name(&self) -> String { self.name.clone() }
 }
 
+#[derive(Debug)]
+pub struct TileEffect {
+    name: String, // Must be "water" // For some reason
+    specular_lightness: Color,
+    foam_color: Color,
+    foam_color_multiplier: f32,
+    tick_scale: f32,
+    animation_speed: f32,
+    animation_scale: Vec<f32>, // One or two members, same for other below
+    dark_threshold: Vec<f32>,
+    reflection_threshold: Vec<f32>,
+    specular_threshold: Vec<f32>,
+    texture: Sprite,
+    near_zoom: f32, // Default: 2.0
+    far_zoom: f32 // Default: 0.5
+}
+
+impl Prototype for TileEffect {
+    fn r#type(&self) -> PrototypeType { PrototypeType::TileEffect }
+    fn name(&self) -> String { self.name.clone() }
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
