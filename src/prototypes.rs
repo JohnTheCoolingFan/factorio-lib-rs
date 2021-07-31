@@ -293,7 +293,7 @@ impl Prototype for SoundPrototype {
 
 #[derive(Debug)]
 pub struct SpectatorController {
-    name: String,
+    name: String, // Must be "default"
     movement_speed: f64 // Must be >= 0.34375
 }
 
