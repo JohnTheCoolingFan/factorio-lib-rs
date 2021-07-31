@@ -182,10 +182,7 @@ pub struct AnimationSpec {
     animation_speed: f32, // Default: 1.0
     max_advance: f32, // Default: MAX_FLOAT
     repeat_count: u8, // Default: 1, can't be 0
-    // What are these???
     dice: Option<Dice>,
-    //dice_x: Option<u8>,
-    //dice_y: Option<u8>,
     frame_sequence: Option<AnimationFrameSequence>,
 }
 
