@@ -150,7 +150,7 @@ pub struct Animation {
 #[derive(Debug)]
 pub struct AnimationSpec {
     filename: Option<FileName>, // Mandatory if "stripes" is not specified
-    priority: Option<SpritePriority>, // Dfeault Medium
+    priority: Option<SpritePriority>, // Default: "medium"
     flags: Option<SpriteFlags>,
     size: Option<SpriteSize>,
     // Automatically converted to size
@@ -177,9 +177,9 @@ pub struct AnimationSpec {
     max_advance: f32, // Default: MAX_FLOAT
     repeat_count: u8, // Default: 1, can't be 0
     // What are these???
-    dice: Option<u8>,
-    dice_x: Option<u8>,
-    dice_y: Option<u8>,
+    dice: Option<Dice>,
+    //dice_x: Option<u8>,
+    //dice_y: Option<u8>,
     frame_sequence: Option<AnimationFrameSequence>,
     stripes: Option<Vec<Stripe>>
 }
@@ -198,11 +198,17 @@ pub struct SpriteLayer {
 #[derive(Debug)]
 pub struct SpriteSpec {
     filename: FileName,
-    slice: Slice, // AKA dice // _y and _x are converted into this
-    priority: SpritePriority,
+    dice: Option<Dice>, // AKA slice // _y and _x are converted into this
+    priority: SpritePriority, // Default: "medium"
     flags: Option<SpriteFlags>,
     size: Option<SpriteSize>,
+    // Automatically converted to size
+    // width
+    // height
     position: Option<SpritePosition>,
+    // Automatically converted to position
+    // x
+    // y
     shift: Factorio2DVector, // (0, 0) by default
     scale: f64, // 1 by default,
     draw_as: DrawAs, // all false by default
@@ -216,9 +222,9 @@ pub struct SpriteSpec {
 }
 
 #[derive(Debug)]
-pub struct Slice(i16, i16);
+pub struct Dice(i16, i16);
 
-impl Slice {
+impl Dice {
     pub fn new(n: i16) -> Self {
         Self(n, n)
     }
