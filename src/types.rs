@@ -143,8 +143,14 @@ pub enum AnimationType {
 
 #[derive(Debug)]
 pub struct Animation {
-    regular: AnimationSpec,
-    hr_version: Option<AnimationSpec>,
+    regular: AnimationVariant,
+    hr_version: Option<AnimationVariant>,
+}
+
+#[derive(Debug)]
+pub enum AnimationVariant {
+    Regular(AnimationSpec),
+    Stripes(Vec<Stripe>)
 }
 
 #[derive(Debug)]
@@ -181,7 +187,6 @@ pub struct AnimationSpec {
     //dice_x: Option<u8>,
     //dice_y: Option<u8>,
     frame_sequence: Option<AnimationFrameSequence>,
-    stripes: Option<Vec<Stripe>>
 }
 
 #[derive(Debug)]
