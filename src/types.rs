@@ -155,34 +155,14 @@ pub enum AnimationVariant {
 
 #[derive(Debug)]
 pub struct AnimationSpec {
-    filename: Option<FileName>, // Mandatory if "stripes" is not specified
-    priority: Option<SpritePriority>, // Default: "medium"
-    flags: Option<SpriteFlags>,
-    size: Option<SpriteSize>,
-    // Automatically converted to size
-    // width
-    // height
-    position: Option<SpritePosition>,
-    // Automatically converted to position
-    // x
-    // y
-    shift: Factorio2DVector, // (0, 0) by default
-    scale: Option<f64>,
-    draw_as: DrawAs, // Aggregates draw_as_* attributes // Default: all false
-    mipmap_count: Option<u8>, // Loaded if this is an icon
-    apply_runtime_tint: Option<bool>, // false by default
-    tint: Option<Color>,
-    blend_mode: Option<BlendMode>, // Default is "normal"
-    load_in_minimal_mode: Option<bool>, // Default: false
-    premul_alpha: bool, // Default: true
-    generate_sdf: bool, // Unused, Default: false
+    // These types share same fields/values, so I decided to "combine" them
+    sprite: SpriteSpec,
     run_mode: RunMode, // Default: "forward"
     frame_count: u32, // Default: 1, can't be 0
     line_length: u32, // Default: 0
     animation_speed: f32, // Default: 1.0
     max_advance: f32, // Default: MAX_FLOAT
     repeat_count: u8, // Default: 1, can't be 0
-    dice: Option<Dice>,
     frame_sequence: Option<AnimationFrameSequence>,
 }
 
