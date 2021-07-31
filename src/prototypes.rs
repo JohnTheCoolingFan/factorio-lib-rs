@@ -18,7 +18,8 @@ use crate::types::{
     ItemStackIndex,
     AnimationType,
     Sound,
-    MouseCursorType};
+    MouseCursorType,
+    Sprite};
 
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
@@ -299,6 +300,17 @@ pub struct SpectatorController {
 
 impl Prototype for SpectatorController {
     fn r#type(&self) -> PrototypeType { PrototypeType::SpectatorController }
+    fn name(&self) -> String { self.name.clone() }
+}
+
+#[derive(Debug)]
+pub struct SpritePrototype {
+    name: String,
+    sprite: Sprite
+}
+
+impl Prototype for SpritePrototype {
+    fn r#type(&self) -> PrototypeType { PrototypeType::Sprite }
     fn name(&self) -> String { self.name.clone() }
 }
 
