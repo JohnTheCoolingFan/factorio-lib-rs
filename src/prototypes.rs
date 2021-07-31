@@ -357,6 +357,17 @@ impl Prototype for TriggerTargetType {
     fn name(&self) -> String { self.name.clone() }
 }
 
+#[derive(Debug)]
+pub struct WindSound {
+    name: String,
+    sound: Sound
+}
+
+impl Prototype for WindSound {
+    fn r#type(&self) -> PrototypeType { PrototypeType::WindSound }
+    fn name(&self) -> String { self.name.clone() }
+}
+
 // Enum for all prototype types
 #[derive(Debug)]
 pub enum PrototypeType {
