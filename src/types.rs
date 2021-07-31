@@ -197,6 +197,7 @@ pub struct SpriteLayer {
 
 #[derive(Debug)]
 pub struct SpriteSpec {
+    filename: FileName,
     slice: Slice, // AKA dice // _y and _x are converted into this
     priority: SpritePriority,
     flags: Option<SpriteFlags>,
