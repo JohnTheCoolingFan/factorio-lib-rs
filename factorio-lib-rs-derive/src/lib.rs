@@ -33,7 +33,7 @@ fn impl_mod_setting_macro(ast: &syn::DeriveInput) -> TokenStream {
 fn impl_prototype_base_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
-        impl PrototypeBase for #name {
+        impl PrototypeBase for #name<'_> {
             fn localised_name(&self) -> Option<LocalisedString> { self.localised_name.clone() }
             fn localised_description(&self) -> Option<LocalisedString> { self.localised_description.clone() }
             fn order(&self) -> String { self.order.clone() }
