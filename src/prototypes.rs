@@ -3,7 +3,7 @@ use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::str::FromStr;
 use std::fmt;
-use factorio_lib_rs_derive::ModSetting;
+use factorio_lib_rs_derive::{ModSetting, PrototypeBase};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
@@ -19,7 +19,8 @@ use crate::types::{
     AnimationType,
     Sound,
     MouseCursorType,
-    Sprite};
+    Sprite,
+    IconSpecification};
 
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
@@ -374,6 +375,46 @@ trait PrototypeBase: Prototype {
     fn localised_description(&self) -> Option<LocalisedString>;
     fn localised_name(&self) -> Option<LocalisedString>;
     fn order(&self) -> String; // Default: ""
+}
+
+#[derive(Debug)]
+pub struct AchievementBase {
+    icon: IconSpecification,
+    steam_stats_name: String, // Default: "" // Unusable
+    allowed_without_fight: bool, // Default: true
+    hidden: bool // Default: false
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct Achievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase
+}
+
+impl Prototype for Achievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::Achievement }
+    fn name(&self) -> String { self.name.clone() }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct BuildEntityAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    to_build: String,
+    amount: u32, // Default: 1
+    limited_to_one_game: bool, // Default: false
+    until_second: u32 // Default: 0 (means infinite)
+}
+
+impl Prototype for BuildEntityAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::BuildEntityAchievement }
+    fn name(&self) -> String { self.name.clone() }
 }
 
 // Enum for all prototype types

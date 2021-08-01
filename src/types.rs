@@ -747,3 +747,33 @@ pub struct CustomCursor {
     hot_pixel_x: i16,
     hot_pixel_y: i16
 }
+
+#[derive(Debug)]
+pub enum IconSpecification {
+    Icon(IconSpec),
+    Icons(IconsSpec)
+}
+
+#[derive(Debug)]
+pub struct IconSpec {
+    icon: FileName,
+    icon_size: i16,
+    icon_mipmaps: u8 // Default: 0
+}
+
+#[derive(Debug)]
+pub struct IconsSpec {
+    icons: Vec<IconData>,
+    // icon_size omitted here, it will be copied to each IconData
+    icon_mipmaps: u8 // Default: 0
+}
+
+#[derive(Debug)]
+pub struct IconData {
+    icon: FileName,
+    icon_size: i16, // Copied from `icon_size` from prototype
+    tint: Color, // Default: (0, 0, 0 , 1)
+    shift: Factorio2DVector, // Default: (0, 0)
+    scale: f64, // Default: 1
+    icon_mipmaps: u8 // Default: 0
+}
