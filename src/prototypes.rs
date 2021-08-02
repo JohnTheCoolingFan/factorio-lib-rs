@@ -23,7 +23,8 @@ use crate::types::{
     IconSpecification,
     Energy,
     ProductType,
-    ResearchTarget};
+    ResearchTarget,
+    AutoplaceControlCategory};
 
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
@@ -675,6 +676,21 @@ impl Prototype for AmmoCategory<'_> {
     fn name(&self) -> &String { &self.name }
 }
 
+#[derive(Debug, PrototypeBase)]
+pub struct AutoplaceControl<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    category: AutoplaceControlCategory,
+    rechness: bool // Default: false
+}
+
+impl Prototype for AutoplaceControl<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::AutoplaceControl }
+    fn name(&self) -> &String { &self.name }
+}
+
 // Enum for all prototype types
 #[derive(Debug, Clone, Copy)]
 pub enum PrototypeType {
@@ -1313,4 +1329,6 @@ pub enum PrototypesErr {
     InvalidSystemCursorStr(String),
     #[error("Invalid Energy string: {0}")]
     InvalidEnergyStr(String),
+    #[error("Invalid AutoplaceControlCategory string: {0}")]
+    InvalidAutoplaceControlCategoryStr(String),
 }

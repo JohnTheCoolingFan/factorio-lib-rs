@@ -823,3 +823,23 @@ pub enum ResearchTarget {
     All,
     Technology(String)
 }
+
+#[derive(Debug)]
+pub enum AutoplaceControlCategory {
+    Resource,
+    Terrain,
+    Enemy
+}
+
+impl FromStr for AutoplaceControlCategory {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "resource" => Ok(Self::Resource),
+            "terrain" => Ok(Self::Terrain),
+            "enemy" => Ok(Self::Enemy),
+            _ => Err(PrototypesErr::InvalidAutoplaceControlCategoryStr(String::from(s)))
+        }
+    }
+}
