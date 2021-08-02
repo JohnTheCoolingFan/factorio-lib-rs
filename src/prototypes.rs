@@ -661,6 +661,20 @@ impl Prototype for TrainPathAchievement<'_> {
     fn name(&self) -> &String { &self.name }
 }
 
+#[derive(Debug, PrototypeBase)]
+pub struct AmmoCategory<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    bonus_gui_order: String // Default: ""
+}
+
+impl Prototype for AmmoCategory<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::AmmoCategory }
+    fn name(&self) -> &String { &self.name }
+}
+
 // Enum for all prototype types
 #[derive(Debug, Clone, Copy)]
 pub enum PrototypeType {
