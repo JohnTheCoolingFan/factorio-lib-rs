@@ -1315,20 +1315,6 @@ pub enum PrototypesErr {
     InvalidPrototypeType(String),
     #[error("Invalid mod setting type: {0}")]
     InvalidModSettingType(String),
-    #[error("Invalid MapGenSize string: {0}")]
-    InvalidMapGenSizeStr(String),
-    #[error("Invalid DifficultySetting string: {0}")]
-    InvalidDifficultySettingStr(String),
-    #[error("Invalid ResearchQueueSetting string: {0}")]
-    InvalidResearchQueueSettingStr(String),
-    #[error("Invalid BlendMode string: {0}")]
-    InvalidBlendModeStr(String),
-    #[error("Invalid RunMode string: {0}")]
-    InvalidRunModeStr(String),
-    #[error("Invalid SystemCursor string: {0}")]
-    InvalidSystemCursorStr(String),
-    #[error("Invalid Energy string: {0}")]
-    InvalidEnergyStr(String),
-    #[error("Invalid AutoplaceControlCategory string: {0}")]
-    InvalidAutoplaceControlCategoryStr(String),
+    #[error("Invalid string for type {0}: {1}")]
+    InvalidTypeStr(String, String)
 }

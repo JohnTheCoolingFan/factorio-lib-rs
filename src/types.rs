@@ -54,7 +54,7 @@ impl FromStr for DifficultySetting {
         match s {
             "normal" => Ok(Self::Normal),
             "expensive" => Ok(Self::Expensive),
-            _ => Err(PrototypesErr::InvalidDifficultySettingStr(String::from(s)))
+            _ => Err(PrototypesErr::InvalidTypeStr(String::from("DifficultySetting"), String::from(s)))
         }
     }
 }
@@ -74,7 +74,7 @@ impl FromStr for ResearchQueueSetting {
             "after-victory" => Ok(Self::AfterVictory),
             "always" => Ok(Self::Always),
             "never" => Ok(Self::Never),
-            _ => Err(PrototypesErr::InvalidResearchQueueSettingStr(String::from(s)))
+            _ => Err(PrototypesErr::InvalidTypeStr(String::from("ResearchQueueSetting"), String::from(s)))
         }
     }
 }
@@ -257,7 +257,7 @@ impl FromStr for BlendMode {
             "additive-soft" => Ok(Self::AdditiveSoft),
             "multiplicative" => Ok(Self::Multiplicative),
             "overwrite" => Ok(Self::Overwrite),
-            _ => Err(PrototypesErr::InvalidBlendModeStr(String::from(s)))
+            _ => Err(PrototypesErr::InvalidTypeStr(String::from("BlendMode"), String::from(s)))
         }
     }
 }
@@ -277,7 +277,7 @@ impl FromStr for RunMode {
             "forward" => Ok(Self::Forward),
             "backward" => Ok(Self::Backward),
             "forward-then-backward" => Ok(Self::ForwardThenBackward),
-            _ => Err(PrototypesErr::InvalidRunModeStr(String::from(s)))
+            _ => Err(PrototypesErr::InvalidTypeStr(String::from("RunMode"), String::from(s)))
         }
     }
 }
@@ -502,7 +502,7 @@ impl FromStr for MapGenSize {
             "normal" | "medium" | "regular" => Ok(Self(1.0)),
             "high" | "big" | "good" => Ok(Self((2.0 as f64).sqrt())),
             "very-high" | "very-big" | "very-good" => Ok(Self(2.0)),
-            _ => Err(PrototypesErr::InvalidMapGenSizeStr(String::from(s)))
+            _ => Err(PrototypesErr::InvalidTypeStr(String::from("MapGenSize"), String::from(s)))
         }
     }
 }
@@ -736,7 +736,7 @@ impl FromStr for SystemCursor {
             "size-all" => Ok(Self::SizeAll),
             "no" => Ok(Self::No),
             "hand" => Ok(Self::Hand),
-            _ => Err(PrototypesErr::InvalidSystemCursorStr(String::from(s)))
+            _ => Err(PrototypesErr::InvalidTypeStr(String::from("SystemCursor"), String::from(s)))
         }
     }
 }
@@ -787,12 +787,12 @@ impl FromStr for Energy {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let len = s.len();
         let mut rev_s = s.chars().rev();
-        if rev_s.next().ok_or(PrototypesErr::InvalidEnergyStr(String::from(s)))? == 'W' {
-            let next_char: char = rev_s.next().ok_or(PrototypesErr::InvalidEnergyStr(String::from(s)))?;
+        if rev_s.next().ok_or(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))? == 'W' {
+            let next_char: char = rev_s.next().ok_or(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
             if next_char.is_ascii_digit() {
-                return Ok(Self(s[0..len-1].parse::<f64>().map_err(|_| PrototypesErr::InvalidEnergyStr(String::from(s)))?))
+                return Ok(Self(s[0..len-1].parse::<f64>().map_err(|_| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?))
             } else {
-                let value: f64 = f64::from_str(&s[0..len-2]).map_err(|_| PrototypesErr::InvalidEnergyStr(String::from(s)))?;
+                let value: f64 = f64::from_str(&s[0..len-2]).map_err(|_| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
 
                 return match next_char {
                     'k' | 'K' => Ok(Self(value * 1000.0)),
@@ -803,11 +803,11 @@ impl FromStr for Energy {
                     'E' => Ok(Self(value * (10.0 as f64).powi(18))),
                     'Z' => Ok(Self(value * (10.0 as f64).powi(21))),
                     'Y' => Ok(Self(value * (10.0 as f64).powi(24))),
-                    _ => Err(PrototypesErr::InvalidEnergyStr(String::from(s)))
+                    _ => Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))
                 }
             }
         } else {
-            return Err(PrototypesErr::InvalidEnergyStr(String::from(s)))
+            return Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))
         } 
     }
 }
@@ -839,7 +839,7 @@ impl FromStr for AutoplaceControlCategory {
             "resource" => Ok(Self::Resource),
             "terrain" => Ok(Self::Terrain),
             "enemy" => Ok(Self::Enemy),
-            _ => Err(PrototypesErr::InvalidAutoplaceControlCategoryStr(String::from(s)))
+            _ => Err(PrototypesErr::InvalidTypeStr(String::from("AutoplaceControlCategory"), String::from(s)))
         }
     }
 }
