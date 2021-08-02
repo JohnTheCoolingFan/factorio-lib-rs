@@ -20,11 +20,11 @@ fn impl_mod_setting_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
         impl ModSetting for #name<'_> {
-            fn localised_name(&self) -> Option<LocalisedString> { self.localised_name.clone() }
-            fn localised_description(&self) -> Option<LocalisedString> { self.localised_description.clone() }
-            fn order(&self) -> Option<String> { self.order.clone() }
+            fn localised_name(&self) -> &Option<LocalisedString> { &self.localised_name }
+            fn localised_description(&self) -> &Option<LocalisedString> { &self.localised_description }
+            fn order(&self) -> &Option<String> { &self.order }
             fn hidden(&self) -> bool { self.hidden }
-            fn setting_type(&self) -> ModSettingType { self.setting_type.clone() }
+            fn setting_type(&self) -> ModSettingType { self.setting_type }
         }
     };
     gen.into()
@@ -34,9 +34,9 @@ fn impl_prototype_base_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
         impl PrototypeBase for #name<'_> {
-            fn localised_name(&self) -> Option<LocalisedString> { self.localised_name.clone() }
-            fn localised_description(&self) -> Option<LocalisedString> { self.localised_description.clone() }
-            fn order(&self) -> String { self.order.clone() }
+            fn localised_name(&self) -> &Option<LocalisedString> { &self.localised_name }
+            fn localised_description(&self) -> &Option<LocalisedString> { &self.localised_description }
+            fn order(&self) -> &String { &self.order }
         }
     };
     gen.into()

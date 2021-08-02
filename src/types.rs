@@ -79,7 +79,7 @@ impl FromStr for ResearchQueueSetting {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum ModSettingType {
     Startup,
     RuntimeGlobal,

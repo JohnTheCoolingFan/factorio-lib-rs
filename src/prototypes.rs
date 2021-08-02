@@ -41,12 +41,12 @@ pub struct DataTable {
 // Contains all values (accessors) for every prototype in the game
 pub trait Prototype: fmt::Debug {
     fn r#type(&self) -> PrototypeType;
-    fn name(&self) -> String;
+    fn name(&self) -> &String;
 }
 pub trait ModSetting: Prototype {
-    fn localised_name(&self) -> Option<LocalisedString>;
-    fn localised_description(&self) -> Option<LocalisedString>;
-    fn order(&self) -> Option<String>;
+    fn localised_name(&self) -> &Option<LocalisedString>;
+    fn localised_description(&self) -> &Option<LocalisedString>;
+    fn order(&self) -> &Option<String>;
     fn hidden(&self) -> bool; // Default: false
     fn setting_type(&self) -> ModSettingType;
 }
@@ -65,7 +65,7 @@ pub struct BoolModSetting<'a> {
 
 impl Prototype for BoolModSetting<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::BoolSetting }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 impl BoolModSetting<'_> {
@@ -89,7 +89,7 @@ pub struct IntModSetting<'a> {
 
 impl Prototype for IntModSetting<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::IntSetting }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 impl IntModSetting<'_> {
@@ -115,7 +115,7 @@ pub struct DoubleModSetting<'a> {
 
 impl Prototype for DoubleModSetting<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::DoubleSetting }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 impl DoubleModSetting<'_> {
@@ -141,7 +141,7 @@ pub struct StringModSetting<'a> {
 
 impl Prototype for StringModSetting<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::StringSetting }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 impl StringModSetting<'_> {
@@ -161,7 +161,7 @@ pub struct AmbientSoundPrototype {
 
 impl Prototype for AmbientSoundPrototype {
     fn r#type(&self) -> PrototypeType { PrototypeType::AmbientSound }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 impl AmbientSoundPrototype {
@@ -206,7 +206,7 @@ pub struct EditorController {
 
 impl Prototype for EditorController {
     fn r#type(&self) -> PrototypeType { PrototypeType::EditorController }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -222,7 +222,7 @@ pub struct Font {
 
 impl Prototype for Font {
     fn r#type(&self) -> PrototypeType { PrototypeType::Font }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -239,7 +239,7 @@ pub struct GodController {
 
 impl Prototype for GodController {
     fn r#type(&self) -> PrototypeType { PrototypeType::GodController }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -250,7 +250,7 @@ pub struct MapGenPresets {
 
 impl Prototype for MapGenPresets {
     fn r#type(&self) -> PrototypeType { PrototypeType::MapGenPresets }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -268,7 +268,7 @@ pub struct MapSettings {
 
 impl Prototype for MapSettings {
     fn r#type(&self) -> PrototypeType { PrototypeType::MapSettings }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -279,7 +279,7 @@ pub struct MouseCursor {
 
 impl Prototype for MouseCursor {
     fn r#type(&self) -> PrototypeType { PrototypeType::MouseCursor }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -290,7 +290,7 @@ pub struct SoundPrototype {
 
 impl Prototype for SoundPrototype {
     fn r#type(&self) -> PrototypeType { PrototypeType::Sound }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -301,7 +301,7 @@ pub struct SpectatorController {
 
 impl Prototype for SpectatorController {
     fn r#type(&self) -> PrototypeType { PrototypeType::SpectatorController }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -312,7 +312,7 @@ pub struct SpritePrototype {
 
 impl Prototype for SpritePrototype {
     fn r#type(&self) -> PrototypeType { PrototypeType::Sprite }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -334,7 +334,7 @@ pub struct TileEffect {
 
 impl Prototype for TileEffect {
     fn r#type(&self) -> PrototypeType { PrototypeType::TileEffect }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -345,7 +345,7 @@ pub struct TipsAndTricksItemCategory {
 
 impl Prototype for TipsAndTricksItemCategory {
     fn r#type(&self) -> PrototypeType { PrototypeType::TipsAndTricksItemCategory }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -355,7 +355,7 @@ pub struct TriggerTargetType {
 
 impl Prototype for TriggerTargetType {
     fn r#type(&self) -> PrototypeType { PrototypeType::TriggerTargetType }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug)]
@@ -366,15 +366,15 @@ pub struct WindSound {
 
 impl Prototype for WindSound {
     fn r#type(&self) -> PrototypeType { PrototypeType::WindSound }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 // PrototypeBase starts here
 
 trait PrototypeBase: Prototype {
-    fn localised_description(&self) -> Option<LocalisedString>;
-    fn localised_name(&self) -> Option<LocalisedString>;
-    fn order(&self) -> String; // Default: ""
+    fn localised_description(&self) -> &Option<LocalisedString>;
+    fn localised_name(&self) -> &Option<LocalisedString>;
+    fn order(&self) -> &String; // Default: ""
 }
 
 #[derive(Debug)]
@@ -396,7 +396,7 @@ pub struct Achievement<'a> {
 
 impl Prototype for Achievement<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::Achievement }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 #[derive(Debug, PrototypeBase)]
@@ -414,11 +414,11 @@ pub struct BuildEntityAchievement<'a> {
 
 impl Prototype for BuildEntityAchievement<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::BuildEntityAchievement }
-    fn name(&self) -> String { self.name.clone() }
+    fn name(&self) -> &String { &self.name }
 }
 
 // Enum for all prototype types
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum PrototypeType {
     // General prototypes
     AmbientSound,
