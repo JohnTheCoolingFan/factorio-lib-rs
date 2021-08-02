@@ -20,7 +20,10 @@ use crate::types::{
     Sound,
     MouseCursorType,
     Sprite,
-    IconSpecification};
+    IconSpecification,
+    Energy,
+    ProductType,
+    ResearchTarget};
 
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
@@ -414,6 +417,247 @@ pub struct BuildEntityAchievement<'a> {
 
 impl Prototype for BuildEntityAchievement<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::BuildEntityAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct CombatRobotCountAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    count: u32 // Default: 1
+}
+
+impl Prototype for CombatRobotCountAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::CombatRobotCountAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct ConstructWithRobotsAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    limited_to_one_game: bool,
+    amount: u32, // Default: 0
+    more_than_manually: bool // Default: false
+}
+
+impl Prototype for ConstructWithRobotsAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::ConstructWithRobotsAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct DeconstructWithRobotsAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    amount: u32
+}
+
+impl Prototype for DeconstructWithRobotsAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::DeconstructWithRobotsAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct DeliverByRobotsAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    amount: f64
+}
+
+impl Prototype for DeliverByRobotsAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::DeliverByRobotsAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct DontBuildEntityAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    dont_buid: Vec<String>, // String is converted to Vec<String> with one element
+    amount: u32 // Default: 0
+}
+
+impl Prototype for DontBuildEntityAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::DontBuildEntityAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct DontCraftManuallyAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    amount: f64
+}
+
+impl Prototype for DontCraftManuallyAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::DontCraftManuallyAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct DontUseEntityInEnergyProductionAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    excluded: Vec<String>, // String is converted to Vec<String> with one element
+    included: Vec<String>, // Same as `excluded`
+    last_hour_only: bool, // Default: false
+    minimum_energy_produced: Energy // Default: 0W
+}
+
+impl Prototype for DontUseEntityInEnergyProductionAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::DontUseEntityInEnergyProductionAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct FinishTheGameAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    until_second: u32 // Default: 0 (means infinite)
+}
+
+impl Prototype for FinishTheGameAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::FinishTheGameAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct GroupAttackAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    amount: u32 // Default: 1
+}
+
+impl Prototype for GroupAttackAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::GroupAttackAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct KillAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    to_kill: String, // Default: ""
+    type_to_kill: Option<PrototypeType>,
+    damage_type: String, // damage type
+    amount: u32, // Default: 1
+    in_vehicle: bool, // Default: false
+    personally: bool // Default: false
+}
+
+impl Prototype for KillAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::KillAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct PlayerDamagedAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    minimum_damage: f32,
+    should_survive: bool,
+    type_of_dealer: Option<PrototypeType>
+}
+
+impl Prototype for PlayerDamagedAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::PlayerDamagedAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct ProduceAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    amount: f64,
+    limited_to_one_game: bool,
+    product: ProductType // Type is determined from item_product or fluid_product // Only one can be set!
+}
+
+impl Prototype for ProduceAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::ProduceAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct ProducePerHourAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    amount: f64,
+    product: ProductType
+}
+
+impl Prototype for ProducePerHourAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::ProducePerHourAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct ResearchAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    target: ResearchTarget // Determined from either `technology` or `research_all` is set
+}
+
+impl Prototype for ResearchAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::ResearchAchievement }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct TrainPathAchievement<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    achievement: AchievementBase,
+    minimum_distance: f64
+}
+
+impl Prototype for TrainPathAchievement<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::TrainPathAchievement }
     fn name(&self) -> &String { &self.name }
 }
 
@@ -1053,4 +1297,6 @@ pub enum PrototypesErr {
     InvalidRunModeStr(String),
     #[error("Invalid SystemCursor string: {0}")]
     InvalidSystemCursorStr(String),
+    #[error("Invalid Energy string: {0}")]
+    InvalidEnergyStr(String),
 }

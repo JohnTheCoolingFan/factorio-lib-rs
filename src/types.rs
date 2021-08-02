@@ -777,3 +777,49 @@ pub struct IconData {
     scale: f64, // Default: 1
     icon_mipmaps: u8 // Default: 0
 }
+
+#[derive(Debug)]
+pub struct Energy(f64); // I don't know which type factorio uses internally, so I will use this
+
+impl FromStr for Energy {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let len = s.len();
+        let mut rev_s = s.chars().rev();
+        if rev_s.next().ok_or(PrototypesErr::InvalidEnergyStr(String::from(s)))? == 'W' {
+            let next_char: char = rev_s.next().ok_or(PrototypesErr::InvalidEnergyStr(String::from(s)))?;
+            if next_char.is_ascii_digit() {
+                return Ok(Self(s[0..len-1].parse::<f64>().map_err(|_| PrototypesErr::InvalidEnergyStr(String::from(s)))?))
+            } else {
+                let value: f64 = f64::from_str(&s[0..len-2]).map_err(|_| PrototypesErr::InvalidEnergyStr(String::from(s)))?;
+
+                return match next_char {
+                    'k' | 'K' => Ok(Self(value * 1000.0)),
+                    'M' => Ok(Self(value * 1000000.0)),
+                    'G' => Ok(Self(value * 1000000000.0)),
+                    'T' => Ok(Self(value * (10.0 as f64).powi(12))),
+                    'P' => Ok(Self(value * (10.0 as f64).powi(15))),
+                    'E' => Ok(Self(value * (10.0 as f64).powi(18))),
+                    'Z' => Ok(Self(value * (10.0 as f64).powi(21))),
+                    'Y' => Ok(Self(value * (10.0 as f64).powi(24))),
+                    _ => Err(PrototypesErr::InvalidEnergyStr(String::from(s)))
+                }
+            }
+        } else {
+            return Err(PrototypesErr::InvalidEnergyStr(String::from(s)))
+        } 
+    }
+}
+
+#[derive(Debug)]
+pub enum ProductType {
+    Item(String),
+    Fluid(String)
+}
+
+#[derive(Debug)]
+pub enum ResearchTarget {
+    All,
+    Technology(String)
+}
