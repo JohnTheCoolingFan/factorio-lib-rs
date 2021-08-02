@@ -10,6 +10,7 @@ pub type Factorio2DVector = (f64, f64);
 pub type AnimationFrameSequence = Vec<u16>;
 pub type SpriteSize = (i16, i16); // sidth, then height
 pub type SpritePosition = (i16, i16);
+pub type KeySequence = String; // Parser and checker maybe?
 
 #[derive(Debug)]
 pub struct Position(i32, i32);
@@ -840,6 +841,48 @@ impl FromStr for AutoplaceControlCategory {
             "terrain" => Ok(Self::Terrain),
             "enemy" => Ok(Self::Enemy),
             _ => Err(PrototypesErr::InvalidTypeStr(String::from("AutoplaceControlCategory"), String::from(s)))
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum ConsumingType {
+    None,
+    GameOnly
+}
+
+impl FromStr for ConsumingType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "none" => Ok(Self::None),
+            "game-only" => Ok(Self::GameOnly),
+            _ => Err(PrototypesErr::InvalidTypeStr(String::from("ConsumingType"), String::from(s)))
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum CustomInputAction {
+    Lua,
+    SpawnItem,
+    TogglePersonalRoboport,
+    TogglePersonalLogisticRequests,
+    ToggleEquipmentMovementsBonus
+}
+
+impl FromStr for CustomInputAction {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "lua" => Ok(Self::Lua),
+            "spawn-item" => Ok(Self::SpawnItem),
+            "toggle-personal-roboport" => Ok(Self::TogglePersonalRoboport),
+            "toggle-personal-logistic-requests" => Ok(Self::TogglePersonalLogisticRequests),
+            "toggle-equipment-movement-bonus" => Ok(Self::ToggleEquipmentMovementsBonus),
+            _ => Err(PrototypesErr::InvalidTypeStr("CustomInputAction".into(), s.into()))
         }
     }
 }

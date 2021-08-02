@@ -24,7 +24,10 @@ use crate::types::{
     Energy,
     ProductType,
     ResearchTarget,
-    AutoplaceControlCategory};
+    AutoplaceControlCategory,
+    KeySequence,
+    ConsumingType,
+    CustomInputAction};
 
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
@@ -688,6 +691,29 @@ pub struct AutoplaceControl<'a> {
 
 impl Prototype for AutoplaceControl<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::AutoplaceControl }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct CustomInput<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    key_sequence: KeySequence, // TODO?: key_sequence parser and checker. Can be empty, if linked_game_control is set, also empty stands for unassigned
+    alternate_key_sequence: Option<KeySequence>,
+    linked_game_control: String, // Default: ""
+    consumed: ConsumingType, // Default: none
+    enabled: bool, // Default: true
+    enabled_while_spectating: bool, // Default: false
+    enabled_while_in_cutscene: bool, // Default: false
+    include_selected_prototype: bool, // Default: false
+    item_to_spawn: Option<String>, // Name of Item
+    action: CustomInputAction // Default: "lua"
+}
+
+impl Prototype for CustomInput<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::CustomInput }
     fn name(&self) -> &String { &self.name }
 }
 
