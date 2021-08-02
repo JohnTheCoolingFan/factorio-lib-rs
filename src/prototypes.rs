@@ -27,7 +27,13 @@ use crate::types::{
     AutoplaceControlCategory,
     KeySequence,
     ConsumingType,
-    CustomInputAction};
+    CustomInputAction,
+    SpriteVariation,
+    BoundingBox,
+    RenderLayer,
+    TriggerEffect,
+    AutoplaceSpecification,
+    CollisionMask};
 
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
@@ -728,6 +734,29 @@ pub struct DamageType<'a> {
 
 impl Prototype for DamageType<'_> {
     fn r#type(&self) -> PrototypeType { PrototypeType::DamageType }
+    fn name(&self) -> &String { &self.name }
+}
+
+#[derive(Debug, PrototypeBase)]
+pub struct Decorative<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    pictures: Vec<SpriteVariation>, // At least 1 is required
+    collision_box: Option<BoundingBox>,
+    render_layer: RenderLayer, // Default: "decorative"
+    grows_through_rail_path: bool, // Default: false
+    tile_layer: i16, // Default: 0 // Mandatory if render_layer is "decals" // I don't understand how this works
+    decal_overdraw_priority: u16, // Default: 0 // Only loaded if render_layer is "decals"
+    walking_sound: Option<Sound>,
+    trigger_effect: Option<TriggerEffect>,
+    autoplace: Option<AutoplaceSpecification>,
+    collision_mask: CollisionMask // Default: "doodad-layer"
+}
+
+impl Prototype for Decorative<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::Decorative }
     fn name(&self) -> &String { &self.name }
 }
 

@@ -11,6 +11,8 @@ pub type AnimationFrameSequence = Vec<u16>;
 pub type SpriteSize = (i16, i16); // sidth, then height
 pub type SpritePosition = (i16, i16);
 pub type KeySequence = String; // Parser and checker maybe?
+pub type BoundingBox = (Position, Position); // Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox?
+                                             // It's kinda undocumented
 
 #[derive(Debug)]
 pub struct Position(i32, i32);
@@ -202,6 +204,27 @@ pub struct SpriteSpec {
     load_in_minimal_mode: bool, //Default: false
     premul_alpha: bool, // Default: true
     generate_sfd: bool // Default: false // Unused (Then why it is documented?)
+}
+
+#[derive(Debug)]
+pub struct SpriteVariation {
+    layers: Vec<SpriteVariationLayer>
+}
+
+#[derive(Debug)]
+pub struct SpriteVariationLayer {
+    regular: SpriteVariationSpec,
+    hr_version: Option<SpriteVariationSpec>
+}
+
+// Extension (or side-step?) of SpriteSpec
+// Ignores dice and slice
+#[derive(Debug)]
+pub struct SpriteVariationSpec {
+    sprite: SpriteSpec,
+    variation_count: u32, // Default: 1
+    repeat_count: u32, // Default: 1
+    line_length: u32 // Default: value of `variation_count`
 }
 
 #[derive(Debug)]
@@ -884,5 +907,284 @@ impl FromStr for CustomInputAction {
             "toggle-equipment-movement-bonus" => Ok(Self::ToggleEquipmentMovementsBonus),
             _ => Err(PrototypesErr::InvalidTypeStr("CustomInputAction".into(), s.into()))
         }
+    }
+}
+
+#[derive(Debug)]
+pub enum RenderLayer {
+    WaterTile,
+    GroundTile,
+    TileTransition,
+    Decals,
+    LowerRadiusVisualization,
+    RadiusVisualization,
+    TransportBeltIntegration,
+    Resource,
+    BuildingSmoke,
+    Decorative,
+    GroundPatch, // Love these names
+    GroundPatchHigher,
+    GroundPatchHigher2,
+    Remnants,
+    Floor,
+    TransportBelt,
+    TransportBeltEndings,
+    FloorMechanicsUnderCorpse,
+    Corpse,
+    FloorMechanics,
+    Item,
+    LowerObject,
+    TransportBeltCircuitConnector,
+    LowerObjectAboveShadow,
+    Object,
+    HigherObjectUnder,
+    HigherObjectAbove,
+    ItemInInserterHand,
+    Wires,
+    WiresAbove,
+    EntityInfoIcon,
+    EntityInfoIconAbove,
+    Explosion,
+    Projectile,
+    Smoke,
+    AirObject,
+    AirEntityInfoIcon,
+    LightEffect,
+    SelectionBox,
+    HigherSelectionBox,
+    CollisionSelectionBox,
+    Arrow,
+    Cursor
+}
+
+impl FromStr for RenderLayer {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "water-tile" => Ok(Self::WaterTile),
+            "ground-tile" => Ok(Self::GroundTile),
+            "tile-transition" => Ok(Self::TileTransition),
+            "decals" => Ok(Self::Decals),
+            "lower-radius-visualization" => Ok(Self::LowerRadiusVisualization),
+            "radius-visualization" => Ok(Self::RadiusVisualization),
+            "transport-belt-integration" => Ok(Self::TransportBeltIntegration),
+            "resource" => Ok(Self::Resource),
+            "building-smoke" => Ok(Self::BuildingSmoke),
+            "decorative" => Ok(Self::Decorative),
+            "ground-patch" => Ok(Self::GroundPatch),
+            "ground-patch-higher" => Ok(Self::GroundPatchHigher),
+            "ground-patch-higher2" => Ok(Self::GroundPatchHigher2),
+            "remnants" => Ok(Self::Remnants),
+            "floor" => Ok(Self::Floor),
+            "transport-belt" => Ok(Self::TransportBelt),
+            "transport-belt-endings" => Ok(Self::TransportBeltEndings),
+            "floor-mechanics-under-corpse" => Ok(Self::FloorMechanicsUnderCorpse),
+            "corpse" => Ok(Self::Corpse),
+            "floor-mechanics" => Ok(Self::FloorMechanics),
+            "item" => Ok(Self::Item),
+            "lower-object" => Ok(Self::LowerObject),
+            "transport-belt-circuit-connector" => Ok(Self::TransportBeltCircuitConnector),
+            "lower-object-above-shadow" => Ok(Self::LowerObjectAboveShadow),
+            "object" => Ok(Self::Object),
+            "higher-object-under" => Ok(Self::HigherObjectUnder),
+            "higher-object-above" => Ok(Self::HigherObjectAbove),
+            "item-in-inserter-hand" => Ok(Self::ItemInInserterHand),
+            "wires" => Ok(Self::Wires),
+            "wires-above" => Ok(Self::WiresAbove),
+            "entity-info-icon" => Ok(Self::EntityInfoIcon),
+            "entity-info-icon-above" => Ok(Self::EntityInfoIconAbove),
+            "explosion" => Ok(Self::Explosion),
+            "projectile" => Ok(Self::Projectile),
+            "smoke" => Ok(Self::Smoke),
+            "air-object" => Ok(Self::AirObject),
+            "air-entity-info-icon" => Ok(Self::AirEntityInfoIcon),
+            "light-effect" => Ok(Self::LightEffect),
+            "selection-box" => Ok(Self::SelectionBox),
+            "higher-selection-box" => Ok(Self::HigherSelectionBox),
+            "collision-selection-box" => Ok(Self::CollisionSelectionBox),
+            "arrow" => Ok(Self::Arrow),
+            "cursor" => Ok(Self::Cursor),
+            _ => Err(PrototypesErr::InvalidTypeStr("RenderLayer".into(), s.into()))
+        }
+    }
+}
+
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub struct CollisionMask(u8);
+
+impl CollisionMask {
+    pub const GROUND_TILE: CollisionMask = CollisionMask(1);
+    pub const WATER_TILE: CollisionMask = CollisionMask(1 << 1);
+    pub const RESOURCE_LAYER: CollisionMask = CollisionMask(1 << 2);
+    pub const DOODAD_LAYER: CollisionMask = CollisionMask(1 << 3);
+    pub const FLOOR_LAYER: CollisionMask = CollisionMask(1 << 4);
+    pub const ITEM_LAYER: CollisionMask = CollisionMask(1 << 5);
+    pub const GHOST_LAYER: CollisionMask = CollisionMask(1 << 6);
+    pub const OBJECT_LAYER: CollisionMask = CollisionMask(1 << 7);
+    pub const PLAYER_LAYER: CollisionMask = CollisionMask(1 << 8);
+    pub const TRAIN_LAYER: CollisionMask = CollisionMask(1 << 9);
+    pub const RAIL_LAYER: CollisionMask = CollisionMask(1 << 10);
+    pub const TRANSPORT_BELT_LAYER: CollisionMask = CollisionMask(1 << 11);
+    pub const LAYER_13: CollisionMask = CollisionMask(1 << 12);
+    pub const LAYER_14: CollisionMask = CollisionMask(1 << 13);
+    pub const LAYER_15: CollisionMask = CollisionMask(1 << 14);
+    pub const LAYER_16: CollisionMask = CollisionMask(1 << 15);
+    pub const LAYER_17: CollisionMask = CollisionMask(1 << 16);
+    pub const LAYER_18: CollisionMask = CollisionMask(1 << 17);
+    pub const LAYER_19: CollisionMask = CollisionMask(1 << 18);
+    pub const LAYER_20: CollisionMask = CollisionMask(1 << 19);
+    pub const LAYER_21: CollisionMask = CollisionMask(1 << 20);
+    pub const LAYER_22: CollisionMask = CollisionMask(1 << 21);
+    pub const LAYER_23: CollisionMask = CollisionMask(1 << 22);
+    pub const LAYER_24: CollisionMask = CollisionMask(1 << 23);
+    pub const LAYER_25: CollisionMask = CollisionMask(1 << 24);
+    pub const LAYER_26: CollisionMask = CollisionMask(1 << 25);
+    pub const LAYER_27: CollisionMask = CollisionMask(1 << 26);
+    pub const LAYER_28: CollisionMask = CollisionMask(1 << 27);
+    pub const LAYER_29: CollisionMask = CollisionMask(1 << 28);
+    pub const LAYER_30: CollisionMask = CollisionMask(1 << 29);
+    pub const LAYER_31: CollisionMask = CollisionMask(1 << 30);
+    pub const LAYER_32: CollisionMask = CollisionMask(1 << 31);
+    pub const LAYER_33: CollisionMask = CollisionMask(1 << 32);
+    pub const LAYER_34: CollisionMask = CollisionMask(1 << 33);
+    pub const LAYER_35: CollisionMask = CollisionMask(1 << 34);
+    pub const LAYER_36: CollisionMask = CollisionMask(1 << 35);
+    pub const LAYER_37: CollisionMask = CollisionMask(1 << 36);
+    pub const LAYER_38: CollisionMask = CollisionMask(1 << 37);
+    pub const LAYER_39: CollisionMask = CollisionMask(1 << 38);
+    pub const LAYER_40: CollisionMask = CollisionMask(1 << 39);
+    pub const LAYER_41: CollisionMask = CollisionMask(1 << 40);
+    pub const LAYER_42: CollisionMask = CollisionMask(1 << 41);
+    pub const LAYER_43: CollisionMask = CollisionMask(1 << 42);
+    pub const LAYER_44: CollisionMask = CollisionMask(1 << 43);
+    pub const LAYER_45: CollisionMask = CollisionMask(1 << 44);
+    pub const LAYER_46: CollisionMask = CollisionMask(1 << 45);
+    pub const LAYER_47: CollisionMask = CollisionMask(1 << 46);
+    pub const LAYER_48: CollisionMask = CollisionMask(1 << 47);
+    pub const LAYER_49: CollisionMask = CollisionMask(1 << 48);
+    pub const LAYER_50: CollisionMask = CollisionMask(1 << 49);
+    pub const LAYER_51: CollisionMask = CollisionMask(1 << 50);
+    pub const LAYER_52: CollisionMask = CollisionMask(1 << 51);
+    pub const LAYER_53: CollisionMask = CollisionMask(1 << 52);
+    pub const LAYER_54: CollisionMask = CollisionMask(1 << 53);
+    pub const LAYER_55: CollisionMask = CollisionMask(1 << 54);
+    pub const NOT_COLLIDING_WITH_ITSELF: CollisionMask = CollisionMask(1 << 55);
+    pub const CONSIDER_TILE_TRANSITIONS: CollisionMask = CollisionMask(1 << 56);
+    pub const COLLIDING_WITH_TILES_ONLY: CollisionMask = CollisionMask(1 << 57);
+}
+
+impl From<Vec<&str>> for CollisionMask {
+    fn from(layers: Vec<&str>) -> Self {
+        let mut result = Self(0);
+        for layer in layers {
+            match layer {
+                "ground-tile" => result |= Self::GROUND_TILE,
+                "water-tile" => result |= Self::WATER_TILE,
+                "resource-layer" => result |= Self::RESOURCE_LAYER,
+                "doodad-layer" => result |= Self::DOODAD_LAYER,
+                "floor-layer" => result |= Self::FLOOR_LAYER,
+                "item-layer" => result |= Self::ITEM_LAYER,
+                "ghost-layer" => result |= Self::GHOST_LAYER,
+                "object-layer" => result |= Self::OBJECT_LAYER,
+                "player-layer" => result |= Self::PLAYER_LAYER,
+                "train-layer" => result |= Self::TRAIN_LAYER,
+                "rail-layer" => result |= Self::RAIL_LAYER,
+                "transport-belt-layer" => result |= Self::TRANSPORT_BELT_LAYER,
+                "not-colliding-with-itself" => result |= Self::NOT_COLLIDING_WITH_ITSELF,
+                "consider-tile-transitions" => result |= Self::CONSIDER_TILE_TRANSITIONS,
+                "colliding-with-tiles-only" => result |= Self::COLLIDING_WITH_TILES_ONLY,
+                // I love vim
+                // https://vim.fandom.com/wiki/Increasing_or_decreasing_numbers
+                // https://vim.fandom.com/wiki/Macros
+                "layer-13" => result |= Self::LAYER_13,
+                "layer-14" => result |= Self::LAYER_14,
+                "layer-15" => result |= Self::LAYER_15,
+                "layer-16" => result |= Self::LAYER_16,
+                "layer-17" => result |= Self::LAYER_17,
+                "layer-18" => result |= Self::LAYER_18,
+                "layer-19" => result |= Self::LAYER_19,
+                "layer-20" => result |= Self::LAYER_20,
+                "layer-21" => result |= Self::LAYER_21,
+                "layer-22" => result |= Self::LAYER_22,
+                "layer-23" => result |= Self::LAYER_23,
+                "layer-24" => result |= Self::LAYER_24,
+                "layer-25" => result |= Self::LAYER_25,
+                "layer-26" => result |= Self::LAYER_26,
+                "layer-27" => result |= Self::LAYER_27,
+                "layer-28" => result |= Self::LAYER_28,
+                "layer-29" => result |= Self::LAYER_29,
+                "layer-30" => result |= Self::LAYER_30,
+                "layer-31" => result |= Self::LAYER_31,
+                "layer-32" => result |= Self::LAYER_32,
+                "layer-33" => result |= Self::LAYER_33,
+                "layer-34" => result |= Self::LAYER_34,
+                "layer-35" => result |= Self::LAYER_35,
+                "layer-36" => result |= Self::LAYER_36,
+                "layer-37" => result |= Self::LAYER_37,
+                "layer-38" => result |= Self::LAYER_38,
+                "layer-39" => result |= Self::LAYER_39,
+                "layer-40" => result |= Self::LAYER_40,
+                "layer-41" => result |= Self::LAYER_41,
+                "layer-42" => result |= Self::LAYER_42,
+                "layer-43" => result |= Self::LAYER_43,
+                "layer-44" => result |= Self::LAYER_44,
+                "layer-45" => result |= Self::LAYER_45,
+                "layer-46" => result |= Self::LAYER_46,
+                "layer-47" => result |= Self::LAYER_47,
+                "layer-48" => result |= Self::LAYER_48,
+                "layer-49" => result |= Self::LAYER_49,
+                "layer-50" => result |= Self::LAYER_50,
+                "layer-51" => result |= Self::LAYER_51,
+                "layer-52" => result |= Self::LAYER_52,
+                "layer-53" => result |= Self::LAYER_53,
+                "layer-54" => result |= Self::LAYER_54,
+                "layer-55" => result |= Self::LAYER_55,
+                _ => {}
+            }
+        }
+        result
+    }
+}
+
+impl BitAnd for CollisionMask {
+    type Output = Self;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        Self(self.0 & rhs.0)
+    }
+}
+
+impl BitAndAssign for CollisionMask {
+    fn bitand_assign(&mut self, rhs: Self) {
+       *self = CollisionMask(self.0 & rhs.0)
+    }
+}
+
+impl BitOr for CollisionMask {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self(self.0 | rhs.0)
+    }
+}
+
+impl BitOrAssign for CollisionMask {
+    fn bitor_assign(&mut self, rhs: Self) {
+       *self = CollisionMask(self.0 | rhs.0)
+    }
+}
+
+impl BitXor for CollisionMask {
+    type Output = Self;
+
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        Self(self.0 ^ rhs.0)
+    }
+}
+
+impl BitXorAssign for CollisionMask {
+    fn bitxor_assign(&mut self, rhs: Self) {
+       *self = CollisionMask(self.0 ^ rhs.0)
     }
 }
