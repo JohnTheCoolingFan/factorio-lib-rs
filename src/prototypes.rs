@@ -717,6 +717,20 @@ impl Prototype for CustomInput<'_> {
     fn name(&self) -> &String { &self.name }
 }
 
+#[derive(Debug, PrototypeBase)]
+pub struct DamageType<'a> {
+    name: String,
+    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString<'a>>,
+    order: String,
+    hidden: bool // Default: false
+}
+
+impl Prototype for DamageType<'_> {
+    fn r#type(&self) -> PrototypeType { PrototypeType::DamageType }
+    fn name(&self) -> &String { &self.name }
+}
+
 // Enum for all prototype types
 #[derive(Debug, Clone, Copy)]
 pub enum PrototypeType {
