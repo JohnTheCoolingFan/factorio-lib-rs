@@ -16,6 +16,18 @@ pub fn prototype_base_macro_derive(input: TokenStream) -> TokenStream {
     impl_prototype_base_macro(&ast)
 }
 
+#[proc_macro_derive(TriggerEffectItemBase)]
+pub fn trigger_effect_item_base_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_trigger_efffect_item_base_macro(&ast)
+}
+
+#[proc_macro_derive(CreateEntityTriggerEffectItemBase)]
+pub fn create_entity_trigger_effect_item_base_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_create_entity_trigger_effect_item_base_macro(&ast)
+}
+
 fn impl_mod_setting_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -37,6 +49,37 @@ fn impl_prototype_base_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn localised_name(&self) -> &Option<LocalisedString> { &self.localised_name }
             fn localised_description(&self) -> &Option<LocalisedString> { &self.localised_description }
             fn order(&self) -> &String { &self.order }
+        }
+    };
+    gen.into()
+}
+
+fn impl_trigger_efffect_item_base_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl TriggerEffectItemBase for #name {
+            fn repeat_count(&self) -> u16 { self.base.repeat_count }
+            fn repeat_count_deviation(&self) -> u16 { self.base.repeat_count_deviation }
+            fn probability(&self) -> f32 { self.base.probability }
+            fn affects_target(&self) -> bool { self.base.affects_target }
+            fn show_in_tooltip(&self) -> bool { self.base.show_in_tooltip }
+            fn damage_type_filters(&self) -> &Option<DamageTypeFilters> { &self.base.damage_type_filters }
+        }
+    };
+    gen.into()
+}
+
+fn impl_create_entity_trigger_effect_item_base_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl CreateEntityTriggerEffectItemBase for #name {
+            fn entity_name(&self) -> &String { &self.create_entity_base.entity_name }
+            fn offset_deviation(&self) -> &Option<BoundingBox> { &self.create_entity_base.offset_deviation }
+            fn trigger_created_entity(&self) -> bool { self.create_entity_base.trigger_created_entity }
+            fn check_buildability(&self) -> bool { self.create_entity_base.check_buildability }
+            fn show_in_tooltip(&self) -> bool { self.create_entity_base.show_in_tooltip }
+            fn tile_collision_mask(&self) -> &Option<CollisionMask> { &self.create_entity_base.tile_collision_mask }
+            fn offsets(&self) -> &Option<Vec<Factorio2DVector>> { &self.create_entity_base.offsets }
         }
     };
     gen.into()

@@ -3,6 +3,7 @@ use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
 use std::fmt;
 use crate::prototypes::PrototypesErr;
+use factorio_lib_rs_derive::{TriggerEffectItemBase, CreateEntityTriggerEffectItemBase};
 
 pub type FileName = String;
 pub type ItemStackIndex = u16;
@@ -1011,7 +1012,7 @@ impl FromStr for RenderLayer {
 }
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct CollisionMask(u8);
+pub struct CollisionMask(u64);
 
 impl CollisionMask {
     pub const GROUND_TILE: CollisionMask = CollisionMask(1);
@@ -1072,6 +1073,7 @@ impl CollisionMask {
     pub const NOT_COLLIDING_WITH_ITSELF: CollisionMask = CollisionMask(1 << 55);
     pub const CONSIDER_TILE_TRANSITIONS: CollisionMask = CollisionMask(1 << 56);
     pub const COLLIDING_WITH_TILES_ONLY: CollisionMask = CollisionMask(1 << 57);
+    pub const ALL: CollisionMask = CollisionMask(u64::MAX); // Just sets all bits 1, instead of setting all usable bits
 }
 
 impl From<Vec<&str>> for CollisionMask {
@@ -1187,4 +1189,337 @@ impl BitXorAssign for CollisionMask {
     fn bitxor_assign(&mut self, rhs: Self) {
        *self = CollisionMask(self.0 ^ rhs.0)
     }
+}
+
+#[derive(Debug)]
+pub struct EntityPrototypeFlags(u32);
+
+impl EntityPrototypeFlags {
+    pub const NOT_ROTATABLE: Self = Self(1);
+    pub const PLACEABLE_PLAYER: Self = Self(1 << 1);
+    pub const PLACEABLE_NEUTRAL: Self = Self(1 << 2);
+    pub const PLACEABLE_ENEMY: Self = Self(1 << 3);
+    pub const PLACEABLE_OFF_GRID: Self = Self(1 << 4);
+    pub const PLAYER_CREATION: Self = Self(1 << 5);
+    pub const BUILDING_DIRECTION_8_WAY: Self = Self(1 << 6);
+    pub const FILTER_DIRECTIONS: Self = Self(1 << 7);
+    pub const FAST_REPLACEABLE_NO_BUILD_WHILE_MOVING: Self = Self(1 << 8);
+    pub const BREATHS_AIR: Self = Self(1 << 9);
+    pub const NOT_REPAIRABLE: Self = Self(1 << 10);
+    pub const NOT_ON_MAP: Self = Self(1 << 11);
+    pub const NOT_BLUEPRINTABLE: Self = Self(1 << 12);
+    pub const NOT_DECONSTRUCTABLE: Self = Self(1 << 13);
+    pub const HIDDEN: Self = Self(1 << 14);
+    pub const HIDE_ALT_INFO: Self = Self(1 << 15);
+    pub const FAST_REPLACEABLE_NO_CROSS_TYPE_WHILE_MOVING: Self = Self(1 << 16);
+    pub const NO_GAR_FILL_WHILE_BUILDING: Self = Self(1 << 17);
+    pub const NOT_FLAMMABLE: Self = Self(1 << 18);
+    pub const NO_AUTOMATED_ITEM_REMOVAL: Self = Self(1 << 19);
+    pub const NO_AUTOMATED_ITEM_INSERTION: Self = Self(1 << 20);
+    pub const NO_COPY_PASTE: Self = Self(1 << 21);
+    pub const NOT_SELECTABLE_IN_GAME: Self = Self(1 << 22);
+    pub const NOT_UPGRADABLE: Self = Self(1 << 23);
+    pub const NOT_IN_KILL_STATISTICS: Self = Self(1 << 24);
+    pub const ALL: Self = Self(u32::MAX);
+}
+
+impl From<Vec<&str>> for EntityPrototypeFlags {
+    fn from(flags: Vec<&str>) -> Self {
+        let mut result = Self(0);
+        for flag in flags {
+            match flag {
+                "not-rotatable" => result |= Self::NOT_ROTATABLE,
+                "placeable-player" => result |= Self::PLACEABLE_PLAYER,
+                "placeable-neutral" => result |= Self::PLACEABLE_NEUTRAL,
+                "placeable-enemy" => result |= Self::PLACEABLE_ENEMY,
+                "placeable-off-grid" => result |= Self::PLACEABLE_OFF_GRID,
+                "player-creation" => result |= Self::PLAYER_CREATION,
+                "building-direction-8-way" => result |= Self::BUILDING_DIRECTION_8_WAY,
+                "filter-directions" => result |= Self::FILTER_DIRECTIONS,
+                "fast-replaceable-no-build-while-moving" => result |= Self::FAST_REPLACEABLE_NO_BUILD_WHILE_MOVING,
+                "breaths-air" => result |= Self::BREATHS_AIR,
+                "not-repairable" => result |= Self::NOT_REPAIRABLE,
+                "not-on-map" => result |= Self::NOT_ON_MAP,
+                "not-blueprintable" => result |= Self::NOT_BLUEPRINTABLE,
+                "not-deconstructable" => result |= Self::NOT_DECONSTRUCTABLE,
+                "hidden" => result |= Self::HIDDEN,
+                "hide-alt-info" => result |= Self::HIDE_ALT_INFO,
+                "fast-replaceable-no-cross-type-while-moving" => result |= Self::FAST_REPLACEABLE_NO_CROSS_TYPE_WHILE_MOVING,
+                "no-gap-fill-while-building" => result |= Self::NO_GAR_FILL_WHILE_BUILDING,
+                "not-flammable" => result |= Self::NOT_FLAMMABLE,
+                "no-automated-item-removal" => result |= Self::NO_AUTOMATED_ITEM_REMOVAL,
+                "no-automated-item-insertion" => result |= Self::NO_AUTOMATED_ITEM_INSERTION,
+                "no-copy-paste" => result |= Self::NO_COPY_PASTE,
+                "not-selectable-in-game" => result |= Self::NOT_SELECTABLE_IN_GAME,
+                "not-upgradable" => result |= Self::NOT_UPGRADABLE,
+                "not-in-kill-statistics" => result |= Self::NOT_IN_KILL_STATISTICS,
+                _ => {}
+            }
+        }
+        result
+    }
+}
+
+impl BitAnd for EntityPrototypeFlags {
+    type Output = Self;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        Self(self.0 & rhs.0)
+    }
+}
+
+impl BitAndAssign for EntityPrototypeFlags {
+    fn bitand_assign(&mut self, rhs: Self) {
+       *self = EntityPrototypeFlags(self.0 & rhs.0)
+    }
+}
+
+impl BitOr for EntityPrototypeFlags {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self(self.0 | rhs.0)
+    }
+}
+
+impl BitOrAssign for EntityPrototypeFlags {
+    fn bitor_assign(&mut self, rhs: Self) {
+       *self = EntityPrototypeFlags(self.0 | rhs.0)
+    }
+}
+
+impl BitXor for EntityPrototypeFlags {
+    type Output = Self;
+
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        Self(self.0 ^ rhs.0)
+    }
+}
+
+impl BitXorAssign for EntityPrototypeFlags {
+    fn bitxor_assign(&mut self, rhs: Self) {
+       *self = EntityPrototypeFlags(self.0 ^ rhs.0)
+    }
+}
+
+#[derive(Debug)]
+pub enum TriggerEffect {
+    Damage(DamageTriggerEffectItem),
+    CreateEntity(CreateEntityTriggerEffectItem),
+    CreateExplosion(CreateExplosionTriggerEffectItem),
+    CreateFire(CreateFireTriggerEffectItem),
+    CreateSmoke(CreateSmokeTriggerEffectItem),
+    CreateTrivialSmoke(CreateTrivialSmokeTriggerEffectItem),
+    CreateParticle(CreateParticleTriggerEffectItem),
+    CreateSticker(CreateStickerTriggerEffectItem),
+    CreateDecorative(CreateDecorativesTriggerEffectItem),
+    NestedResult(NestedTriggerEffectItem),
+    PlaySound(PlaySoundTriggerEffectItem),
+    PushBack(PushBackTriggerEffectItem),
+    DestoryCliffs(DestoryCliffsTriggerEffectItem),
+    ShowExplosionOnChart(ShowExplosionOnChartTriggerEffectItem),
+    InsertItem(InsertItemTriggerEffectItem),
+    Script(ScriptTriggerEffectItem),
+    SetTile(SetTileTriggerEffectItem),
+    InvokeTileTrigger(InvokeTileTriggerTriggerEffectItem),
+    DestoryDecoratives(DestoryDecorativesTriggerEffectItem),
+    CameraEffect(CameraEffectTriggerEffectItem),
+}
+
+#[derive(Debug)]
+pub struct DamagePrototype {
+    amount: f32,
+    r#type: String // Damage type
+}
+
+#[derive(Debug)]
+pub struct DamageTypeFilters {
+    types: Vec<String>, // If String, converted to Vec<String> with one element // Name of DamageType prototype
+    whitelist: bool // Default: false
+}
+
+#[derive(Debug)]
+pub struct TriggerEffectItem {
+    repeat_count: u16, // Default: 1
+    repeat_count_deviation: u16, // Default: 0
+    probability: f32, // Default: 1 // 0 < value <= 1
+    affects_target: bool, // Default: false
+    show_in_tooltip: bool, // Default: true // Default: false in some cases
+    damage_type_filters: Option<DamageTypeFilters>
+}
+
+pub trait TriggerEffectItemBase {
+    fn repeat_count(&self) -> u16;
+    fn repeat_count_deviation(&self) -> u16;
+    fn probability(&self) -> f32;
+    fn affects_target(&self) -> bool;
+    fn show_in_tooltip(&self) -> bool;
+    fn damage_type_filters(&self) -> &Option<DamageTypeFilters>;
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct DamageTriggerEffectItem {
+    base: TriggerEffectItem,
+    damage: DamagePrototype,
+    apply_damage_to_trees: bool, // Default: true
+    vaporize: bool, // Default: false
+    lower_distance_threshold: u16, // Default: u16::MAX
+    upper_distance_threshold: u16, // Default: u16::MAX
+    lower_damage_modifier: f32, // Default: 1
+    upper_damage_modifier: f32  // Default: 1
+}
+
+#[derive(Debug)]
+pub struct CreateEntityTriggerEffect {
+    entity_name: String, // Entity name
+    offset_deviation: Option<BoundingBox>,
+    trigger_created_entity: bool, // Default: false
+    check_buildability: bool, // Default: false
+    // Override default in constructor
+    show_in_tooltip: bool, // Default: false
+    tile_collision_mask: Option<CollisionMask>,
+    offsets: Option<Vec<Factorio2DVector>>
+}
+
+#[derive(Debug, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
+pub struct CreateEntityTriggerEffectItem {
+    base: TriggerEffectItem,
+    create_entity_base: CreateEntityTriggerEffect
+}
+
+pub trait CreateEntityTriggerEffectItemBase {
+    fn entity_name(&self) -> &String;
+    fn offset_deviation(&self) -> &Option<BoundingBox>;
+    fn trigger_created_entity(&self) -> bool;
+    fn check_buildability(&self) -> bool;
+    fn show_in_tooltip(&self) -> bool;
+    fn tile_collision_mask(&self) -> &Option<CollisionMask>;
+    fn offsets(&self) -> &Option<Vec<Factorio2DVector>>;
+}
+
+#[derive(Debug, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
+pub struct CreateExplosionTriggerEffectItem {
+    base: TriggerEffectItem,
+    create_entity_base: CreateEntityTriggerEffect,
+    max_movement_distance: f32, // Default: -1
+    max_movement_distance_deviation: f32, // Default: 0
+    inherit_movement_distance_from_projectile: bool, // Default: false
+    cycle_while_moving: bool // Default: false
+}
+
+#[derive(Debug, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
+pub struct CreateFireTriggerEffectItem {
+    base: TriggerEffectItem,
+    create_entity_base: CreateEntityTriggerEffect,
+    initial_ground_flame_count: u8 // Default: u8::MAX
+}
+
+#[derive(Debug, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
+pub struct CreateSmokeTriggerEffectItem {
+    base: TriggerEffectItem,
+    create_entity_base: CreateEntityTriggerEffect,
+    initial_height: f32, // Default: 0
+    speed: Option<Factorio2DVector>,
+    speed_multiplier: f32, // Default: 0
+    speed_multiplier_deviation: f32, // Default: 0
+    starting_frame: f32, // Default: 0 // Why is it f32?
+    starting_frame_deviation: f32, // Default: 0
+    starting_frame_speed: f32, // Default: 0
+    starting_frame_speed_deviation: f32, // Default: 0
+    speed_from_center: f32, // Default: 0
+    speed_from_center_deviation: f32 // Default: 0
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct CreateTrivialSmokeTriggerEffectItem {
+    base: TriggerEffectItem,
+    smoke_name: String, // Name of TrivialSmoke prototype
+    offset_deviation: Option<BoundingBox>,
+    offsets: Option<Vec<Factorio2DVector>>,
+    initial_height: f32, // Default: 0
+    max_radius: f32, // Default: 0
+    speed: Factorio2DVector, // Default: (0, 0)
+    speed_multiplier: f32, // Default: 0
+    speed_multiplier_deviation: f32, // Default: 0
+    starting_frame: f32, // Default: 0
+    starting_frame_deviation: f32, // Default: 0
+    starting_frame_speed: f32, // Default: 0
+    starting_frame_speed_deviation: f32, // Default: 0
+    speed_from_center: f32, // Default: 0
+    speed_from_center_deviation: f32 // Default: 0
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct CreateParticleTriggerEffectItem {
+    base: TriggerEffectItem,
+    particle_name: String, // Name of Particle prototype
+    initial_height: f32,
+    offset_deviation: Option<BoundingBox>,
+    // show_in_tooltip: Default: false // Override in constructor
+    tile_collision_mask: Option<CollisionMask>,
+    offsets: Option<Vec<Factorio2DVector>>,
+    initial_height_deviation: f32, // Default: 0
+    initial_vertical_speed: f32, // Default: 0
+    initial_vertical_speed_deviation: f32, // Default: 0
+    speed_from_center: f32, // Default: 0
+    speed_from_center_deviation: f32, // Default: 0
+    frame_speed: f32, // Default: 1
+    frame_speed_deviation: f32, // Default: 0
+    tail_length: u8, // Default: 0 // Silently capped to maximum fo 100
+    tail_length_deviation: u8, // Default: 0
+    tail_width: f32, // Default: 1
+    rotate_offsets: bool // Default: false
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct CreateStickerTriggerEffectItem {
+    base: TriggerEffectItem,
+    stricker: String, // Name of Sticker prototype
+    // show_in_tooltip: Default: false // Override in constructor
+    trigger_created_entity: bool // Default: false
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct CreateDecorativesTriggerEffectItem {
+    base: TriggerEffectItem,
+    decorative: String, // name of Decorative prototype
+    spawn_max: u16,
+    spawn_min_radius: f32,
+    spawn_max_radius: f32, // Limited to < 24
+    spawn_min: u16, // Default: u16
+    radius_curve: f32, // Default: 0.5
+    apply_projection: bool, // Default: false
+    spread_evenly: bool // Default: false
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct NestedTriggerEffectItem {
+    base: TriggerEffectItem,
+    action: Trigger
+}
+
+#[derive(Debug)]
+pub enum Trigger {
+    Direct(DirectTriggerItem),
+    Area(AreaTriggerItem),
+    Line(LineTriggerItem),
+    Cluster(ClusterTriggerItem)
+}
+
+#[derive(Debug)]
+pub enum TriggerTargetMask {
+    Everything,
+    Specific(Vec<String>)
+}
+
+#[derive(Debug)]
+pub struct TriggerItem {
+    entity_flags: EntityPrototypeFlags, // Default: all flags
+    ignore_collision_condition: bool, // Default: false
+    trigger_target_mask: TriggerTargetMask, // Default: all flags
+    repeat_count: u32, // Default: 1
+    probability: f32, // Default: 1
+    collision_mask: CollisionMask, // Default: all
+    action_delivery: Option<Vec<TriggerDelivery>>,
+    force: ForceCondition // Default: all forces
 }
