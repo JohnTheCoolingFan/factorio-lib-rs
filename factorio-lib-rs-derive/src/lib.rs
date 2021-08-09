@@ -28,6 +28,12 @@ pub fn create_entity_trigger_effect_item_base_macro_derive(input: TokenStream) -
     impl_create_entity_trigger_effect_item_base_macro(&ast)
 }
 
+#[proc_macro_derive(TriggerItemBase)]
+pub fn trigger_item_base_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_trigger_item_base_macro(&ast)
+}
+
 fn impl_mod_setting_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -80,6 +86,23 @@ fn impl_create_entity_trigger_effect_item_base_macro(ast: &syn::DeriveInput) -> 
             fn show_in_tooltip(&self) -> bool { self.create_entity_base.show_in_tooltip }
             fn tile_collision_mask(&self) -> &Option<CollisionMask> { &self.create_entity_base.tile_collision_mask }
             fn offsets(&self) -> &Option<Vec<Factorio2DVector>> { &self.create_entity_base.offsets }
+        }
+    };
+    gen.into()
+}
+
+fn impl_trigger_item_base_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl TriggerItemBase for #name {
+            fn entity_flags(&self) -> EntityPrototypeFlags { self.base.entity_flags }
+            fn ignore_collision_condition(&self) -> bool { self.base.ignore_collision_condition }
+            fn trigger_target_mask(&self) -> &TriggerTargetMask { &self.base.trigger_target_mask }
+            fn repeat_count(&self) -> u32 { self.base.repeat_count }
+            fn probability(&self) -> f32 { self.base.probability }
+            fn collision_mask(&self) -> CollisionMask { self.base.collision_mask }
+            fn action_delivery(&self) -> &Option<Vec<TriggerDelivery>> { &self.base.action_delivery }
+            fn force(&self) -> ForceCondition { self.base.force }
         }
     };
     gen.into()
