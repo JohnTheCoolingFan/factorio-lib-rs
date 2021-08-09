@@ -1302,6 +1302,7 @@ impl BitXorAssign for EntityPrototypeFlags {
     }
 }
 
+// TODO: probably move to a separate file because this takes a lot of lines and is complicated
 #[derive(Debug)]
 pub enum TriggerEffect {
     Damage(DamageTriggerEffectItem),
