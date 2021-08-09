@@ -1557,7 +1557,6 @@ impl fmt::Display for ForceCondition {
             Self::NotFriend => "not-friend",
             Self::Same => "same",
             Self::NotSame => "not-same",
-            _ => return Err(fmt::Error)
         })
     }
 }
@@ -1694,7 +1693,6 @@ impl fmt::Display for CollisionMode {
         write!(f, "{}", match self {
             Self::DistanceFromCollisionBox => "distance-from-collision-box",
             Self::DistanceFromCenter => "distance-from-center",
-            _ => return Err(fmt::Error)
         })
     }
 }
