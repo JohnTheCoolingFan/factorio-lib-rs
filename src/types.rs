@@ -3,7 +3,7 @@ use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
 use std::fmt;
 use crate::prototypes::PrototypesErr;
-use factorio_lib_rs_derive::{TriggerEffectItemBase, CreateEntityTriggerEffectItemBase};
+use factorio_lib_rs_derive::{TriggerEffectItemBase, CreateEntityTriggerEffectItemBase, TriggerItemBase};
 
 pub type FileName = String;
 pub type ItemStackIndex = u16;
@@ -1011,7 +1011,7 @@ impl FromStr for RenderLayer {
     }
 }
 
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd, Clone, Copy)]
 pub struct CollisionMask(u64);
 
 impl CollisionMask {
@@ -1191,7 +1191,7 @@ impl BitXorAssign for CollisionMask {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct EntityPrototypeFlags(u32);
 
 impl EntityPrototypeFlags {
@@ -1313,16 +1313,16 @@ pub enum TriggerEffect {
     CreateParticle(CreateParticleTriggerEffectItem),
     CreateSticker(CreateStickerTriggerEffectItem),
     CreateDecorative(CreateDecorativesTriggerEffectItem),
-    NestedResult(NestedTriggerEffectItem),
+    NestedResult(Box<NestedTriggerEffectItem>),
     PlaySound(PlaySoundTriggerEffectItem),
     PushBack(PushBackTriggerEffectItem),
-    DestoryCliffs(DestoryCliffsTriggerEffectItem),
+    DestoryCliffs(DestroyCliffsTriggerEffectItem),
     ShowExplosionOnChart(ShowExplosionOnChartTriggerEffectItem),
     InsertItem(InsertItemTriggerEffectItem),
     Script(ScriptTriggerEffectItem),
     SetTile(SetTileTriggerEffectItem),
-    InvokeTileTrigger(InvokeTileTriggerTriggerEffectItem),
-    DestoryDecoratives(DestoryDecorativesTriggerEffectItem),
+    InvokeTileTrigger(InvokeTileEffectTriggerEffectItem),
+    DestoryDecoratives(DestroyDecorativesTriggerEffectItem),
     CameraEffect(CameraEffectTriggerEffectItem),
 }
 
@@ -1522,4 +1522,274 @@ pub struct TriggerItem {
     collision_mask: CollisionMask, // Default: all
     action_delivery: Option<Vec<TriggerDelivery>>,
     force: ForceCondition // Default: all forces
+}
+
+pub trait TriggerItemBase {
+    fn entity_flags(&self) -> EntityPrototypeFlags; // Default: all flags
+    fn ignore_collision_condition(&self) -> bool; // Default: false
+    fn trigger_target_mask(&self) -> &TriggerTargetMask; // Default: all flags
+    fn repeat_count(&self) -> u32; // Default: 1
+    fn probability(&self) -> f32; // Default: 1
+    fn collision_mask(&self) -> CollisionMask; // Default: all
+    fn action_delivery(&self) -> &Option<Vec<TriggerDelivery>>;
+    fn force(&self) -> ForceCondition; // Default: all forces
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum ForceCondition {
+    All,
+    Enemy,
+    Ally,
+    Friend,
+    NotFriend,
+    Same,
+    NotSame
+}
+
+impl fmt::Display for ForceCondition {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::All => "all",
+            Self::Enemy => "enemy",
+            Self::Ally => "ally",
+            Self::Friend => "friend",
+            Self::NotFriend => "not-friend",
+            Self::Same => "same",
+            Self::NotSame => "not-same",
+            _ => return Err(fmt::Error)
+        })
+    }
+}
+
+impl FromStr for ForceCondition {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "all" => Ok(Self::All),
+            "enemy" => Ok(Self::Enemy),
+            "ally" => Ok(Self::Ally),
+            "friend" => Ok(Self::Friend),
+            "not-friend" => Ok(Self::NotFriend),
+            "same" => Ok(Self::Same),
+            "not-same" => Ok(Self::NotSame),
+            _ => Err(PrototypesErr::InvalidTypeStr("ForceCondition".into(), s.into()))
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum TriggerDelivery {
+    Instant(InstantTriggerDelivery),
+    Projectile(ProjectileTriggerDelivery),
+    FlameThrowerExplosion(FlameThrowerExplosionTriggerDelivery),
+    Beam(BeamTriggerDelivery),
+    Stream(StreamTriggerDelivery),
+    Artillery(ArtilleryTriggerDelivery)
+}
+
+#[derive(Debug)]
+pub struct InstantTriggerDelivery {
+    source_effects: Option<TriggerEffect>,
+    target_effects: Option<TriggerEffect>
+}
+
+#[derive(Debug)]
+pub struct ProjectileTriggerDelivery {
+    source_effects: Option<TriggerEffect>,
+    target_effects: Option<TriggerEffect>,
+    projectile: String,
+    starting_speed: f32,
+    starting_speed_deviation: f32, // Default: 0
+    direction_deviation: f32, // Default: 0
+    range_deviation: f32, // Default: 0
+    max_range: f64, // Default: 1000
+    min_range: f64 // Default: 0
+}
+
+#[derive(Debug)]
+pub struct FlameThrowerExplosionTriggerDelivery {
+    source_effects: Option<TriggerEffect>,
+    target_effects: Option<TriggerEffect>,
+    explosion: String,
+    starting_distance: f64,
+    direction_deviation: f32, // Default: 0
+    speed_deviation: f64, // Default: 0
+    starting_frame_fraction_deviation: f64, // Default: 0
+    projectile_starting_speed: f64 // Default: 1
+}
+
+#[derive(Debug)]
+pub struct BeamTriggerDelivery {
+    source_effects: Option<TriggerEffect>,
+    target_effects: Option<TriggerEffect>,
+    beam: String, // Name of Beam prototype
+    add_to_shooter: bool, // Default: true
+    max_length: u32, // Default: 0
+    duration: u32, // Default: 0
+    source_offset: Option<Factorio2DVector>,
+}
+
+#[derive(Debug)]
+pub struct StreamTriggerDelivery {
+    source_effects: Option<TriggerEffect>,
+    target_effects: Option<TriggerEffect>,
+    stream: String, // Name of FluidStream prototype
+    source_offset: Option<Factorio2DVector>
+}
+
+#[derive(Debug)]
+pub struct ArtilleryTriggerDelivery {
+    source_effects: Option<TriggerEffect>,
+    target_effects: Option<TriggerEffect>,
+    projectile: String, // Name of ArtilleryProjectile prototype
+    starting_speed: f32,
+    starting_speed_deviation: f32, // Default: 0
+    direction_deviation: f32, // Default: 0
+    range_deviation: f32, // Default: 0
+    trigger_fired_artillery: bool // Default: false
+}
+
+#[derive(Debug, TriggerItemBase)]
+pub struct DirectTriggerItem {
+    base: TriggerItem,
+    filter_enabled: bool // Default: false
+}
+
+#[derive(Debug, TriggerItemBase)]
+pub struct AreaTriggerItem {
+    base: TriggerItem,
+    radius: f64,
+    trigger_from_target: bool, // Default: false
+    target_entities: bool, // Default: true
+    show_in_tooltip: bool, // Default: true
+    collision_mode: CollisionMode // Default: "distance-from-collision-box"
+}
+
+#[derive(Debug, TriggerItemBase)]
+pub struct LineTriggerItem {
+    base: TriggerItem,
+    range: f64,
+    width: f64,
+    range_effects: Option<TriggerEffect>
+}
+
+#[derive(Debug, TriggerItemBase)]
+pub struct ClusterTriggerItem {
+    base: TriggerItem,
+    cluster_count: f64, // Must be at least 2
+    distance: f32,
+    distance_deviation: f32 // Default: 0
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum CollisionMode {
+    DistanceFromCollisionBox,
+    DistanceFromCenter,
+}
+
+impl fmt::Display for CollisionMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::DistanceFromCollisionBox => "distance-from-collision-box",
+            Self::DistanceFromCenter => "distance-from-center",
+            _ => return Err(fmt::Error)
+        })
+    }
+}
+
+impl FromStr for CollisionMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "distance-from-collision-box" => Ok(Self::DistanceFromCollisionBox),
+            "distance-from-center" => Ok(Self::DistanceFromCenter),
+            _ => Err(PrototypesErr::InvalidTypeStr("CollisionMode".into(), s.into()))
+        }
+    }
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct PlaySoundTriggerEffectItem {
+    base: TriggerEffectItem,
+    sound: Sound,
+    // Negative values are silently clamped to 0
+    min_distance: f32, // Default: 0
+    max_distance: f32, // Default: 1e21
+    volume_modifier: f32, // Default: 1
+    audible_distance_modifier: f32, // Default: 1
+    play_on_target_position: bool // Default: false
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct PushBackTriggerEffectItem {
+    base: TriggerEffectItem,
+    distance: f32
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct DestroyCliffsTriggerEffectItem {
+    base: TriggerEffectItem,
+    radius: f32,
+    explosion: Option<String>, // Name of an entity
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct ShowExplosionOnChartTriggerEffectItem {
+    base: TriggerEffectItem,
+    scale: f32
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct InsertItemTriggerEffectItem {
+    base: TriggerEffectItem,
+    item: String, // Name of an item
+    count: u32 // Default: 1
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct ScriptTriggerEffectItem {
+    base: TriggerEffectItem,
+    effect_id: String
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct SetTileTriggerEffectItem {
+    base: TriggerEffectItem,
+    tile_name: String, // Name of a prototype
+    radius: f32,
+    apply_projection: bool, // Default: false
+    tile_collision_mask: CollisionMask // Default: none
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct InvokeTileEffectTriggerEffectItem {
+    base: TriggerEffectItem,
+    tile_collision_mask: Option<CollisionMask>
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct DestroyDecorativesTriggerEffectItem {
+    base: TriggerEffectItem,
+    radius: f32,
+    from_render_layer: RenderLayer, // Default: first layer
+    to_render_layer: RenderLayer, // Default: last layer
+    include_soft_decoratives: bool, // Default: false
+    include_decals: bool, // Default: false
+    invoke_decorative_trigger: bool, // Default: true
+    decoratives_with_trigger_only: bool // Default: false
+}
+
+#[derive(Debug, TriggerEffectItemBase)]
+pub struct CameraEffectTriggerEffectItem {
+    base: TriggerEffectItem,
+    effect: String,
+    duration: u8,
+    ease_in_duration: u8, // Default: 0
+    ease_out_duration: u8, // Default: 0
+    delay: u8, // Default: 0
+    full_strength_max_distance: u16, // Default: 0
+    max_distance: u16, // Default: 0
+    strength: f32, // Default: 0
 }
