@@ -4,6 +4,12 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn;
 
+#[proc_macro_derive(Prototype)]
+pub fn prototype_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_prototype_macro(&ast)
+}
+
 #[proc_macro_derive(ModSetting)]
 pub fn mod_setting_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -34,10 +40,20 @@ pub fn trigger_item_base_macro_derive(input: TokenStream) -> TokenStream {
     impl_trigger_item_base_macro(&ast)
 }
 
+fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl Prototype for #name {
+            fn name(&self) -> &String { &self.name }
+        }
+    };
+    gen.into()
+}
+
 fn impl_mod_setting_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
-        impl ModSetting for #name<'_> {
+        impl ModSetting for #name {
             fn localised_name(&self) -> &Option<LocalisedString> { &self.localised_name }
             fn localised_description(&self) -> &Option<LocalisedString> { &self.localised_description }
             fn order(&self) -> &Option<String> { &self.order }
@@ -51,7 +67,7 @@ fn impl_mod_setting_macro(ast: &syn::DeriveInput) -> TokenStream {
 fn impl_prototype_base_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
-        impl PrototypeBase for #name<'_> {
+        impl PrototypeBase for #name {
             fn localised_name(&self) -> &Option<LocalisedString> { &self.localised_name }
             fn localised_description(&self) -> &Option<LocalisedString> { &self.localised_description }
             fn order(&self) -> &String { &self.order }
