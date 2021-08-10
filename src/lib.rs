@@ -1,6 +1,7 @@
 pub mod concepts;
-pub mod prototypes;
 pub mod mod_structs;
+pub mod prototypes;
+pub mod prototype_type;
 pub mod types;
 
 // I guess this is a good place for todos
