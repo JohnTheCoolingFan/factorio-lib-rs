@@ -32,7 +32,19 @@ use crate::types::{
     RenderLayer,
     TriggerEffect,
     AutoplaceSpecification,
-    CollisionMask};
+    CollisionMask,
+    TriggerTargetMask,
+    EntityPrototypeFlags,
+    MinableProperties,
+    Factorio2DVector,
+    RemoveDecoratives,
+    CreateTrivialSmokeEffectItem,
+    WorkingSound,
+    Trigger,
+    RadiusVisualizationSpecification,
+    ItemToPlace,
+    WaterReflectionDefinition
+};
 
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
@@ -554,6 +566,54 @@ pub struct Decorative {
     trigger_effect: Option<TriggerEffect>,
     autoplace: Option<AutoplaceSpecification>,
     collision_mask: CollisionMask // Default: "doodad-layer"
+}
+
+#[derive(Debug)]
+pub struct EntityBase {
+    icon: Option<IconSpecification>, // Mandatory if one of flags active: "placeable-neutral", "placeable-player", "placeable-enemy"
+    collision_box: BoundingBox, // Default: ((0, 0), (0, 0))
+    collision_mask: CollisionMask, // Default: ("item-layer", "object-layer", "player-layer", "water-tile") and depends on type
+    map_generator_bounding_box: BoundingBox,
+    selection_box: BoundingBox, // Default: ((0, 0), (0, 0))
+    drawing_box: BoundingBox, // Default: ((0, 0), (0, 0)), selection_box is used instead
+    sticker_box: BoundingBox, // Default: collision_box
+    hit_visualization_box: BoundingBox, // Default: ((0, 0), (0, 0))
+    trigger_target_mask: Option<TriggerTargetMask>,
+    flags: Option<EntityPrototypeFlags>,
+    minable: MinableProperties, // Default: not minable
+    subgroup: Option<String>,
+    allow_copy_paste: bool, // Default: true
+    selectable_in_game: bool, // Default: true
+    selection_priority: u8, // Default: 50
+    remove_decoratives: RemoveDecoratives, // Default: "automatic"
+    emissions_per_second: f64, // Default: 0
+    shooting_cursor_size: Option<f64>,
+    created_smoke: CreateTrivialSmokeEffectItem, // Default: "smoke-building"-smoke
+    working_sound: Option<WorkingSound>,
+    created_effect: Option<Trigger>,
+    build_sound: Option<Sound>,
+    mined_sound: Option<Sound>,
+    mining_sound: Option<Sound>,
+    rotated_sound: Option<Sound>,
+    vehicle_impact_sound: Option<Sound>,
+    open_sound: Option<Sound>,
+    close_sound: Option<Sound>,
+    radius_visualization_specification: Option<RadiusVisualizationSpecification>,
+    build_base_evolution_requirement: f64, // Default: 0
+    alert_icon_shift: Option<Factorio2DVector>,
+    alert_icon_scale: Option<f32>,
+    fast_replaceable_group: String, // Default: ""
+    next_upgrade: Option<String>, // Name of the entity // Has limitations, listed on wiki
+    placeable_by: Option<Vec<ItemToPlace>>,
+    remains_when_mined: Option<Vec<String>>,
+    additional_pastable_entities: Option<Vec<String>>,
+    tile_width: u32, // Default: Calculated from collision_box
+    tile_height: u32, // Default: Calculated from collision_box
+    autoplace: Option<AutoplaceSpecification>,
+    map_color: Option<Color>,
+    friendly_map_color: Option<Color>,
+    enemy_map_color: Option<Color>,
+    water_reflection: Option<WaterReflectionDefinition>
 }
 
 // Enum for all prototypes
