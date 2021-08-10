@@ -715,7 +715,7 @@ pub enum PrototypeGeneral {
     AutoplaceControl(AutoplaceControl),
     CustomInput(CustomInput),
     DamageType(DamageType),
-    Decorative(Decorative), // TODO: other prototypes
+    Decorative(Decorative),
     Arrow(Arrow),
     ArtilleryFlare,
     ArtilleryProjectile,
