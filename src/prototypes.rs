@@ -301,7 +301,7 @@ pub struct WindSound {
 
 // PrototypeBase starts here
 
-trait PrototypeBase: Prototype {
+pub trait PrototypeBase: Prototype {
     fn localised_description(&self) -> &Option<LocalisedString>;
     fn localised_name(&self) -> &Option<LocalisedString>;
     fn order(&self) -> &String; // Default: ""
@@ -614,6 +614,53 @@ pub struct EntityBase {
     friendly_map_color: Option<Color>,
     enemy_map_color: Option<Color>,
     water_reflection: Option<WaterReflectionDefinition>
+}
+
+pub trait Entity: PrototypeBase {
+    fn icon(&self) -> &Option<IconSpecification>;
+    fn collision_box(&self) -> BoundingBox;
+    fn collision_mask(&self) -> CollisionMask;
+    fn map_generator_bounding_box(&self) -> BoundingBox;
+    fn selection_box(&self) -> BoundingBox;
+    fn drawing_box(&self) -> BoundingBox;
+    fn sticker_box(&self) -> BoundingBox;
+    fn hit_visualization_box(&self) -> BoundingBox;
+    fn trigger_target_mask(&self) -> &Option<TriggerTargetMask>;
+    fn flags(&self) -> Option<EntityPrototypeFlags>;
+    fn minable(&self) -> &MinableProperties;
+    fn subgroup(&self) -> &Option<String>;
+    fn allow_copy_paste(&self) -> bool;
+    fn selectable_in_game(&self) -> bool;
+    fn selection_priority(&self) -> u8;
+    fn remove_decoratives(&self) -> RemoveDecoratives;
+    fn emissions_per_second(&self) -> f64;
+    fn shooting_cursor_size(&self) -> Option<f64>;
+    fn created_smoke(&self) -> &CreateTrivialSmokeEffectItem;
+    fn working_sound(&self) -> &Option<WorkingSound>;
+    fn created_effect(&self) -> &Option<Trigger>;
+    fn build_sound(&self) -> &Option<Sound>;
+    fn mined_sound(&self) -> &Option<Sound>;
+    fn mining_sound(&self) -> &Option<Sound>;
+    fn rotated_sound(&self) -> &Option<Sound>;
+    fn vehicle_impact_sound(&self) -> &Option<Sound>;
+    fn open_sound(&self) -> &Option<Sound>;
+    fn close_sound(&self) -> &Option<Sound>;
+    fn radius_visualization_specification(&self) -> &Option<RadiusVisualizationSpecification>;
+    fn build_base_evolution_requirement(&self) -> f64;
+    fn alert_icon_shift(&self) -> Option<Factorio2DVector>;
+    fn alert_icon_scale(&self) -> Option<f32>;
+    fn fast_replaceable_group(&self) -> String;
+    fn next_upgrade(&self) -> &Option<String>;
+    fn placeable_by(&self) -> &Option<Vec<ItemToPlace>>;
+    fn remains_when_mined(&self) -> &Option<Vec<String>>;
+    fn additional_pastable_entities(&self) -> &Option<Vec<String>>;
+    fn tile_width(&self) -> u32;
+    fn tile_height(&self) -> u32;
+    fn autoplace(&self) -> &Option<AutoplaceSpecification>;
+    fn map_color(&self) -> Option<Color>;
+    fn friendly_map_color(&self) -> Option<Color>;
+    fn enemy_map_color(&self) -> Option<Color>;
+    fn water_reflection(&self) -> &Option<WaterReflectionDefinition>;
 }
 
 // Enum for all prototypes

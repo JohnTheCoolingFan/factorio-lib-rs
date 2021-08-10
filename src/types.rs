@@ -24,7 +24,7 @@ impl Position {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Color(f32, f32, f32, f32);
 
 impl Color {
@@ -1191,7 +1191,7 @@ impl BitXorAssign for CollisionMask {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd, Clone, Copy)]
 pub struct EntityPrototypeFlags(u32);
 
 impl EntityPrototypeFlags {
@@ -1310,7 +1310,7 @@ pub enum TriggerEffect {
     CreateExplosion(CreateExplosionTriggerEffectItem),
     CreateFire(CreateFireTriggerEffectItem),
     CreateSmoke(CreateSmokeTriggerEffectItem),
-    CreateTrivialSmoke(CreateTrivialSmokeTriggerEffectItem),
+    CreateTrivialSmoke(CreateTrivialSmokeEffectItem),
     CreateParticle(CreateParticleTriggerEffectItem),
     CreateSticker(CreateStickerTriggerEffectItem),
     CreateDecorative(CreateDecorativesTriggerEffectItem),
@@ -1432,7 +1432,7 @@ pub struct CreateSmokeTriggerEffectItem {
 }
 
 #[derive(Debug, TriggerEffectItemBase)]
-pub struct CreateTrivialSmokeTriggerEffectItem {
+pub struct CreateTrivialSmokeEffectItem {
     base: TriggerEffectItem,
     smoke_name: String, // Name of TrivialSmoke prototype
     offset_deviation: Option<BoundingBox>,
@@ -1876,3 +1876,119 @@ pub enum NoiseExpression {
     IfElseChain(String), // FIXME // no
 }
 
+#[derive(Debug)]
+pub struct MinableProperties {
+    mining_type: f64,
+    results: Vec<ProductPrototype>,
+    fluid_amount: f64, // Default: 0
+    mining_particle: Option<String>, // Name of Prototype/Particle
+    required_fluid: Option<String>, // Name of Prototype/Fluid
+    // Converted to results item
+    // if results are present, these are ignored
+    //result: String,
+    //count: u16, // Default: 1
+    mining_trigger: Option<Trigger>
+}
+
+#[derive(Debug)]
+pub enum ProductPrototype {
+    Item(ItemProductPrototype), // type = "item" // Default
+    Fluid(FluidProductPrototype) // type = "fluid"
+}
+
+// Either a sequence or a table
+// first item stands for name and second for amount
+#[derive(Debug)]
+pub struct ItemProductPrototype {
+    name: String, // Name of Prototype/Item
+    show_details_in_recipe_tooltip: bool, // Default: true
+    amount: Option<u16>, // Mandatory when defined in a sequence
+    probability: f64, // Default: 1
+    amount_min: Option<u16>, // Mandatory if amount is not specified
+    amount_max: Option<u16>, // Mandatory if amount is not specified // Set to amount_min if amount_max < amount_min
+    catalyst_amount: u16, // Default: 0
+}
+
+#[derive(Debug)]
+pub struct FluidProductPrototype {
+    name: String, // Name of Prototype/Fluid
+    show_details_in_recipe_tooltip: bool, // Default: true
+    probability: f64, // Default: 1
+    amount: Option<u16>, // Mandatory when defined in a sequence // Cannot be < 0
+    amount_min: Option<u16>, // Mandatory if amount is not specified // Cannot be < 0
+    amount_max: Option<u16>, // Mandatory if amount is not specified // Set to amount_min if amount_max < amount_min
+    temperature: Option<f64>,
+    catalyst_amount: f64, // Default: 0
+    fuildbox_index: u32, // Default: 0
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum RemoveDecoratives {
+    Automatic,
+    True,
+    False,
+}
+
+impl fmt::Display for RemoveDecoratives {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Automatic => "automatic",
+            Self::True => "true",
+            Self::False => "false",
+        })
+    }
+}
+
+impl FromStr for RemoveDecoratives {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "automatic" => Ok(Self::Automatic),
+            "true" => Ok(Self::True),
+            "false" => Ok(Self::False),
+            _ => Err(PrototypesErr::InvalidTypeStr("RemoveDecoratives".into(), s.into()))
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct WorkingSound {
+    sound: Sound, // If property not present, Sound is constructed from WorkingSound fields
+    apparent_volume: f32, // Default: 1
+    max_sounds_per_type: Option<u8>,
+    match_progress_to_activity: bool, // Default: false
+    match_volume_to_activity: bool, // Default: false
+    match_speed_to_activity: bool, // Default: false
+    persistent: bool, // Default: false
+    use_doppler_shift: bool, // Default: true
+    audible_distance_modifier: bool, // Default: 1
+    probability: f64, // Default: 1
+    fade_in_ticks: u32, // Default: 0
+    fade_out_ticks: u32, // Default: 0
+    idle_sound: Option<Sound>,
+    activate_sound: Option<Sound>,
+    deactivate_sound: Option<Sound>,
+}
+
+#[derive(Debug)]
+pub struct RadiusVisualizationSpecification {
+    sprite: Option<Sprite>,
+    distance: f64, // Default: 0 // Must be > 0
+    offset: Option<Factorio2DVector>,
+    draw_in_cursor: bool, // Default: true
+    draw_on_selection: bool // Default: true
+}
+
+#[derive(Debug)]
+pub struct ItemToPlace {
+    item: String, // Name of Item
+    count: u32 // Can't be larger than the stack size of the item
+}
+
+#[derive(Debug)]
+pub struct WaterReflectionDefinition {
+    pictures: Option<Vec<SpriteVariation>>,
+    orientation_to_variation: bool, // default: false
+    rotate: bool, // Default: false
+}
