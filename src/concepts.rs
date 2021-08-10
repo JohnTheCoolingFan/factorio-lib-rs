@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use std::ops::Index;
 use std::io::Read;
 use std::collections::HashMap;
@@ -51,12 +52,12 @@ impl LocaleHandler {
 // The input type for functions that accept LocalisedString
 // Also used in LocalisedString itself
 #[derive(Debug, Clone)]
-pub enum LocalisedStringEntry<'a> {
+pub enum LocalisedStringEntry {
     String(String),                 // Just a string
-    LocString(LocalisedString<'a>), // Table / LocalisedString
+    LocString(LocalisedString), // Table / LocalisedString
 }
 
-impl fmt::Display for LocalisedStringEntry<'_> {
+impl fmt::Display for LocalisedStringEntry {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             LocalisedStringEntry::String(s) => write!(f, "{}", s),
@@ -65,7 +66,7 @@ impl fmt::Display for LocalisedStringEntry<'_> {
     }
 }
 
-impl<'lua> mlua::FromLua<'lua> for LocalisedStringEntry<'_> {
+impl<'lua> mlua::FromLua<'lua> for LocalisedStringEntry {
     fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::Result<Self> {
         match value {
             mlua::Value::Table(t) => Ok(LocalisedStringEntry::LocString(lua.unpack::<LocalisedString>(lua.pack(t)?)?)),
@@ -78,13 +79,13 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedStringEntry<'_> {
 // This is unfinished but working implementation.
 // Referencing other locale stries is not implemented
 #[derive(Debug, Clone)]
-pub struct LocalisedString<'a> {
+pub struct LocalisedString {
     key: String,
-    parameters: Vec<LocalisedStringEntry<'a>>, // All elements after first element
-    locale_handler: Option<&'a LocaleHandler>,
+    parameters: Vec<LocalisedStringEntry>, // All elements after first element
+    locale_handler: Option<Rc<LocaleHandler>>,
 }
 
-impl fmt::Display for LocalisedString<'_> {
+impl fmt::Display for LocalisedString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // To print actual localised strings, access to locale info is needed, located in .cfg (ini) files
         if self.key.is_empty() { // Concatenate all parameters
@@ -92,7 +93,7 @@ impl fmt::Display for LocalisedString<'_> {
                 match parameter {
                     LocalisedStringEntry::String(v) => write!(f, "{}", v)?, // It's just a string or converted to string, simply write it
                     LocalisedStringEntry::LocString(mut v) => {
-                        v.set_handler(self.locale_handler.unwrap()); // Pass the locale_handler reference to inner LocalisedString
+                        v.set_handler(&self.locale_handler.unwrap()); // Pass the locale_handler reference to inner LocalisedString
                         write!(f, "{}", v)?
                     },
                 }
@@ -123,7 +124,7 @@ impl fmt::Display for LocalisedString<'_> {
     }
 }
 
-impl<'lua> mlua::FromLua<'lua> for LocalisedString<'_> {
+impl<'lua> mlua::FromLua<'lua> for LocalisedString {
     fn from_lua(value: mlua::Value<'lua>, _: &'lua mlua::Lua) -> LuaResult<Self> {
         match &value {
             mlua::Value::Table(t) => {
@@ -155,9 +156,9 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedString<'_> {
     }
 }
 
-impl<'a> LocalisedString<'a> {
-    fn set_handler(&mut self, locale_handler: &'a LocaleHandler) {
-        self.locale_handler = Some(locale_handler);
+impl LocalisedString {
+    fn set_handler(&mut self, locale_handler: &Rc<LocaleHandler>) {
+        self.locale_handler = Some(Rc::clone(locale_handler));
     }
 }
 
