@@ -15,7 +15,7 @@ pub type KeySequence = String; // Parser and checker maybe?
 pub type BoundingBox = (Position, Position); // Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox?
                                              // It's kinda undocumented
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct Position(i32, i32);
 
 impl Position {

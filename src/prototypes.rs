@@ -649,7 +649,7 @@ pub trait Entity: PrototypeBase {
     fn build_base_evolution_requirement(&self) -> f64;
     fn alert_icon_shift(&self) -> Option<Factorio2DVector>;
     fn alert_icon_scale(&self) -> Option<f32>;
-    fn fast_replaceable_group(&self) -> String;
+    fn fast_replaceable_group(&self) -> &String;
     fn next_upgrade(&self) -> &Option<String>;
     fn placeable_by(&self) -> &Option<Vec<ItemToPlace>>;
     fn remains_when_mined(&self) -> &Option<Vec<String>>;
