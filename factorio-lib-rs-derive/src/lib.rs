@@ -42,7 +42,7 @@ pub fn trigger_item_base_macro_derive(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(Entity)]
 pub fn entity_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(TokenStream).unwrap();
+    let ast = syn::parse(input).unwrap();
     impl_entity_macro(&ast)
 }
 
