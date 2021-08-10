@@ -556,7 +556,7 @@ pub struct Decorative {
     collision_mask: CollisionMask // Default: "doodad-layer"
 }
 
-// Enum for all prototype types
+// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeType {
     // General prototypes
