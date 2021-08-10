@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::fmt;
-use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase};
+use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
@@ -663,6 +663,18 @@ pub trait Entity: PrototypeBase {
     fn water_reflection(&self) -> &Option<WaterReflectionDefinition>;
 }
 
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct Arrow {
+    name: String,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
+    order: String,
+    entity_base: EntityBase,
+    arrow_picture: Sprite,
+    circle_picture: Option<Sprite>,
+    blinking: bool, // Default: false
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -704,7 +716,7 @@ pub enum PrototypeGeneral {
     CustomInput(CustomInput),
     DamageType(DamageType),
     Decorative(Decorative), // TODO: other prototypes
-    Arrow,
+    Arrow(Arrow),
     ArtilleryFlare,
     ArtilleryProjectile,
     Beam,
