@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
-use std::str::FromStr;
 use std::fmt;
-use factorio_lib_rs_derive::{ModSetting, PrototypeBase};
+use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
@@ -38,7 +37,7 @@ use crate::types::{
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
 pub struct DataTable {
-    prototypes: Vec<Box<dyn Prototype>>
+    prototypes: Vec<PrototypeType>
 }
 
 // Factorio prototypes
@@ -53,9 +52,9 @@ pub struct DataTable {
 // Prototype
 // Contains all values (accessors) for every prototype in the game
 pub trait Prototype: fmt::Debug {
-    fn r#type(&self) -> PrototypeType;
     fn name(&self) -> &String;
 }
+
 pub trait ModSetting: Prototype {
     fn localised_name(&self) -> &Option<LocalisedString>;
     fn localised_description(&self) -> &Option<LocalisedString>;
@@ -64,11 +63,11 @@ pub trait ModSetting: Prototype {
     fn setting_type(&self) -> ModSettingType;
 }
 
-#[derive(Debug, ModSetting)]
-pub struct BoolModSetting<'a> {
+#[derive(Debug, Prototype, ModSetting)]
+pub struct BoolModSetting {
     name: String,
-    localised_name: Option<LocalisedString<'a>>,
-    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString>,
+    localised_description: Option<LocalisedString>,
     order: Option<String>,
     hidden: bool,
     setting_type: ModSettingType,
@@ -76,21 +75,16 @@ pub struct BoolModSetting<'a> {
     forced_value: Option<bool>,
 }
 
-impl Prototype for BoolModSetting<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::BoolSetting }
-    fn name(&self) -> &String { &self.name }
-}
-
-impl BoolModSetting<'_> {
+impl BoolModSetting {
     pub fn default_value(&self) -> bool { self.default_value }
     pub fn forced_value(&self) -> Option<bool> { self.forced_value }
 }
 
-#[derive(Debug, ModSetting)]
-pub struct IntModSetting<'a> {
+#[derive(Debug, Prototype, ModSetting)]
+pub struct IntModSetting {
     name: String,
-    localised_name: Option<LocalisedString<'a>>,
-    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString>,
+    localised_description: Option<LocalisedString>,
     order: Option<String>,
     hidden: bool,
     setting_type: ModSettingType,
@@ -100,23 +94,18 @@ pub struct IntModSetting<'a> {
     allowed_values: Option<Vec<i64>>,
 }
 
-impl Prototype for IntModSetting<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::IntSetting }
-    fn name(&self) -> &String { &self.name }
-}
-
-impl IntModSetting<'_> {
+impl IntModSetting {
     pub fn default_value(&self) -> i64 { self.default_value }
     pub fn minimum_value(&self) -> Option<i64> { self.minimum_value }
     pub fn maximum_value(&self) -> Option<i64> { self.maximum_value }
     pub fn allowed_values(&self) -> Option<Vec<i64>> { self.allowed_values.clone() }
 }
 
-#[derive(Debug, ModSetting)]
-pub struct DoubleModSetting<'a> {
+#[derive(Debug, Prototype, ModSetting)]
+pub struct DoubleModSetting {
     name: String,
-    localised_name: Option<LocalisedString<'a>>,
-    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString>,
+    localised_description: Option<LocalisedString>,
     order: Option<String>,
     hidden: bool,
     setting_type: ModSettingType,
@@ -126,23 +115,18 @@ pub struct DoubleModSetting<'a> {
     allowed_values: Option<Vec<f64>>,
 }
 
-impl Prototype for DoubleModSetting<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::DoubleSetting }
-    fn name(&self) -> &String { &self.name }
-}
-
-impl DoubleModSetting<'_> {
+impl DoubleModSetting {
     pub fn default_value(&self) -> f64 { self.default_value }
     pub fn minimum_value(&self) -> Option<f64> { self.minimum_value }
     pub fn maximum_value(&self) -> Option<f64> { self.maximum_value }
     pub fn allowed_values(&self) -> Option<Vec<f64>> { self.allowed_values.clone() }
 }
 
-#[derive(Debug, ModSetting)]
-pub struct StringModSetting<'a> {
+#[derive(Debug, Prototype, ModSetting)]
+pub struct StringModSetting {
     name: String,
-    localised_name: Option<LocalisedString<'a>>,
-    localised_description: Option<LocalisedString<'a>>,
+    localised_name: Option<LocalisedString>,
+    localised_description: Option<LocalisedString>,
     order: Option<String>,
     hidden: bool,
     setting_type: ModSettingType,
@@ -152,29 +136,19 @@ pub struct StringModSetting<'a> {
     allowed_values: Option<Vec<String>>
 }
 
-impl Prototype for StringModSetting<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::StringSetting }
-    fn name(&self) -> &String { &self.name }
-}
-
-impl StringModSetting<'_> {
+impl StringModSetting {
     pub fn default_value(&self) -> String { self.default_value.clone() }
     pub fn allow_blank(&self) -> Option<bool> { self.allow_blank }
     pub fn auto_trim(&self) -> Option<bool> {self.auto_trim }
     pub fn allowed_values(&self) -> Option<Vec<String>> { self.allowed_values.clone() }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct AmbientSoundPrototype {
     name: String,
     sound: Sound,
     track_type: String,
     weight: Option<f64>
-}
-
-impl Prototype for AmbientSoundPrototype {
-    fn r#type(&self) -> PrototypeType { PrototypeType::AmbientSound }
-    fn name(&self) -> &String { &self.name }
 }
 
 impl AmbientSoundPrototype {
@@ -183,13 +157,13 @@ impl AmbientSoundPrototype {
     pub fn weight(&self) -> Option<f64> { self.weight }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct AnimationPrototype {
     name: String,
     layers: Vec<AnimationType> // If lua table doesn;t have layers, use same table for constructing just one
 }
 
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct EditorController {
     name: String, // Must be "default"
     inventory_size: ItemStackIndex,
@@ -217,12 +191,7 @@ pub struct EditorController {
     placed_corpses_never_expire: bool
 }
 
-impl Prototype for EditorController {
-    fn r#type(&self) -> PrototypeType { PrototypeType::EditorController }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct Font {
     name: String,
     size: i32,
@@ -233,12 +202,7 @@ pub struct Font {
     border_color: Option<Color>
 }
 
-impl Prototype for Font {
-    fn r#type(&self) -> PrototypeType { PrototypeType::Font }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct GodController {
     name: String, // Must be "default"
     inventory_size: ItemStackIndex,
@@ -250,23 +214,13 @@ pub struct GodController {
     mining_categories: Option<Vec<String>>
 }
 
-impl Prototype for GodController {
-    fn r#type(&self) -> PrototypeType { PrototypeType::GodController }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct MapGenPresets {
     name: String,
     presets: HashMap<String, MapGenPreset>
 }
 
-impl Prototype for MapGenPresets {
-    fn r#type(&self) -> PrototypeType { PrototypeType::MapGenPresets }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct MapSettings {
     name: String, // Must be "map-settings"
     pollution: MapPollutionSettings,
@@ -279,56 +233,31 @@ pub struct MapSettings {
     difficulty_settings: MapDifficultySettings
 }
 
-impl Prototype for MapSettings {
-    fn r#type(&self) -> PrototypeType { PrototypeType::MapSettings }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct MouseCursor {
     name: String,
     cursor: MouseCursorType
 }
 
-impl Prototype for MouseCursor {
-    fn r#type(&self) -> PrototypeType { PrototypeType::MouseCursor }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct SoundPrototype {
     name: String,
     sound: Sound
 }
 
-impl Prototype for SoundPrototype {
-    fn r#type(&self) -> PrototypeType { PrototypeType::Sound }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct SpectatorController {
     name: String, // Must be "default"
     movement_speed: f64 // Must be >= 0.34375
 }
 
-impl Prototype for SpectatorController {
-    fn r#type(&self) -> PrototypeType { PrototypeType::SpectatorController }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct SpritePrototype {
     name: String,
     sprite: Sprite
 }
 
-impl Prototype for SpritePrototype {
-    fn r#type(&self) -> PrototypeType { PrototypeType::Sprite }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct TileEffect {
     name: String, // Must be "water" // For some reason
     specular_lightness: Color,
@@ -345,41 +274,21 @@ pub struct TileEffect {
     far_zoom: f32 // Default: 0.5
 }
 
-impl Prototype for TileEffect {
-    fn r#type(&self) -> PrototypeType { PrototypeType::TileEffect }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct TipsAndTricksItemCategory {
     name: String,
     order: String
 }
 
-impl Prototype for TipsAndTricksItemCategory {
-    fn r#type(&self) -> PrototypeType { PrototypeType::TipsAndTricksItemCategory }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct TriggerTargetType {
     name: String
 }
 
-impl Prototype for TriggerTargetType {
-    fn r#type(&self) -> PrototypeType { PrototypeType::TriggerTargetType }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Prototype)]
 pub struct WindSound {
     name: String,
     sound: Sound
-}
-
-impl Prototype for WindSound {
-    fn r#type(&self) -> PrototypeType { PrototypeType::WindSound }
-    fn name(&self) -> &String { &self.name }
 }
 
 // PrototypeBase starts here
@@ -390,6 +299,7 @@ trait PrototypeBase: Prototype {
     fn order(&self) -> &String; // Default: ""
 }
 
+// Base for Achievement and all inherited types
 #[derive(Debug)]
 pub struct AchievementBase {
     icon: IconSpecification,
@@ -398,25 +308,20 @@ pub struct AchievementBase {
     hidden: bool // Default: false
 }
 
-#[derive(Debug, PrototypeBase)]
-pub struct Achievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct Achievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase
 }
 
-impl Prototype for Achievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::Achievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct BuildEntityAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct BuildEntityAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     to_build: String,
@@ -425,31 +330,21 @@ pub struct BuildEntityAchievement<'a> {
     until_second: u32 // Default: 0 (means infinite)
 }
 
-impl Prototype for BuildEntityAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::BuildEntityAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct CombatRobotCountAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct CombatRobotCountAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     count: u32 // Default: 1
 }
 
-impl Prototype for CombatRobotCountAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::CombatRobotCountAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct ConstructWithRobotsAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct ConstructWithRobotsAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     limited_to_one_game: bool,
@@ -457,77 +352,52 @@ pub struct ConstructWithRobotsAchievement<'a> {
     more_than_manually: bool // Default: false
 }
 
-impl Prototype for ConstructWithRobotsAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::ConstructWithRobotsAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct DeconstructWithRobotsAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct DeconstructWithRobotsAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     amount: u32
 }
 
-impl Prototype for DeconstructWithRobotsAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::DeconstructWithRobotsAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct DeliverByRobotsAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct DeliverByRobotsAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     amount: f64
 }
 
-impl Prototype for DeliverByRobotsAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::DeliverByRobotsAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct DontBuildEntityAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct DontBuildEntityAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     dont_buid: Vec<String>, // String is converted to Vec<String> with one element
     amount: u32 // Default: 0
 }
 
-impl Prototype for DontBuildEntityAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::DontBuildEntityAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct DontCraftManuallyAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct DontCraftManuallyAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     amount: f64
 }
 
-impl Prototype for DontCraftManuallyAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::DontCraftManuallyAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct DontUseEntityInEnergyProductionAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct DontUseEntityInEnergyProductionAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     excluded: Vec<String>, // String is converted to Vec<String> with one element
@@ -536,83 +406,58 @@ pub struct DontUseEntityInEnergyProductionAchievement<'a> {
     minimum_energy_produced: Energy // Default: 0W
 }
 
-impl Prototype for DontUseEntityInEnergyProductionAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::DontUseEntityInEnergyProductionAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct FinishTheGameAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct FinishTheGameAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     until_second: u32 // Default: 0 (means infinite)
 }
 
-impl Prototype for FinishTheGameAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::FinishTheGameAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct GroupAttackAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct GroupAttackAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     amount: u32 // Default: 1
 }
 
-impl Prototype for GroupAttackAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::GroupAttackAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct KillAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct KillAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     to_kill: String, // Default: ""
-    type_to_kill: Option<PrototypeType>,
+    type_to_kill: Option<String>, // TODO: another prototype enum?
     damage_type: String, // damage type
     amount: u32, // Default: 1
     in_vehicle: bool, // Default: false
     personally: bool // Default: false
 }
 
-impl Prototype for KillAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::KillAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct PlayerDamagedAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct PlayerDamagedAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     minimum_damage: f32,
     should_survive: bool,
-    type_of_dealer: Option<PrototypeType>
+    type_of_dealer: Option<String> // TODO: another prototype enum?
 }
 
-impl Prototype for PlayerDamagedAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::PlayerDamagedAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct ProduceAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct ProduceAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     amount: f64,
@@ -620,91 +465,61 @@ pub struct ProduceAchievement<'a> {
     product: ProductType // Type is determined from item_product or fluid_product // Only one can be set!
 }
 
-impl Prototype for ProduceAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::ProduceAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct ProducePerHourAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct ProducePerHourAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     amount: f64,
     product: ProductType
 }
 
-impl Prototype for ProducePerHourAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::ProducePerHourAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct ResearchAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct ResearchAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     target: ResearchTarget // Determined from either `technology` or `research_all` is set
 }
 
-impl Prototype for ResearchAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::ResearchAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct TrainPathAchievement<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct TrainPathAchievement {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     achievement: AchievementBase,
     minimum_distance: f64
 }
 
-impl Prototype for TrainPathAchievement<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::TrainPathAchievement }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct AmmoCategory<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct AmmoCategory {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     bonus_gui_order: String // Default: ""
 }
 
-impl Prototype for AmmoCategory<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::AmmoCategory }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct AutoplaceControl<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct AutoplaceControl {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     category: AutoplaceControlCategory,
     rechness: bool // Default: false
 }
 
-impl Prototype for AutoplaceControl<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::AutoplaceControl }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct CustomInput<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct CustomInput {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     key_sequence: KeySequence, // TODO?: key_sequence parser and checker. Can be empty, if linked_game_control is set, also empty stands for unassigned
     alternate_key_sequence: Option<KeySequence>,
@@ -718,30 +533,20 @@ pub struct CustomInput<'a> {
     action: CustomInputAction // Default: "lua"
 }
 
-impl Prototype for CustomInput<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::CustomInput }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct DamageType<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct DamageType {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     hidden: bool // Default: false
 }
 
-impl Prototype for DamageType<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::DamageType }
-    fn name(&self) -> &String { &self.name }
-}
-
-#[derive(Debug, PrototypeBase)]
-pub struct Decorative<'a> {
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct Decorative {
     name: String,
-    localised_description: Option<LocalisedString<'a>>,
-    localised_name: Option<LocalisedString<'a>>,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
     order: String,
     pictures: Vec<SpriteVariation>, // At least 1 is required
     collision_box: Option<BoundingBox>,
@@ -755,52 +560,47 @@ pub struct Decorative<'a> {
     collision_mask: CollisionMask // Default: "doodad-layer"
 }
 
-impl Prototype for Decorative<'_> {
-    fn r#type(&self) -> PrototypeType { PrototypeType::Decorative }
-    fn name(&self) -> &String { &self.name }
-}
-
 // Enum for all prototype types
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub enum PrototypeType {
     // General prototypes
-    AmbientSound,
-    Animation,
-    EditorController,
-    Font,
-    GodController,
-    MapGenPresets,
-    MapSettings,
-    MouseCursor,
-    Sound,
-    SpectatorController,
-    Sprite,
-    TileEffect,
-    TipsAndTricksItemCategory,
-    TriggerTargetType,
-    WindSound,
-    Achievement,
-    BuildEntityAchievement,
-    CombatRobotCountAchievement,
-    ConstructWithRobotsAchievement,
-    DeconstructWithRobotsAchievement,
-    DeliverByRobotsAchievement,
-    DontBuildEntityAchievement,
-    DontCraftManuallyAchievement,
-    DontUseEntityInEnergyProductionAchievement,
-    FinishTheGameAchievement,
-    GroupAttackAchievement,
-    KillAchievement,
-    PlayerDamagedAchievement,
-    ProduceAchievement,
-    ProducePerHourAchievement,
-    ResearchAchievement,
-    TrainPathAchievement,
-    AmmoCategory,
-    AutoplaceControl,
-    CustomInput,
-    DamageType,
-    Decorative,
+    AmbientSound(AmbientSoundPrototype),
+    Animation(AnimationPrototype),
+    EditorController(EditorController),
+    Font(Font),
+    GodController(GodController),
+    MapGenPresets(MapGenPresets),
+    MapSettings(MapSettings),
+    MouseCursor(MouseCursor),
+    Sound(SoundPrototype),
+    SpectatorController(SpectatorController),
+    Sprite(SpritePrototype),
+    TileEffect(TileEffect),
+    TipsAndTricksItemCategory(TipsAndTricksItemCategory),
+    TriggerTargetType(TriggerTargetType),
+    WindSound(WindSound),
+    Achievement(Achievement),
+    BuildEntityAchievement(BuildEntityAchievement),
+    CombatRobotCountAchievement(CombatRobotCountAchievement),
+    ConstructWithRobotsAchievement(ConstructWithRobotsAchievement),
+    DeconstructWithRobotsAchievement(DeconstructWithRobotsAchievement),
+    DeliverByRobotsAchievement(DeliverByRobotsAchievement),
+    DontBuildEntityAchievement(DontBuildEntityAchievement),
+    DontCraftManuallyAchievement(DontCraftManuallyAchievement),
+    DontUseEntityInEnergyProductionAchievement(DontUseEntityInEnergyProductionAchievement),
+    FinishTheGameAchievement(FinishTheGameAchievement),
+    GroupAttackAchievement(GroupAttackAchievement),
+    KillAchievement(KillAchievement),
+    PlayerDamagedAchievement(PlayerDamagedAchievement),
+    ProduceAchievement(ProduceAchievement),
+    ProducePerHourAchievement(ProducePerHourAchievement),
+    ResearchAchievement(ResearchAchievement),
+    TrainPathAchievement(TrainPathAchievement),
+    AmmoCategory(AmmoCategory),
+    AutoplaceControl(AutoplaceControl),
+    CustomInput(CustomInput),
+    DamageType(DamageType),
+    Decorative(Decorative), // TODO: other prototypes
     Arrow,
     ArtilleryFlare,
     ArtilleryProjectile,
