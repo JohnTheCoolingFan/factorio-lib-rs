@@ -82,7 +82,7 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedStringEntry {
 pub struct LocalisedString {
     key: String,
     parameters: Vec<LocalisedStringEntry>, // All elements after first element
-    locale_handler: Option<Rc<LocaleHandler>>,
+    locale_handler: Rc<Option<LocaleHandler>>,
 }
 
 impl fmt::Display for LocalisedString {
@@ -93,13 +93,18 @@ impl fmt::Display for LocalisedString {
                 match parameter {
                     LocalisedStringEntry::String(v) => write!(f, "{}", v)?, // It's just a string or converted to string, simply write it
                     LocalisedStringEntry::LocString(mut v) => {
-                        v.set_handler(&self.locale_handler.unwrap()); // Pass the locale_handler reference to inner LocalisedString
+                        v.set_handler(Rc::clone(&self.locale_handler)); // Pass the locale_handler reference to inner LocalisedString
                         write!(f, "{}", v)?
                     },
                 }
             }
         } else { // Resolve the key and use parameters for substitution
-            let locale_string = self.locale_handler.unwrap().get_by_key(&self.key); // Resolved locale string
+            let locale_string = {
+                match &*self.locale_handler { // Dereference, then reference?..
+                    Some(lh) => lh.get_by_key(&self.key),
+                    _ => None
+                }
+            };
 
             match locale_string {
                 Some(s) => { // Key is found
@@ -145,7 +150,7 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedString {
                     })
                 };
                 let parameters = seq_t.collect::<Result<Vec<LocalisedStringEntry>, mlua::Error>>()?;
-                Ok(Self{key, parameters, locale_handler: None})
+                Ok(Self{key, parameters, locale_handler: Rc::new(None)})
             },
             _ => Err(mlua::Error::FromLuaConversionError{
                 from: value.type_name(),
@@ -157,8 +162,8 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedString {
 }
 
 impl LocalisedString {
-    fn set_handler(&mut self, locale_handler: &Rc<LocaleHandler>) {
-        self.locale_handler = Some(Rc::clone(locale_handler));
+    fn set_handler(&mut self, locale_handler: Rc<Option<LocaleHandler>>) {
+        self.locale_handler = Rc::clone(&locale_handler);
     }
 }
 
