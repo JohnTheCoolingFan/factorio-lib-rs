@@ -965,6 +965,7 @@ pub enum PrototypeType {
     StringSetting
 }
 
+/*
 impl fmt::Display for PrototypeType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", match &self {
@@ -1377,6 +1378,7 @@ impl FromStr for PrototypeType {
         }
     }
 }
+*/
 
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
