@@ -15,7 +15,7 @@ use crate::types::{
     MapGenPreset,
     Color,
     ItemStackIndex,
-    AnimationType,
+    Animation,
     Sound,
     MouseCursorType,
     Sprite,
@@ -44,7 +44,8 @@ use crate::types::{
     RadiusVisualizationSpecification,
     ItemToPlace,
     WaterReflectionDefinition,
-    AnimationVariation
+    AnimationVariation,
+    LightAnimations
 };
 
 // Struct representing global `data` table in lua environment
@@ -169,7 +170,7 @@ impl AmbientSoundPrototype {
 #[derive(Debug, Prototype)]
 pub struct AnimationPrototype {
     name: String,
-    layers: Vec<AnimationType> // If lua table doesn;t have layers, use same table for constructing just one
+    layers: Vec<Animation> // If lua table doesn't have layers, use same table for constructing just one
 }
 
 #[derive(Debug, Prototype)]
@@ -723,6 +724,37 @@ pub struct ArtilleryProjectile {
     rotatable: bool, // Default: true
 }
 
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct Beam {
+    name: String,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
+    order: String,
+    entity_base: EntityBase,
+    width: f64,
+    damage_interval: u32, // Can't be 0
+    head: Animation,
+    tail: Animation,
+    body: Vec<AnimationVariation>, // Must have at least 1 variation
+    action: Option<Trigger>,
+    target_offset: Option<Factorio2DVector>,
+    random_target_offset: bool, // Default: false
+    action_triggered_automatically: bool, // Default: false
+    random_end_animation_rotation: bool, // Default: true
+    transparent_start_end_animations: bool, // Default: true
+    start: Option<Animation>,
+    ending: Option<Animation>,
+    light_animations: Option<LightAnimations>,
+    ground_light_animations: Option<LightAnimations>,
+    // These values are considered deprecated.
+    // If present, converted to light_animations, other *_animations properties are ignored
+    // start_light: Option<Animation>
+    // ending_light: Option<Animation>
+    // head_light: Option<Animation>
+    // tail_light: Option<Animation>
+    // body_light: Option<Vec<AnimationVariation>>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -767,7 +799,7 @@ pub enum PrototypeGeneral {
     Arrow(Arrow),
     ArtilleryFlare(ArtilleryFlare),
     ArtilleryProjectile(ArtilleryProjectile),
-    Beam,
+    Beam(Beam),
     CharacterCorpse,
     Cliff,
     Corpse,

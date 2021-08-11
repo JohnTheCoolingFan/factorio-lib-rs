@@ -2168,3 +2168,12 @@ pub struct WaterReflectionDefinition {
     orientation_to_variation: bool, // default: false
     rotate: bool, // Default: false
 }
+
+#[derive(Debug)]
+pub struct LightAnimations {
+    start: Option<Animation>,
+    ending: Option<Animation>,
+    head: Option<Animation>,
+    tail: Option<Animation>,
+    body: Option<Vec<AnimationVariation>>
+}
