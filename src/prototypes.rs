@@ -877,8 +877,9 @@ pub enum PrototypeGeneral {
     RailRemnants(RailRemnants),
     DeconstructibleTileProxy(DeconstructibleTileProxy),
     EntityGhost(EntityGhost),
-    EntityParticle,
-    LeafParticle,
+    // For migration, cannot be used
+    //EntityParticle,
+    //LeafParticle,
     Accumulator,
     ArtilleryTurret,
     Beacon,
