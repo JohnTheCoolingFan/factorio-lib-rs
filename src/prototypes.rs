@@ -817,6 +817,15 @@ pub struct DeconstructibleTileProxy {
     entity_base: EntityBase,
 }
 
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct EntityGhost {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    medium_build_sound: Option<Sound>,
+    large_build_sound: Option<Sound>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -867,7 +876,7 @@ pub enum PrototypeGeneral {
     Corpse(CorpsePrototype),
     RailRemnants(RailRemnants),
     DeconstructibleTileProxy(DeconstructibleTileProxy),
-    EntityGhost,
+    EntityGhost(EntityGhost),
     EntityParticle,
     LeafParticle,
     Accumulator,
