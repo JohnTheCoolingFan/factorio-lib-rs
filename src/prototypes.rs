@@ -710,6 +710,17 @@ pub struct Beam {
     // body_light: Option<Vec<AnimationVariation>>
 }
 
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct CharacterCorpse {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    time_to_live: u32,
+    render_layer: RenderLayer, // Default: "object"
+    pictures: Vec<AnimationVariation>, // Mandatory // picture field is converted to this
+    armor_picture_mapping: HashMap<String, usize> // Exact type of animation index is unknown, it references index in pictures field
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -755,7 +766,7 @@ pub enum PrototypeGeneral {
     ArtilleryFlare(ArtilleryFlare),
     ArtilleryProjectile(ArtilleryProjectile),
     Beam(Beam),
-    CharacterCorpse,
+    CharacterCorpse(CharacterCorpse),
     Cliff,
     Corpse,
     RailRemnants,
