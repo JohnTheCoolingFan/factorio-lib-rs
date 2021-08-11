@@ -54,7 +54,12 @@ use crate::types::{
     ExplosionDefinition,
     Resistance,
     Loot,
-    AttackReactionItem
+    AttackReactionItem,
+    EnergySource,
+    LightDefinition,
+    WireConnectionPoint,
+    CircuitConnectorSprites,
+    SignalIDConnector
 };
 
 // Struct representing global `data` table in lua environment
@@ -873,6 +878,26 @@ pub trait EntityWithHealth: Entity {
     fn integration_patch_render_layer(&self) -> RenderLayer;
     fn corpse(&self) -> &Vec<String>;
     fn integration_patch(&self) -> &Sprite4Way;
+}
+
+#[derive(Debug, EntityWithHealth)]
+pub struct Accumulator {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_source: EnergySource,
+    picture: Sprite,
+    charge_cooldown: u16,
+    discharge_cooldown: u16,
+    charge_animation: Option<Animation>,
+    charge_light: Option<LightDefinition>,
+    discharge_animation: Option<Animation>,
+    discharge_light: Option<LightDefinition>,
+    circuit_wire_connection_point: Option<WireConnectionPoint>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    default_output_signal: Option<SignalIDConnector>
 }
 
 // Enum for all prototypes

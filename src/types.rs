@@ -2340,3 +2340,229 @@ pub struct AttackReactionItem {
     reaction_modifier: f32, // Default: 0
     damage_type: Option<String>, // name of Prototype/DamageType
 }
+
+#[derive(Debug)]
+pub struct EnergySourceBase {
+    emissions_per_minute: f64, // Default: 0
+    render_no_power_icon: bool, // Default: true
+    render_no_network_icon: bool, // Default: true
+}
+
+#[derive(Debug)]
+pub enum EnergySource {
+    Electric(ElectricEnergySource),
+    Burner(BurnerEnergySource),
+    Heat(HeatEnergySource),
+    Fluid(FluidEnergySource),
+    Void
+}
+
+#[derive(Debug)]
+pub struct ElectricEnergySource {
+    base: EnergySourceBase,
+    buffer_capacity: Option<Energy>,
+    usage_priority: ElectricUsagePriority,
+    input_flow_limit: Energy, // Default: f64::MAX
+    output_flow_limit: Energy, // Default: f64::MAX
+    drain: Option<Energy>
+}
+
+#[derive(Debug)]
+pub struct BurnerEnergySource {
+    base: EnergySourceBase,
+    fuel_inventory_size: ItemStackIndex,
+    burnt_inventory_size: ItemStackIndex, // Default: 0
+    smoke: Option<Vec<SmokeSource>>,
+    light_flicker: Option<LightFlickeringDefinition>,
+    effectivity: f64, // Default: 1
+    fuel_categories: Vec<String>, // Default: "chemical"
+}
+
+#[derive(Debug)]
+pub struct HeatEnergySource {
+    base: EnergySourceBase,
+    max_temperature: f64, // Must be >= default_temperature
+    default_temperature: f64, // Default: 15
+    specific_heat: Energy,
+    max_transfer: Energy,
+    max_temperature_gradient: f64, // Default: 1
+    min_working_temperature: f64, // Default: 15 // Must be >= default_temperature AND <= max_temperature
+    minimum_glow_temperature: f32, // Default: 1
+    pipe_covers: Option<Sprite4Way>,
+    heat_pipe_covers: Option<Sprite4Way>,
+    heat_picture: Option<Sprite4Way>,
+    heat_glow: Option<Sprite4Way>,
+    connections: Option<Vec<HeatConnection>> // Up to 32 connections
+}
+
+#[derive(Debug)]
+pub struct FluidEnergySource {
+    base: EnergySourceBase,
+    fluid_box: FluidBox,
+    smoke: Option<Vec<SmokeSource>>,
+    light_flicker: Option<LightFlickeringDefinition>,
+    effectivity: f64, // Default: 1
+    burns_fluid: bool, // Default: false
+    scale_fluid_usage: bool, // Default: false
+    fluid_usage_per_tick: f64, // Default: 0
+    maximum_temperature: f64, // Default: f64::INFINITY
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum ElectricUsagePriority {
+    PrimaryInput,
+    PrimaryOutput,
+    SecondaryInput,
+    SecondaryOutput,
+    Tertiary,
+    Solar, // Can only be used by Prototype/SolarPanel
+    Lamp, // Can only be used by Prototype/Lamp
+}
+
+impl FromStr for ElectricUsagePriority {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "primary-input" => Ok(Self::PrimaryInput),
+            "primary-output" => Ok(Self::PrimaryOutput),
+            "secondary-input" => Ok(Self::SecondaryInput),
+            "secondary-output" => Ok(Self::SecondaryOutput),
+            "tertiary" => Ok(Self::Tertiary),
+            "solar" => Ok(Self::Solar),
+            "lamp" => Ok(Self::Lamp),
+            _ => Err(PrototypesErr::InvalidTypeStr("ElectricUsagePriority".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ElectricUsagePriority {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::PrimaryInput => "primary-input",
+            Self::PrimaryOutput => "primary-output",
+            Self::SecondaryInput => "secondary-input",
+            Self::SecondaryOutput => "secondary-output",
+            Self::Tertiary => "tertiary",
+            Self::Solar => "solar",
+            Self::Lamp => "lamp",
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct SmokeSource {
+    name: String, // Name of Prototype/TrivialSmoke
+    frequency: f64, // Can't be negative, NaN or infinite
+    offset: f64, // Default: 0
+    position: Option<Factorio2DVector>,
+    north_position: Option<Factorio2DVector>,
+    east_position: Option<Factorio2DVector>,
+    south_position: Option<Factorio2DVector>,
+    west_position: Option<Factorio2DVector>,
+    deviation: Option<Position>,
+    starting_frame_speed: u16, // Default: 0
+    starting_frame_speed_deviation: f64, // Default: 0
+    starting_frame: u16, // Default: 0
+    starting_frame_deviation: f64, // Default: 0
+    slow_down_factor: u8, // Default: 1
+    height: f32, // Default: 0
+    height_deviation: f32, // Default: 0
+    starting_vertical_speed: f32, // Default: 0
+    starting_vertical_speed_deviation: f32, // Default: 0
+    vertical_speed_slowdown: f32 // Default: 0.965
+}
+
+#[derive(Debug)]
+pub struct LightFlickeringDefinition {
+    minimum_intensity: f32, // Default: 0.2
+    maximum_intensity: f32, // Default: 0.8
+    derivation_change_frequency: f32, // Default: 0.3
+    derivation_change_deviation: f32, // Default: 0.06
+    border_fix_speed: f32, // Default: 0.02
+    minimum_light_size: f32, // Default: 0.5
+    light_intensity_to_size_coefficient: f32, // Default: 0.5
+    color: Color // Default: (1, 1, 1) (White)
+}
+
+#[derive(Debug)]
+pub struct HeatConnection {
+    position: Position,
+    direction: Direction
+}
+
+#[derive(Debug)]
+pub struct FluidBox {
+    pipe_connections: Vec<PipeConnectionDefinition>, // Max: 256
+    base_area: f64, // Default: 1 // Must be > 0
+    base_level: f64, // Default: 0
+    height: f64, // Default: 1 // Must be > 0
+    filter: Option<String>, // Name of Prototype/Fluid
+    render_layer: RenderLayer, // Default: "object"
+    pipe_covers: Option<Sprite4Way>,
+    minimum_temperature: Option<f64>,
+    maximum_temperature: Option<f64>,
+    production_type: Option<ProductionType>, // Default: None
+    //secondary_draw_order: u8, // Default: 1 // Converted to secondary_draw_orders
+    secondary_draw_orders: SecondaryDrawOrders // Default: (north = 1, east = 1, south = 1, west = 1)
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub struct Direction(u32);
+
+impl From<u32> for Direction {
+    fn from(value: u32) -> Self {
+        Self(value)
+    }
+}
+
+impl Into<u32> for Direction {
+    fn into(self) -> u32 {
+        self.0
+    }
+}
+
+#[derive(Debug)]
+pub struct PipeConnectionDefinition {
+    positions: Vec<Factorio2DVector>, // `position` takes priority and gets converted to this
+    max_underground_distance: u32, // Default: 0
+    r#type: ProductionType, // Default: "input-output"
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum ProductionType {
+    Input,
+    InputOutput,
+    Output,
+}
+
+impl FromStr for ProductionType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "input" => Ok(Self::Input),
+            "input-output" => Ok(Self::InputOutput),
+            "output" => Ok(Self::Output),
+            _ => Err(PrototypesErr::InvalidTypeStr("ProductionType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ProductionType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Input => "input",
+            Self::InputOutput => "input-output",
+            Self::Output => "output",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub struct SecondaryDrawOrders {
+    north: i8,
+    east: i8,
+    south: i8,
+    west: i8
+}
