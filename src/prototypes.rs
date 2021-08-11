@@ -859,7 +859,7 @@ pub enum PrototypeGeneral {
     Cliff(Cliff),
     Corpse(CorpsePrototype),
     RailRemnants(RailRemnants),
-    DecorativeTileProxy,
+    DeconstructibleTileProxy,
     EntityGhost,
     EntityParticle,
     LeafParticle,

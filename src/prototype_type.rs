@@ -50,7 +50,7 @@ pub enum PrototypeType {
     Cliff,
     Corpse,
     RailRemnants,
-    DecorativeTileProxy,
+    DeconstructibleTileProxy,
     EntityGhost,
     EntityParticle,
     LeafParticle,
