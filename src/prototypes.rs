@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::fmt;
-use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity, Corpse};
+use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity, Corpse, EntityWithHealth};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
@@ -49,7 +49,12 @@ use crate::types::{
     OrientedCliffPrototypes,
     RotatedAnimationVariation,
     BendingType,
-    RailRemnantsPictures
+    RailRemnantsPictures,
+    Sprite4Way,
+    ExplosionDefinition,
+    Resistance,
+    Loot,
+    AttackReactionItem
 };
 
 // Struct representing global `data` table in lua environment
@@ -824,6 +829,50 @@ pub struct EntityGhost {
     entity_base: EntityBase,
     medium_build_sound: Option<Sound>,
     large_build_sound: Option<Sound>
+}
+
+#[derive(Debug)]
+pub struct EntityWithHealthBase {
+    // Yes, this one includes PrototypeBase and Entity
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    max_health: f32, // Default: 10
+    healing_per_tick: f32, // Default: 0.001666 for Prototype/Tree, 0 for the rest
+    repair_speed_multiplier: f32, // Default: 1
+    dying_explosion: Option<Vec<ExplosionDefinition>>,
+    drying_trigger_effect: Option<TriggerEffect>,
+    damaged_trigger_effect: Option<TriggerEffect>,
+    loot: Option<Vec<Loot>>,
+    resistances: Option<Vec<Resistance>>,
+    attack_reaction: Vec<AttackReactionItem>, // Default: Empty
+    repair_sound: Sound, // Default: Utility Sound (defaultManualRepair)
+    alert_when_damaged: bool, // Default: true
+    hide_resistances: bool, // Default: true
+    create_ghost_on_death: bool, // Default: true
+    random_corpse_variation: bool, // Default: false
+    integration_patch_render_layer: RenderLayer, // Default: "lower-object"
+    corpse: Vec<String>, // Default: Empty // (Names) Name of Prototype/Corpse
+    integration_patch: Sprite4Way
+}
+
+pub trait EntityWithHealth: Entity {
+    fn max_health(&self) -> f32;
+    fn healing_per_tick(&self) -> f32;
+    fn repair_speed_multiplier(&self) -> f32;
+    fn dying_explosion(&self) -> &Option<Vec<ExplosionDefinition>>;
+    fn drying_trigger_effect(&self) -> &Option<TriggerEffect>;
+    fn damaged_trigger_effect(&self) -> &Option<TriggerEffect>;
+    fn loot(&self) -> &Option<Vec<Loot>>;
+    fn resistances(&self) -> &Option<Vec<Resistance>>;
+    fn attack_reaction(&self) -> &Vec<AttackReactionItem>;
+    fn repair_sound(&self) -> &Sound;
+    fn alert_when_damaged(&self) -> bool;
+    fn hide_resistances(&self) -> bool;
+    fn create_ghost_on_death(&self) -> bool;
+    fn random_corpse_variation(&self) -> bool;
+    fn integration_patch_render_layer(&self) -> RenderLayer;
+    fn corpse(&self) -> &Vec<String>;
+    fn integration_patch(&self) -> &Sprite4Way;
 }
 
 // Enum for all prototypes

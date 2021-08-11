@@ -2301,7 +2301,42 @@ pub struct Sprite8Way {
 }
 
 #[derive(Debug)]
+pub struct Sprite4Way {
+    // Priority list (most priority first): sheets, sheet, other properties
+    sheets: Vec<SpriteNWaySheet>
+}
+
+#[derive(Debug)]
 pub struct SpriteNWaySheet {
     sprite: SpriteSpec,
     frames: u32, // 4 or 8
+}
+
+#[derive(Debug)]
+pub struct ExplosionDefinition {
+    name: String, // Name of Prototype/Entity
+    offset: Option<Factorio2DVector>
+}
+
+#[derive(Debug)]
+pub struct Resistance {
+    r#type: String, // Name of Prototype/DamageType
+    decrease: f32, // Default: 0
+    percent: f32, // Default: 0
+}
+
+#[derive(Debug)]
+pub struct Loot {
+    item: String, // Name of Prototype/Item
+    probability: f64, // Default: 1
+    count_min: f64, // Default: 1
+    count_max: f64, // Default: 1 // Must be > 0
+}
+
+#[derive(Debug)]
+pub struct AttackReactionItem {
+    range: f32,
+    action: Option<Trigger>,
+    reaction_modifier: f32, // Default: 0
+    damage_type: Option<String>, // name of Prototype/DamageType
 }
