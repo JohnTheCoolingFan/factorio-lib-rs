@@ -198,6 +198,31 @@ pub struct AnimationVariation {
 }
 
 #[derive(Debug)]
+pub enum RotatedAnimationVariation {
+    Layers(Vec<RotatedAnimationVariation>),
+    Single(RotatedAnimation)
+}
+
+#[derive(Debug)]
+pub struct RotatedAnimation {
+    regular: RotatedAnimationSpec,
+    hr_version: Option<RotatedAnimationSpec>
+}
+
+// A: "Are you sure this will work?"; Me: "I have no idea!"
+#[derive(Debug)]
+pub struct RotatedAnimationSpec {
+    direction_count: u32,
+    still_frame: u32, // Default: 0
+    axially_symmetrical: bool, // Default: false
+    counterclockwise: bool, // Default: false
+    middle_orientation: f32, // Default: 0.5
+    orientation_range: f32, // Default: 1
+    apply_projection: bool, // Default: true
+    animation: AnimationVariant
+}
+
+#[derive(Debug)]
 pub struct Sprite {
     layers: Vec<SpriteLayer>
 }
@@ -2207,4 +2232,76 @@ pub struct OrientedCliffPrototype {
     collision_bounding_box: BoundingBox,
     pictures: Vec<SpriteVariation>,
     fill_volume: u32
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum BendingType {
+    Straight,
+    Turn,
+}
+
+impl FromStr for BendingType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "straight" => Ok(Self::Straight),
+            "turn" => Ok(Self::Turn),
+            _ => Err(PrototypesErr::InvalidTypeStr("BendingType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for BendingType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Straight => "straight",
+            Self::Turn => "turn",
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct RailRemnantsPictures {
+    straight_rail_horizontal: RailPieceLayers,
+    straight_rail_vertical: RailPieceLayers,
+    straight_rail_diagonal_left_top: RailPieceLayers,
+    straight_rail_diagonal_right_top: RailPieceLayers,
+    straight_rail_diagonal_right_bottom: RailPieceLayers,
+    straight_rail_diagonal_left_bottom: RailPieceLayers,
+    curved_rail_vertical_left_top: RailPieceLayers,
+    curved_rail_vertical_right_top: RailPieceLayers,
+    curved_rail_vertical_right_bottom: RailPieceLayers,
+    curved_rail_vertical_left_bottom: RailPieceLayers,
+    curved_rail_horizontal_left_top: RailPieceLayers,
+    curved_rail_horizontal_right_top: RailPieceLayers,
+    curved_rail_horizontal_right_bottom: RailPieceLayers,
+    curved_rail_horizontal_left_bottom: RailPieceLayers,
+    rail_endings: Sprite8Way
+}
+
+#[derive(Debug)]
+pub struct RailPieceLayers {
+    metals: Vec<SpriteVariation>,
+    backplayes: Vec<SpriteVariation>, // Must have same number of variations as `metals`
+    ties: Vec<SpriteVariation>, // Must have between 1 and 4 items
+    stone_path: Vec<SpriteVariation>, // Must have between 1 and 4 items
+    stone_path_background: Option<Vec<SpriteVariation>>,
+    segment_visualisation_middle: Option<Sprite>,
+    segment_visualisation_ending_front: Option<Sprite>,
+    segment_visualisation_ending_back: Option<Sprite>,
+    segment_visualisation_continuing_front: Option<Sprite>,
+    segment_visualisation_continuing_back: Option<Sprite>,
+}
+
+#[derive(Debug)]
+pub struct Sprite8Way {
+    // Priority list (most priority first): sheets, sheet, other properties
+    sheets: Vec<SpriteNWaySheet>
+}
+
+#[derive(Debug)]
+pub struct SpriteNWaySheet {
+    sprite: SpriteSpec,
+    frames: u32, // 4 or 8
 }

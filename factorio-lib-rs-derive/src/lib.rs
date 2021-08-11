@@ -46,6 +46,12 @@ pub fn entity_macro_derive(input: TokenStream) -> TokenStream {
     impl_entity_macro(&ast)
 }
 
+#[proc_macro_derive(Corpse)]
+pub fn corpse_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_corpse_macro(&ast)
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -178,6 +184,39 @@ fn impl_entity_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn friendly_map_color(&self) -> Option<Color> { self.entity_base.friendly_map_color }
             fn enemy_map_color(&self) -> Option<Color> { self.entity_base.enemy_map_color }
             fn water_reflection(&self) -> &Option<WaterReflectionDefinition> { &self.entity_base.water_reflection }
+        }
+    };
+    gen.into()
+}
+
+fn impl_corpse_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl  Corpse for #name {
+            fn dying_speed(&self) -> f32 { self.corpse_base.dying_speed }
+            fn splash_speed(&self) -> f32 { self.corpse_base.splash_speed }
+            fn time_before_shading_off(&self) -> i32 { self.corpse_base.time_before_shading_off }
+            fn time_before_removed(&self) -> i32 { self.corpse_base.time_before_removed }
+            fn remove_on_entity_placemen(&self) -> bool { self.corpse_base.remove_on_entity_placemen }
+            fn remove_on_tile_placement(&self) -> bool { self.corpse_base.remove_on_tile_placement }
+            fn final_render_layer(&self) -> RenderLayer { self.corpse_base.final_render_layer }
+            fn gound_patch_render_layer(&self) -> RenderLayer { self.corpse_base.gound_patch_render_layer }
+            fn animation_render_layer(&self) -> RenderLayer { self.corpse_base.animation_render_layer }
+            fn splash_render_layer(&self) -> RenderLayer { self.corpse_base.splash_render_layer }
+            fn animation_overlay_render_layer(&self) -> RenderLayer { self.corpse_base.animation_overlay_render_layer }
+            fn animation_overlay_final_render_layer(&self) -> RenderLayer { self.corpse_base.animation_overlay_final_render_layer }
+            fn shuffle_directions_at_frame(&self) -> u8 { self.corpse_base.shuffle_directions_at_frame }
+            fn use_tile_color_for_ground_patch_tint(&self) -> bool { self.corpse_base.use_tile_color_for_ground_patch_tint }
+            fn ground_patch_fade_in_delay(&self) -> f32 { self.corpse_base.ground_patch_fade_in_delay }
+            fn ground_patch_fade_in_speed(&self) -> f32 { self.corpse_base.ground_patch_fade_in_speed }
+            fn ground_patch_fade_out_start(&self) -> f32 { self.corpse_base.ground_patch_fade_out_start }
+            fn animation(&self) -> &Option<Vec<RotatedAnimationVariation>> { &self.corpse_base.animation }
+            fn animation_overlay(&self) -> &Option<Vec<RotatedAnimationVariation>> { &self.corpse_base.animation_overlay }
+            fn splash(&self) -> &Option<Vec<AnimationVariation>> { &self.corpse_base.splash }
+            fn ground_patch(&self) -> &Option<Vec<AnimationVariation>> { &self.corpse_base.ground_patch }
+            fn ground_patch_higher(&self) -> &Option<Vec<AnimationVariation>> { &self.corpse_base.ground_patch_higher }
+            fn ground_patch_fade_out_duration(&self) -> f32 { self.corpse_base.ground_patch_fade_out_duration }
+            fn direction_shuffle(&self) -> &Option<Vec<Vec<u16>>> { &self.corpse_base.direction_shuffle }
         }
     };
     gen.into()

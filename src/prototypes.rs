@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::fmt;
-use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity};
+use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity, Corpse};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
@@ -46,7 +46,10 @@ use crate::types::{
     WaterReflectionDefinition,
     AnimationVariation,
     LightAnimations,
-    OrientedCliffPrototypes
+    OrientedCliffPrototypes,
+    RotatedAnimationVariation,
+    BendingType,
+    RailRemnantsPictures
 };
 
 // Struct representing global `data` table in lua environment
@@ -734,6 +737,79 @@ pub struct Cliff {
     cliff_explosive: String, // Name of capsule that has a robot_action to explode cliffs
 }
 
+#[derive(Debug)]
+pub struct CorpseBase {
+    dying_speed: f32, // Default: 1
+    splash_speed: f32, // Default: 1
+    time_before_shading_off: i32, // Default: 60 * 15
+    time_before_removed: i32, // Default: 60 * 120
+    remove_on_entity_placemen: bool, // Default: true
+    remove_on_tile_placement: bool, // Default: true
+    final_render_layer: RenderLayer, // Default: "corpse"
+    gound_patch_render_layer: RenderLayer, // Default: "ground-patch"
+    animation_render_layer: RenderLayer, // Default: "object"
+    splash_render_layer: RenderLayer, // Default: "object"
+    animation_overlay_render_layer: RenderLayer, // Default: "object"
+    animation_overlay_final_render_layer: RenderLayer, // Default: "corpse"
+    shuffle_directions_at_frame: u8, // Default: 1
+    use_tile_color_for_ground_patch_tint: bool, // Default: false
+    ground_patch_fade_in_delay: f32, // Default: 0
+    ground_patch_fade_in_speed: f32, // Default: 0
+    ground_patch_fade_out_start: f32, // Default: 0
+    animation: Option<Vec<RotatedAnimationVariation>>,
+    animation_overlay: Option<Vec<RotatedAnimationVariation>>,
+    splash: Option<Vec<AnimationVariation>>,
+    ground_patch: Option<Vec<AnimationVariation>>,
+    ground_patch_higher: Option<Vec<AnimationVariation>>,
+    ground_patch_fade_out_duration: f32, // Default: 0
+    direction_shuffle: Option<Vec<Vec<u16>>> // Inner Vecs should be the same size
+}
+
+pub trait Corpse: Entity {
+    fn dying_speed(&self) -> f32;
+    fn splash_speed(&self) -> f32;
+    fn time_before_shading_off(&self) -> i32;
+    fn time_before_removed(&self) -> i32;
+    fn remove_on_entity_placemen(&self) -> bool;
+    fn remove_on_tile_placement(&self) -> bool;
+    fn final_render_layer(&self) -> RenderLayer;
+    fn gound_patch_render_layer(&self) -> RenderLayer;
+    fn animation_render_layer(&self) -> RenderLayer;
+    fn splash_render_layer(&self) -> RenderLayer;
+    fn animation_overlay_render_layer(&self) -> RenderLayer;
+    fn animation_overlay_final_render_layer(&self) -> RenderLayer;
+    fn shuffle_directions_at_frame(&self) -> u8;
+    fn use_tile_color_for_ground_patch_tint(&self) -> bool;
+    fn ground_patch_fade_in_delay(&self) -> f32;
+    fn ground_patch_fade_in_speed(&self) -> f32;
+    fn ground_patch_fade_out_start(&self) -> f32;
+    fn animation(&self) -> &Option<Vec<RotatedAnimationVariation>>;
+    fn animation_overlay(&self) -> &Option<Vec<RotatedAnimationVariation>>;
+    fn splash(&self) -> &Option<Vec<AnimationVariation>>;
+    fn ground_patch(&self) -> &Option<Vec<AnimationVariation>>;
+    fn ground_patch_higher(&self) -> &Option<Vec<AnimationVariation>>;
+    fn ground_patch_fade_out_duration(&self) -> f32;
+    fn direction_shuffle(&self) -> &Option<Vec<Vec<u16>>>;
+}
+
+#[derive(Debug, Prototype, PrototypeBase, Entity, Corpse)]
+pub struct CorpsePrototype {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    corpse_base: CorpseBase
+}
+
+#[derive(Debug, Prototype, PrototypeBase, Entity, Corpse)]
+pub struct RailRemnants {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    corpse_base: CorpseBase,
+    bending_type: BendingType,
+    pictures: RailRemnantsPictures
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -781,8 +857,8 @@ pub enum PrototypeGeneral {
     Beam(Beam),
     CharacterCorpse(CharacterCorpse),
     Cliff(Cliff),
-    Corpse,
-    RailRemnants,
+    Corpse(CorpsePrototype),
+    RailRemnants(RailRemnants),
     DecorativeTileProxy,
     EntityGhost,
     EntityParticle,
