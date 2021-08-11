@@ -810,6 +810,13 @@ pub struct RailRemnants {
     pictures: RailRemnantsPictures
 }
 
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct DeconstructibleTileProxy {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -859,7 +866,7 @@ pub enum PrototypeGeneral {
     Cliff(Cliff),
     Corpse(CorpsePrototype),
     RailRemnants(RailRemnants),
-    DeconstructibleTileProxy,
+    DeconstructibleTileProxy(DeconstructibleTileProxy),
     EntityGhost,
     EntityParticle,
     LeafParticle,
