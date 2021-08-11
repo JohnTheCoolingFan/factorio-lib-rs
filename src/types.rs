@@ -45,7 +45,7 @@ impl Color {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum DifficultySetting {
     Normal,
     Expensive
@@ -63,7 +63,16 @@ impl FromStr for DifficultySetting {
     }
 }
 
-#[derive(Debug)]
+impl fmt::Display for DifficultySetting {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Normal => "normal",
+            Self::Expensive => "expensive",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum ResearchQueueSetting {
     AfterVictory,
     Always,
@@ -83,7 +92,17 @@ impl FromStr for ResearchQueueSetting {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+impl fmt::Display for ResearchQueueSetting {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::AfterVictory => "after-victory",
+            Self::Always => "always",
+            Self::Never => "never",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum ModSettingType {
     Startup,
     RuntimeGlobal,
@@ -236,7 +255,7 @@ pub struct SpriteVariationSpec {
     line_length: u32 // Default: value of `variation_count`
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub struct Dice(i16, i16);
 
 impl Dice {
@@ -249,7 +268,7 @@ impl Dice {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum DrawAs {
     DrawAsShadow,
     DrawAsGlow,
@@ -271,7 +290,7 @@ impl DrawAs {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum BlendMode {
     Normal,
     Additive,
@@ -295,7 +314,19 @@ impl FromStr for BlendMode {
     }
 }
 
-#[derive(Debug)]
+impl fmt::Display for BlendMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Normal => "normal",
+            Self::Additive => "additive",
+            Self::AdditiveSoft => "additive-soft",
+            Self::Multiplicative => "multiplicative",
+            Self::Overwrite => "overwrite",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum RunMode {
     Forward,
     Backward,
@@ -315,6 +346,16 @@ impl FromStr for RunMode {
     }
 }
 
+impl fmt::Display for RunMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Forward => "forward",
+            Self::Backward => "backward",
+            Self::ForwardThenBackward => "forward-then-backward",
+        })
+    }
+}
+
 #[derive(Debug)]
 pub struct Stripe {
     width_in_frames: u32,
@@ -324,7 +365,7 @@ pub struct Stripe {
     y: Option<u32>
 }
 
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub struct SpriteFlags(u32);
 
 impl SpriteFlags {
@@ -490,7 +531,7 @@ impl BitXorAssign for SpriteFlags {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum SpritePriority {
     ExtraHighNoScale,
     ExtraHigh,
@@ -499,6 +540,37 @@ pub enum SpritePriority {
     Low,
     VeryLow,
     NoAtlas
+}
+
+impl fmt::Display for SpritePriority {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::ExtraHighNoScale => "extra-high-no-scale",
+            Self::ExtraHigh => "extra-high",
+            Self::High => "high",
+            Self::Medium => "medium",
+            Self::Low => "low",
+            Self::VeryLow => "very-low",
+            Self::NoAtlas => "no-atlas",
+        })
+    }
+}
+
+impl FromStr for SpritePriority {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "extra-high-no-scale" => Ok(Self::ExtraHighNoScale),
+            "extra-high" => Ok(Self::ExtraHigh),
+            "high" => Ok(Self::High),
+            "medium" => Ok(Self::Medium),
+            "low" => Ok(Self::Low),
+            "very-low" => Ok(Self::VeryLow),
+            "no-atlas" => Ok(Self::NoAtlas),
+            _ => Err(PrototypesErr::InvalidTypeStr("SpritePriority".into(), s.into()))
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -521,7 +593,7 @@ pub struct MapGenPresetNonDefault {
     advanced_settings: Option<MapGenPresetAdvancedSettings>
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub struct MapGenSize(f64); // Exact type is unknown, so slap an f64
 
 impl FromStr for MapGenSize {
@@ -746,7 +818,7 @@ pub enum MouseCursorType {
     CustomCursor(CustomCursor)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum SystemCursor {
     Arrow,
     IBeam,
@@ -771,6 +843,20 @@ impl FromStr for SystemCursor {
             "hand" => Ok(Self::Hand),
             _ => Err(PrototypesErr::InvalidTypeStr(String::from("SystemCursor"), String::from(s)))
         }
+    }
+}
+
+impl fmt::Display for SystemCursor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Arrow => "arrow",
+            Self::IBeam => "i-beam",
+            Self::Crosshair => "crosshair",
+            Self::WaitArrow => "wait-arrow",
+            Self::SizeAll => "size-all",
+            Self::No => "no",
+            Self::Hand => "hand",
+        })
     }
 }
 
@@ -811,7 +897,8 @@ pub struct IconData {
     icon_mipmaps: u8 // Default: 0
 }
 
-#[derive(Debug)]
+// TODO: fmt::Display
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub struct Energy(f64); // I don't know which type factorio uses internally, so I will use this
 
 impl FromStr for Energy {
@@ -857,7 +944,7 @@ pub enum ResearchTarget {
     Technology(String)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum AutoplaceControlCategory {
     Resource,
     Terrain,
@@ -877,7 +964,17 @@ impl FromStr for AutoplaceControlCategory {
     }
 }
 
-#[derive(Debug)]
+impl fmt::Display for AutoplaceControlCategory {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Resource => "resource",
+            Self::Terrain => "terrain",
+            Self::Enemy => "enemy",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum ConsumingType {
     None,
     GameOnly
@@ -895,13 +992,22 @@ impl FromStr for ConsumingType {
     }
 }
 
+impl fmt::Display for ConsumingType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::None => "none",
+            Self::GameOnly => "game-only",
+        })
+    }
+}
+
 #[derive(Debug)]
 pub enum CustomInputAction {
     Lua,
     SpawnItem,
     TogglePersonalRoboport,
     TogglePersonalLogisticRequests,
-    ToggleEquipmentMovementsBonus
+    ToggleEquipmentMovementBonus
 }
 
 impl FromStr for CustomInputAction {
@@ -913,13 +1019,25 @@ impl FromStr for CustomInputAction {
             "spawn-item" => Ok(Self::SpawnItem),
             "toggle-personal-roboport" => Ok(Self::TogglePersonalRoboport),
             "toggle-personal-logistic-requests" => Ok(Self::TogglePersonalLogisticRequests),
-            "toggle-equipment-movement-bonus" => Ok(Self::ToggleEquipmentMovementsBonus),
+            "toggle-equipment-movement-bonus" => Ok(Self::ToggleEquipmentMovementBonus),
             _ => Err(PrototypesErr::InvalidTypeStr("CustomInputAction".into(), s.into()))
         }
     }
 }
 
-#[derive(Debug)]
+impl fmt::Display for CustomInputAction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Lua => "lua",
+            Self::SpawnItem => "spawn-item",
+            Self::TogglePersonalRoboport => "toggle-personal-roboport",
+            Self::TogglePersonalLogisticRequests => "toggle-personal-logistic-requests",
+            Self::ToggleEquipmentMovementBonus => "toggle-equipment-movement-bonus",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum RenderLayer {
     WaterTile,
     GroundTile,
@@ -1019,7 +1137,57 @@ impl FromStr for RenderLayer {
     }
 }
 
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd, Clone, Copy)]
+impl fmt::Display for RenderLayer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::WaterTile => "water-tile",
+            Self::GroundTile => "ground-tile",
+            Self::TileTransition => "tile-transition",
+            Self::Decals => "decals",
+            Self::LowerRadiusVisualization => "lower-radius-visualization",
+            Self::RadiusVisualization => "radius-visualization",
+            Self::TransportBeltIntegration => "transport-belt-integration",
+            Self::Resource => "resource",
+            Self::BuildingSmoke => "building-smoke",
+            Self::Decorative => "decorative",
+            Self::GroundPatch => "ground-patch",
+            Self::GroundPatchHigher => "ground-patch-higher",
+            Self::GroundPatchHigher2 => "ground-patch-higher2",
+            Self::Remnants => "remnants",
+            Self::Floor => "floor",
+            Self::TransportBelt => "transport-belt",
+            Self::TransportBeltEndings => "transport-belt-endings",
+            Self::FloorMechanicsUnderCorpse => "floor-mechanics-under-corpse",
+            Self::Corpse => "corpse",
+            Self::FloorMechanics => "floor-mechanics",
+            Self::Item => "item",
+            Self::LowerObject => "lower-object",
+            Self::TransportBeltCircuitConnector => "transport-belt-circuit-connector",
+            Self::LowerObjectAboveShadow => "lower-object-above-shadow",
+            Self::Object => "object",
+            Self::HigherObjectUnder => "higher-object-under",
+            Self::HigherObjectAbove => "higher-object-above",
+            Self::ItemInInserterHand => "item-in-inserter-hand",
+            Self::Wires => "wires",
+            Self::WiresAbove => "wires-above",
+            Self::EntityInfoIcon => "entity-info-icon",
+            Self::EntityInfoIconAbove => "entity-info-icon-above",
+            Self::Explosion => "explosion",
+            Self::Projectile => "projectile",
+            Self::Smoke => "smoke",
+            Self::AirObject => "air-object",
+            Self::AirEntityInfoIcon => "air-entity-info-icon",
+            Self::LightEffect => "light-effect",
+            Self::SelectionBox => "selection-box",
+            Self::HigherSelectionBox => "higher-selection-box",
+            Self::CollisionSelectionBox => "collision-selection-box",
+            Self::Arrow => "arrow",
+            Self::Cursor => "cursor",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub struct CollisionMask(u64);
 
 impl CollisionMask {
@@ -1544,7 +1712,7 @@ pub trait TriggerItemBase {
     fn force(&self) -> ForceCondition; // Default: all forces
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum ForceCondition {
     All,
     Enemy,
