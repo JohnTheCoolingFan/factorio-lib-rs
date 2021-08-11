@@ -303,6 +303,13 @@ pub struct WindSound {
 
 // PrototypeBase starts here
 
+#[derive(Debug)]
+pub struct PrototypeBaseSpec {
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
+    order: String
+}
+
 pub trait PrototypeBase: Prototype {
     fn localised_description(&self) -> &Option<LocalisedString>;
     fn localised_name(&self) -> &Option<LocalisedString>;
@@ -321,18 +328,14 @@ pub struct AchievementBase {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct Achievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase
 }
 
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct BuildEntityAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     to_build: String,
     amount: u32, // Default: 1
@@ -343,9 +346,7 @@ pub struct BuildEntityAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct CombatRobotCountAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     count: u32 // Default: 1
 }
@@ -353,9 +354,7 @@ pub struct CombatRobotCountAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct ConstructWithRobotsAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     limited_to_one_game: bool,
     amount: u32, // Default: 0
@@ -365,9 +364,7 @@ pub struct ConstructWithRobotsAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DeconstructWithRobotsAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     amount: u32
 }
@@ -375,9 +372,7 @@ pub struct DeconstructWithRobotsAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DeliverByRobotsAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     amount: f64
 }
@@ -385,9 +380,7 @@ pub struct DeliverByRobotsAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DontBuildEntityAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     dont_buid: Vec<String>, // String is converted to Vec<String> with one element
     amount: u32 // Default: 0
@@ -396,9 +389,7 @@ pub struct DontBuildEntityAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DontCraftManuallyAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     amount: f64
 }
@@ -406,9 +397,7 @@ pub struct DontCraftManuallyAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DontUseEntityInEnergyProductionAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     excluded: Vec<String>, // String is converted to Vec<String> with one element
     included: Vec<String>, // Same as `excluded`
@@ -419,9 +408,7 @@ pub struct DontUseEntityInEnergyProductionAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct FinishTheGameAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     until_second: u32 // Default: 0 (means infinite)
 }
@@ -429,9 +416,7 @@ pub struct FinishTheGameAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct GroupAttackAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     amount: u32 // Default: 1
 }
@@ -439,9 +424,7 @@ pub struct GroupAttackAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct KillAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     to_kill: String, // Default: ""
     type_to_kill: Option<String>, // TODO: another prototype enum?
@@ -454,9 +437,7 @@ pub struct KillAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct PlayerDamagedAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     minimum_damage: f32,
     should_survive: bool,
@@ -466,9 +447,7 @@ pub struct PlayerDamagedAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct ProduceAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     amount: f64,
     limited_to_one_game: bool,
@@ -478,9 +457,7 @@ pub struct ProduceAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct ProducePerHourAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     amount: f64,
     product: ProductType
@@ -489,9 +466,7 @@ pub struct ProducePerHourAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct ResearchAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     target: ResearchTarget // Determined from either `technology` or `research_all` is set
 }
@@ -499,9 +474,7 @@ pub struct ResearchAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct TrainPathAchievement {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     achievement: AchievementBase,
     minimum_distance: f64
 }
@@ -509,18 +482,14 @@ pub struct TrainPathAchievement {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct AmmoCategory {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     bonus_gui_order: String // Default: ""
 }
 
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct AutoplaceControl {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     category: AutoplaceControlCategory,
     rechness: bool // Default: false
 }
@@ -528,9 +497,7 @@ pub struct AutoplaceControl {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct CustomInput {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     key_sequence: KeySequence, // TODO?: key_sequence parser and checker. Can be empty, if linked_game_control is set, also empty stands for unassigned
     alternate_key_sequence: Option<KeySequence>,
     linked_game_control: String, // Default: ""
@@ -546,18 +513,14 @@ pub struct CustomInput {
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DamageType {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     hidden: bool // Default: false
 }
 
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct Decorative {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     pictures: Vec<SpriteVariation>, // At least 1 is required
     collision_box: Option<BoundingBox>,
     render_layer: RenderLayer, // Default: "decorative"
@@ -668,9 +631,7 @@ pub trait Entity: PrototypeBase {
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct Arrow {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     arrow_picture: Sprite,
     circle_picture: Option<Sprite>,
@@ -682,9 +643,7 @@ pub struct ArtilleryFlare {
     // map_color is mandatory
     // selection_priority default: 48
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     pictures: Vec<AnimationVariation>,
     life_time: u16,
@@ -710,9 +669,7 @@ pub struct ArtilleryProjectile {
     // Bounding box must be zero
     // map_color is mandatory
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     reveal_map: bool,
     pcture: Option<Sprite>,
@@ -727,9 +684,7 @@ pub struct ArtilleryProjectile {
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct Beam {
     name: String,
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String,
+    prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     width: f64,
     damage_interval: u32, // Can't be 0
