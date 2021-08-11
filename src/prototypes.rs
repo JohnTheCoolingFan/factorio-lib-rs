@@ -43,7 +43,8 @@ use crate::types::{
     Trigger,
     RadiusVisualizationSpecification,
     ItemToPlace,
-    WaterReflectionDefinition
+    WaterReflectionDefinition,
+    AnimationVariation
 };
 
 // Struct representing global `data` table in lua environment
@@ -675,6 +676,34 @@ pub struct Arrow {
     blinking: bool, // Default: false
 }
 
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct ArtilleryFlare {
+    // map_color is mandatory
+    // selection_priority default: 48
+    name: String,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
+    order: String,
+    entity_base: EntityBase,
+    pictures: Vec<AnimationVariation>,
+    life_time: u16,
+    shadows: Option<Vec<AnimationVariation>>,
+    render_layer: RenderLayer, // Default: "object"
+    render_layer_when_on_ground: RenderLayer, // Default: "lower-object"
+    regular_trigger_effect: Option<TriggerEffect>,
+    regular_trigger_effect_frequency: u32, // Default: 0
+    ended_in_water_trigger_effect: Option<TriggerEffect>,
+    movement_modifier_when_on_ground: f64, // Default: 0.8
+    creation_shift: Option<Factorio2DVector>,
+    initial_speed: Option<Factorio2DVector>,
+    initial_height: f32, // Default: 0
+    initial_vertical_speed: f32, // Default: 0
+    initial_frame_speed: f32, // Default: 1
+    shots_per_flare: u32, // Default: 1
+    early_death_ticks: u32, // Default: 3 * 60 (180)
+    shot_category: String, // Name of Prototype/AmmoCategory
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -717,7 +746,7 @@ pub enum PrototypeGeneral {
     DamageType(DamageType),
     Decorative(Decorative),
     Arrow(Arrow),
-    ArtilleryFlare,
+    ArtilleryFlare(ArtilleryFlare),
     ArtilleryProjectile,
     Beam,
     CharacterCorpse,

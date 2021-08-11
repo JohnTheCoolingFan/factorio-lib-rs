@@ -171,6 +171,14 @@ pub struct AnimationSpec {
 }
 
 #[derive(Debug)]
+pub struct AnimationVariation {
+    animation: Animation, // Filename is mandatory
+    variation_count: u32,
+    frame_count: u32, // Default: 1
+    line_length: u32, // Default: variation_count
+}
+
+#[derive(Debug)]
 pub struct Sprite {
     layers: Vec<SpriteLayer>
 }
