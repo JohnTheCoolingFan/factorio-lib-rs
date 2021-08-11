@@ -49,6 +49,7 @@ impl ModDependency {
             version_req: match [captures.name("version_req"), captures.name("version")] {
                 [Some(req_match), Some(version_match)] => {
                     let version_str = version_match.as_str();
+                    #[allow(unstable_name_collisions)]
                     let sanitized = version_str
                         .split('.')
                         .map(|sub| {
