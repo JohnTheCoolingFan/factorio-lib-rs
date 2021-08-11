@@ -246,7 +246,7 @@ fn impl_entity_with_health_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn hide_resistances(&self) -> bool { self.entity_with_health_base.hide_resistances }
             fn create_ghost_on_death(&self) -> bool { self.entity_with_health_base.create_ghost_on_death }
             fn random_corpse_variation(&self) -> bool { self.entity_with_health_base.random_corpse_variation }
-            fn integration_patch_render_layer(&self) -> RenderLayer { &self.entity_with_health_base.integration_patch_render_layer }
+            fn integration_patch_render_layer(&self) -> RenderLayer { self.entity_with_health_base.integration_patch_render_layer }
             fn corpse(&self) -> &Vec<String> { &self.entity_with_health_base.corpse }
             fn integration_patch(&self) -> &Sprite4Way { &self.entity_with_health_base.integration_patch }
         }
