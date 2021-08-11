@@ -2177,3 +2177,34 @@ pub struct LightAnimations {
     tail: Option<Animation>,
     body: Option<Vec<AnimationVariation>>
 }
+
+#[derive(Debug)]
+pub struct OrientedCliffPrototypes {
+    west_to_east: OrientedCliffPrototype,
+    north_to_south: OrientedCliffPrototype,
+    east_to_west: OrientedCliffPrototype,
+    south_to_north: OrientedCliffPrototype,
+    west_to_north: OrientedCliffPrototype,
+    north_to_east: OrientedCliffPrototype,
+    east_to_south: OrientedCliffPrototype,
+    south_to_west: OrientedCliffPrototype,
+    west_to_south: OrientedCliffPrototype,
+    north_to_west: OrientedCliffPrototype,
+    east_to_north: OrientedCliffPrototype,
+    south_to_east: OrientedCliffPrototype,
+    west_to_none: OrientedCliffPrototype,
+    none_to_east: OrientedCliffPrototype,
+    north_to_none: OrientedCliffPrototype,
+    none_to_south: OrientedCliffPrototype,
+    east_to_none: OrientedCliffPrototype,
+    none_to_west: OrientedCliffPrototype,
+    south_to_none: OrientedCliffPrototype,
+    none_to_north: OrientedCliffPrototype,
+}
+
+#[derive(Debug)]
+pub struct OrientedCliffPrototype {
+    collision_bounding_box: BoundingBox,
+    pictures: Vec<SpriteVariation>,
+    fill_volume: u32
+}

@@ -45,7 +45,8 @@ use crate::types::{
     ItemToPlace,
     WaterReflectionDefinition,
     AnimationVariation,
-    LightAnimations
+    LightAnimations,
+    OrientedCliffPrototypes
 };
 
 // Struct representing global `data` table in lua environment
@@ -721,6 +722,18 @@ pub struct CharacterCorpse {
     armor_picture_mapping: HashMap<String, usize> // Exact type of animation index is unknown, it references index in pictures field
 }
 
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct Cliff {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    orientations: OrientedCliffPrototypes,
+    grid_size: Factorio2DVector,
+    grid_offset: Factorio2DVector,
+    cliff_height: f32, // Default: 4
+    cliff_explosive: String, // Name of capsule that has a robot_action to explode cliffs
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -767,7 +780,7 @@ pub enum PrototypeGeneral {
     ArtilleryProjectile(ArtilleryProjectile),
     Beam(Beam),
     CharacterCorpse(CharacterCorpse),
-    Cliff,
+    Cliff(Cliff),
     Corpse,
     RailRemnants,
     DecorativeTileProxy,
