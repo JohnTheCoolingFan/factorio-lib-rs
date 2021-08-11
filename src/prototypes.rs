@@ -704,6 +704,25 @@ pub struct ArtilleryFlare {
     shot_category: String, // Name of Prototype/AmmoCategory
 }
 
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct ArtilleryProjectile {
+    // Bounding box must be zero
+    // map_color is mandatory
+    name: String,
+    localised_description: Option<LocalisedString>,
+    localised_name: Option<LocalisedString>,
+    order: String,
+    entity_base: EntityBase,
+    reveal_map: bool,
+    pcture: Option<Sprite>,
+    shadow: Option<Sprite>,
+    chart_picture: Option<Sprite>,
+    action: Option<Trigger>,
+    final_action: Option<Trigger>,
+    height_from_ground: f32, // Default: 1
+    rotatable: bool, // Default: true
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -747,7 +766,7 @@ pub enum PrototypeGeneral {
     Decorative(Decorative),
     Arrow(Arrow),
     ArtilleryFlare(ArtilleryFlare),
-    ArtilleryProjectile,
+    ArtilleryProjectile(ArtilleryProjectile),
     Beam,
     CharacterCorpse,
     Cliff,
