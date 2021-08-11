@@ -159,13 +159,13 @@ pub struct SoundVariation {
 }
 
 #[derive(Debug)]
-pub enum AnimationType {
-    Layers(Vec<AnimationType>),
-    Animation(Animation)
+pub enum Animation {
+    Layers(Vec<Animation>),
+    Single(AnimationBase)
 }
 
 #[derive(Debug)]
-pub struct Animation {
+pub struct AnimationBase {
     regular: AnimationVariant,
     hr_version: Option<AnimationVariant>,
 }
@@ -191,7 +191,7 @@ pub struct AnimationSpec {
 
 #[derive(Debug)]
 pub struct AnimationVariation {
-    animation: Animation, // Filename is mandatory
+    animation: AnimationBase, // Filename is mandatory
     variation_count: u32,
     frame_count: u32, // Default: 1
     line_length: u32, // Default: variation_count
