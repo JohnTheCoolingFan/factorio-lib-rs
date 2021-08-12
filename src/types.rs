@@ -2566,3 +2566,109 @@ pub struct SecondaryDrawOrders {
     south: i8,
     west: i8
 }
+
+#[derive(Debug)]
+pub struct LightDefinition {
+    r#type: LightDefinitionType,
+    // Next 2 are not optional if type is "oriented"
+    picture: Option<Sprite>,
+    rotation_shift: Option<f32>,
+    intensity: f32,
+    size: f32,
+    source_orientation_offset: f32, // Default: 0
+    add_perspective: bool, // Default: false
+    shift: Option<Factorio2DVector>,
+    color: Color, // Default: no color
+    minimum_darkness: f32 // Default: 0
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum LightDefinitionType {
+    Basic,
+    Oriented,
+}
+
+impl FromStr for LightDefinitionType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "basic" => Ok(Self::Basic),
+            "oriented" => Ok(Self::Oriented),
+            _ => Err(PrototypesErr::InvalidTypeStr("LightDefinitionType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for LightDefinitionType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Basic => "basic",
+            Self::Oriented => "oriented",
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct WireConnectionPoint {
+    wire: WirePosition,
+    shadow: WirePosition
+}
+
+#[derive(Debug)]
+pub struct WirePosition {
+    copper: Option<Factorio2DVector>,
+    red: Option<Factorio2DVector>,
+    green: Option<Factorio2DVector>
+}
+
+#[derive(Debug)]
+pub struct CircuitConnectorSprites {
+    led_red: Sprite,
+    led_green: Sprite,
+    led_blue: Sprite,
+    led_light: LightDefinition,
+    connector_main: Option<Sprite>,
+    connector_shadow: Option<Sprite>,
+    wire_pins: Option<Sprite>,
+    wire_pins_shadow: Option<Sprite>,
+    led_blue_off: Option<Sprite>,
+    blue_led_light_offset: Option<Factorio2DVector>,
+    red_green_led_light_offset: Option<Factorio2DVector>
+}
+
+#[derive(Debug)]
+pub struct SignalIDConnector {
+    r#type: SignalIDConnectorType,
+    name: String, // Name of a circuit network signal
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum SignalIDConnectorType {
+    Virtual,
+    Item,
+    Fluid,
+}
+
+impl FromStr for SignalIDConnectorType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "virtual" => Ok(Self::Virtual),
+            "item" => Ok(Self::Item),
+            "fluid" => Ok(Self::Fluid),
+            _ => Err(PrototypesErr::InvalidTypeStr("SignalIDConnectorType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for SignalIDConnectorType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Virtual => "virtual",
+            Self::Item => "item",
+            Self::Fluid => "fluid",
+        })
+    }
+}

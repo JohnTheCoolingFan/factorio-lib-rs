@@ -954,7 +954,7 @@ pub enum PrototypeGeneral {
     // For migration, cannot be used
     //EntityParticle,
     //LeafParticle,
-    Accumulator,
+    Accumulator(Accumulator),
     ArtilleryTurret,
     Beacon,
     Boiler,
