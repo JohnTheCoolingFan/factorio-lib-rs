@@ -2706,3 +2706,188 @@ pub struct InterruptibleSound {
     sound: Sound,
     fade_ticks: u32 // Default: 0
 }
+
+#[derive(Debug)]
+pub struct ModuleSpecification {
+    module_slots: u16, // Default: 0
+    module_info_max_icons_per_row: u8, // Default: width of selection box / 0,75
+    module_info_max_icon_rows: u8, // Default: width of selection box / 1.5
+    module_info_icon_shift: Factorio2DVector, // Default: (0, 0.7)
+    module_info_icon_scale: f32, // Default: 0.5
+    module_info_separation_multiplier: f32, // Default: 1.1
+    module_info_multi_row_initial_height_modifier: f32 // Default: -0.1
+}
+
+#[derive(Debug)]
+pub struct BeaconGraphicsSet {
+    draw_animation_when_idle: bool, //Default: true
+    draw_light_when_idle: bool, // Default: false
+    random_animation_offset: bool, // Default: false
+    module_icons_suppressed: bool, // Default: false
+    base_layer: RenderLayer, // Default: "object"
+    animation_layer: RenderLayer, // Default: "object"
+    top_layer: RenderLayer, // Default: "object"
+    animation_progress: f32, // Default: 1
+    min_animation_progress: f32, // Default: 0
+    max_animation_progress: f32, // Default: 1000
+    apply_module_tint: Option<ApplyModuleTint>, // Default: "none"
+    apply_module_tint_to_light: Option<ApplyModuleTint>, // Default: "none"
+    no_modules_tint: Color, //Default: no color
+    animation_list: Option<Vec<AnimationElement>>,
+    light: Option<LightDefinition>,
+    module_visualisations: Option<BeaconModuleVisualizations>,
+    module_tint_mode: ModuleTintMode // Default: "single-module"
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum ApplyModuleTint {
+    Primary,
+    Secondary,
+    Tertiary,
+    Quaternary,
+}
+
+impl FromStr for ApplyModuleTint {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "primary" => Ok(Self::Primary),
+            "secondary" => Ok(Self::Secondary),
+            "tertiary" => Ok(Self::Tertiary),
+            "quaternary" => Ok(Self::Quaternary),
+            _ => Err(PrototypesErr::InvalidTypeStr("ApplyModuleTint".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ApplyModuleTint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Primary => "primary",
+            Self::Secondary => "secondary",
+            Self::Tertiary => "tertiary",
+            Self::Quaternary => "quaternary",
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct AnimationElement {
+    render_layer: RenderLayer, // Default: "object"
+    secondary_draw_order: Option<i8>,
+    draw_as_sprite: bool, // Default: true
+    draw_as_light: bool, // Default: false
+    apply_tint: bool, // Default: false
+    always_draw: bool, // Default: true
+    animation: Animation
+}
+
+#[derive(Debug)]
+pub struct BeaconModuleVisualizations {
+    art_style: String,
+    use_for_empty_slots: bool, // Default: false
+    tier_offset: i32, // Default: 0
+    slots: Option<Vec<Vec<BeaconModuleVisualization>>>
+}
+
+#[derive(Debug)]
+pub struct BeaconModuleVisualization {
+    has_empty_slot: bool, // Default: false
+    draw_as_light: bool, // Default: false
+    draw_as_sprite: bool, // Default: true
+    secondary_draw_order: i8, // Default: 0
+    apply_module_tint: ApplyModuleTint, // Default: "none"
+    render_layer: RenderLayer, // Default: "object"
+    pictures: Option<Vec<SpriteVariation>>
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum ModuleTintMode {
+    SingleModule,
+    Mix,
+}
+
+impl FromStr for ModuleTintMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "single-module" => Ok(Self::SingleModule),
+            "mix" => Ok(Self::Mix),
+            _ => Err(PrototypesErr::InvalidTypeStr("ModuleTintMode".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ModuleTintMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::SingleModule => "single-module",
+            Self::Mix => "mix",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub struct EffectTypeLimitation(u8);
+
+impl EffectTypeLimitation {
+    pub const SPEED: Self = Self(1);
+    pub const PRODUCTIVITY: Self = Self(1 << 1);
+    pub const CONSUMPTION: Self = Self(1 << 2);
+    pub const POLLUTION: Self = Self(1 << 3);
+}
+
+impl From<Vec<&str>> for EffectTypeLimitation {
+    fn from(in_arr: Vec<&str>) -> Self {
+        let mut result = Self(0);        for item in in_arr {
+            match item {
+                "speed" => result |= Self::SPEED,
+                "productivity" => result |= Self::PRODUCTIVITY,
+                "consumption" => result |= Self::CONSUMPTION,
+                "pollution" => result |= Self::POLLUTION,
+                _ => {}            }
+        }
+        result
+    }
+}
+
+impl BitAnd for EffectTypeLimitation {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        Self(self.0 & rhs.0)
+    }
+}
+
+impl BitAndAssign for EffectTypeLimitation {
+    fn bitand_assign(&mut self, rhs: Self) {
+        *self = Self(self.0 & rhs.0)
+    }
+}
+
+impl BitOr for EffectTypeLimitation {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self(self.0 | rhs.0)
+    }
+}
+
+impl BitOrAssign for EffectTypeLimitation {
+    fn bitor_assign(&mut self, rhs: Self) {
+        *self = Self(self.0 | rhs.0)
+    }
+}
+
+impl BitXor for EffectTypeLimitation {
+    type Output = Self;
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        Self(self.0 ^ rhs.0)
+    }
+}
+
+impl BitXorAssign for EffectTypeLimitation {
+    fn bitxor_assign(&mut self, rhs: Self) {
+        *self = Self(self.0 ^ rhs.0)
+    }
+}

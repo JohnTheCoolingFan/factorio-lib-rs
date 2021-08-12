@@ -63,7 +63,10 @@ use crate::types::{
     SignalIDConnector,
     Animation4Way,
     RotatedSprite,
-    InterruptibleSound
+    InterruptibleSound,
+    ModuleSpecification,
+    BeaconGraphicsSet,
+    EffectTypeLimitation
 };
 
 // Struct representing global `data` table in lua environment
@@ -932,6 +935,22 @@ pub struct ArtilleryTurret {
     cannon_barrel_light_direction: Option<Factorio3DVector> // Only loaded if cannon_barrel_recoil_shiftings is loaded
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Beacon {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_usage: Energy,
+    energy_source: EnergySource,
+    supply_area_distance: f64,
+    distribution_effectivity: f64,
+    module_specification: ModuleSpecification,
+    graphics_set: Option<BeaconGraphicsSet>,
+    animation: Option<Animation>, // Loaded only if `graphics_set` is not present
+    base_picture: Option<Sprite>, // Loaded only if `graphics_set` is not present
+    radius_visualization_picture: Option<Sprite>,
+    allowed_effects: Option<EffectTypeLimitation>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -988,7 +1007,7 @@ pub enum PrototypeGeneral {
     //LeafParticle,
     Accumulator(Accumulator),
     ArtilleryTurret(ArtilleryTurret),
-    Beacon,
+    Beacon(Beacon),
     Boiler,
     BurnerGenerator,
     Character,
