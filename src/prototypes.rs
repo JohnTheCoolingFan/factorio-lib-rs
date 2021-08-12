@@ -69,7 +69,10 @@ use crate::types::{
     EffectTypeLimitation,
     FluidBox,
     Sprite4WaySided,
-    BoilerMode
+    BoilerMode,
+    CharacterArmorAnimation,
+    FootstepTriggerEffectList,
+    FootprintParticle
 };
 
 // Struct representing global `data` table in lua environment
@@ -987,6 +990,48 @@ pub struct BurnerGenerator {
     performance_to_sound_speedup: f64, // Default: 0.5
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Character {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    mining_speed: f64,
+    running_speed: f64,
+    distance_per_frame: f64,
+    maximum_corner_sliding_distance: f64,
+    heartbeat: Sound,
+    eat: Sound,
+    inventory_size: ItemStackIndex,
+    build_distance: u32,
+    drop_item_distance: u32,
+    reach_distance: u32,
+    reach_resource_distance: f64,
+    item_pickup_distance: f64,
+    loot_pickup_distance: f64,
+    ticks_to_keep_gun: u32,
+    ticks_to_keep_aiming_direction: u32,
+    ticks_to_stay_in_combat: u32,
+    damage_hit_tint: Color,
+    running_sound_animation_positions: Vec<f32>,
+    mining_with_tool_particles_animation_positions: Vec<f32>,
+    animations: Vec<CharacterArmorAnimation>,
+    crafting_categories: Option<Vec<String>>, // (Names) Name of crafting category
+    mining_categories: Option<Vec<String>>, // (Names) Name of mining category
+    light: Option<LightDefinition>,
+    enter_vehicle_distance: f64, // Default: 3.0
+    tool_attack_distance: f64, // Default: 1.5
+    respawn_time: u32, // Default: 10
+    has_belt_immunity: bool, // Default: false
+    character_corpse: Option<String>,
+    footstep_particle_triggers: Option<FootstepTriggerEffectList>,
+    synced_footstep_particle_triggers: Option<FootstepTriggerEffectList>,
+    footprint_particles: Option<Vec<FootprintParticle>>,
+    left_footprint_offset: Option<Factorio2DVector>,
+    right_footprint_offset: Option<Factorio2DVector>,
+    right_footprint_frames: Option<Factorio2DVector>,
+    left_footprint_frames: Option<Factorio2DVector>,
+    tool_attack_result: Option<Trigger>,
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1046,7 +1091,7 @@ pub enum PrototypeGeneral {
     Beacon(Beacon),
     Boiler(Boiler),
     BurnerGenerator(BurnerGenerator),
-    Character,
+    Character(Character),
     ArithmeticCombinator,
     DeciderCombinator,
     ConstantCombinator,

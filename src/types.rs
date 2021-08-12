@@ -2926,3 +2926,30 @@ impl fmt::Display for BoilerMode {
         })
     }
 }
+
+#[derive(Debug)]
+pub struct CharacterArmorAnimation {
+    idle: RotatedAnimation,
+    idle_with_gun: RotatedAnimation,
+    running: RotatedAnimation,
+    running_with_gun: RotatedAnimation,
+    mining_with_tool: RotatedAnimation,
+    flipped_shadow_running_with_gun: Option<RotatedAnimation>, // If set, must containt exactly 18 directions
+    armors: Option<Vec<String>>,
+}
+
+pub type FootstepTriggerEffectList = Vec<FootstepTriggerEffect>;
+
+#[derive(Debug)]
+pub struct FootstepTriggerEffect {
+    actions: Vec<CreateParticleTriggerEffectItem>,
+    use_as_default: bool, // Default: false
+    tiles: Vec<String>, // (Names) Name of tile
+}
+
+#[derive(Debug)]
+pub struct FootprintParticle {
+    tiles: Vec<String>, // (Names) Name of a tile
+    particle_name: Option<String>, // Name of a particle
+    use_as_default: bool, // Default: false
+}
