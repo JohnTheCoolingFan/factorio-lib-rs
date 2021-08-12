@@ -37,6 +37,7 @@ use crate::types::{
     EntityPrototypeFlags,
     MinableProperties,
     Factorio2DVector,
+    Factorio3DVector,
     RemoveDecoratives,
     CreateTrivialSmokeEffectItem,
     WorkingSound,
@@ -59,7 +60,10 @@ use crate::types::{
     LightDefinition,
     WireConnectionPoint,
     CircuitConnectorSprites,
-    SignalIDConnector
+    SignalIDConnector,
+    Animation4Way,
+    RotatedSprite,
+    InterruptibleSound
 };
 
 // Struct representing global `data` table in lua environment
@@ -900,6 +904,34 @@ pub struct Accumulator {
     default_output_signal: Option<SignalIDConnector>
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct ArtilleryTurret {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    gun: String, // Name of a gun item
+    inventory_size: u16, // Must be > 0
+    ammo_stack_limit: u32, // Must be > 0
+    automated_ammo_count: u32,
+    turret_rotation_speed: f64,
+    manual_range_modifier: f64, // Must be positive
+    alert_when_attacking: bool, // Default: true
+    disable_automatic_firing: bool, // Default: false
+    base_picture_secondary_draw_order: u8, // Default: 0
+    base_picture_render_layer: RenderLayer, // Default: "lower-object"
+    base_shift: Option<Factorio2DVector>,
+    base_picture: Option<Animation4Way>,
+    cannon_base_pictures: Option<RotatedSprite>,
+    cannon_barrel_pictures: Option<RotatedSprite>,
+    rotating_sound: Option<InterruptibleSound>,
+    rotating_stopped_sound: Option<Sound>,
+    turn_after_shooting_cooldown: u16, // Default: 0
+    cannon_parking_frame_count: u16, // Default: 0
+    cannon_parking_speed: u16, // Default: 1
+    cannon_barrel_recoil_shiftings: Option<Vec<Factorio3DVector>>,
+    cannon_barrel_recoil_shiftings_load_correction_matrix: Option<Vec<Factorio3DVector>>, // Only loaded if cannon_barrel_recoil_shiftings is loaded
+    cannon_barrel_light_direction: Option<Factorio3DVector> // Only loaded if cannon_barrel_recoil_shiftings is loaded
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -955,7 +987,7 @@ pub enum PrototypeGeneral {
     //EntityParticle,
     //LeafParticle,
     Accumulator(Accumulator),
-    ArtilleryTurret,
+    ArtilleryTurret(ArtilleryTurret),
     Beacon,
     Boiler,
     BurnerGenerator,

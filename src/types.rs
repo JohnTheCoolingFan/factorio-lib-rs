@@ -7,7 +7,8 @@ use factorio_lib_rs_derive::{TriggerEffectItemBase, CreateEntityTriggerEffectIte
 
 pub type FileName = String;
 pub type ItemStackIndex = u16;
-pub type Factorio2DVector = (f64, f64);
+pub type Factorio2DVector = (f32, f32); // Type derived from Factorio3DVector definition (https://wiki.factorio.com/Types/Vector3D)
+pub type Factorio3DVector = (f32, f32, f32);
 pub type AnimationFrameSequence = Vec<u16>;
 pub type SpriteSize = (i16, i16); // sidth, then height
 pub type SpritePosition = (i16, i16);
@@ -220,6 +221,23 @@ pub struct RotatedAnimationSpec {
     orientation_range: f32, // Default: 1
     apply_projection: bool, // Default: true
     animation: AnimationVariant
+}
+
+#[derive(Debug)]
+pub struct RotatedSprite {
+    layers: Vec<RotatedSpriteLayer>
+}
+
+#[derive(Debug)]
+pub struct RotatedSpriteLayer {
+    regular: RotatedSpriteSpec,
+    hr_version: Option<RotatedSpriteSpec>
+}
+
+#[derive(Debug)]
+pub struct RotatedSpriteSpec {
+    sprites: Vec<SpriteSpec>, // If `filenames` is set, copy all properties to each object for each filename
+    direction_count: u16
 }
 
 #[derive(Debug)]
@@ -2652,6 +2670,7 @@ pub enum SignalIDConnectorType {
 
 impl FromStr for SignalIDConnectorType {
     type Err = PrototypesErr;
+    // All fancy shenanigans are omitted, this program/library behaves like a game
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -2671,4 +2690,19 @@ impl fmt::Display for SignalIDConnectorType {
             Self::Fluid => "fluid",
         })
     }
+}
+
+#[derive(Debug)]
+pub struct Animation4Way {
+    // All fancy shenanigans are omitted, this program/library behaves like a game
+    north: Animation,
+    east: Animation,
+    south: Animation,
+    west: Animation,
+}
+
+#[derive(Debug)]
+pub struct InterruptibleSound {
+    sound: Sound,
+    fade_ticks: u32 // Default: 0
 }
