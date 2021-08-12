@@ -140,7 +140,7 @@ pub enum PrototypeType {
     ResourceEntity,
     RocketSiloRocket,
     RocketSiloRocketShadow,
-    SimpleSmoke, // note: for migration, cannot be used.
+    //SimpleSmoke, // note: for migration, cannot be used.
     SmokeWithTrigger,
     SpeechBubble,
     Sticker,
@@ -178,7 +178,7 @@ pub enum PrototypeType {
     SpidertronRemote,
     Tool,
     Armor,
-    MiningTool, // note: for migration, cannot be used.
+    //MiningTool, // note: for migration, cannot be used.
     RepairTool,
     ItemGroup,
     ItemSubGroup,
@@ -344,7 +344,7 @@ impl fmt::Display for PrototypeType {
             PrototypeType::ResourceEntity => "resource",
             PrototypeType::RocketSiloRocket => "rocket-silo-rocket",
             PrototypeType::RocketSiloRocketShadow => "rocket-silo-rocket-shadow",
-            PrototypeType::SimpleSmoke => "smoke",
+            //PrototypeType::SimpleSmoke => "smoke",
             PrototypeType::SmokeWithTrigger => "smoke-with-trigger",
             PrototypeType::SpeechBubble => "speech-bubble",
             PrototypeType::Sticker => "sticker",
@@ -382,7 +382,7 @@ impl fmt::Display for PrototypeType {
             PrototypeType::SpidertronRemote => "spidertron-remote",
             PrototypeType::Tool => "tool",
             PrototypeType::Armor => "armor",
-            PrototypeType::MiningTool => "mining-tool",
+            //PrototypeType::MiningTool => "mining-tool",
             PrototypeType::RepairTool => "repair-tool",
             PrototypeType::ItemGroup => "item-group",
             PrototypeType::ItemSubGroup => "item-subgroup",
@@ -551,7 +551,7 @@ impl FromStr for PrototypeType {
             "resource" => Ok(PrototypeType::ResourceEntity),
             "rocket-silo-rocket" => Ok(PrototypeType::RocketSiloRocket),
             "rocket-silo-rocket-shadow" => Ok(PrototypeType::RocketSiloRocketShadow),
-            "smoke" => Ok(PrototypeType::SimpleSmoke),
+            //"smoke" => Ok(PrototypeType::SimpleSmoke),
             "smoke-with-trigger" => Ok(PrototypeType::SmokeWithTrigger),
             "speech-bubble" => Ok(PrototypeType::SpeechBubble),
             "sticker" => Ok(PrototypeType::Sticker),
@@ -589,7 +589,7 @@ impl FromStr for PrototypeType {
             "spidertron-remote" => Ok(PrototypeType::SpidertronRemote),
             "tool" => Ok(PrototypeType::Tool),
             "armor" => Ok(PrototypeType::Armor),
-            "mining-tool" => Ok(PrototypeType::MiningTool),
+            //"mining-tool" => Ok(PrototypeType::MiningTool),
             "repair-tool" => Ok(PrototypeType::RepairTool),
             "item-group" => Ok(PrototypeType::ItemGroup),
             "item-subgroup" => Ok(PrototypeType::ItemSubGroup),

@@ -1127,7 +1127,7 @@ pub enum PrototypeGeneral {
     ResourceEntity,
     RocketSiloRocket,
     RocketSiloRocketShadow,
-    SimpleSmoke, // note: for migration, cannot be used.
+    //SimpleSmoke, // note: for migration, cannot be used.
     SmokeWithTrigger,
     SpeechBubble,
     Sticker,
@@ -1165,7 +1165,7 @@ pub enum PrototypeGeneral {
     SpidertronRemote,
     Tool,
     Armor,
-    MiningTool, // note: for migration, cannot be used.
+    //MiningTool, // note: for migration, cannot be used.
     RepairTool,
     ItemGroup,
     ItemSubGroup,
