@@ -973,6 +973,20 @@ pub struct Boiler {
     patch: Option<Sprite4WaySided>,
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct BurnerGenerator {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_source: EnergySource, // Emissions are ignored
+    burner: EnergySource, // Must be a burner energy source
+    animation: Animation4Way,
+    max_power_output: Energy,
+    idle_animation: Option<Animation4Way>,
+    always_draw_idle_animation: bool, // Default: false
+    min_perceived_performance: f64, // Default: 0.25
+    performance_to_sound_speedup: f64, // Default: 0.5
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1031,7 +1045,7 @@ pub enum PrototypeGeneral {
     ArtilleryTurret(ArtilleryTurret),
     Beacon(Beacon),
     Boiler(Boiler),
-    BurnerGenerator,
+    BurnerGenerator(BurnerGenerator),
     Character,
     ArithmeticCombinator,
     DeciderCombinator,
