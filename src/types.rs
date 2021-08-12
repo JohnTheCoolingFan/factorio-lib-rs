@@ -2899,3 +2899,30 @@ impl BitXorAssign for EffectTypeLimitation {
         *self = Self(self.0 ^ rhs.0)
     }
 }
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum BoilerMode {
+    HeatWaterInside,
+    OutputToSeparatePipe,
+}
+
+impl FromStr for BoilerMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "heat-water-inside" => Ok(Self::HeatWaterInside),
+            "output-to-separate-pipe" => Ok(Self::OutputToSeparatePipe),
+            _ => Err(PrototypesErr::InvalidTypeStr("BoilerMode".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for BoilerMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::HeatWaterInside => "heat-water-inside",
+            Self::OutputToSeparatePipe => "output-to-separate-pipe",
+        })
+    }
+}

@@ -68,7 +68,8 @@ use crate::types::{
     BeaconGraphicsSet,
     EffectTypeLimitation,
     FluidBox,
-    Sprite4WaySided
+    Sprite4WaySided,
+    BoilerMode
 };
 
 // Struct representing global `data` table in lua environment
@@ -968,7 +969,7 @@ pub struct Boiler {
     fire_glow: Animation4Way, // Can be empty
     fire_glow_flicker_enabled: bool, // Default: false
     fire_flicker_enabled: bool, // Default: false
-    mode: String, // Default: "heat-water-inside"
+    mode: BoilerMode, // Default: "heat-water-inside"
     patch: Option<Sprite4WaySided>,
 }
 
