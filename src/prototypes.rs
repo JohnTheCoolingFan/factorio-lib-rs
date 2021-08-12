@@ -66,7 +66,9 @@ use crate::types::{
     InterruptibleSound,
     ModuleSpecification,
     BeaconGraphicsSet,
-    EffectTypeLimitation
+    EffectTypeLimitation,
+    FluidBox,
+    Sprite4WaySided
 };
 
 // Struct representing global `data` table in lua environment
@@ -951,6 +953,25 @@ pub struct Beacon {
     allowed_effects: Option<EffectTypeLimitation>
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Boiler {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_source: EnergySource,
+    fluid_box: FluidBox,
+    output_fluid_box: FluidBox,
+    energy_consumption: Energy,
+    burning_cooldown: u32,
+    target_temperature: f64,
+    structure: Animation4Way,
+    fire: Animation4Way, // Can be empty
+    fire_glow: Animation4Way, // Can be empty
+    fire_glow_flicker_enabled: bool, // Default: false
+    fire_flicker_enabled: bool, // Default: false
+    mode: String, // Default: "heat-water-inside"
+    patch: Option<Sprite4WaySided>,
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1008,7 +1029,7 @@ pub enum PrototypeGeneral {
     Accumulator(Accumulator),
     ArtilleryTurret(ArtilleryTurret),
     Beacon(Beacon),
-    Boiler,
+    Boiler(Boiler),
     BurnerGenerator,
     Character,
     ArithmeticCombinator,

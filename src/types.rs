@@ -2331,6 +2331,14 @@ pub struct SpriteNWaySheet {
 }
 
 #[derive(Debug)]
+pub struct Sprite4WaySided {
+    north: Sprite,
+    east: Sprite,
+    south: Sprite,
+    west: Sprite
+}
+
+#[derive(Debug)]
 pub struct ExplosionDefinition {
     name: String, // Name of Prototype/Entity
     offset: Option<Factorio2DVector>
