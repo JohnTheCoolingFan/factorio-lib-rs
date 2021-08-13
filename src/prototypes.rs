@@ -68,7 +68,6 @@ use crate::types::{
     BeaconGraphicsSet,
     EffectTypeLimitation,
     FluidBox,
-    Sprite4WaySided,
     BoilerMode,
     CharacterArmorAnimation,
     FootstepTriggerEffectList,
@@ -849,6 +848,7 @@ pub struct EntityGhost {
     large_build_sound: Option<Sound>
 }
 
+/// <https://wiki.factorio.com/Prototype/EntityWithHealth>
 #[derive(Debug)]
 pub struct EntityWithHealthBase {
     // Yes, this one includes PrototypeBase and Entity
@@ -873,6 +873,7 @@ pub struct EntityWithHealthBase {
     integration_patch: Sprite4Way
 }
 
+/// <https://wiki.factorio.com/Prototype/EntityWithHealth>
 pub trait EntityWithHealth: Entity {
     fn max_health(&self) -> f32;
     fn healing_per_tick(&self) -> f32;
@@ -973,7 +974,7 @@ pub struct Boiler {
     fire_glow_flicker_enabled: bool, // Default: false
     fire_flicker_enabled: bool, // Default: false
     mode: BoilerMode, // Default: "heat-water-inside"
-    patch: Option<Sprite4WaySided>,
+    patch: Option<Sprite4Way>,
 }
 
 #[derive(Debug, EntityWithHealth)]

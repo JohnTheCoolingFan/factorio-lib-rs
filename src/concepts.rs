@@ -9,6 +9,7 @@ use ini::Ini;
 
 
 // Unfinished
+/// Handles the locale file parsing, aggregation and unified access
 #[derive(Debug)]
 pub struct LocaleHandler {
     entries: HashMap<String, String>
@@ -49,8 +50,8 @@ impl LocaleHandler {
 // Factorio concepts
 // https://lua-api.factorio.com/latest/Concepts.html
 
-// The input type for functions that accept LocalisedString
-// Also used in LocalisedString itself
+/// The input type for functions that accept LocalisedString
+/// Also used in LocalisedString itself
 #[derive(Debug, Clone)]
 pub enum LocalisedStringEntry {
     String(String),                 // Just a string
@@ -76,12 +77,12 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedStringEntry {
 }
 
 // LocalisedString
-// This is unfinished but working implementation.
-// Referencing other locale stries is not implemented
+/// This is unfinished but working implementation.
+/// Referencing other locale entries is not implemented
 #[derive(Debug, Clone)]
 pub struct LocalisedString {
     key: String,
-    parameters: Vec<LocalisedStringEntry>, // All elements after first element
+    parameters: Vec<LocalisedStringEntry>, /// All elements after first element
     locale_handler: Rc<Option<LocaleHandler>>,
 }
 
