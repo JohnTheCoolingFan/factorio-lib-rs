@@ -58,6 +58,12 @@ pub fn entity_with_health_macro_derive(input: TokenStream) -> TokenStream {
     impl_entity_with_health_macro(&ast)
 }
 
+#[proc_macro_derive(Combinator)]
+pub fn combinator_macro_derive(input:TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_combinator_macro(&ast)
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -303,6 +309,31 @@ fn impl_entity_with_health_macro(ast: &syn::DeriveInput) -> TokenStream {
         }
         impl Prototype for #name {
             fn name(&self) -> &String { &self.name }
+        }
+    };
+    gen.into()
+}
+
+fn impl_combinator_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl Combinator for #name {
+            fn energy_source(&self) -> &EnergySource { &self.combinator_base.energy_source }
+            fn active_energy_usage(&self) -> Energy { self.combinator_base.active_energy_usage }
+            fn sprites(&self) -> &Sprite4Way { &self.combinator_base.sprites }
+            fn activity_led_sprites(&self) -> &Sprite4Way { &self.combinator_base.activity_led_sprites }
+            fn input_connection_bounding_box(&self) -> BoundingBox { self.combinator_base.input_connection_bounding_box }
+            fn output_connection_bounding_box(&self) -> BoundingBox { self.combinator_base.output_connection_bounding_box }
+            fn activity_led_light_offsets(&self) -> [Factorio2DVector; 4] { self.combinator_base.activity_led_light_offsets }
+            fn screen_light_offsets(&self) -> [Factorio2DVector; 4] { self.combinator_base.screen_light_offsets }
+            fn input_connection_points(&self) -> &[WireConnectionPoint; 4] { &self.combinator_base.input_connection_points }
+            fn output_connection_points(&self) -> &[WireConnectionPoint; 4] { &self.combinator_base.output_connection_points }
+            fn activity_led_light(&self) -> &Option<LightDefinition> { &self.combinator_base.activity_led_light }
+            fn screen_light(&self) -> &Option<LightDefinition> { &self.combinator_base.screen_light }
+            fn activity_led_hold_time(&self) -> u8 { self.combinator_base.activity_led_hold_time }
+            fn circuit_wire_max_distance(&self) -> f64 { self.combinator_base.circuit_wire_max_distance }
+            fn draw_copper_wires(&self) -> bool { self.combinator_base.draw_copper_wires }
+            fn draw_circuit_wires(&self) -> bool { self.combinator_base.draw_circuit_wires }
         }
     };
     gen.into()

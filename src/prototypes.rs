@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::fmt;
-use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity, Corpse, EntityWithHealth};
+use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity, Corpse, EntityWithHealth, Combinator};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
@@ -1032,6 +1032,91 @@ pub struct Character {
     tool_attack_result: Option<Trigger>,
 }
 
+#[derive(Debug)]
+pub struct CombinatorBase {
+    energy_source: EnergySource, // Must be an electric void energy source
+    active_energy_usage: Energy,
+    sprites: Sprite4Way,
+    activity_led_sprites: Sprite4Way,
+    input_connection_bounding_box: BoundingBox,
+    output_connection_bounding_box: BoundingBox,
+    activity_led_light_offsets: [Factorio2DVector; 4],
+    screen_light_offsets: [Factorio2DVector; 4],
+    input_connection_points: [WireConnectionPoint; 4],
+    output_connection_points: [WireConnectionPoint; 4],
+    activity_led_light: Option<LightDefinition>,
+    screen_light: Option<LightDefinition>,
+    activity_led_hold_time: u8, // Default: 5
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+}
+
+pub trait Combinator {
+    fn energy_source(&self) -> &EnergySource;
+    fn active_energy_usage(&self) -> Energy;
+    fn sprites(&self) -> &Sprite4Way;
+    fn activity_led_sprites(&self) -> &Sprite4Way;
+    fn input_connection_bounding_box(&self) -> BoundingBox;
+    fn output_connection_bounding_box(&self) -> BoundingBox;
+    fn activity_led_light_offsets(&self) -> [Factorio2DVector; 4];
+    fn screen_light_offsets(&self) -> [Factorio2DVector; 4];
+    fn input_connection_points(&self) -> &[WireConnectionPoint; 4];
+    fn output_connection_points(&self) -> &[WireConnectionPoint; 4];
+    fn activity_led_light(&self) -> &Option<LightDefinition>;
+    fn screen_light(&self) -> &Option<LightDefinition>;
+    fn activity_led_hold_time(&self) -> u8;
+    fn circuit_wire_max_distance(&self) -> f64;
+    fn draw_copper_wires(&self) -> bool;
+    fn draw_circuit_wires(&self) -> bool;
+}
+
+#[derive(Debug, EntityWithHealth, Combinator)]
+pub struct ArithmeticCombinator {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    combinator_base: CombinatorBase,
+    plus_symbol_sprites: Sprite4Way,
+    minus_symbol_sprites: Sprite4Way,
+    multiply_symbol_sprites: Sprite4Way,
+    divide_symbol_sprites: Sprite4Way,
+    modulo_symbol_sprites: Sprite4Way,
+    power_symbol_sprites: Sprite4Way,
+    left_shift_symbol_sprites: Sprite4Way,
+    right_shift_symbol_sprites: Sprite4Way,
+    and_symbol_sprites: Sprite4Way,
+    or_symbol_sprites: Sprite4Way,
+    xor_symbol_sprites: Sprite4Way,
+}
+
+#[derive(Debug, EntityWithHealth, Combinator)]
+pub struct DeciderCombinator {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    combinator_base: CombinatorBase,
+    equal_symbol_sprites: Sprite4Way,
+    greater_symbol_sprites: Sprite4Way,
+    less_symbol_sprites: Sprite4Way,
+    not_equal_symbol_sprites: Sprite4Way,
+    greater_or_equal_symbol_sprites: Sprite4Way,
+    less_or_equal_symbol_sprites: Sprite4Way,
+}
+
+#[derive(Debug, EntityWithHealth)]
+pub struct ConstantCombinator {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    item_slot_count: u32,
+    sprites: Sprite4Way,
+    activity_led_sprites: Sprite4Way,
+    activity_led_light_offsets: [Factorio2DVector; 4],
+    circuit_wire_connection_points: [WireConnectionPoint; 4],
+    activity_led_light: Option<LightDefinition>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1092,9 +1177,9 @@ pub enum PrototypeGeneral {
     Boiler(Boiler),
     BurnerGenerator(BurnerGenerator),
     Character(Character),
-    ArithmeticCombinator,
-    DeciderCombinator,
-    ConstantCombinator,
+    ArithmeticCombinator(ArithmeticCombinator),
+    DeciderCombinator(DeciderCombinator),
+    ConstantCombinator(ConstantCombinator),
     Container,
     LogisticContainer,
     InfinityContainer,
