@@ -64,6 +64,12 @@ pub fn combinator_macro_derive(input:TokenStream) -> TokenStream {
     impl_combinator_macro(&ast)
 }
 
+#[proc_macro_derive(CraftingMachine)]
+pub fn crafting_machine_macro_derive(input:TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_crafting_machine_macro(&ast)
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -334,6 +340,39 @@ fn impl_combinator_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn circuit_wire_max_distance(&self) -> f64 { self.combinator_base.circuit_wire_max_distance }
             fn draw_copper_wires(&self) -> bool { self.combinator_base.draw_copper_wires }
             fn draw_circuit_wires(&self) -> bool { self.combinator_base.draw_circuit_wires }
+        }
+    };
+    gen.into()
+}
+
+fn impl_crafting_machine_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl CraftingMachine for #name {
+            fn energy_usage(&self) -> Energy { self.crafting_machine_base.energy_usage }
+            fn crafting_speed(&self) -> f64 { self.crafting_machine_base.crafting_speed }
+            fn crafting_categories(&self) -> &Vec<String>{ &self.crafting_machine_base.crafting_categories }
+            fn energy_source(&self) -> &EnergySource { &self.crafting_machine_base.energy_source }
+            fn fluid_boxes(&self) -> &Option<Vec<FluidBox>> { &self.crafting_machine_base.fluid_boxes }
+            fn allowed_effects(&self) -> &Option<EffectTypeLimitation> { &self.crafting_machine_base.allowed_effects }
+            fn scale_entity_info_icon(&self) -> bool { self.crafting_machine_base.scale_entity_info_icon }
+            fn show_recipe_icon(&self) -> bool { self.crafting_machine_base.show_recipe_icon }
+            fn return_ingredients_on_change(&self) -> bool { self.crafting_machine_base.return_ingredients_on_change }
+            fn animation(&self) -> &Option<Animation4Way> { &self.crafting_machine_base.animation }
+            fn idle_animation(&self) -> &Option<Animation4Way> { &self.crafting_machine_base.idle_animation }
+            fn always_draw_idle_animation(&self) -> bool { self.crafting_machine_base.always_draw_idle_animation }
+            fn default_recipe_tint(&self) -> &Option<CraftingMachineDefaultRecipeTint> { &self.crafting_machine_base.default_recipe_tint }
+            fn shift_animation_waypoints(&self) -> &Option<CraftingMachineShiftAnimationWaypoints> { &self.crafting_machine_base.shift_animation_waypoints }
+            fn shift_animation_waypoint_stop_duration(&self) -> u16 { self.crafting_machine_base.shift_animation_waypoint_stop_duration }
+            fn shift_animation_transition_duration(&self) -> u16 { self.crafting_machine_base.shift_animation_transition_duration }
+            fn status_colors(&self) -> &Option<CraftingMachineStatusColors> { &self.crafting_machine_base.status_colors }
+            fn entity_info_icon_shift(&self) -> Factorio2DVector { self.crafting_machine_base.entity_info_icon_shift }
+            fn draw_entity_info_icon_background(&self) -> bool { self.crafting_machine_base.draw_entity_info_icon_background }
+            fn match_animation_speed_to_activity(&self) -> bool { self.crafting_machine_base.match_animation_speed_to_activity }
+            fn show_recipe_icon_on_map(&self) -> bool { self.crafting_machine_base.show_recipe_icon_on_map }
+            fn base_productivity(&self) -> f32 { self.crafting_machine_base.base_productivity }
+            fn module_specification(&self) -> &Option<ModuleSpecification> { &self.crafting_machine_base.module_specification }
+            fn working_visualisations(&self) -> &Option<Vec<WorkingVisualization>> { &self.crafting_machine_base.working_visualisations }
         }
     };
     gen.into()

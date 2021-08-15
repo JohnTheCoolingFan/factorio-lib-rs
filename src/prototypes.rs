@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::fmt;
-use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity, Corpse, EntityWithHealth, Combinator};
+use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity, Corpse, EntityWithHealth, Combinator, CraftingMachine};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
@@ -73,7 +73,11 @@ use crate::types::{
     FootstepTriggerEffectList,
     FootprintParticle,
     LogisticMode,
-    InfinityContainerGuiMode
+    InfinityContainerGuiMode,
+    WorkingVisualization,
+    CraftingMachineDefaultRecipeTint,
+    CraftingMachineShiftAnimationWaypoints,
+    CraftingMachineStatusColors
 };
 
 // Struct representing global `data` table in lua environment
@@ -1181,6 +1185,71 @@ pub struct InfinityContainer {
     gui_mode: InfinityContainerGuiMode // Default: "none"
 }
 
+#[derive(Debug)]
+pub struct CraftingMachineBase {
+    energy_usage: Energy, // Must be positive
+    crafting_speed: f64, // Must be positive
+    crafting_categories: Vec<String>, // (Names) Name of crafting category
+    energy_source: EnergySource, // if drain is not specified, automatically set to energy_usage / 30
+    fluid_boxes: Option<Vec<FluidBox>>,
+    allowed_effects: Option<EffectTypeLimitation>,
+    scale_entity_info_icon: bool, // Default: false
+    show_recipe_icon: bool, // Default: true
+    return_ingredients_on_change: bool, // Default: true
+    animation: Option<Animation4Way>,
+    idle_animation: Option<Animation4Way>,
+    always_draw_idle_animation: bool, // Default: false
+    default_recipe_tint: Option<CraftingMachineDefaultRecipeTint>,
+    shift_animation_waypoints: Option<CraftingMachineShiftAnimationWaypoints>, // Only loaded if `shift_animation_waypoint_stop_duration` or `shift_animation_transition_duration` is not 0
+    shift_animation_waypoint_stop_duration: u16, // Default: 0 // Only loaded if `shift_animation_waypoints` is present
+    shift_animation_transition_duration: u16, // Default: 0 // Only loaded if `shift_animation_waypoints` is present
+    status_colors: Option<CraftingMachineStatusColors>,
+    entity_info_icon_shift: Factorio2DVector, // Default: {0, -0.3} for 
+    draw_entity_info_icon_background: bool, // Default: true
+    match_animation_speed_to_activity: bool, // Default: false
+    show_recipe_icon_on_map: bool, // Default: true
+    base_productivity: f32, // Default: 0
+    module_specification: Option<ModuleSpecification>,
+    working_visualisations: Option<Vec<WorkingVisualization>>,
+}
+
+pub trait CraftingMachine {
+    fn energy_usage(&self) -> Energy;
+    fn crafting_speed(&self) -> f64;
+    fn crafting_categories(&self) -> &Vec<String>;
+    fn energy_source(&self) -> &EnergySource;
+    fn fluid_boxes(&self) -> &Option<Vec<FluidBox>>;
+    fn allowed_effects(&self) -> &Option<EffectTypeLimitation>;
+    fn scale_entity_info_icon(&self) -> bool;
+    fn show_recipe_icon(&self) -> bool;
+    fn return_ingredients_on_change(&self) -> bool;
+    fn animation(&self) -> &Option<Animation4Way>;
+    fn idle_animation(&self) -> &Option<Animation4Way>;
+    fn always_draw_idle_animation(&self) -> bool;
+    fn default_recipe_tint(&self) -> &Option<CraftingMachineDefaultRecipeTint>;
+    fn shift_animation_waypoints(&self) -> &Option<CraftingMachineShiftAnimationWaypoints>;
+    fn shift_animation_waypoint_stop_duration(&self) -> u16;
+    fn shift_animation_transition_duration(&self) -> u16;
+    fn status_colors(&self) -> &Option<CraftingMachineStatusColors>;
+    fn entity_info_icon_shift(&self) -> Factorio2DVector;
+    fn draw_entity_info_icon_background(&self) -> bool;
+    fn match_animation_speed_to_activity(&self) -> bool;
+    fn show_recipe_icon_on_map(&self) -> bool;
+    fn base_productivity(&self) -> f32;
+    fn module_specification(&self) -> &Option<ModuleSpecification>;
+    fn working_visualisations(&self) -> &Option<Vec<WorkingVisualization>>;
+}
+
+#[derive(Debug, EntityWithHealth, CraftingMachine)]
+pub struct AssemblingMachine {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    crafting_machine_base: CraftingMachineBase,
+    fixed_recipe: String, // Default: "" // Name of Recipe
+    gui_title_key: String, // Default: ""
+    ingredient_count: u8, // Default: 255
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1244,10 +1313,10 @@ pub enum PrototypeGeneral {
     ArithmeticCombinator(ArithmeticCombinator),
     DeciderCombinator(DeciderCombinator),
     ConstantCombinator(ConstantCombinator),
-    Container,
-    LogisticContainer,
-    InfinityContainer,
-    AssemblingMachine,
+    Container(Container),
+    LogisticContainer(LogisticContainer),
+    InfinityContainer(InfinityContainer),
+    AssemblingMachine(AssemblingMachine),
     RocketSilo,
     Furnace,
     ElectricEnergyInterface,

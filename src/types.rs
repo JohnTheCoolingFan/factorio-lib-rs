@@ -3199,3 +3199,161 @@ impl fmt::Display for InfinityContainerGuiMode {
         })
     }
 }
+
+#[derive(Debug)]
+pub struct WorkingVisualization {
+    render_layer: RenderLayer, // Default: "object"
+    fadeout: bool, // Default: false
+    synced_fadeout: bool, // Default: false
+    constant_speed: bool, // Default: false
+    always_draw: bool, // Default: false
+    animated_shift: bool, // Default: false
+    align_to_waypoint: bool, // Default: false
+    secondary_draw_order: Option<i8>,
+    draw_as_sprite: bool, // Default: true
+    draw_as_light: bool, // Default: false
+    light: Option<LightDefinition>,
+    effect: Option<WorkingVisualizationEffect>,
+    apply_recipe_tint: Option<ApplyRecipeTint>,
+    apply_tint: Option<ApplyTint>,
+    north_animation: Option<Animation>,
+    west_animation: Option<Animation>,
+    south_animation: Option<Animation>,
+    east_animation: Option<Animation>,
+    animation: Option<Animation>,
+    north_position: Option<Factorio2DVector>,
+    west_position: Option<Factorio2DVector>,
+    south_position: Option<Factorio2DVector>,
+    east_position: Option<Factorio2DVector>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum ApplyRecipeTint {
+    Primary,
+    Secondary,
+    Tertiary,
+    Quaternary,
+    None,
+}
+
+impl FromStr for ApplyRecipeTint {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "primary" => Ok(Self::Primary),
+            "secondary" => Ok(Self::Secondary),
+            "tertiary" => Ok(Self::Tertiary),
+            "quaternary" => Ok(Self::Quaternary),
+            "none" => Ok(Self::None),
+            _ => Err(PrototypesErr::InvalidTypeStr("ApplyRecipeTint".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ApplyRecipeTint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Primary => "primary",
+            Self::Secondary => "secondary",
+            Self::Tertiary => "tertiary",
+            Self::Quaternary => "quaternary",
+            Self::None => "none",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum ApplyTint {
+    ResourceColor,
+    InputFluidBaseColor,
+    InputFluidFlowColor,
+    Status,
+    None,
+}
+
+impl FromStr for ApplyTint {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "resource-color" => Ok(Self::ResourceColor),
+            "input-fluid-base-color" => Ok(Self::InputFluidBaseColor),
+            "input-fluid-flow-color" => Ok(Self::InputFluidFlowColor),
+            "status" => Ok(Self::Status),
+            "none" => Ok(Self::None),
+            _ => Err(PrototypesErr::InvalidTypeStr("ApplyTint".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ApplyTint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::ResourceColor => "resource-color",
+            Self::InputFluidBaseColor => "input-fluid-base-color",
+            Self::InputFluidFlowColor => "input-fluid-flow-color",
+            Self::Status => "status",
+            Self::None => "none",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum WorkingVisualizationEffect {
+    Flicker,
+    UraniumGlow,
+    None,
+}
+
+impl FromStr for WorkingVisualizationEffect {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "flicker" => Ok(Self::Flicker),
+            "uranium-glow" => Ok(Self::UraniumGlow),
+            "none" => Ok(Self::None),
+            _ => Err(PrototypesErr::InvalidTypeStr("WorkingVisualizationEffect".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for WorkingVisualizationEffect {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Flicker => "flicker",
+            Self::UraniumGlow => "uranium-glow",
+            Self::None => "none",
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct CraftingMachineDefaultRecipeTint {
+    // All default to (1, 1, 1, 1)
+    primary: Color,
+    secondary: Color,
+    tertiary: Color,
+    quaternary: Color
+}
+
+#[derive(Debug)]
+pub struct CraftingMachineShiftAnimationWaypoints {
+    north: Option<Vec<Factorio2DVector>>,
+    east: Option<Vec<Factorio2DVector>>,
+    south: Option<Vec<Factorio2DVector>>,
+    west: Option<Vec<Factorio2DVector>>
+}
+
+#[derive(Debug)]
+pub struct CraftingMachineStatusColors {
+    idle: Color, // Default: White (1, 1, 1)
+    no_minable_resources: Color, // Default: `idle`
+    full_output: Color, // Default: `idle`
+    insufficient_output: Color, // Default: `idle`
+    disabled: Color, // Default: `idle`
+    no_power: Color, // Default: No color
+    working: Color, // Default: White (1, 1, 1)
+    low_power: Color, // Default: `working`
+}
