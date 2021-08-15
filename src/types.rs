@@ -3133,3 +3133,69 @@ pub struct FootprintParticle {
     particle_name: Option<String>, // Name of a particle
     use_as_default: bool, // Default: false
 }
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum LogisticMode {
+    PassiveProvider,
+    ActiveProvider,
+    Storage,
+    Buffer,
+    Requester,
+}
+
+impl FromStr for LogisticMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "passive-provider" => Ok(Self::PassiveProvider),
+            "active-provider" => Ok(Self::ActiveProvider),
+            "storage" => Ok(Self::Storage),
+            "buffer" => Ok(Self::Buffer),
+            "requester" => Ok(Self::Requester),
+            _ => Err(PrototypesErr::InvalidTypeStr("LogisticMode".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for LogisticMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::PassiveProvider => "passive-provider",
+            Self::ActiveProvider => "active-provider",
+            Self::Storage => "storage",
+            Self::Buffer => "buffer",
+            Self::Requester => "requester",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum InfinityContainerGuiMode {
+    All,
+    None,
+    Admins,
+}
+
+impl FromStr for InfinityContainerGuiMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "all" => Ok(Self::All),
+            "none" => Ok(Self::None),
+            "admins" => Ok(Self::Admins),
+            _ => Err(PrototypesErr::InvalidTypeStr("InfinityContainerGuiMode".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for InfinityContainerGuiMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::All => "all",
+            Self::None => "none",
+            Self::Admins => "admins",
+        })
+    }
+}

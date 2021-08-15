@@ -71,7 +71,9 @@ use crate::types::{
     BoilerMode,
     CharacterArmorAnimation,
     FootstepTriggerEffectList,
-    FootprintParticle
+    FootprintParticle,
+    LogisticMode,
+    InfinityContainerGuiMode
 };
 
 // Struct representing global `data` table in lua environment
@@ -1116,6 +1118,67 @@ pub struct ConstantCombinator {
     circuit_wire_max_distance: f64, // Default: 0
     draw_copper_wires: bool, // Default: true
     draw_circuit_wires: bool, // Default: true
+}
+
+#[derive(Debug, EntityWithHealth)]
+pub struct Container {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    inventory_size: u16,
+    picture: Sprite,
+    enable_inventory_bar: bool, // Default: true
+    scale_info_icons: bool, // Default: false
+    circuit_wire_connection_point: Option<WireConnectionPoint>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_connector_sprites: Option<CircuitConnectorSprites>
+}
+
+#[derive(Debug, EntityWithHealth)]
+pub struct LogisticContainer {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    inventory_size: u16,
+    picture: Option<Sprite>,
+    logistic_mode: LogisticMode,
+    enable_inventory_bar: bool, // Default: true
+    scale_info_icons: bool, // Default: false
+    circuit_wire_connection_point: Option<WireConnectionPoint>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    max_logistic_slots: Option<u16>, // requester-type must have > 0 and <= 1000 // Storage type must have <= 1
+    render_not_in_network_icon: bool, // Default: true
+    opened_duration: u8, // Default: 0
+    animation: Option<Animation>,
+    landing_location_offset: Option<Factorio2DVector>,
+    animation_sound: Option<Sound>
+}
+
+#[derive(Debug, EntityWithHealth)]
+pub struct InfinityContainer {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    inventory_size: u16, // Can't be 0
+    picture: Option<Sprite>,
+    logistic_mode: Option<LogisticMode>,
+    erase_contents_when_mined: bool,
+    enable_inventory_bar: bool, // Default: true
+    scale_info_icons: bool, // Default: false
+    circuit_wire_connection_point: Option<WireConnectionPoint>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    max_logistic_slots: Option<u16>, // requester-type must have > 0 and <= 1000 // Storage type must have <= 1
+    render_not_in_network_icon: bool, // Default: false
+    opened_duration: u8, // Default: 0
+    animation: Option<Animation>,
+    landing_location_offset: Option<Factorio2DVector>,
+    animation_sound: Option<Sound>,
+    gui_mode: InfinityContainerGuiMode // Default: "none"
 }
 
 // Enum for all prototypes
