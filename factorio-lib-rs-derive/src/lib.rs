@@ -70,6 +70,12 @@ pub fn crafting_machine_macro_derive(input:TokenStream) -> TokenStream {
     impl_crafting_machine_macro(&ast)
 }
 
+#[proc_macro_derive(FlyingRobot)]
+pub fn flying_robot_macro_derive(input:TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_flying_robot_macro(&ast)
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -373,6 +379,23 @@ fn impl_crafting_machine_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn base_productivity(&self) -> f32 { self.crafting_machine_base.base_productivity }
             fn module_specification(&self) -> &Option<ModuleSpecification> { &self.crafting_machine_base.module_specification }
             fn working_visualisations(&self) -> &Option<Vec<WorkingVisualization>> { &self.crafting_machine_base.working_visualisations }
+        }
+    };
+    gen.into()
+}
+
+fn impl_flying_robot_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl FlyingRobot for #name {
+            fn speed(&self) -> f64 { self.flying_robot_base.speed }
+            fn max_speed(&self) -> f64 { self.flying_robot_base.max_speed }
+            fn max_energy(&self) -> Energy { self.flying_robot_base.max_energy }
+            fn energy_per_move(&self) -> Energy { self.flying_robot_base.energy_per_move }
+            fn energy_per_tick(&self) -> Energy { self.flying_robot_base.energy_per_tick }
+            fn min_to_charge(&self) -> f32 { self.flying_robot_base.min_to_charge }
+            fn max_to_charge(&self) -> f32 { self.flying_robot_base.max_to_charge }
+            fn speed_multiplier_when_out_of_energy(&self) -> f32 { self.flying_robot_base.speed_multiplier_when_out_of_energy }
         }
     };
     gen.into()

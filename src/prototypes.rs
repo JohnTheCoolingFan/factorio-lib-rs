@@ -2,7 +2,17 @@ use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::fmt;
-use factorio_lib_rs_derive::{Prototype, ModSetting, PrototypeBase, Entity, Corpse, EntityWithHealth, Combinator, CraftingMachine};
+use factorio_lib_rs_derive::{
+    Prototype,
+    ModSetting,
+    PrototypeBase,
+    Entity,
+    Corpse,
+    EntityWithHealth,
+    Combinator,
+    CraftingMachine,
+    FlyingRobot
+};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
@@ -79,7 +89,9 @@ use crate::types::{
     CraftingMachineStatusColors,
     GuiMode,
     CreateDecorativesTriggerEffectItem,
-    UnitSpawnDefinition
+    UnitSpawnDefinition,
+    RotatedAnimation,
+    AttackParameters
 };
 
 // Struct representing global `data` table in lua environment
@@ -1383,6 +1395,47 @@ pub struct Fish {
     name: String,
     entity_with_health_base: EntityWithHealthBase,
     pictures: Vec<SpriteVariation>
+}
+
+#[derive(Debug)]
+pub struct FlyingRobotBase {
+    speed: f64,
+    max_speed: f64, // Default: max double
+    max_energy: Energy, // Default: 0
+    energy_per_move: Energy, // Default: 0
+    energy_per_tick: Energy, // Default: 0
+    min_to_charge: f32, // Default: 0.2
+    max_to_charge: f32, // Default: 0.95
+    speed_multiplier_when_out_of_energy: f32, // Default: 0
+}
+
+pub trait FlyingRobot {
+    fn speed(&self) -> f64;
+    fn max_speed(&self) -> f64;
+    fn max_energy(&self) -> Energy;
+    fn energy_per_move(&self) -> Energy;
+    fn energy_per_tick(&self) -> Energy;
+    fn min_to_charge(&self) -> f32;
+    fn max_to_charge(&self) -> f32;
+    fn speed_multiplier_when_out_of_energy(&self) -> f32;
+}
+
+#[derive(Debug, EntityWithHealth, FlyingRobot)]
+pub struct CombatRobot {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    flying_robot_base: FlyingRobotBase,
+    time_to_live: u32,
+    attack_parameters: AttackParameters,
+    idle: RotatedAnimation,
+    shadow_idle: RotatedAnimation,
+    in_motion: RotatedAnimation,
+    shadow_in_motion: RotatedAnimation,
+    range_from_player: f64, // Default: 0
+    friction: f64, // Default: 0
+    destroy_action: Option<Trigger>,
+    follows_player: bool, // Default: false
+    light: Option<LightDefinition>
 }
 
 // Enum for all prototypes

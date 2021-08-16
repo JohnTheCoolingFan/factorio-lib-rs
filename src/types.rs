@@ -17,6 +17,7 @@ pub type SpritePosition = (i16, i16);
 pub type KeySequence = String; /// Keyboard keys sequence.
 pub type BoundingBox = (Position, Position); // Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox?
                                              // It's kinda undocumented
+pub type RealOrientation = f32;
 
 /// Can be constructed from an array or table with x and y values
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -3370,4 +3371,202 @@ pub struct UnitSpawnDefinition {
 pub struct SpawnPoint {
     evolution_factor: f64,
     spawn_height: f64, // Must be >= 0
+}
+
+#[derive(Debug)]
+pub enum AttackParameters {
+    // Depends on `type` key
+    Projectile(ProjectileAttackParameters), // "projectile"
+    Beam(BeamAttackParameters), // "beam"
+    Stream(StreamAttackParameters) // "stream"
+}
+
+#[derive(Debug)]
+pub struct AmmoType {
+    category: String, // Name of AmmoCategory
+    action: Option<Trigger>,
+    clamp_position: bool, // Default: false // Forced to be false if `target_type` is "entity"
+    energy_consumption: Option<Energy>,
+    range_modifier: f64, // Default: 1
+    cooldown_modifier: f64, // Default: 1
+    consumption_modifier: f64, // Default: 1
+    target_type: TargetType
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum TargetType {
+    Entity,
+    Position,
+    Direction,
+}
+
+impl FromStr for TargetType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "entity" => Ok(Self::Entity),
+            "position" => Ok(Self::Position),
+            "direction" => Ok(Self::Direction),
+            _ => Err(PrototypesErr::InvalidTypeStr("TargetType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for TargetType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Entity => "entity",
+            Self::Position => "position",
+            Self::Direction => "direction",
+        })
+    }
+}
+
+pub type LayeredSound = Vec<Sound>; // `layers`
+
+#[derive(Debug)]
+pub struct CyclicSound {
+    begin_sound: Option<Sound>,
+    middle_sound: Option<Sound>,
+    end_sound: Option<Sound>
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum RangeMode {
+    CenterToCenter,
+    BoundingBoxToBoundingBox,
+}
+
+impl FromStr for RangeMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "center-to-center" => Ok(Self::CenterToCenter),
+            "bounding-box-to-bounding-box" => Ok(Self::BoundingBoxToBoundingBox),
+            _ => Err(PrototypesErr::InvalidTypeStr("RangeMode".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for RangeMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::CenterToCenter => "center-to-center",
+            Self::BoundingBoxToBoundingBox => "bounding-box-to-bounding-box",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum ActivationType {
+    Shoot,
+    Throw,
+    Consume,
+    Activate,
+}
+
+impl FromStr for ActivationType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "shoot" => Ok(Self::Shoot),
+            "throw" => Ok(Self::Throw),
+            "consume" => Ok(Self::Consume),
+            "activate" => Ok(Self::Activate),
+            _ => Err(PrototypesErr::InvalidTypeStr("ActivationType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ActivationType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Shoot => "shoot",
+            Self::Throw => "throw",
+            Self::Consume => "consume",
+            Self::Activate => "activate",
+        })
+    }
+}
+
+pub type CircularParticleCreationSpecification = Vec<(RealOrientation, Factorio2DVector)>;
+
+#[derive(Debug)]
+pub struct BeamAttackParameters {
+    range: f32,
+    cooldown: f32,
+    min_range: f32, // Default: 0
+    turn_range: f32, // Default: 1
+    fire_penalty: f32, // Default: 0
+    rotate_penalty: f32, // Default: 0
+    health_penalty: f32, // Default: 0
+    range_mode: RangeMode, // Default: "center-to-center"
+    min_attack_distance: f32, // Default: `range`
+    damage_modifier: f32, // Default: 1
+    ammo_consumption_modifier: f32, // Default: 1
+    cooldown_deviation: f32, // Default: 0
+    warmup: u32, // Default: 0
+    lead_target_for_projectile_speed: f32, // Default: 0
+    movement_slow_down_cooldown: f32, // Default: `cooldown`
+    movement_slow_down_factor: f64, // Default: 1
+    ammo_type: Option<AmmoType>,
+    activation_type: Option<ActivationType>,
+    sound: Option<LayeredSound>,
+    animation: Option<RotatedAnimation>,
+    cyclic_sound: Option<CyclicSound>,
+    use_shooter_direction: bool, // Default: false
+    ammo_categories: Option<Vec<String>>, // (Names) Name of AmmoCategory
+    ammo_category: Option<String>,
+    source_direction_count: u32, // Default: 0
+    source_offset: Option<Factorio2DVector>
+}
+
+#[derive(Debug)]
+pub struct StreamAttackParameters {
+    range: f32,
+    cooldown: f32,
+    min_range: f32, // Default: 0
+    turn_range: f32, // Default: 1
+    fire_penalty: f32, // Default: 0
+    rotate_penalty: f32, // Default: 0
+    health_penalty: f32, // Default: 0
+    range_mode: RangeMode, // Default: "center-to-center"
+    min_attack_distance: f32, // Default: `range`
+    damage_modifier: f32, // Default: 1
+    ammo_consumption_modifier: f32, // Default: 1
+    cooldown_deviation: f32, // Default: 0
+    warmup: u32, // Default: 0
+    lead_target_for_projectile_speed: f32, // Default: 0
+    movement_slow_down_cooldown: f32, // Default: `cooldown`
+    movement_slow_down_factor: f64, // Default: 1
+    ammo_type: Option<AmmoType>,
+    activation_type: Option<ActivationType>,
+    sound: Option<LayeredSound>,
+    animation: Option<RotatedAnimation>,
+    cyclic_sound: Option<CyclicSound>,
+    use_shooter_direction: bool, // Default: false
+    ammo_categories: Option<Vec<String>>, // (Names) Name of AmmoCategory
+    ammo_category: Option<String>,
+    fluid_consumption: f32, // Default: 0
+    gun_barrel_length: f32, // Default: 0
+    projectile_creation_parameters: Option<CircularParticleCreationSpecification>,
+    gun_center_shift: Option<GunCenterShift>,
+    fluids: Vec<StreamAttackFluid>
+}
+
+#[derive(Debug)]
+pub struct GunCenterShift {
+    north: Factorio2DVector,
+    east: Factorio2DVector,
+    south: Factorio2DVector,
+    west: Factorio2DVector
+}
+
+#[derive(Debug)]
+pub struct StreamAttackFluid {
+    r#type: String, // Name of Fluid
+    damage_modifier: f64, // Default: 1
 }
