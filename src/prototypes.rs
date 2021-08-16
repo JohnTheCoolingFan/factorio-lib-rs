@@ -1336,6 +1336,22 @@ pub enum ElectricEnergyInterfaceVisuals {
     Animations(Animation4Way)
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct ElectricPole {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    pictures: RotatedSprite,
+    supply_area_distance: f64, // Max value: 64
+    connection_points: Vec<WireConnectionPoint>,
+    radius_visualisation_picture: Option<Sprite>,
+    active_picture: Option<Sprite>,
+    maximum_wire_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    light: Option<LightDefinition>,
+    track_coverage_during_build_by_moving: bool // Default: false
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1406,7 +1422,7 @@ pub enum PrototypeGeneral {
     RocketSilo(RocketSilo),
     Furnace(Furnace),
     ElectricEnergyInterface(ElectricEnergyInterface),
-    ElectricPole,
+    ElectricPole(ElectricPole),
     EnemySpawner,
     Fish,
     CombatRobot,
