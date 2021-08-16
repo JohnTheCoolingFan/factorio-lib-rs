@@ -1250,6 +1250,60 @@ pub struct AssemblingMachine {
     ingredient_count: u8, // Default: 255
 }
 
+#[derive(Debug, EntityWithHealth, CraftingMachine)]
+pub struct RocketSilo {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    crafting_machine_base: CraftingMachineBase,
+    fixed_recipe: String, // Default: "" // Name of Recipe
+    gui_title_key: String, // Default: ""
+    ingredient_count: u8, // Default: 255
+    active_energy_usage: Energy,
+    idle_energy_usage: Energy,
+    lamp_energy_usage: Energy,
+    rocket_entity: String, // Name of RocketSiloRocket
+    satellite_animation: Animation,
+    satellite_shadow_animation: Animation,
+    arm_01_back_animation: Animation,
+    arm_02_right_animation: Animation,
+    arm_03_front_animation: Animation,
+    shadow_sprite: Sprite,
+    hole_sprite: Sprite,
+    hole_light_sprite: Sprite,
+    rocket_shadow_overlay_sprite: Sprite,
+    rocket_glow_overlay_sprite: Sprite,
+    door_back_sprite: Sprite,
+    door_front_sprite: Sprite,
+    base_day_sprite: Sprite,
+    base_front_sprite: Sprite,
+    red_lights_back_sprites: Sprite,
+    red_lights_front_sprites: Sprite,
+    hole_clipping_box: BoundingBox,
+    door_back_open_offset: Factorio2DVector,
+    door_front_open_offset: Factorio2DVector,
+    silo_fade_out_start_distance: f64,
+    silo_fade_out_end_distance: f64,
+    times_to_blink: u8,
+    light_blinking_speed: f64,
+    door_opening_speed: f64,
+    rocket_parts_required: u32,
+    base_night_sprite: Option<Sprite>,
+    base_light: Option<LightDefinition>,
+    base_engine_light: Option<LightDefinition>,
+    alarm_trigger: Option<TriggerEffect>,
+    clamps_on_trigger: Option<TriggerEffect>,
+    clamps_off_trigger: Option<TriggerEffect>,
+    doors_trigger: Option<TriggerEffect>,
+    raise_rocket_trigger: Option<TriggerEffect>,
+    alarm_sound: Option<Sound>,
+    clamps_on_sound: Option<Sound>,
+    clamps_off_sound: Option<Sound>,
+    doors_sound: Option<Sound>,
+    raise_rocket_sound: Option<Sound>,
+    flying_sound: Option<Sound>,
+    rocket_result_inventory_size: u16 // Default: 0
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1317,7 +1371,7 @@ pub enum PrototypeGeneral {
     LogisticContainer(LogisticContainer),
     InfinityContainer(InfinityContainer),
     AssemblingMachine(AssemblingMachine),
-    RocketSilo,
+    RocketSilo(RocketSilo),
     Furnace,
     ElectricEnergyInterface,
     ElectricPole,
