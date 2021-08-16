@@ -1511,7 +1511,7 @@ pub enum PrototypeGeneral {
     ElectricPole(ElectricPole),
     EnemySpawner(EnemySpawner),
     Fish(Fish),
-    CombatRobot,
+    CombatRobot(CombatRobot),
     ConstructionRobot,
     Gate,
     Generator,
