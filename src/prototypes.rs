@@ -1378,6 +1378,13 @@ pub struct EnemySpawner {
     spawn_decoration: Vec<CreateDecorativesTriggerEffectItem>
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Fish {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    pictures: Vec<SpriteVariation>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1450,7 +1457,7 @@ pub enum PrototypeGeneral {
     ElectricEnergyInterface(ElectricEnergyInterface),
     ElectricPole(ElectricPole),
     EnemySpawner(EnemySpawner),
-    Fish,
+    Fish(Fish),
     CombatRobot,
     ConstructionRobot,
     Gate,
