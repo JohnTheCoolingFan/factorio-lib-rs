@@ -77,7 +77,9 @@ use crate::types::{
     CraftingMachineDefaultRecipeTint,
     CraftingMachineShiftAnimationWaypoints,
     CraftingMachineStatusColors,
-    GuiMode
+    GuiMode,
+    CreateDecorativesTriggerEffectItem,
+    UnitSpawnDefinition
 };
 
 // Struct representing global `data` table in lua environment
@@ -1351,6 +1353,31 @@ pub struct ElectricPole {
     track_coverage_during_build_by_moving: bool // Default: false
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct EnemySpawner {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    animations: Vec<AnimationVariation>,
+    max_count_of_owned_units: u32,
+    max_friends_around_to_spawn: u32,
+    spawning_cooldown: [f64; 2],
+    spawning_radius: f64,
+    spawning_spacing: f64,
+    max_richness_for_spawn_shift: f64,
+    max_spawn_shift: f64,
+    pollution_absorption_absolute: f64,
+    pollution_absorption_proportional: f64,
+    call_for_help_radius: f64,
+    result_units: Vec<UnitSpawnDefinition>,
+    dying_sound: Option<Sound>,
+    integration: Vec<SpriteVariation>,
+    min_darkness_to_spawn: f32, // Default: 0.0
+    max_darkness_to_spawn: f32, // Default: 1.0
+    random_animation_offset: bool, // Default: true
+    spawn_decorations_on_expansion: bool, // Default: false
+    spawn_decoration: Vec<CreateDecorativesTriggerEffectItem>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1422,7 +1449,7 @@ pub enum PrototypeGeneral {
     Furnace(Furnace),
     ElectricEnergyInterface(ElectricEnergyInterface),
     ElectricPole(ElectricPole),
-    EnemySpawner,
+    EnemySpawner(EnemySpawner),
     Fish,
     CombatRobot,
     ConstructionRobot,

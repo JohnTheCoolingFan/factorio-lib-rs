@@ -3357,3 +3357,17 @@ pub struct CraftingMachineStatusColors {
     working: Color, // Default: White (1, 1, 1)
     low_power: Color, // Default: `working`
 }
+
+// Can also be converted from array
+#[derive(Debug)]
+pub struct UnitSpawnDefinition {
+    unit: String, // Name of Entity
+    spawn_points: Vec<SpawnPoint> // `evolution_factor` must be ascending from entry to entry
+}
+
+// Can also be converted from array
+#[derive(Debug)]
+pub struct SpawnPoint {
+    evolution_factor: f64,
+    spawn_height: f64, // Must be >= 0
+}
