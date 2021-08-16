@@ -1304,6 +1304,15 @@ pub struct RocketSilo {
     rocket_result_inventory_size: u16 // Default: 0
 }
 
+#[derive(Debug, EntityWithHealth, CraftingMachine)]
+pub struct Furnace {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    crafting_machine_base: CraftingMachineBase,
+    result_inventory_size: u16,
+    source_inventory_size: u16 // Not more than 1
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1372,7 +1381,7 @@ pub enum PrototypeGeneral {
     InfinityContainer(InfinityContainer),
     AssemblingMachine(AssemblingMachine),
     RocketSilo(RocketSilo),
-    Furnace,
+    Furnace(Furnace),
     ElectricEnergyInterface,
     ElectricPole,
     EnemySpawner,
