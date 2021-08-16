@@ -73,7 +73,6 @@ use crate::types::{
     FootstepTriggerEffectList,
     FootprintParticle,
     LogisticMode,
-    InfinityContainerGuiMode,
     WorkingVisualization,
     CraftingMachineDefaultRecipeTint,
     CraftingMachineShiftAnimationWaypoints,
@@ -1183,7 +1182,7 @@ pub struct InfinityContainer {
     animation: Option<Animation>,
     landing_location_offset: Option<Factorio2DVector>,
     animation_sound: Option<Sound>,
-    gui_mode: InfinityContainerGuiMode // Default: "none"
+    gui_mode: GuiMode // Default: "none"
 }
 
 #[derive(Debug)]

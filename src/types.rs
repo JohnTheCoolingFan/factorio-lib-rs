@@ -3171,13 +3171,13 @@ impl fmt::Display for LogisticMode {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
-pub enum InfinityContainerGuiMode {
+pub enum GuiMode {
     All,
     None,
     Admins,
 }
 
-impl FromStr for InfinityContainerGuiMode {
+impl FromStr for GuiMode {
     type Err = PrototypesErr;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -3185,12 +3185,12 @@ impl FromStr for InfinityContainerGuiMode {
             "all" => Ok(Self::All),
             "none" => Ok(Self::None),
             "admins" => Ok(Self::Admins),
-            _ => Err(PrototypesErr::InvalidTypeStr("InfinityContainerGuiMode".into(), s.into()))
+            _ => Err(PrototypesErr::InvalidTypeStr("GuiMode".into(), s.into()))
         }
     }
 }
 
-impl fmt::Display for InfinityContainerGuiMode {
+impl fmt::Display for GuiMode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", match self {
             Self::All => "all",
