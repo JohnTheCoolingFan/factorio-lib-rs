@@ -77,7 +77,8 @@ use crate::types::{
     WorkingVisualization,
     CraftingMachineDefaultRecipeTint,
     CraftingMachineShiftAnimationWaypoints,
-    CraftingMachineStatusColors
+    CraftingMachineStatusColors,
+    GuiMode
 };
 
 // Struct representing global `data` table in lua environment
@@ -1313,6 +1314,28 @@ pub struct Furnace {
     source_inventory_size: u16 // Not more than 1
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct ElectricEnergyInterface {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_source: EnergySource, // Must be electric
+    energy_production: Energy, // Default: 0
+    energy_usage: Energy, // Default: 0
+    gui_mode: GuiMode, // Default: "none"
+    continuous_animation: bool, // Default: false
+    render_layer: RenderLayer, // Default: "object"
+    light: Option<LightDefinition>,
+    visuals: ElectricEnergyInterfaceVisuals
+}
+
+#[derive(Debug)]
+pub enum ElectricEnergyInterfaceVisuals {
+    Picture(Sprite),
+    Pictures(Sprite4Way),
+    Animation(Animation),
+    Animations(Animation4Way)
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1382,7 +1405,7 @@ pub enum PrototypeGeneral {
     AssemblingMachine(AssemblingMachine),
     RocketSilo(RocketSilo),
     Furnace(Furnace),
-    ElectricEnergyInterface,
+    ElectricEnergyInterface(ElectricEnergyInterface),
     ElectricPole,
     EnemySpawner,
     Fish,
