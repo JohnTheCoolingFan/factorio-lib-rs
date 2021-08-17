@@ -2,7 +2,7 @@ use std::str::FromStr;
 use std::fmt;
 use crate::prototypes::PrototypesErr;
 
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
 pub enum PrototypeType {
     // General prototypes
     AmbientSound,
