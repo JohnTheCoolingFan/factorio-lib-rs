@@ -3495,6 +3495,40 @@ impl fmt::Display for ActivationType {
 
 pub type CircularParticleCreationSpecification = Vec<(RealOrientation, Factorio2DVector)>;
 
+/// <https://wiki.factorio.com/Types/ProjectileAttackParameters>
+#[derive(Debug)]
+pub struct ProjectileAttackParameters {
+    range: f32,
+    cooldown: f32,
+    min_range: f32, // Default: 0
+    turn_range: f32, // Default: 1
+    fire_penalty: f32, // Default: 0
+    rotate_penalty: f32, // Default: 0
+    health_penalty: f32, // Default: 0
+    range_mode: RangeMode, // Default: "center-to-center"
+    min_attack_distance: f32, // Default: `range`
+    damage_modifier: f32, // Default: 1
+    ammo_consumption_modifier: f32, // Default: 1
+    cooldown_deviation: f32, // Default: 0
+    warmup: u32, // Default: 0
+    lead_target_for_projectile_speed: f32, // Default: 0
+    movement_slow_down_cooldown: f32, // Default: `cooldown`
+    movement_slow_down_factor: f64, // Default: 1
+    ammo_type: Option<AmmoType>,
+    activation_type: Option<ActivationType>,
+    sound: Option<LayeredSound>,
+    animation: Option<RotatedAnimation>,
+    cyclic_sound: Option<CyclicSound>,
+    use_shooter_direction: bool, // Default: false
+    ammo_categories: Option<Vec<String>>, // (Names) Name of AmmoCategory
+    ammo_category: Option<String>,
+    prohectile_center: Factorio2DVector, // Default: (0, 0)
+    projectile_creation_distance: f32, // Default: 0
+    shell_particle: Option<CircularParticleCreationSpecification>,
+    projectile_creation_parameters: Option<CircularParticleCreationSpecification>,
+    projectile_orientation_offset: f32, // Default: 0
+}
+
 #[derive(Debug)]
 pub struct BeamAttackParameters {
     range: f32,
