@@ -91,7 +91,8 @@ use crate::types::{
     CreateDecorativesTriggerEffectItem,
     UnitSpawnDefinition,
     RotatedAnimation,
-    AttackParameters
+    AttackParameters,
+    SmokeSource
 };
 
 // Struct representing global `data` table in lua environment
@@ -1507,6 +1508,25 @@ pub struct Gate {
     opened_collision_mask: CollisionMask // Default: ["object-layer", "item-layer", "floor-layer", "water-tile"]
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Generator {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_source: EnergySource, // Must be electric
+    fluid_box: FluidBox,
+    horizontal_animation: Animation,
+    vertical_animation: Animation,
+    effectivity: f64,
+    fluid_usage_per_tick: f64,
+    maximum_temperature: f64,
+    smoke: Option<Vec<SmokeSource>>, // 1 or more, if specified
+    burns_fluid: bool, // Default: false
+    scale_fluid_usage: bool, // Default: false
+    min_perceived_performance: f64, // Default: 0.25
+    performance_to_sound_speedup: f64, // Default: 0.5
+    max_power_output: Option<Energy>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1584,7 +1604,7 @@ pub enum PrototypeGeneral {
     ConstructionRobot(ConstructionRobot),
     LogisticRobot(LogisticRobot),
     Gate(Gate),
-    Generator,
+    Generator(Generator),
     HeatInterface,
     HeatPipe,
     Inserter,
