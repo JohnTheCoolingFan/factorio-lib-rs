@@ -3587,3 +3587,23 @@ pub struct HeatBuffer {
     heat_glow: Option<Sprite4Way>,
     connections: Option<Vec<HeatConnection>> // 32 max
 }
+
+#[derive(Debug)]
+pub struct ConnectableEntityGraphics {
+    single: Vec<SpriteVariation>,
+    straight_vertical: Vec<SpriteVariation>,
+    straight_horizontal: Vec<SpriteVariation>,
+    corner_right_down: Vec<SpriteVariation>,
+    corner_left_down: Vec<SpriteVariation>,
+    corner_right_up: Vec<SpriteVariation>,
+    corner_left_up: Vec<SpriteVariation>,
+    t_up: Vec<SpriteVariation>,
+    t_right: Vec<SpriteVariation>,
+    t_down: Vec<SpriteVariation>,
+    t_left: Vec<SpriteVariation>,
+    ending_up: Vec<SpriteVariation>,
+    ending_right: Vec<SpriteVariation>,
+    ending_down: Vec<SpriteVariation>,
+    ending_left: Vec<SpriteVariation>,
+    cross: Vec<SpriteVariation>,
+}

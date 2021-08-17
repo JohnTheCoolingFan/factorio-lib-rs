@@ -93,7 +93,8 @@ use crate::types::{
     RotatedAnimation,
     AttackParameters,
     SmokeSource,
-    HeatBuffer
+    HeatBuffer,
+    ConnectableEntityGraphics
 };
 
 // Struct representing global `data` table in lua environment
@@ -1537,6 +1538,15 @@ pub struct HeatInterface {
     guid_mode: GuiMode, // Default: "all"
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct HeatPipe {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    connection_sprites: ConnectableEntityGraphics,
+    heat_glow_sprites: ConnectableEntityGraphics,
+    heat_buffer: HeatBuffer
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1616,7 +1626,7 @@ pub enum PrototypeGeneral {
     Gate(Gate),
     Generator(Generator),
     HeatInterface(HeatInterface),
-    HeatPipe,
+    HeatPipe(HeatPipe),
     Inserter,
     Lab,
     Lamp,
