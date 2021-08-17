@@ -92,7 +92,8 @@ use crate::types::{
     UnitSpawnDefinition,
     RotatedAnimation,
     AttackParameters,
-    SmokeSource
+    SmokeSource,
+    HeatBuffer
 };
 
 // Struct representing global `data` table in lua environment
@@ -1525,6 +1526,15 @@ pub struct Generator {
     min_perceived_performance: f64, // Default: 0.25
     performance_to_sound_speedup: f64, // Default: 0.5
     max_power_output: Option<Energy>
+}
+
+#[derive(Debug, EntityWithHealth)]
+pub struct HeatInterface {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    heat_buffer: HeatBuffer,
+    picture: Option<Sprite>,
+    guid_mode: GuiMode, // Default: "all"
 }
 
 // Enum for all prototypes
