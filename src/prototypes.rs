@@ -1615,7 +1615,7 @@ pub enum PrototypeGeneral {
     LogisticRobot(LogisticRobot),
     Gate(Gate),
     Generator(Generator),
-    HeatInterface,
+    HeatInterface(HeatInterface),
     HeatPipe,
     Inserter,
     Lab,
