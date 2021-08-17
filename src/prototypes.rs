@@ -1438,6 +1438,53 @@ pub struct CombatRobot {
     light: Option<LightDefinition>
 }
 
+#[derive(Debug, EntityWithHealth, FlyingRobot)]
+pub struct ConstructionRobot {
+    // Must have collision box of zero
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    flying_robot_base: FlyingRobotBase,
+    // RobotWithLogisticInterface
+    max_payload_size: u32,
+    cargo_centered: Factorio2DVector,
+    idle: Option<RotatedAnimation>,
+    in_motion: Option<RotatedAnimation>,
+    shadow_idle: Option<RotatedAnimation>,
+    shadow_in_motion: Option<RotatedAnimation>,
+    destroy_action: Option<Trigger>,
+    draw_cargo: bool, // Default: true
+    // ConstructionRobot
+    construction_vector: Factorio2DVector,
+    working: Option<RotatedAnimation>,
+    shadow_working: Option<RotatedAnimation>,
+    smoke: Option<Animation>,
+    sparks: Option<Vec<AnimationVariation>>,
+    repairing_sound: Option<Sound>,
+    working_light: Option<LightDefinition>
+}
+
+#[derive(Debug, EntityWithHealth, FlyingRobot)]
+pub struct LogisticRobot {
+    // Must have collision box of zero
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    flying_robot_base: FlyingRobotBase,
+    // RobotWithLogisticInterface
+    max_payload_size: u32,
+    cargo_centered: Factorio2DVector,
+    idle: Option<RotatedAnimation>,
+    in_motion: Option<RotatedAnimation>,
+    shadow_idle: Option<RotatedAnimation>,
+    shadow_in_motion: Option<RotatedAnimation>,
+    destroy_action: Option<Trigger>,
+    draw_cargo: bool, // Default: true
+    // LogisticRobot
+    idle_with_cargo: Option<RotatedAnimation>,
+    in_motion_with_cargo: Option<RotatedAnimation>,
+    shadow_idle_with_cargo: Option<RotatedAnimation>,
+    shadow_in_motion_with_cargo: Option<RotatedAnimation>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1512,7 +1559,8 @@ pub enum PrototypeGeneral {
     EnemySpawner(EnemySpawner),
     Fish(Fish),
     CombatRobot(CombatRobot),
-    ConstructionRobot,
+    ConstructionRobot(ConstructionRobot),
+    LogisticRobot(LogisticRobot),
     Gate,
     Generator,
     HeatInterface,
