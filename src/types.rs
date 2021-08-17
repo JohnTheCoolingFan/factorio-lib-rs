@@ -5,19 +5,20 @@ use std::fmt;
 use crate::prototypes::PrototypesErr;
 use factorio_lib_rs_derive::{TriggerEffectItemBase, CreateEntityTriggerEffectItemBase, TriggerItemBase};
 
-pub type FileName = String; /// My be made into struct in the future
-pub type ItemStackIndex = u16;
+pub type FileName = String; /// May be made into struct in the future
+pub type ItemStackIndex = u16; /// <https://wiki.factorio.com/Types/ItemStackIndex>
 // Type derived from Factorio3DVector definition (https://wiki.factorio.com/Types/Vector3D)
 pub type Factorio2DVector = (f32, f32); /// 2D Vector defined by Factorio
 pub type Factorio3DVector = (f32, f32, f32); /// 3D Vector defined by Factorio <https://wiki.factorio.com/Types/Vector3D>
 pub type AnimationFrameSequence = Vec<u16>; /// List of 1-based frame indices into the spreadsheet
-pub type SpriteSize = (i16, i16); /// Width and Height
-pub type SpritePosition = (i16, i16);
+pub type SpriteSize = (i16, i16); /// Width and Height <https://wiki.factorio.com/Types/Sprite#width>
+pub type SpritePosition = (i16, i16); /// <https://wiki.factorio.com/Types/Sprite#position>
 // Parser and checker maybe?
-pub type KeySequence = String; /// Keyboard keys sequence.
-pub type BoundingBox = (Position, Position); // Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox?
-                                             // It's kinda undocumented
-pub type RealOrientation = f32;
+pub type KeySequence = String; /// Keyboard keys sequence <https://wiki.factorio.com/Prototype/CustomInput#key_sequence>
+// Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox? It's kinda undocumented
+pub type BoundingBox = (Position, Position); /// <https://wiki.factorio.com/Types/BoundingBox>
+// Value range: [0.0; 1.0)
+pub type RealOrientation = f32; /// <https://wiki.factorio.com/Types/RealOrientation>
 
 /// Can be constructed from an array or table with x and y values
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -3588,6 +3589,7 @@ pub struct HeatBuffer {
     connections: Option<Vec<HeatConnection>> // 32 max
 }
 
+/// <https://wiki.factorio.com/Types/ConnectableEntityGraphics>
 #[derive(Debug)]
 pub struct ConnectableEntityGraphics {
     single: Vec<SpriteVariation>,
