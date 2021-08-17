@@ -1485,6 +1485,28 @@ pub struct LogisticRobot {
     shadow_in_motion_with_cargo: Option<RotatedAnimation>
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Gate {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    vertical_animation: Animation,
+    horizontal_animation: Animation,
+    vertical_rail_animation_left: Animation,
+    vertical_rail_animation_right: Animation,
+    horizontal_rail_animation_left: Animation,
+    horizontal_rail_animation_right: Animation,
+    vertical_rail_base: Animation,
+    horizontal_rail_base: Animation,
+    wall_patch: Animation,
+    opening_speed: f32,
+    activation_distance: f64,
+    timeout_to_close: u32,
+    open_sound: Sound,
+    close_sound: Sound,
+    fadeout_interval: u32, // Default: 0
+    opened_collision_mask: CollisionMask // Default: ["object-layer", "item-layer", "floor-layer", "water-tile"]
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1561,7 +1583,7 @@ pub enum PrototypeGeneral {
     CombatRobot(CombatRobot),
     ConstructionRobot(ConstructionRobot),
     LogisticRobot(LogisticRobot),
-    Gate,
+    Gate(Gate),
     Generator,
     HeatInterface,
     HeatPipe,
