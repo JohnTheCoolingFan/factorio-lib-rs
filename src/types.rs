@@ -3541,7 +3541,6 @@ pub struct ProjectileAttackParameters {
     cyclic_sound: Option<CyclicSound>,
     use_shooter_direction: bool, // Default: false
     ammo_categories: Option<Vec<String>>, // (Names) Name of AmmoCategory
-    ammo_category: Option<String>,
     prohectile_center: Factorio2DVector, // Default: (0, 0)
     projectile_creation_distance: f32, // Default: 0
     shell_particle: Option<CircularParticleCreationSpecification>,
@@ -3575,7 +3574,6 @@ pub struct BeamAttackParameters {
     cyclic_sound: Option<CyclicSound>,
     use_shooter_direction: bool, // Default: false
     ammo_categories: Option<Vec<String>>, // (Names) Name of AmmoCategory
-    ammo_category: Option<String>,
     source_direction_count: u32, // Default: 0
     source_offset: Option<Factorio2DVector>
 }
@@ -3606,7 +3604,6 @@ pub struct StreamAttackParameters {
     cyclic_sound: Option<CyclicSound>,
     use_shooter_direction: bool, // Default: false
     ammo_categories: Option<Vec<String>>, // (Names) Name of AmmoCategory
-    ammo_category: Option<String>,
     fluid_consumption: f32, // Default: 0
     gun_barrel_length: f32, // Default: 0
     projectile_creation_parameters: Option<CircularParticleCreationSpecification>,
