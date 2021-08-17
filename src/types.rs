@@ -3136,6 +3136,7 @@ pub struct FootprintParticle {
     use_as_default: bool, // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/LogisticContainer#logistic_mode>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum LogisticMode {
     PassiveProvider,
@@ -3172,6 +3173,8 @@ impl fmt::Display for LogisticMode {
     }
 }
 
+/// Used in many places, specified as string
+/// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface#gui_mode>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum GuiMode {
     All,
@@ -3202,6 +3205,7 @@ impl fmt::Display for GuiMode {
     }
 }
 
+/// <https://wiki.factorio.com/Types/WorkingVisualisation>
 #[derive(Debug)]
 pub struct WorkingVisualization {
     render_layer: RenderLayer, // Default: "object"
@@ -3229,6 +3233,7 @@ pub struct WorkingVisualization {
     east_position: Option<Factorio2DVector>,
 }
 
+/// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_recipe_tint>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum ApplyRecipeTint {
     Primary,
@@ -3265,6 +3270,7 @@ impl fmt::Display for ApplyRecipeTint {
     }
 }
 
+/// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_tint>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum ApplyTint {
     ResourceColor,
@@ -3301,6 +3307,7 @@ impl fmt::Display for ApplyTint {
     }
 }
 
+/// <https://wiki.factorio.com/Types/WorkingVisualisation#effect>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum WorkingVisualizationEffect {
     Flicker,
@@ -3331,6 +3338,7 @@ impl fmt::Display for WorkingVisualizationEffect {
     }
 }
 
+/// <https://wiki.factorio.com/Prototype/CraftingMachine#default_recipe_tint>
 #[derive(Debug)]
 pub struct CraftingMachineDefaultRecipeTint {
     // All default to (1, 1, 1, 1)
@@ -3340,6 +3348,7 @@ pub struct CraftingMachineDefaultRecipeTint {
     quaternary: Color
 }
 
+/// <https://wiki.factorio.com/Prototype/CraftingMachine#shift_animation_waypoints>
 #[derive(Debug)]
 pub struct CraftingMachineShiftAnimationWaypoints {
     north: Option<Vec<Factorio2DVector>>,
@@ -3348,6 +3357,7 @@ pub struct CraftingMachineShiftAnimationWaypoints {
     west: Option<Vec<Factorio2DVector>>
 }
 
+/// <https://wiki.factorio.com/Prototype/CraftingMachine#status_colors>
 #[derive(Debug)]
 pub struct CraftingMachineStatusColors {
     idle: Color, // Default: White (1, 1, 1)
@@ -3361,6 +3371,7 @@ pub struct CraftingMachineStatusColors {
 }
 
 // Can also be converted from array
+/// <https://wiki.factorio.com/Types/UnitSpawnDefinition>
 #[derive(Debug)]
 pub struct UnitSpawnDefinition {
     unit: String, // Name of Entity
@@ -3368,12 +3379,14 @@ pub struct UnitSpawnDefinition {
 }
 
 // Can also be converted from array
+/// <https://wiki.factorio.com/Types/SpawnPoint>
 #[derive(Debug)]
 pub struct SpawnPoint {
     evolution_factor: f64,
     spawn_height: f64, // Must be >= 0
 }
 
+/// <https://wiki.factorio.com/Types/AttackParameters>
 #[derive(Debug)]
 pub enum AttackParameters {
     // Depends on `type` key
@@ -3382,6 +3395,7 @@ pub enum AttackParameters {
     Stream(StreamAttackParameters) // "stream"
 }
 
+/// <https://wiki.factorio.com/Types/AmmoType>
 #[derive(Debug)]
 pub struct AmmoType {
     category: String, // Name of AmmoCategory
@@ -3394,6 +3408,7 @@ pub struct AmmoType {
     target_type: TargetType
 }
 
+/// <https://wiki.factorio.com/Types/AmmoType#target_type>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum TargetType {
     Entity,
@@ -3424,8 +3439,10 @@ impl fmt::Display for TargetType {
     }
 }
 
+/// <https://wiki.factorio.com/Types/LayeredSound>
 pub type LayeredSound = Vec<Sound>; // `layers`
 
+/// <https://wiki.factorio.com/Types/CyclicSound>
 #[derive(Debug)]
 pub struct CyclicSound {
     begin_sound: Option<Sound>,
@@ -3433,6 +3450,7 @@ pub struct CyclicSound {
     end_sound: Option<Sound>
 }
 
+/// <https://wiki.factorio.com/Types/BaseAttackParameters#range_mode>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum RangeMode {
     CenterToCenter,
@@ -3460,6 +3478,7 @@ impl fmt::Display for RangeMode {
     }
 }
 
+/// <https://wiki.factorio.com/Types/BaseAttackParameters#activation_type>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum ActivationType {
     Shoot,
@@ -3493,6 +3512,7 @@ impl fmt::Display for ActivationType {
     }
 }
 
+/// <https://wiki.factorio.com/Types/CircularProjectileCreationSpecification>
 pub type CircularParticleCreationSpecification = Vec<(RealOrientation, Factorio2DVector)>;
 
 /// <https://wiki.factorio.com/Types/ProjectileAttackParameters>
@@ -3529,6 +3549,7 @@ pub struct ProjectileAttackParameters {
     projectile_orientation_offset: f32, // Default: 0
 }
 
+/// <https://wiki.factorio.com/Types/BeamAttackParameters>
 #[derive(Debug)]
 pub struct BeamAttackParameters {
     range: f32,
@@ -3559,6 +3580,7 @@ pub struct BeamAttackParameters {
     source_offset: Option<Factorio2DVector>
 }
 
+/// <https://wiki.factorio.com/Types/StreamAttackParameters>
 #[derive(Debug)]
 pub struct StreamAttackParameters {
     range: f32,
@@ -3592,6 +3614,7 @@ pub struct StreamAttackParameters {
     fluids: Vec<StreamAttackFluid>
 }
 
+/// <https://wiki.factorio.com/Types/StreamAttackParameters#gun_center_shift>
 #[derive(Debug)]
 pub struct GunCenterShift {
     north: Factorio2DVector,
@@ -3600,6 +3623,8 @@ pub struct GunCenterShift {
     west: Factorio2DVector
 }
 
+
+/// <https://wiki.factorio.com/Types/StreamAttackParameters#fluids>
 #[derive(Debug)]
 pub struct StreamAttackFluid {
     r#type: String, // Name of Fluid
