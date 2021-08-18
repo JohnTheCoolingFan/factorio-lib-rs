@@ -1547,6 +1547,42 @@ pub struct HeatPipe {
     heat_buffer: HeatBuffer
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Inserter {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    extension_speed: f64,
+    rotation_speed: f64,
+    insert_position: Factorio2DVector,
+    pickup_position: Factorio2DVector,
+    platform_picture: Sprite4Way,
+    hand_base_picture: Sprite,
+    hand_open_picture: Sprite,
+    hand_closed_picture: Sprite,
+    energy_source: EnergySource, // Emissions are ignored
+    energy_per_movement: Energy, // Default: 0
+    energy_per_rotation: Energy, // Default: 0
+    stack: bool, // Default: false
+    allow_custom_vectors: bool, // Default: false
+    allow_burner_leech: bool, // Default: false
+    draw_held_item: bool, // Default: true
+    use_easter_egg: bool, // Default: true
+    filter_count: u8, // Default: 0
+    hand_base_shadow: Option<Sprite>,
+    hand_open_shadow: Option<Sprite>,
+    hand_closed_shadow: Option<Sprite>,
+    hand_size: f64, // Default: 0.75
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    default_stack_control_input_signal: Option<SignalIDConnector>,
+    draw_inserter_arrow: bool, // Default: true
+    chases_belt_items: bool, // Default: true
+    stack_size_bonus: u32, // Default: 0
+    circuit_wire_connection_points: Option<Vec<WireConnectionPoint>>,
+    circuit_connector_sprites: Option<Vec<CircuitConnectorSprites>>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1627,7 +1663,7 @@ pub enum PrototypeGeneral {
     Generator(Generator),
     HeatInterface(HeatInterface),
     HeatPipe(HeatPipe),
-    Inserter,
+    Inserter(Inserter),
     Lab,
     Lamp,
     LandMine,
