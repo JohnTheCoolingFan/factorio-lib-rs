@@ -1583,6 +1583,23 @@ pub struct Inserter {
     circuit_connector_sprites: Option<Vec<CircuitConnectorSprites>>
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Lab {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_usage: Energy,
+    energy_source: EnergySource,
+    on_animation: Animation,
+    off_animation: Animation,
+    inputs: Vec<String>, // (Names) Name of science pack items
+    researching_speed: f64, // Default: 1
+    allowed_effects: EffectTypeLimitation, // Default: all allowed
+    light: Option<LightDefinition>,
+    base_productivity: f32, // Default: 0
+    entity_info_icon_shift: Factorio2DVector, // Default: (0, 0)
+    module_specification: Option<ModuleSpecification>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1664,7 +1681,7 @@ pub enum PrototypeGeneral {
     HeatInterface(HeatInterface),
     HeatPipe(HeatPipe),
     Inserter(Inserter),
-    Lab,
+    Lab(Lab),
     Lamp,
     LandMine,
     LinkedContainer,
