@@ -96,7 +96,8 @@ use crate::types::{
     HeatBuffer,
     ConnectableEntityGraphics,
     SignalColorMapping,
-    GlowRenderMode 
+    GlowRenderMode,
+    ForceCondition
 };
 
 // Struct representing global `data` table in lua environment
@@ -1626,6 +1627,21 @@ pub struct Lamp {
     glow_render_mode: GlowRenderMode // Default: "additive"
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct LandMine {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    picture_safe: Sprite,
+    picture_set: Sprite,
+    trigger_radius: f64,
+    picture_set_enemy: Option<Sprite>,
+    timeout: u32, // Default: 120
+    action: Option<Trigger>,
+    ammo_category: Option<String>, // Name of AmmoCategory
+    force_die_on_attack: bool, // Default: true
+    trigger_force: ForceCondition // Default: "enemy"
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1709,7 +1725,7 @@ pub enum PrototypeGeneral {
     Inserter(Inserter),
     Lab(Lab),
     Lamp(Lamp),
-    LandMine,
+    LandMine(LandMine),
     LinkedContainer,
     Market,
     MiningDrill,
