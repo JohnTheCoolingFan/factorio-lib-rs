@@ -1002,6 +1002,7 @@ pub struct IconData {
 }
 
 // TODO: fmt::Display
+// TODO: Joule support, convert to Joule/tick
 /// <https://wiki.factorio.com/Types/Energy>
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub struct Energy(f64); // I don't know which type factorio uses internally, so I will use this
