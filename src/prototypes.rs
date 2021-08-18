@@ -101,7 +101,8 @@ use crate::types::{
     MiningDrillGraphicsSet,
     OffshorePumpGraphicsSet,
     PipePictures,
-    PipeToGroundPictures
+    PipeToGroundPictures,
+    Instrument
 };
 
 // Struct representing global `data` table in lua environment
@@ -1773,6 +1774,24 @@ pub struct PowerSwitch {
     draw_circuit_wires: bool, // Default: true
 }
 
+/// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker>
+#[derive(Debug, EntityWithHealth)]
+pub struct ProgrammableSpeaker {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_source: EnergySource, // Must be electric
+    energy_usage_per_tick: Energy,
+    sprite: Sprite,
+    maximum_polyphony: u32,
+    instruments: Vec<Instrument>,
+    audible_distance_modifier: f32, // Default: 1
+    circuit_wire_connection_point: Option<WireConnectionPoint>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_connector_sprites: Option<CircuitConnectorSprites>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1866,7 +1885,7 @@ pub enum PrototypeGeneral {
     PipeToGround(PipeToGround),
     PlayerPort(PlayerPort),
     PowerSwitch(PowerSwitch),
-    ProgrammableSpeaker,
+    ProgrammableSpeaker(ProgrammableSpeaker),
     Pump,
     Radar,
     CurvedRail,

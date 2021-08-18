@@ -3833,3 +3833,17 @@ pub struct PipeToGroundPictures {
     left: Sprite,
     ritgh: Sprite
 }
+
+/// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker#instruments>
+#[derive(Debug)]
+pub struct Instrument {
+    name: String,
+    notes: Vec<Note>
+}
+
+/// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker#instruments>
+#[derive(Debug)]
+pub struct Note {
+    name: String,
+    sound: Sound
+}
