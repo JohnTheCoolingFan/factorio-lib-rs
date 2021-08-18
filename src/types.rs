@@ -3341,7 +3341,7 @@ impl fmt::Display for WorkingVisualizationEffect {
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#default_recipe_tint>
 #[derive(Debug)]
-pub struct CraftingMachineDefaultRecipeTint {
+pub struct RecipeTint {
     // All default to (1, 1, 1, 1)
     primary: Color,
     secondary: Color,
@@ -3351,7 +3351,7 @@ pub struct CraftingMachineDefaultRecipeTint {
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#shift_animation_waypoints>
 #[derive(Debug)]
-pub struct CraftingMachineShiftAnimationWaypoints {
+pub struct ShiftAnimationWaypoints {
     north: Option<Vec<Factorio2DVector>>,
     east: Option<Vec<Factorio2DVector>>,
     south: Option<Vec<Factorio2DVector>>,
@@ -3360,7 +3360,7 @@ pub struct CraftingMachineShiftAnimationWaypoints {
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#status_colors>
 #[derive(Debug)]
-pub struct CraftingMachineStatusColors {
+pub struct StatusColors {
     idle: Color, // Default: White (1, 1, 1)
     no_minable_resources: Color, // Default: `idle`
     full_output: Color, // Default: `idle`
@@ -3728,5 +3728,56 @@ impl fmt::Display for GlowRenderMode {
             Self::Additive => "additive",
             Self::Multiplicative => "multiplicative",
         })
+    }
+}
+
+/// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet>
+#[derive(Debug)]
+pub struct MiningDrillGraphicsSet {
+    animation: Option<Animation4Way>,
+    idle_animation: Option<Animation4Way>,
+    always_draw_idle_animation: bool, // Default: false
+    default_recipe_tint: Option<RecipeTint>,
+    working_visualisations: Option<WorkingVisualization>,
+    /// Only loaded if `shift_animation_waypoint_stop_duration` or `shift_animation_transition_duration` is not 0
+    shift_animation_waypoints: Option<ShiftAnimationWaypoints>,
+    shift_animation_waypoint_stop_duration: u16, // Default: 0
+    shift_animation_transition_duration: u16, // Default: 0
+    status_colors: Option<StatusColors>,
+    drilling_vertical_movement_duration: u16, // Default: 0
+    animation_progress: f32, // Default: 1
+    max_animation_progress: f32, // Default: 1000
+    min_animation_progress: f32, // Default: 0
+    circuit_connector_layer: CircuitConnectorRenderLayers, // Default: all "object"
+    circuit_connector_secondary_draw_order: CircuitConnectorSecondaryDrawOrder // Default: all 100
+}
+
+/// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_layer>
+#[derive(Debug)]
+pub struct CircuitConnectorRenderLayers {
+    north: RenderLayer,
+    east: RenderLayer,
+    south: RenderLayer,
+    west: RenderLayer
+}
+
+impl CircuitConnectorRenderLayers {
+    pub fn new(render_layer: RenderLayer) -> Self {
+        Self{north: render_layer, east: render_layer, south: render_layer, west: render_layer}
+    }
+}
+
+/// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_secondary_draw_order>
+#[derive(Debug)]
+pub struct CircuitConnectorSecondaryDrawOrder {
+    north: i8,
+    east: i8,
+    south: i8,
+    west: i8
+}
+
+impl CircuitConnectorSecondaryDrawOrder {
+    pub fn new(draw_order: i8) -> Self {
+        Self{north: draw_order, east: draw_order, south: draw_order, west: draw_order}
     }
 }

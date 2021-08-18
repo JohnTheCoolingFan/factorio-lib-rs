@@ -367,11 +367,11 @@ fn impl_crafting_machine_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn animation(&self) -> &Option<Animation4Way> { &self.crafting_machine_base.animation }
             fn idle_animation(&self) -> &Option<Animation4Way> { &self.crafting_machine_base.idle_animation }
             fn always_draw_idle_animation(&self) -> bool { self.crafting_machine_base.always_draw_idle_animation }
-            fn default_recipe_tint(&self) -> &Option<CraftingMachineDefaultRecipeTint> { &self.crafting_machine_base.default_recipe_tint }
-            fn shift_animation_waypoints(&self) -> &Option<CraftingMachineShiftAnimationWaypoints> { &self.crafting_machine_base.shift_animation_waypoints }
+            fn default_recipe_tint(&self) -> &Option<RecipeTint> { &self.crafting_machine_base.default_recipe_tint }
+            fn shift_animation_waypoints(&self) -> &Option<ShiftAnimationWaypoints> { &self.crafting_machine_base.shift_animation_waypoints }
             fn shift_animation_waypoint_stop_duration(&self) -> u16 { self.crafting_machine_base.shift_animation_waypoint_stop_duration }
             fn shift_animation_transition_duration(&self) -> u16 { self.crafting_machine_base.shift_animation_transition_duration }
-            fn status_colors(&self) -> &Option<CraftingMachineStatusColors> { &self.crafting_machine_base.status_colors }
+            fn status_colors(&self) -> &Option<StatusColors> { &self.crafting_machine_base.status_colors }
             fn entity_info_icon_shift(&self) -> Factorio2DVector { self.crafting_machine_base.entity_info_icon_shift }
             fn draw_entity_info_icon_background(&self) -> bool { self.crafting_machine_base.draw_entity_info_icon_background }
             fn match_animation_speed_to_activity(&self) -> bool { self.crafting_machine_base.match_animation_speed_to_activity }

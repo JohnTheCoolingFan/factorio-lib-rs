@@ -84,9 +84,9 @@ use crate::types::{
     FootprintParticle,
     LogisticMode,
     WorkingVisualization,
-    CraftingMachineDefaultRecipeTint,
-    CraftingMachineShiftAnimationWaypoints,
-    CraftingMachineStatusColors,
+    RecipeTint,
+    ShiftAnimationWaypoints,
+    StatusColors,
     GuiMode,
     CreateDecorativesTriggerEffectItem,
     UnitSpawnDefinition,
@@ -97,7 +97,8 @@ use crate::types::{
     ConnectableEntityGraphics,
     SignalColorMapping,
     GlowRenderMode,
-    ForceCondition
+    ForceCondition,
+    MiningDrillGraphicsSet
 };
 
 // Struct representing global `data` table in lua environment
@@ -1219,11 +1220,11 @@ pub struct CraftingMachineBase {
     animation: Option<Animation4Way>,
     idle_animation: Option<Animation4Way>,
     always_draw_idle_animation: bool, // Default: false
-    default_recipe_tint: Option<CraftingMachineDefaultRecipeTint>,
-    shift_animation_waypoints: Option<CraftingMachineShiftAnimationWaypoints>, // Only loaded if `shift_animation_waypoint_stop_duration` or `shift_animation_transition_duration` is not 0
+    default_recipe_tint: Option<RecipeTint>,
+    shift_animation_waypoints: Option<ShiftAnimationWaypoints>, // Only loaded if `shift_animation_waypoint_stop_duration` or `shift_animation_transition_duration` is not 0
     shift_animation_waypoint_stop_duration: u16, // Default: 0 // Only loaded if `shift_animation_waypoints` is present
     shift_animation_transition_duration: u16, // Default: 0 // Only loaded if `shift_animation_waypoints` is present
-    status_colors: Option<CraftingMachineStatusColors>,
+    status_colors: Option<StatusColors>,
     entity_info_icon_shift: Factorio2DVector, // Default: {0, -0.3} for 
     draw_entity_info_icon_background: bool, // Default: true
     match_animation_speed_to_activity: bool, // Default: false
@@ -1246,11 +1247,11 @@ pub trait CraftingMachine {
     fn animation(&self) -> &Option<Animation4Way>;
     fn idle_animation(&self) -> &Option<Animation4Way>;
     fn always_draw_idle_animation(&self) -> bool;
-    fn default_recipe_tint(&self) -> &Option<CraftingMachineDefaultRecipeTint>;
-    fn shift_animation_waypoints(&self) -> &Option<CraftingMachineShiftAnimationWaypoints>;
+    fn default_recipe_tint(&self) -> &Option<RecipeTint>;
+    fn shift_animation_waypoints(&self) -> &Option<ShiftAnimationWaypoints>;
     fn shift_animation_waypoint_stop_duration(&self) -> u16;
     fn shift_animation_transition_duration(&self) -> u16;
-    fn status_colors(&self) -> &Option<CraftingMachineStatusColors>;
+    fn status_colors(&self) -> &Option<StatusColors>;
     fn entity_info_icon_shift(&self) -> Factorio2DVector;
     fn draw_entity_info_icon_background(&self) -> bool;
     fn match_animation_speed_to_activity(&self) -> bool;
@@ -1660,6 +1661,35 @@ pub struct Market {
     allow_access_to_all_forces: bool, // Default: true
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct MiningDrill {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    vector_to_place_result: Factorio2DVector,
+    resource_searching_radius: f64,
+    energy_usage: Energy,
+    mining_speed: f64,
+    energy_source: EnergySource,
+    resource_categories: Vec<String>, // (Names) Name of resourceCategory
+    output_fluid_box: Option<FluidBox>,
+    input_fluid_box: Option<FluidBox>,
+    animations: Option<Animation4Way>, // Loaded only if `graphics_set` is not present
+    graphics_set: Option<MiningDrillGraphicsSet>,
+    wet_mining_graphics_set: Option<MiningDrillGraphicsSet>,
+    base_picture: Option<Sprite4Way>,
+    allowed_effects: EffectTypeLimitation, // Default: all allowed
+    radius_visualisation_picture: Option<Sprite>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    base_render_layer: RenderLayer, // Default: "lower-object"
+    base_productivity: f32, // Default: 0
+    monitor_visualization_tint: Option<Color>,
+    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory iff `circuit_wire_max_distance` > 0
+    module_specification: Option<ModuleSpecification>
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1746,7 +1776,7 @@ pub enum PrototypeGeneral {
     LandMine(LandMine),
     LinkedContainer(LinkedContainer),
     Market(Market),
-    MiningDrill,
+    MiningDrill(MiningDrill),
     OffshorePump,
     Pipe,
     InfinityPipe,
