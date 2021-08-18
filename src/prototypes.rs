@@ -1652,6 +1652,14 @@ pub struct LinkedContainer {
     scale_info_icons: bool // Default: false
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Market {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    picture: Sprite,
+    allow_access_to_all_forces: bool, // Default: true
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1737,7 +1745,7 @@ pub enum PrototypeGeneral {
     Lamp(Lamp),
     LandMine(LandMine),
     LinkedContainer(LinkedContainer),
-    Market,
+    Market(Market),
     MiningDrill,
     OffshorePump,
     Pipe,
