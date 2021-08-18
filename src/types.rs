@@ -3824,3 +3824,12 @@ pub struct PipePictures {
     gas_flow: Animation
 
 }
+
+/// <https://wiki.factorio.com/Prototype/PipeToGround#pictures>
+#[derive(Debug)]
+pub struct PipeToGroundPictures {
+    down: Sprite,
+    up: Sprite,
+    left: Sprite,
+    ritgh: Sprite
+}

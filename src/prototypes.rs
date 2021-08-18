@@ -100,7 +100,8 @@ use crate::types::{
     ForceCondition,
     MiningDrillGraphicsSet,
     OffshorePumpGraphicsSet,
-    PipePictures
+    PipePictures,
+    PipeToGroundPictures
 };
 
 // Struct representing global `data` table in lua environment
@@ -1718,6 +1719,15 @@ pub struct OffshorePump {
 }
 
 #[derive(Debug, EntityWithHealth)]
+pub struct PipeToGround {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    fluid_box: FluidBox,
+    pictures: PipeToGroundPictures,
+    draw_fluid_icon_override: bool // Default: false
+}
+
+#[derive(Debug, EntityWithHealth)]
 pub struct Pipe {
     name: String,
     entity_with_health_base: EntityWithHealthBase,
@@ -1828,7 +1838,7 @@ pub enum PrototypeGeneral {
     OffshorePump(OffshorePump),
     Pipe(Pipe),
     InfinityPipe(InfinityPipe),
-    PipeToGround,
+    PipeToGround(PipeToGround),
     PlayerPort,
     PowerSwitch,
     ProgrammableSpeaker,
