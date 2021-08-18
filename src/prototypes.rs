@@ -211,6 +211,7 @@ impl StringModSetting {
     pub fn allowed_values(&self) -> Option<Vec<String>> { self.allowed_values.clone() }
 }
 
+/// <https://wiki.factorio.com/Prototype/AmbientSound>
 #[derive(Debug, Prototype)]
 pub struct AmbientSoundPrototype {
     name: String,
@@ -225,12 +226,14 @@ impl AmbientSoundPrototype {
     pub fn weight(&self) -> Option<f64> { self.weight }
 }
 
+/// <https://wiki.factorio.com/Prototype/Animation>
 #[derive(Debug, Prototype)]
 pub struct AnimationPrototype {
     name: String,
     layers: Vec<Animation> // If lua table doesn't have layers, use same table for constructing just one
 }
 
+/// <https://wiki.factorio.com/Prototype/EditorController>
 #[derive(Debug, Prototype)]
 pub struct EditorController {
     name: String, // Must be "default"
@@ -259,6 +262,7 @@ pub struct EditorController {
     placed_corpses_never_expire: bool
 }
 
+/// <https://wiki.factorio.com/Prototype/Font>
 #[derive(Debug, Prototype)]
 pub struct Font {
     name: String,
@@ -270,6 +274,7 @@ pub struct Font {
     border_color: Option<Color>
 }
 
+/// <https://wiki.factorio.com/Prototype/GodController>
 #[derive(Debug, Prototype)]
 pub struct GodController {
     name: String, // Must be "default"
@@ -282,12 +287,14 @@ pub struct GodController {
     mining_categories: Option<Vec<String>>
 }
 
+/// <https://wiki.factorio.com/Prototype/MapGenPresets>
 #[derive(Debug, Prototype)]
 pub struct MapGenPresets {
     name: String,
     presets: HashMap<String, MapGenPreset>
 }
 
+/// <https://wiki.factorio.com/Prototype/MapSettings>
 #[derive(Debug, Prototype)]
 pub struct MapSettings {
     name: String, // Must be "map-settings"
@@ -301,30 +308,35 @@ pub struct MapSettings {
     difficulty_settings: MapDifficultySettings
 }
 
+/// <https://wiki.factorio.com/Prototype/MouseCursor>
 #[derive(Debug, Prototype)]
 pub struct MouseCursor {
     name: String,
     cursor: MouseCursorType
 }
 
+/// <https://wiki.factorio.com/Prototype/Sound>
 #[derive(Debug, Prototype)]
 pub struct SoundPrototype {
     name: String,
     sound: Sound
 }
 
+/// <https://wiki.factorio.com/Prototype/SpectatorController>
 #[derive(Debug, Prototype)]
 pub struct SpectatorController {
     name: String, // Must be "default"
     movement_speed: f64 // Must be >= 0.34375
 }
 
+/// <https://wiki.factorio.com/Prototype/Sprite>
 #[derive(Debug, Prototype)]
 pub struct SpritePrototype {
     name: String,
     sprite: Sprite
 }
 
+/// <https://wiki.factorio.com/Prototype/TileEffect>
 #[derive(Debug, Prototype)]
 pub struct TileEffect {
     name: String, // Must be "water" // For some reason
@@ -342,17 +354,20 @@ pub struct TileEffect {
     far_zoom: f32 // Default: 0.5
 }
 
+/// <https://wiki.factorio.com/Prototype/TipsAndTricksItemCategory>
 #[derive(Debug, Prototype)]
 pub struct TipsAndTricksItemCategory {
     name: String,
     order: String
 }
 
+/// <https://wiki.factorio.com/Prototype/TriggerTargetType>
 #[derive(Debug, Prototype)]
 pub struct TriggerTargetType {
     name: String
 }
 
+/// <https://wiki.factorio.com/Prototype/WindSound>
 #[derive(Debug, Prototype)]
 pub struct WindSound {
     name: String,
@@ -360,7 +375,7 @@ pub struct WindSound {
 }
 
 // PrototypeBase starts here
-
+/// <https://wiki.factorio.com/PrototypeBase>
 #[derive(Debug)]
 pub struct PrototypeBaseSpec {
     localised_description: Option<LocalisedString>,
@@ -368,13 +383,14 @@ pub struct PrototypeBaseSpec {
     order: String
 }
 
+/// <https://wiki.factorio.com/PrototypeBase>
 pub trait PrototypeBase: Prototype {
     fn localised_description(&self) -> &Option<LocalisedString>;
     fn localised_name(&self) -> &Option<LocalisedString>;
     fn order(&self) -> &String; // Default: ""
 }
 
-// Base for Achievement and all inherited types
+/// Base for Achievement and all inherited types <https://wiki.factorio.com/Prototype/Achievement>
 #[derive(Debug)]
 pub struct AchievementBase {
     icon: IconSpecification,
@@ -383,6 +399,7 @@ pub struct AchievementBase {
     hidden: bool // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/Achievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct Achievement {
     name: String,
@@ -390,6 +407,7 @@ pub struct Achievement {
     achievement: AchievementBase
 }
 
+/// <https://wiki.factorio.com/Prototype/BuildEntityAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct BuildEntityAchievement {
     name: String,
@@ -401,6 +419,7 @@ pub struct BuildEntityAchievement {
     until_second: u32 // Default: 0 (means infinite)
 }
 
+/// <https://wiki.factorio.com/Prototype/CombatRobotCountAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct CombatRobotCountAchievement {
     name: String,
@@ -409,6 +428,7 @@ pub struct CombatRobotCountAchievement {
     count: u32 // Default: 1
 }
 
+/// <https://wiki.factorio.com/Prototype/ConstructWithRobotsAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct ConstructWithRobotsAchievement {
     name: String,
@@ -419,6 +439,7 @@ pub struct ConstructWithRobotsAchievement {
     more_than_manually: bool // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/DeconstructWithRobotsAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DeconstructWithRobotsAchievement {
     name: String,
@@ -427,6 +448,7 @@ pub struct DeconstructWithRobotsAchievement {
     amount: u32
 }
 
+/// <https://wiki.factorio.com/Prototype/DeliverByRobotsAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DeliverByRobotsAchievement {
     name: String,
@@ -435,6 +457,7 @@ pub struct DeliverByRobotsAchievement {
     amount: f64
 }
 
+/// <https://wiki.factorio.com/Prototype/DontBuildEntityAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DontBuildEntityAchievement {
     name: String,
@@ -444,6 +467,7 @@ pub struct DontBuildEntityAchievement {
     amount: u32 // Default: 0
 }
 
+/// <https://wiki.factorio.com/Prototype/DontCraftManuallyAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DontCraftManuallyAchievement {
     name: String,
@@ -452,6 +476,7 @@ pub struct DontCraftManuallyAchievement {
     amount: f64
 }
 
+/// <https://wiki.factorio.com/Prototype/DontUseEntityInEnergyProductionAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DontUseEntityInEnergyProductionAchievement {
     name: String,
@@ -463,6 +488,7 @@ pub struct DontUseEntityInEnergyProductionAchievement {
     minimum_energy_produced: Energy // Default: 0W
 }
 
+/// <https://wiki.factorio.com/Prototype/FinishTheGameAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct FinishTheGameAchievement {
     name: String,
@@ -471,6 +497,7 @@ pub struct FinishTheGameAchievement {
     until_second: u32 // Default: 0 (means infinite)
 }
 
+/// <https://wiki.factorio.com/Prototype/GroupAttackAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct GroupAttackAchievement {
     name: String,
@@ -479,6 +506,7 @@ pub struct GroupAttackAchievement {
     amount: u32 // Default: 1
 }
 
+/// <https://wiki.factorio.com/Prototype/KillAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct KillAchievement {
     name: String,
@@ -492,6 +520,7 @@ pub struct KillAchievement {
     personally: bool // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/PlayerDamagedAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct PlayerDamagedAchievement {
     name: String,
@@ -502,6 +531,7 @@ pub struct PlayerDamagedAchievement {
     type_of_dealer: Option<String> // TODO: another prototype enum?
 }
 
+/// <https://wiki.factorio.com/Prototype/ProduceAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct ProduceAchievement {
     name: String,
@@ -512,6 +542,7 @@ pub struct ProduceAchievement {
     product: ProductType // Type is determined from item_product or fluid_product // Only one can be set!
 }
 
+/// <https://wiki.factorio.com/Prototype/ProducePerHourAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct ProducePerHourAchievement {
     name: String,
@@ -521,6 +552,7 @@ pub struct ProducePerHourAchievement {
     product: ProductType
 }
 
+/// <https://wiki.factorio.com/Prototype/ResearchAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct ResearchAchievement {
     name: String,
@@ -529,6 +561,7 @@ pub struct ResearchAchievement {
     target: ResearchTarget // Determined from either `technology` or `research_all` is set
 }
 
+/// <https://wiki.factorio.com/Prototype/TrainPathAchievement>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct TrainPathAchievement {
     name: String,
@@ -537,6 +570,7 @@ pub struct TrainPathAchievement {
     minimum_distance: f64
 }
 
+/// <https://wiki.factorio.com/Prototype/AmmoCategory>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct AmmoCategory {
     name: String,
@@ -544,6 +578,7 @@ pub struct AmmoCategory {
     bonus_gui_order: String // Default: ""
 }
 
+/// <https://wiki.factorio.com/Prototype/AutoplaceControl>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct AutoplaceControl {
     name: String,
@@ -552,6 +587,7 @@ pub struct AutoplaceControl {
     rechness: bool // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/CustomInput>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct CustomInput {
     name: String,
@@ -568,6 +604,7 @@ pub struct CustomInput {
     action: CustomInputAction // Default: "lua"
 }
 
+/// <https://wiki.factorio.com/Prototype/DamageType>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct DamageType {
     name: String,
@@ -575,6 +612,7 @@ pub struct DamageType {
     hidden: bool // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/Decorative>
 #[derive(Debug, Prototype, PrototypeBase)]
 pub struct Decorative {
     name: String,
@@ -591,6 +629,7 @@ pub struct Decorative {
     collision_mask: CollisionMask // Default: "doodad-layer"
 }
 
+/// <https://wiki.factorio.com/Prototype/Entity>
 #[derive(Debug)]
 pub struct EntityBase {
     icon: Option<IconSpecification>, // Mandatory if one of flags active: "placeable-neutral", "placeable-player", "placeable-enemy"
@@ -639,6 +678,7 @@ pub struct EntityBase {
     water_reflection: Option<WaterReflectionDefinition>
 }
 
+/// <https://wiki.factorio.com/Prototype/Entity>
 pub trait Entity: PrototypeBase {
     fn icon(&self) -> &Option<IconSpecification>;
     fn collision_box(&self) -> BoundingBox;
@@ -686,6 +726,7 @@ pub trait Entity: PrototypeBase {
     fn water_reflection(&self) -> &Option<WaterReflectionDefinition>;
 }
 
+/// <https://wiki.factorio.com/Prototype/Arrow>
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct Arrow {
     name: String,
@@ -696,6 +737,7 @@ pub struct Arrow {
     blinking: bool, // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/ArtilleryFlare>
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct ArtilleryFlare {
     // map_color is mandatory
@@ -722,6 +764,7 @@ pub struct ArtilleryFlare {
     shot_category: String, // Name of Prototype/AmmoCategory
 }
 
+/// <https://wiki.factorio.com/Prototype/ArtilleryProjectile>
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct ArtilleryProjectile {
     // Bounding box must be zero
@@ -739,6 +782,7 @@ pub struct ArtilleryProjectile {
     rotatable: bool, // Default: true
 }
 
+/// <https://wiki.factorio.com/Prototype/Beam>
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct Beam {
     name: String,
@@ -768,6 +812,7 @@ pub struct Beam {
     // body_light: Option<Vec<AnimationVariation>>
 }
 
+/// <https://wiki.factorio.com/Prototype/CharacterCorpse>
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct CharacterCorpse {
     name: String,
@@ -779,6 +824,7 @@ pub struct CharacterCorpse {
     armor_picture_mapping: HashMap<String, usize> // Exact type of animation index is unknown, it references index in pictures field
 }
 
+/// <https://wiki.factorio.com/Prototype/Cliff>
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct Cliff {
     name: String,
@@ -791,6 +837,7 @@ pub struct Cliff {
     cliff_explosive: String, // Name of capsule that has a robot_action to explode cliffs
 }
 
+/// <https://wiki.factorio.com/Prototype/Corpse>
 #[derive(Debug)]
 pub struct CorpseBase {
     dying_speed: f32, // Default: 1
@@ -819,6 +866,7 @@ pub struct CorpseBase {
     direction_shuffle: Option<Vec<Vec<u16>>> // Inner Vecs should be the same size
 }
 
+/// <https://wiki.factorio.com/Prototype/Corpse>
 pub trait Corpse: Entity {
     fn dying_speed(&self) -> f32;
     fn splash_speed(&self) -> f32;
@@ -846,6 +894,7 @@ pub trait Corpse: Entity {
     fn direction_shuffle(&self) -> &Option<Vec<Vec<u16>>>;
 }
 
+/// <https://wiki.factorio.com/Prototype/Corpse>
 #[derive(Debug, Prototype, PrototypeBase, Entity, Corpse)]
 pub struct CorpsePrototype {
     name: String,
@@ -854,6 +903,7 @@ pub struct CorpsePrototype {
     corpse_base: CorpseBase
 }
 
+/// <https://wiki.factorio.com/Prototype/RailRemnants>
 #[derive(Debug, Prototype, PrototypeBase, Entity, Corpse)]
 pub struct RailRemnants {
     name: String,
@@ -864,6 +914,7 @@ pub struct RailRemnants {
     pictures: RailRemnantsPictures
 }
 
+/// <https://wiki.factorio.com/Prototype/DeconstructibleTileProxy>
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct DeconstructibleTileProxy {
     name: String,
@@ -871,6 +922,7 @@ pub struct DeconstructibleTileProxy {
     entity_base: EntityBase,
 }
 
+/// <https://wiki.factorio.com/Prototype/EntityGhost>
 #[derive(Debug, Prototype, PrototypeBase, Entity)]
 pub struct EntityGhost {
     name: String,
@@ -926,6 +978,7 @@ pub trait EntityWithHealth: Entity {
     fn integration_patch(&self) -> &Sprite4Way;
 }
 
+/// <https://wiki.factorio.com/Prototype/Accumulator>
 #[derive(Debug, EntityWithHealth)]
 pub struct Accumulator {
     name: String,
@@ -946,6 +999,7 @@ pub struct Accumulator {
     default_output_signal: Option<SignalIDConnector>
 }
 
+/// <https://wiki.factorio.com/Prototype/ArtilleryTurret>
 #[derive(Debug, EntityWithHealth)]
 pub struct ArtilleryTurret {
     name: String,
@@ -974,6 +1028,7 @@ pub struct ArtilleryTurret {
     cannon_barrel_light_direction: Option<Factorio3DVector> // Only loaded if cannon_barrel_recoil_shiftings is loaded
 }
 
+/// <https://wiki.factorio.com/Prototype/Beacon>
 #[derive(Debug, EntityWithHealth)]
 pub struct Beacon {
     name: String,
@@ -990,6 +1045,7 @@ pub struct Beacon {
     allowed_effects: Option<EffectTypeLimitation>
 }
 
+/// <https://wiki.factorio.com/Prototype/Boiler>
 #[derive(Debug, EntityWithHealth)]
 pub struct Boiler {
     name: String,
@@ -1009,6 +1065,7 @@ pub struct Boiler {
     patch: Option<Sprite4Way>,
 }
 
+/// <https://wiki.factorio.com/Prototype/BurnerGenerator>
 #[derive(Debug, EntityWithHealth)]
 pub struct BurnerGenerator {
     name: String,
@@ -1023,6 +1080,7 @@ pub struct BurnerGenerator {
     performance_to_sound_speedup: f64, // Default: 0.5
 }
 
+/// <https://wiki.factorio.com/Prototype/Character>
 #[derive(Debug, EntityWithHealth)]
 pub struct Character {
     name: String,
@@ -1065,6 +1123,7 @@ pub struct Character {
     tool_attack_result: Option<Trigger>,
 }
 
+/// <https://wiki.factorio.com/Prototype/Combinator>
 #[derive(Debug)]
 pub struct CombinatorBase {
     energy_source: EnergySource, // Must be an electric void energy source
@@ -1085,6 +1144,7 @@ pub struct CombinatorBase {
     draw_circuit_wires: bool, // Default: true
 }
 
+/// <https://wiki.factorio.com/Prototype/Combinator>
 pub trait Combinator {
     fn energy_source(&self) -> &EnergySource;
     fn active_energy_usage(&self) -> Energy;
@@ -1104,6 +1164,7 @@ pub trait Combinator {
     fn draw_circuit_wires(&self) -> bool;
 }
 
+/// <https://wiki.factorio.com/Prototype/ArithmeticCombinator>
 #[derive(Debug, EntityWithHealth, Combinator)]
 pub struct ArithmeticCombinator {
     name: String,
@@ -1122,6 +1183,7 @@ pub struct ArithmeticCombinator {
     xor_symbol_sprites: Sprite4Way,
 }
 
+/// <https://wiki.factorio.com/Prototype/DeciderCombinator>
 #[derive(Debug, EntityWithHealth, Combinator)]
 pub struct DeciderCombinator {
     name: String,
@@ -1135,6 +1197,7 @@ pub struct DeciderCombinator {
     less_or_equal_symbol_sprites: Sprite4Way,
 }
 
+/// <https://wiki.factorio.com/Prototype/ConstantCombinator>
 #[derive(Debug, EntityWithHealth)]
 pub struct ConstantCombinator {
     name: String,
@@ -1150,6 +1213,7 @@ pub struct ConstantCombinator {
     draw_circuit_wires: bool, // Default: true
 }
 
+/// <https://wiki.factorio.com/Prototype/Container>
 #[derive(Debug, EntityWithHealth)]
 pub struct Container {
     name: String,
@@ -1165,6 +1229,7 @@ pub struct Container {
     circuit_connector_sprites: Option<CircuitConnectorSprites>
 }
 
+/// <https://wiki.factorio.com/Prototype/LogisticContainer>
 #[derive(Debug, EntityWithHealth)]
 pub struct LogisticContainer {
     name: String,
@@ -1187,6 +1252,7 @@ pub struct LogisticContainer {
     animation_sound: Option<Sound>
 }
 
+/// <https://wiki.factorio.com/Prototype/InfinityContainer>
 #[derive(Debug, EntityWithHealth)]
 pub struct InfinityContainer {
     name: String,
@@ -1211,6 +1277,7 @@ pub struct InfinityContainer {
     gui_mode: GuiMode // Default: "none"
 }
 
+/// <https://wiki.factorio.com/Prototype/CraftingMachine>
 #[derive(Debug)]
 pub struct CraftingMachineBase {
     energy_usage: Energy, // Must be positive
@@ -1239,6 +1306,7 @@ pub struct CraftingMachineBase {
     working_visualisations: Option<Vec<WorkingVisualization>>,
 }
 
+/// <https://wiki.factorio.com/Prototype/CraftingMachine>
 pub trait CraftingMachine {
     fn energy_usage(&self) -> Energy;
     fn crafting_speed(&self) -> f64;
@@ -1266,6 +1334,7 @@ pub trait CraftingMachine {
     fn working_visualisations(&self) -> &Option<Vec<WorkingVisualization>>;
 }
 
+/// <https://wiki.factorio.com/Prototype/AssemblingMachine>
 #[derive(Debug, EntityWithHealth, CraftingMachine)]
 pub struct AssemblingMachine {
     name: String,
@@ -1276,6 +1345,7 @@ pub struct AssemblingMachine {
     ingredient_count: u8, // Default: 255
 }
 
+/// <https://wiki.factorio.com/Prototype/RocketSilo>
 #[derive(Debug, EntityWithHealth, CraftingMachine)]
 pub struct RocketSilo {
     name: String,
@@ -1330,6 +1400,7 @@ pub struct RocketSilo {
     rocket_result_inventory_size: u16 // Default: 0
 }
 
+/// <https://wiki.factorio.com/Prototype/Furnace>
 #[derive(Debug, EntityWithHealth, CraftingMachine)]
 pub struct Furnace {
     name: String,
@@ -1339,6 +1410,7 @@ pub struct Furnace {
     source_inventory_size: u16 // Not more than 1
 }
 
+/// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface>
 #[derive(Debug, EntityWithHealth)]
 pub struct ElectricEnergyInterface {
     name: String,
@@ -1353,6 +1425,7 @@ pub struct ElectricEnergyInterface {
     visuals: ElectricEnergyInterfaceVisuals
 }
 
+/// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface#picture>
 #[derive(Debug)]
 pub enum ElectricEnergyInterfaceVisuals {
     Picture(Sprite),
@@ -1361,6 +1434,7 @@ pub enum ElectricEnergyInterfaceVisuals {
     Animations(Animation4Way)
 }
 
+/// <https://wiki.factorio.com/Prototype/ElectricPole>
 #[derive(Debug, EntityWithHealth)]
 pub struct ElectricPole {
     name: String,
@@ -1377,6 +1451,7 @@ pub struct ElectricPole {
     track_coverage_during_build_by_moving: bool // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/EnemySpawner>
 #[derive(Debug, EntityWithHealth)]
 pub struct EnemySpawner {
     name: String,
@@ -1402,6 +1477,7 @@ pub struct EnemySpawner {
     spawn_decoration: Vec<CreateDecorativesTriggerEffectItem>
 }
 
+/// <https://wiki.factorio.com/Prototype/Fish>
 #[derive(Debug, EntityWithHealth)]
 pub struct Fish {
     name: String,
@@ -1409,6 +1485,7 @@ pub struct Fish {
     pictures: Vec<SpriteVariation>
 }
 
+/// <https://wiki.factorio.com/Prototype/FlyingRobot>
 #[derive(Debug)]
 pub struct FlyingRobotBase {
     speed: f64,
@@ -1421,6 +1498,7 @@ pub struct FlyingRobotBase {
     speed_multiplier_when_out_of_energy: f32, // Default: 0
 }
 
+/// <https://wiki.factorio.com/Prototype/FlyingRobot>
 pub trait FlyingRobot {
     fn speed(&self) -> f64;
     fn max_speed(&self) -> f64;
@@ -1432,6 +1510,7 @@ pub trait FlyingRobot {
     fn speed_multiplier_when_out_of_energy(&self) -> f32;
 }
 
+/// <https://wiki.factorio.com/Prototype/CombatRobot>
 #[derive(Debug, EntityWithHealth, FlyingRobot)]
 pub struct CombatRobot {
     name: String,
@@ -1450,6 +1529,7 @@ pub struct CombatRobot {
     light: Option<LightDefinition>
 }
 
+/// <https://wiki.factorio.com/Prototype/ConstructionRobot>
 #[derive(Debug, EntityWithHealth, FlyingRobot)]
 pub struct ConstructionRobot {
     // Must have collision box of zero
@@ -1475,6 +1555,7 @@ pub struct ConstructionRobot {
     working_light: Option<LightDefinition>
 }
 
+/// <https://wiki.factorio.com/Prototype/LogisticRobot>
 #[derive(Debug, EntityWithHealth, FlyingRobot)]
 pub struct LogisticRobot {
     // Must have collision box of zero
@@ -1497,6 +1578,7 @@ pub struct LogisticRobot {
     shadow_in_motion_with_cargo: Option<RotatedAnimation>
 }
 
+/// <https://wiki.factorio.com/Prototype/Gate>
 #[derive(Debug, EntityWithHealth)]
 pub struct Gate {
     name: String,
@@ -1519,6 +1601,7 @@ pub struct Gate {
     opened_collision_mask: CollisionMask // Default: ["object-layer", "item-layer", "floor-layer", "water-tile"]
 }
 
+/// <https://wiki.factorio.com/Prototype/Generator>
 #[derive(Debug, EntityWithHealth)]
 pub struct Generator {
     name: String,
@@ -1538,6 +1621,7 @@ pub struct Generator {
     max_power_output: Option<Energy>
 }
 
+/// <https://wiki.factorio.com/Prototype/HeatInterface>
 #[derive(Debug, EntityWithHealth)]
 pub struct HeatInterface {
     name: String,
@@ -1547,6 +1631,7 @@ pub struct HeatInterface {
     guid_mode: GuiMode, // Default: "all"
 }
 
+/// <https://wiki.factorio.com/Prototype/HeatPipe>
 #[derive(Debug, EntityWithHealth)]
 pub struct HeatPipe {
     name: String,
@@ -1556,6 +1641,7 @@ pub struct HeatPipe {
     heat_buffer: HeatBuffer
 }
 
+/// <https://wiki.factorio.com/Prototype/Inserter>
 #[derive(Debug, EntityWithHealth)]
 pub struct Inserter {
     name: String,
@@ -1592,6 +1678,7 @@ pub struct Inserter {
     circuit_connector_sprites: Option<Vec<CircuitConnectorSprites>>
 }
 
+/// <https://wiki.factorio.com/Prototype/Lab>
 #[derive(Debug, EntityWithHealth)]
 pub struct Lab {
     name: String,
@@ -1609,6 +1696,7 @@ pub struct Lab {
     module_specification: Option<ModuleSpecification>
 }
 
+/// <https://wiki.factorio.com/Prototype/Lamp>
 #[derive(Debug, EntityWithHealth)]
 pub struct Lamp {
     name: String,
@@ -1633,6 +1721,7 @@ pub struct Lamp {
     glow_render_mode: GlowRenderMode // Default: "additive"
 }
 
+/// <https://wiki.factorio.com/Prototype/LandMine>
 #[derive(Debug, EntityWithHealth)]
 pub struct LandMine {
     name: String,
@@ -1648,6 +1737,7 @@ pub struct LandMine {
     trigger_force: ForceCondition // Default: "enemy"
 }
 
+/// <https://wiki.factorio.com/Prototype/LinkedContainer>
 #[derive(Debug, EntityWithHealth)]
 pub struct LinkedContainer {
     name: String,
@@ -1658,6 +1748,7 @@ pub struct LinkedContainer {
     scale_info_icons: bool // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/Market>
 #[derive(Debug, EntityWithHealth)]
 pub struct Market {
     name: String,
@@ -1666,6 +1757,7 @@ pub struct Market {
     allow_access_to_all_forces: bool, // Default: true
 }
 
+/// <https://wiki.factorio.com/Prototype/MiningDrill>
 #[derive(Debug, EntityWithHealth)]
 pub struct MiningDrill {
     name: String,
@@ -1695,6 +1787,7 @@ pub struct MiningDrill {
     module_specification: Option<ModuleSpecification>
 }
 
+/// <https://wiki.factorio.com/Prototype/OffshorePump>
 #[derive(Debug, EntityWithHealth)]
 pub struct OffshorePump {
     name: String,
@@ -1720,15 +1813,7 @@ pub struct OffshorePump {
     circuit_connector_sprites: Vec<CircuitConnectorSprites> // Mandatory if `circuit_wire_max_distance` > 0
 }
 
-#[derive(Debug, EntityWithHealth)]
-pub struct PipeToGround {
-    name: String,
-    entity_with_health_base: EntityWithHealthBase,
-    fluid_box: FluidBox,
-    pictures: PipeToGroundPictures,
-    draw_fluid_icon_override: bool // Default: false
-}
-
+/// <https://wiki.factorio.com/Prototype/Pipe>
 #[derive(Debug, EntityWithHealth)]
 pub struct Pipe {
     name: String,
@@ -1739,6 +1824,7 @@ pub struct Pipe {
     pictures: PipePictures
 }
 
+/// <https://wiki.factorio.com/Prototype/InfinityPipe>
 #[derive(Debug, EntityWithHealth)]
 pub struct InfinityPipe {
     name: String,
@@ -1750,6 +1836,17 @@ pub struct InfinityPipe {
     gui_mode: GuiMode
 }
 
+/// <https://wiki.factorio.com/Prototype/PipeToGround>
+#[derive(Debug, EntityWithHealth)]
+pub struct PipeToGround {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    fluid_box: FluidBox,
+    pictures: PipeToGroundPictures,
+    draw_fluid_icon_override: bool // Default: false
+}
+
+/// <https://wiki.factorio.com/Prototype/PlayerPort>
 #[derive(Debug, EntityWithHealth)]
 pub struct PlayerPort {
     name: String,
@@ -1757,6 +1854,7 @@ pub struct PlayerPort {
     animation: Animation
 }
 
+/// <https://wiki.factorio.com/Prototype/PowerSwitch>
 #[derive(Debug, EntityWithHealth)]
 pub struct PowerSwitch {
     name: String,
