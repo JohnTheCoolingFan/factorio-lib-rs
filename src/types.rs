@@ -3847,3 +3847,29 @@ pub struct Note {
     name: String,
     sound: Sound
 }
+
+/// <https://wiki.factorio.com/Prototype/Pump#fluid_wagon_connector_graphics>
+#[derive(Debug)]
+pub struct PumpConnectorGraphicsFluidWagon {
+    load_animations: PumpConnectorGraphics,
+    unload_animations: PumpConnectorGraphics
+}
+
+/// <https://wiki.factorio.com/Types/PumpConnectorGraphics>
+#[derive(Debug)]
+pub struct PumpConnectorGraphics {
+    north: Vec<PumpConnectorGraphicsMapping>,
+    east: Vec<PumpConnectorGraphicsMapping>,
+    south: Vec<PumpConnectorGraphicsMapping>,
+    west: Vec<PumpConnectorGraphicsMapping>,
+}
+
+/// <https://wiki.factorio.com/Types/PumpConnectorGraphics>
+#[derive(Debug)]
+pub struct PumpConnectorGraphicsMapping {
+    standup_base: Option<Animation>,
+    standup_top: Option<Animation>,
+    standup_shadow: Option<Animation>,
+    connector: Option<Animation>,
+    connector_shadow: Option<Animation>,
+}

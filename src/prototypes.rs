@@ -102,7 +102,8 @@ use crate::types::{
     OffshorePumpGraphicsSet,
     PipePictures,
     PipeToGroundPictures,
-    Instrument
+    Instrument,
+    PumpConnectorGraphicsFluidWagon
 };
 
 // Struct representing global `data` table in lua environment
@@ -1792,6 +1793,29 @@ pub struct ProgrammableSpeaker {
     circuit_connector_sprites: Option<CircuitConnectorSprites>
 }
 
+/// <https://wiki.factorio.com/Prototype/Pump>
+#[derive(Debug, EntityWithHealth)]
+pub struct Pump {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    fluid_box: FluidBox,
+    energy_source: EnergySource,
+    energy_usage: Energy,
+    pumping_speed: f64,
+    animations: Animation4Way,
+    fluid_wagon_connector_speed: f64, // Default: 1 / 64.0
+    fluid_wagon_connector_alignment_tolerance: f64, // Default: 2 / 32.0
+    fluid_wagon_connector_frame_count: u8, // Default: 1
+    fluid_animation: Option<Animation4Way>,
+    glass_pictures: Option<Sprite4Way>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
+    fluid_wagon_connector_graphics: PumpConnectorGraphicsFluidWagon
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1886,7 +1910,7 @@ pub enum PrototypeGeneral {
     PlayerPort(PlayerPort),
     PowerSwitch(PowerSwitch),
     ProgrammableSpeaker(ProgrammableSpeaker),
-    Pump,
+    Pump(Pump),
     Radar,
     CurvedRail,
     StraightRail,
