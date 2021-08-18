@@ -99,7 +99,8 @@ use crate::types::{
     GlowRenderMode,
     ForceCondition,
     MiningDrillGraphicsSet,
-    OffshorePumpGraphicsSet
+    OffshorePumpGraphicsSet,
+    PipePictures
 };
 
 // Struct representing global `data` table in lua environment
@@ -1716,6 +1717,27 @@ pub struct OffshorePump {
     circuit_connector_sprites: Vec<CircuitConnectorSprites> // Mandatory if `circuit_wire_max_distance` > 0
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Pipe {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    fluid_box: FluidBox,
+    horizontal_window_bounding_box: BoundingBox,
+    vertical_window_bounding_box: BoundingBox,
+    pictures: PipePictures
+}
+
+#[derive(Debug, EntityWithHealth)]
+pub struct InfinityPipe {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    fluid_box: FluidBox,
+    horizontal_window_bounding_box: BoundingBox,
+    vertical_window_bounding_box: BoundingBox,
+    pictures: PipePictures,
+    gui_mode: GuiMode
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1804,8 +1826,8 @@ pub enum PrototypeGeneral {
     Market(Market),
     MiningDrill(MiningDrill),
     OffshorePump(OffshorePump),
-    Pipe,
-    InfinityPipe,
+    Pipe(Pipe),
+    InfinityPipe(InfinityPipe),
     PipeToGround,
     PlayerPort,
     PowerSwitch,

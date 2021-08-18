@@ -3793,3 +3793,34 @@ pub struct OffshorePumpGraphicsSet {
     base_pictures: Option<Sprite4Way>,
     underwater_pictures: Option<Sprite4Way>
 }
+
+/// <https://wiki.factorio.com/Prototype/Pipe#pictures>
+#[derive(Debug)]
+pub struct PipePictures {
+    straight_vertical_single: Sprite,
+    straight_vertical: Sprite,
+    straight_vertical_window: Sprite,
+    straight_horizontal: Sprite,
+    straight_horizontal_window: Sprite,
+    corner_up_right: Sprite,
+    corner_up_left: Sprite,
+    corner_down_right: Sprite,
+    corner_down_left: Sprite,
+    t_up: Sprite,
+    t_down: Sprite,
+    t_right: Sprite,
+    t_left: Sprite,
+    cross: Sprite,
+    ending_up: Sprite,
+    ending_down: Sprite,
+    ending_right: Sprite,
+    ending_left: Sprite,
+    horizontal_window_background: Sprite,
+    vertical_window_background: Sprite,
+    fluid_background: Sprite,
+    low_temperature_flow: Sprite,
+    middle_temperature_flow: Sprite,
+    high_temperature_flow: Sprite,
+    gas_flow: Animation
+
+}
