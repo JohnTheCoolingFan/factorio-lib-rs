@@ -1642,6 +1642,16 @@ pub struct LandMine {
     trigger_force: ForceCondition // Default: "enemy"
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct LinkedContainer {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    inventory_size: u16, // Must be >0
+    picture: Option<Sprite>,
+    gui_mode: GuiMode, // Default: "all"
+    scale_info_icons: bool // Default: false
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1726,7 +1736,7 @@ pub enum PrototypeGeneral {
     Lab(Lab),
     Lamp(Lamp),
     LandMine(LandMine),
-    LinkedContainer,
+    LinkedContainer(LinkedContainer),
     Market,
     MiningDrill,
     OffshorePump,
