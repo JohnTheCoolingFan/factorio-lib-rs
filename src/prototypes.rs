@@ -98,7 +98,8 @@ use crate::types::{
     SignalColorMapping,
     GlowRenderMode,
     ForceCondition,
-    MiningDrillGraphicsSet
+    MiningDrillGraphicsSet,
+    OffshorePumpGraphicsSet
 };
 
 // Struct representing global `data` table in lua environment
@@ -1690,6 +1691,31 @@ pub struct MiningDrill {
     module_specification: Option<ModuleSpecification>
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct OffshorePump {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    fluid_box: FluidBox,
+    pumping_speed: f32, // Must be > 0
+    fluid: String, // Name of Fluid
+    graphics_set: Option<OffshorePumpGraphicsSet>, // Mandatory if `picture` is not defined
+    picture: Option<Sprite4Way>, // Deprecated
+    min_perceived_performance: f32, // Default: 0.25
+    fluid_box_tile_collision_test: CollisionMask, // Default: "ground-tile"
+    adjacent_tile_collision_test: CollisionMask, // Defauylt: "water-tile"
+    adjacent_tile_collision_mask: CollisionMask, // Default: none
+    center_collision_mask: CollisionMask, // Default: none
+    adjacent_tile_collision_box: BoundingBox, // Default: ((-0.05, -0.8), (0.05, -0.7))
+    placeable_position_visualization: Option<Sprite>,
+    remove_on_tile_collision: bool, // Default: false
+    always_draw_fluid: bool, // Default: true
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    circuit_connector_sprites: Vec<CircuitConnectorSprites> // Mandatory if `circuit_wire_max_distance` > 0
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1777,7 +1803,7 @@ pub enum PrototypeGeneral {
     LinkedContainer(LinkedContainer),
     Market(Market),
     MiningDrill(MiningDrill),
-    OffshorePump,
+    OffshorePump(OffshorePump),
     Pipe,
     InfinityPipe,
     PipeToGround,

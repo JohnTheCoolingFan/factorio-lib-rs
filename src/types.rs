@@ -3781,3 +3781,15 @@ impl CircuitConnectorSecondaryDrawOrder {
         Self{north: draw_order, east: draw_order, south: draw_order, west: draw_order}
     }
 }
+
+/// <https://wiki.factorio.com/Prototype/OffshorePump#graphics_set>
+#[derive(Debug)]
+pub struct OffshorePumpGraphicsSet {
+    animation: Animation4Way,
+    base_render_layer: RenderLayer, // Default: "ground-patch"
+    underwater_layer_offset: i8, // Default: 1
+    fluid_animation: Option<Animation4Way>,
+    glass_pictures: Option<Sprite4Way>,
+    base_pictures: Option<Sprite4Way>,
+    underwater_pictures: Option<Sprite4Way>
+}
