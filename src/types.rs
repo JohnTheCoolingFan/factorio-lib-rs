@@ -3208,7 +3208,7 @@ impl fmt::Display for GuiMode {
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation>
 #[derive(Debug)]
-pub struct WorkingVisualization {
+pub struct WorkingVisualisation {
     render_layer: RenderLayer, // Default: "object"
     fadeout: bool, // Default: false
     synced_fadeout: bool, // Default: false
@@ -3220,7 +3220,7 @@ pub struct WorkingVisualization {
     draw_as_sprite: bool, // Default: true
     draw_as_light: bool, // Default: false
     light: Option<LightDefinition>,
-    effect: Option<WorkingVisualizationEffect>,
+    effect: Option<WorkingVisualisationEffect>,
     apply_recipe_tint: Option<ApplyRecipeTint>,
     apply_tint: Option<ApplyTint>,
     north_animation: Option<Animation>,
@@ -3310,13 +3310,13 @@ impl fmt::Display for ApplyTint {
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#effect>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
-pub enum WorkingVisualizationEffect {
+pub enum WorkingVisualisationEffect {
     Flicker,
     UraniumGlow,
     None,
 }
 
-impl FromStr for WorkingVisualizationEffect {
+impl FromStr for WorkingVisualisationEffect {
     type Err = PrototypesErr;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -3324,12 +3324,12 @@ impl FromStr for WorkingVisualizationEffect {
             "flicker" => Ok(Self::Flicker),
             "uranium-glow" => Ok(Self::UraniumGlow),
             "none" => Ok(Self::None),
-            _ => Err(PrototypesErr::InvalidTypeStr("WorkingVisualizationEffect".into(), s.into()))
+            _ => Err(PrototypesErr::InvalidTypeStr("WorkingVisualisationEffect".into(), s.into()))
         }
     }
 }
 
-impl fmt::Display for WorkingVisualizationEffect {
+impl fmt::Display for WorkingVisualisationEffect {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", match self {
             Self::Flicker => "flicker",
@@ -3738,7 +3738,7 @@ pub struct MiningDrillGraphicsSet {
     idle_animation: Option<Animation4Way>,
     always_draw_idle_animation: bool, // Default: false
     default_recipe_tint: Option<RecipeTint>,
-    working_visualisations: Option<WorkingVisualization>,
+    working_visualisations: Option<WorkingVisualisation>,
     /// Only loaded if `shift_animation_waypoint_stop_duration` or `shift_animation_transition_duration` is not 0
     shift_animation_waypoints: Option<ShiftAnimationWaypoints>,
     shift_animation_waypoint_stop_duration: u16, // Default: 0

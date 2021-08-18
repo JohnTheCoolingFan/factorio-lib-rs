@@ -83,7 +83,7 @@ use crate::types::{
     FootstepTriggerEffectList,
     FootprintParticle,
     LogisticMode,
-    WorkingVisualization,
+    WorkingVisualisation,
     RecipeTint,
     ShiftAnimationWaypoints,
     StatusColors,
@@ -1303,7 +1303,7 @@ pub struct CraftingMachineBase {
     show_recipe_icon_on_map: bool, // Default: true
     base_productivity: f32, // Default: 0
     module_specification: Option<ModuleSpecification>,
-    working_visualisations: Option<Vec<WorkingVisualization>>,
+    working_visualisations: Option<Vec<WorkingVisualisation>>,
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine>
@@ -1331,7 +1331,7 @@ pub trait CraftingMachine {
     fn show_recipe_icon_on_map(&self) -> bool;
     fn base_productivity(&self) -> f32;
     fn module_specification(&self) -> &Option<ModuleSpecification>;
-    fn working_visualisations(&self) -> &Option<Vec<WorkingVisualization>>;
+    fn working_visualisations(&self) -> &Option<Vec<WorkingVisualisation>>;
 }
 
 /// <https://wiki.factorio.com/Prototype/AssemblingMachine>

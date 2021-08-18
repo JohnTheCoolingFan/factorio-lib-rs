@@ -378,7 +378,7 @@ fn impl_crafting_machine_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn show_recipe_icon_on_map(&self) -> bool { self.crafting_machine_base.show_recipe_icon_on_map }
             fn base_productivity(&self) -> f32 { self.crafting_machine_base.base_productivity }
             fn module_specification(&self) -> &Option<ModuleSpecification> { &self.crafting_machine_base.module_specification }
-            fn working_visualisations(&self) -> &Option<Vec<WorkingVisualization>> { &self.crafting_machine_base.working_visualisations }
+            fn working_visualisations(&self) -> &Option<Vec<WorkingVisualisation>> { &self.crafting_machine_base.working_visualisations }
         }
     };
     gen.into()
