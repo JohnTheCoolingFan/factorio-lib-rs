@@ -1755,6 +1755,24 @@ pub struct PlayerPort {
     animation: Animation
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct PowerSwitch {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    power_on_animation: Animation,
+    overlay_start: Animation,
+    overlay_loop: Animation,
+    led_on: Sprite,
+    led_off: Sprite,
+    overlay_start_delay: u8,
+    circuit_wire_connection_point: WireConnectionPoint,
+    left_wire_connection_point: WireConnectionPoint,
+    right_wire_connection_point: WireConnectionPoint,
+    wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1847,7 +1865,7 @@ pub enum PrototypeGeneral {
     InfinityPipe(InfinityPipe),
     PipeToGround(PipeToGround),
     PlayerPort(PlayerPort),
-    PowerSwitch,
+    PowerSwitch(PowerSwitch),
     ProgrammableSpeaker,
     Pump,
     Radar,
