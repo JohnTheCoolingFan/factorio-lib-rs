@@ -3666,3 +3666,67 @@ pub struct ConnectableEntityGraphics {
     ending_left: Vec<SpriteVariation>,
     cross: Vec<SpriteVariation>,
 }
+
+#[derive(Debug)]
+pub struct SignalColorMapping {
+    r#type: SignalType,
+    name: String, // Name of a signal
+    color: Color
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum SignalType {
+    Virtual,
+    Item,
+    Fluid,
+}
+
+impl FromStr for SignalType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "virtual" => Ok(Self::Virtual),
+            "item" => Ok(Self::Item),
+            "fluid" => Ok(Self::Fluid),
+            _ => Err(PrototypesErr::InvalidTypeStr("SignalType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for SignalType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Virtual => "virtual",
+            Self::Item => "item",
+            Self::Fluid => "fluid",
+        })
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum GlowRenderMode {
+    Additive,
+    Multiplicative,
+}
+
+impl FromStr for GlowRenderMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "additive" => Ok(Self::Additive),
+            "multiplicative" => Ok(Self::Multiplicative),
+            _ => Err(PrototypesErr::InvalidTypeStr("GlowRenderMode".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for GlowRenderMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Additive => "additive",
+            Self::Multiplicative => "multiplicative",
+        })
+    }
+}

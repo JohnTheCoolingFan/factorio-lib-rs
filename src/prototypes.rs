@@ -94,7 +94,9 @@ use crate::types::{
     AttackParameters,
     SmokeSource,
     HeatBuffer,
-    ConnectableEntityGraphics
+    ConnectableEntityGraphics,
+    SignalColorMapping,
+    GlowRenderMode 
 };
 
 // Struct representing global `data` table in lua environment
@@ -1600,6 +1602,30 @@ pub struct Lab {
     module_specification: Option<ModuleSpecification>
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct Lamp {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    picture_on: Sprite,
+    picture_off: Sprite,
+    energy_usage_per_tick: Energy,
+    energy_source: EnergySource, // Must be electric or void, emissions are ignored
+    light: Option<LightDefinition>,
+    light_when_colored: Option<LightDefinition>,
+    circuit_wire_connection_point: Option<WireConnectionPoint>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    glow_size: f32, // Default: 0
+    glow_color_intensity: f32, // Default: 0
+    darkness_for_all_lamps_on: f32, // Default: 0.5
+    darkness_for_all_lamps_off: f32, // Default: 0.3
+    always_on: bool, // Default: false
+    signal_to_color_mapping: Option<Vec<SignalColorMapping>>,
+    glow_render_mode: GlowRenderMode // Default: "additive"
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1682,7 +1708,7 @@ pub enum PrototypeGeneral {
     HeatPipe(HeatPipe),
     Inserter(Inserter),
     Lab(Lab),
-    Lamp,
+    Lamp(Lamp),
     LandMine,
     LinkedContainer,
     Market,
