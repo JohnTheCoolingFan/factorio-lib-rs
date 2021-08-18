@@ -1748,6 +1748,13 @@ pub struct InfinityPipe {
     gui_mode: GuiMode
 }
 
+#[derive(Debug, EntityWithHealth)]
+pub struct PlayerPort {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    animation: Animation
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -1839,7 +1846,7 @@ pub enum PrototypeGeneral {
     Pipe(Pipe),
     InfinityPipe(InfinityPipe),
     PipeToGround(PipeToGround),
-    PlayerPort,
+    PlayerPort(PlayerPort),
     PowerSwitch,
     ProgrammableSpeaker,
     Pump,
