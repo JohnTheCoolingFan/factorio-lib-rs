@@ -508,7 +508,8 @@ pub struct IconData {
 }
 
 // TODO: fmt::Display
-// TODO: Joule support, convert to Joule/tick
+/// Input data is converted to J/tick or Joule
+/// J/s (Joule/second) is not supported, as I can't find any uses and it's equvalent to W (Watt)
 /// <https://wiki.factorio.com/Types/Energy>
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub struct Energy(f64); // I don't know which type factorio uses internally, so I will use this
@@ -517,26 +518,42 @@ impl FromStr for Energy {
     type Err = PrototypesErr;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        fn parse_num(num_string: &str, original: &str) -> Result<f64, PrototypesErr> {
+            num_string.parse().map_err(|_| PrototypesErr::InvalidTypeStr("Energy".into(), original.into()))
+        }
+
+        fn get_multiplier(multiplier_char: &char, original: &str) -> Result<f64, PrototypesErr> {
+            match multiplier_char {
+                    'k' | 'K' => Ok(1000.0),
+                    'M' => Ok(1000000.0),
+                    'G' => Ok(1000000000.0),
+                    'T' => Ok((10.0 as f64).powi(12)),
+                    'P' => Ok((10.0 as f64).powi(15)),
+                    'E' => Ok((10.0 as f64).powi(18)),
+                    'Z' => Ok((10.0 as f64).powi(21)),
+                    'Y' => Ok((10.0 as f64).powi(24)),
+                    _ => Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(original)))
+            }
+        }
+
         let len = s.len();
         let mut rev_s = s.chars().rev();
-        if rev_s.next().ok_or(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))? == 'W' {
+        let last_char: char = rev_s.next().ok_or(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
+        if last_char == 'W' {
             let next_char: char = rev_s.next().ok_or(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
             if next_char.is_ascii_digit() {
-                return Ok(Self(s[0..len-1].parse::<f64>().map_err(|_| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?))
+                return Ok(Self(parse_num(&s[0..len-1], s)?/60.0))
             } else {
-                let value: f64 = f64::from_str(&s[0..len-2]).map_err(|_| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
-
-                return match next_char {
-                    'k' | 'K' => Ok(Self(value * 1000.0)),
-                    'M' => Ok(Self(value * 1000000.0)),
-                    'G' => Ok(Self(value * 1000000000.0)),
-                    'T' => Ok(Self(value * (10.0 as f64).powi(12))),
-                    'P' => Ok(Self(value * (10.0 as f64).powi(15))),
-                    'E' => Ok(Self(value * (10.0 as f64).powi(18))),
-                    'Z' => Ok(Self(value * (10.0 as f64).powi(21))),
-                    'Y' => Ok(Self(value * (10.0 as f64).powi(24))),
-                    _ => Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))
-                }
+                let value = parse_num(&s[0..len-2], s)?;
+                return Ok(Self(value * get_multiplier(&next_char, &s)?/60.0))
+            }
+        } else if last_char == 'J' {
+            let next_char: char = rev_s.next().ok_or(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
+            if next_char.is_ascii_digit() {
+                return Ok(Self(parse_num(&s[0..len-1], s)?))
+            } else {
+                let value = parse_num(&s[0..len-2], s)?;
+                return Ok(Self(value * get_multiplier(&next_char, &s)?))
             }
         } else {
             return Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))
