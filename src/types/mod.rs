@@ -34,7 +34,7 @@ pub type BoundingBox = (Position, Position);
 /// Value range: [0.0; 1.0) <https://wiki.factorio.com/Types/RealOrientation>
 pub type RealOrientation = f32;
 
-/// Can be constructed from an array or table with x and y values
+/// Can be constructed from an array or table with x and y values <https://wiki.factorio.com/Types/Position>
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct Position(i32, i32);
 
@@ -44,7 +44,7 @@ impl Position {
     }
 }
 
-/// Any of the color components are optional
+/// Any of the color components are optional <https://wiki.factorio.com/Types/Color>
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Color(f32, f32, f32, f32);
 
