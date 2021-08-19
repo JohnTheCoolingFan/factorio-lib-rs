@@ -7,6 +7,7 @@ use crate::types::{Factorio2DVector, Color, FileName};
 // ============ // Simple types // ============ //
 
 /// List of 1-based frame indices into the spreadsheet
+/// <https://wiki.factorio.com/Types/AnimationFrameSequence>
 pub type AnimationFrameSequence = Vec<u16>;
 /// <https://wiki.factorio.com/Types/Sprite#position>
 pub type SpritePosition = (i16, i16);
@@ -208,6 +209,7 @@ impl fmt::Display for RangeMode {
     }
 }
 
+/// <https://wiki.factorio.com/Prototype/Lamp#glow_render_mode>
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 pub enum GlowRenderMode {
     Additive,

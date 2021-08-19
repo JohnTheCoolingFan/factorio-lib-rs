@@ -10,6 +10,7 @@ pub struct AutoplaceSpecification {
     base: AutoplaceSpecificationBase,
 }
 
+/// <https://wiki.factorio.com/Types/AutoplaceSpecification#General_properties>
 #[derive(Debug)]
 pub enum AutoplaceSpecificationBase {
     /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>

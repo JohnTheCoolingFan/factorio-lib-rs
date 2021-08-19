@@ -16,7 +16,7 @@ use std::str::FromStr;
 use std::fmt;
 use crate::prototypes::PrototypesErr;
 
-/// May be made into struct in the future
+/// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
 pub type FileName = String;
 /// <https://wiki.factorio.com/Types/ItemStackIndex>
 pub type ItemStackIndex = u16;
@@ -125,6 +125,7 @@ impl fmt::Display for ResearchQueueSetting {
     }
 }
 
+/// <https://wiki.factorio.com/Tutorial:Mod_settings#The_setting_type_property>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum ModSettingType {
     Startup,
@@ -1755,6 +1756,7 @@ pub struct HeatBuffer {
     connections: Option<Vec<HeatConnection>> // 32 max
 }
 
+/// <https://wiki.factorio.com/Types/SignalColorMapping>
 #[derive(Debug)]
 pub struct SignalColorMapping {
     r#type: SignalType,
@@ -1762,6 +1764,7 @@ pub struct SignalColorMapping {
     color: Color
 }
 
+/// <https://wiki.factorio.com/Types/SignalColorMapping#type>
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 pub enum SignalType {
     Virtual,
