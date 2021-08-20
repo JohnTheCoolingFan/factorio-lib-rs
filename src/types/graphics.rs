@@ -1356,3 +1356,29 @@ pub enum SimpleEntityWithOwnerVisuals {
     Pictire(Sprite4Way),
     Animations(AnimationVariations)
 }
+
+/// <https://wiki.factorio.com/Types/SpiderLegGraphicsSet>
+#[derive(Debug)]
+pub struct SpiderLegGraphicsSet {
+    joint_turn_offset: f32, // Default: 0
+    joint: Option<Sprite>,
+    joint_shadow: Option<Sprite>,
+    upper_part: Option<SpiderLegPart>,
+    lower_part: Option<SpiderLegPart>,
+    upper_part_shadow: Option<SpiderLegPart>,
+    lower_part_shadow: Option<SpiderLegPart>,
+    upper_part_water_reflection: Option<SpiderLegPart>,
+    lower_part_water_reflection: Option<SpiderLegPart>
+}
+
+/// <https://wiki.factorio.com/Types/SpiderLegPart>
+#[derive(Debug)]
+pub struct SpiderLegPart {
+    top_end: Option<Sprite>,
+    middle: Option<Sprite>,
+    bottom_end: Option<Sprite>,
+    middle_offset_from_top: f32, // Default: 0
+    middle_offset_from_bottom: f32, // Default: 0
+    top_end_length: f32, // Default: 0
+    bottom_end_length: f32 // Default: 0
+}

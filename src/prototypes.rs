@@ -107,7 +107,8 @@ use crate::types::{
     PumpConnectorGraphicsFluidWagon,
     RailPictures,
     SimpleEntityVisuals,
-    SimpleEntityWithOwnerVisuals
+    SimpleEntityWithOwnerVisuals,
+    SpiderLegGraphicsSet
 };
 
 // Struct representing global `data` table in lua environment
@@ -2131,6 +2132,21 @@ pub struct SolarPanel {
     overlay: Option<SpriteVariations>
 }
 
+/// <https://wiki.factorio.com/Prototype/SpiderLeg>
+#[derive(Debug, EntityWithHealth)]
+pub struct SpiderLeg {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    part_length: f64, // Must be > 0
+    initial_movement_speed: f64,
+    movement_acceleration: f64,
+    target_position_randomisation_distance: f64,
+    minimal_step_size: f64,
+    movement_based_position_selection_distance: f64,
+    graphics_set: SpiderLegGraphicsSet,
+    walking_sound_volume_modifier: f64, // Default: 1
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2237,7 +2253,7 @@ pub enum PrototypeGeneral {
     SimpleEntityWithOwner(SimpleEntityWithOwner),
     SimpleEntityWithForce(SimpleEntityWithForce),
     SolarPanel(SolarPanel),
-    SpiderLeg,
+    SpiderLeg(SpiderLeg),
     StorageTank,
     TrainStop,
     LinkedBelt,
