@@ -106,7 +106,8 @@ use crate::types::{
     Instrument,
     PumpConnectorGraphicsFluidWagon,
     RailPictures,
-    SimpleEntityVisuals
+    SimpleEntityVisuals,
+    SimpleEntityWithOwnerVisuals
 };
 
 // Struct representing global `data` table in lua environment
@@ -2094,6 +2095,19 @@ pub struct SimpleEntity {
     visuals: SimpleEntityVisuals
 }
 
+/// <https://wiki.factorio.com/Prototype/SimpleEntityWithOwner>
+#[derive(Debug, EntityWithHealth)]
+pub struct SimpleEntityWithOwner {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    render_layer: RenderLayer, // default: "object"
+    secondary_draw_order: i8, // Default: 0
+    random_animation_offset: bool, // Default: false
+    random_variation_on_create: bool, // Default: true
+    visuals: SimpleEntityWithOwnerVisuals,
+    force_visibility: ForceCondition, // Default: "all"
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2197,7 +2211,7 @@ pub enum PrototypeGeneral {
     Reactor(Reactor),
     Roboport(Roboport),
     SimpleEntity(SimpleEntity),
-    SimpleEntityWithOwner,
+    SimpleEntityWithOwner(SimpleEntityWithOwner),
     SimpleEntityWithForce,
     SolarPanel,
     SpiderLeg,

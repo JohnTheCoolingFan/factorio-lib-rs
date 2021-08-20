@@ -1348,3 +1348,11 @@ pub enum SimpleEntityVisuals {
     Picture(Sprite),
     Animations(AnimationVariations)
 }
+
+/// <https://wiki.factorio.com/Prototype/SimpleEntityWithOwner#pictures>
+#[derive(Debug)]
+pub enum SimpleEntityWithOwnerVisuals {
+    Pictires(SpriteVariations),
+    Pictire(Sprite4Way),
+    Animations(AnimationVariations)
+}
