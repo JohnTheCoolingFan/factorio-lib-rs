@@ -105,7 +105,8 @@ use crate::types::{
     PipeToGroundPictures,
     Instrument,
     PumpConnectorGraphicsFluidWagon,
-    RailPictures
+    RailPictures,
+    SimpleEntityVisuals
 };
 
 // Struct representing global `data` table in lua environment
@@ -2080,6 +2081,19 @@ pub struct Roboport {
     logistics_connection_distance: Option<f32> // Must be >= `logistics_radius`
 }
 
+/// <https://wiki.factorio.com/Prototype/SimpleEntity>
+#[derive(Debug, EntityWithHealth)]
+pub struct SimpleEntity {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    count_as_rock_for_filtered_deconstruction: bool, // Default: false
+    render_layer: RenderLayer, // Default: "object"
+    secondary_draw_order: i8, // Default: 0
+    random_animation_offset: bool, // Default: false
+    random_variation_on_create: bool, // Default: true
+    visuals: SimpleEntityVisuals
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2182,7 +2196,7 @@ pub enum PrototypeGeneral {
     RailSignal(RailSignal),
     Reactor(Reactor),
     Roboport(Roboport),
-    SimpleEntity,
+    SimpleEntity(SimpleEntity),
     SimpleEntityWithOwner,
     SimpleEntityWithForce,
     SolarPanel,

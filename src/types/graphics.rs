@@ -1340,3 +1340,11 @@ pub struct PumpConnectorGraphicsMapping {
     connector: Option<Animation>,
     connector_shadow: Option<Animation>,
 }
+
+/// <https://wiki.factorio.com/Prototype/SimpleEntity#pictures>
+#[derive(Debug)]
+pub enum SimpleEntityVisuals {
+    Pictures(SpriteVariations),
+    Picture(Sprite),
+    Animations(AnimationVariations)
+}
