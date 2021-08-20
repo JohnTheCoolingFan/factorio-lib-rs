@@ -25,6 +25,7 @@ use crate::types::{
     MapGenPreset,
     Color,
     ItemStackIndex,
+    ItemCountType,
     Animation,
     Sound,
     MouseCursorType,
@@ -2030,6 +2031,55 @@ pub struct Reactor {
     default_fuel_glow_color: Color, // Default: (1, 1, 1, 1)
 }
 
+/// <https://wiki.factorio.com/Prototype/Roboport>
+#[derive(Debug, EntityWithHealth)]
+pub struct Roboport {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_source: EnergySource, // Must be electric or void
+    energy_usage: Energy,
+    recharge_minimum: Energy,
+    robot_slots_count: ItemStackIndex,
+    material_slots_count: ItemStackIndex,
+    base: Sprite,
+    base_patch: Sprite,
+    base_animation: Animation,
+    door_animation_up: Animation,
+    door_animation_down: Animation,
+    request_to_open_door_timeout: u32,
+    recharging_animation: Animation,
+    spawn_and_station_height: f32,
+    charge_approach_distance: f32,
+    logistics_radius: f32, // Can't be negative
+    construction_radius: f32, // Can'be negative
+    charging_energy: Energy,
+    open_door_trigger_effect: Option<TriggerEffect>,
+    close_door_trigger_effect: Option<TriggerEffect>,
+    default_available_logistic_output_signal: Option<SignalIDConnector>,
+    default_total_logistic_output_signal: Option<SignalIDConnector>,
+    default_available_construction_output_signal: Option<SignalIDConnector>,
+    default_total_construction_output_signal: Option<SignalIDConnector>,
+    circuit_wire_connection_point: Option<WireConnectionPoint>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    spawn_and_station_shadow_height_offset: f32, // Default: 0
+    draw_logistic_radius_visualization: bool, // Default: true
+    draw_construction_radius_visualization: bool, // Default: true
+    recharging_light: Option<LightDefinition>,
+    charging_station_count: u32, // Default: 0
+    charging_distance: f32, // Default: 0
+    charging_station_shift: Option<Factorio2DVector>,
+    charging_threshold_distance: f32, // Default: 1
+    robot_vertical_acceleration: f32, // Default: 0.01
+    stationing_offset: Option<Factorio2DVector>,
+    robot_limit: ItemCountType, // Default: u32::MAX
+    robots_shrink_when_entering_and_exiting: bool, // Default: false
+    charging_offsets: Option<Vec<Factorio2DVector>>,
+    logistics_connection_distance: Option<f32> // Must be >= `logistics_radius`
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2131,7 +2181,7 @@ pub enum PrototypeGeneral {
     RailChainSignal(RailChainSignal),
     RailSignal(RailSignal),
     Reactor(Reactor),
-    Roboport,
+    Roboport(Roboport),
     SimpleEntity,
     SimpleEntityWithOwner,
     SimpleEntityWithForce,
