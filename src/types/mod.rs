@@ -20,6 +20,8 @@ use crate::prototypes::PrototypesErr;
 pub type FileName = String;
 /// <https://wiki.factorio.com/Types/ItemStackIndex>
 pub type ItemStackIndex = u16;
+/// <https://wiki.factorio.com/Types/ItemCountType>
+pub type ItemCountType = u32;
 // Type derived from Factorio3DVector definition (https://wiki.factorio.com/Types/Vector3D)
 /// 2D Vector defined by Factorio <https://wiki.factorio.com/Types/vector>
 pub type Factorio2DVector = (f32, f32);
