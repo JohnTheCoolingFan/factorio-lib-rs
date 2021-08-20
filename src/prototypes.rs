@@ -2080,7 +2080,7 @@ pub struct Roboport {
     logistics_connection_distance: Option<f32> // Must be >= `logistics_radius`
 }
 
-// Enum for all prototypes
+/// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
     // General prototypes
