@@ -1952,6 +1952,25 @@ pub struct StraightRail {
     bending_type: BendingType // Must be "straight"
 }
 
+/// <https://wiki.factorio.com/Prototype/RailChainSignal>
+/// <https://wiki.factorio.com/Prototype/RailSignalBase>
+#[derive(Debug, EntityWithHealth)]
+pub struct RailChainSignal {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    selection_box_offsets: [Factorio2DVector; 8],
+    blue_light: Option<LightDefinition>,
+    default_blue_output_signal: Option<SignalIDConnector>
+}
+
+/// <https://wiki.factorio.com/Prototype/RailSignal>
+/// <https://wiki.factorio.com/Prototype/RailSignalBase>
+#[derive(Debug, EntityWithHealth)]
+pub struct RailSignal {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2050,8 +2069,8 @@ pub enum PrototypeGeneral {
     Radar(Radar),
     CurvedRail(CurvedRail),
     StraightRail(StraightRail),
-    RailChainSignal,
-    RailSignal,
+    RailChainSignal(RailChainSignal),
+    RailSignal(RailSignal),
     Reactor,
     Roboport,
     SimpleEntity,
