@@ -38,6 +38,7 @@ use crate::types::{
     ConsumingType,
     CustomInputAction,
     SpriteVariation,
+    SpriteVariations,
     BoundingBox,
     RenderLayer,
     TriggerEffect,
@@ -2003,6 +2004,32 @@ pub struct RailSignal {
     circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
 }
 
+/// <https://wiki.factorio.com/Prototype/Reactor>
+#[derive(Debug, EntityWithHealth)]
+pub struct Reactor {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    working_light_picture: Sprite,
+    heat_buffer: HeatBuffer,
+    energy_source: EnergySource,
+    consumption: Energy,
+    // If defined, Number of variations must be >= count of connections defined in `heat_buffer`
+    connection_patches_connected: Option<SpriteVariations>,
+    connection_patches_disconnected: Option<SpriteVariations>,
+    heat_connection_patches_connected: Option<SpriteVariations>,
+    heat_connection_patches_disconnected: Option<SpriteVariations>,
+    lower_layer_picture: Option<Sprite>,
+    heat_lower_layer_picture: Option<Sprite>,
+    picture: Option<Sprite>,
+    light: Option<LightDefinition>,
+    meltdown_action: Option<Trigger>,
+    neighbour_bonus: f64, // Default: 1
+    neighbour_collision_increase: f64, // Default: 0.25 // Can't be negative
+    scale_energy_usage: bool, // Default: false
+    use_fuel_glow_color: bool, // Default: false
+    default_fuel_glow_color: Color, // Default: (1, 1, 1, 1)
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2103,7 +2130,7 @@ pub enum PrototypeGeneral {
     StraightRail(StraightRail),
     RailChainSignal(RailChainSignal),
     RailSignal(RailSignal),
-    Reactor,
+    Reactor(Reactor),
     Roboport,
     SimpleEntity,
     SimpleEntityWithOwner,
