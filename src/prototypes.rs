@@ -2108,6 +2108,18 @@ pub struct SimpleEntityWithOwner {
     force_visibility: ForceCondition, // Default: "all"
 }
 
+/// <https://wiki.factorio.com/Prototype/SimpleEntityWithForce>
+#[derive(Debug, EntityWithHealth)]
+pub struct SimpleEntityWithForce {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    render_layer: RenderLayer, // Default: "object"
+    secondary_draw_order: i8, // Default: 0
+    random_animation_offset: bool, // Default: false
+    random_variation_on_create: bool, // Default: true
+    visuals: SimpleEntityWithOwnerVisuals
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2212,7 +2224,7 @@ pub enum PrototypeGeneral {
     Roboport(Roboport),
     SimpleEntity(SimpleEntity),
     SimpleEntityWithOwner(SimpleEntityWithOwner),
-    SimpleEntityWithForce,
+    SimpleEntityWithForce(SimpleEntityWithForce),
     SolarPanel,
     SpiderLeg,
     StorageTank,
