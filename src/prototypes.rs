@@ -60,7 +60,6 @@ use crate::types::{
     OrientedCliffPrototypes,
     RotatedAnimationVariation,
     BendingType,
-    RailRemnantsPictures,
     Sprite4Way,
     ExplosionDefinition,
     Resistance,
@@ -103,7 +102,8 @@ use crate::types::{
     PipePictures,
     PipeToGroundPictures,
     Instrument,
-    PumpConnectorGraphicsFluidWagon
+    PumpConnectorGraphicsFluidWagon,
+    RailPictures
 };
 
 // Struct representing global `data` table in lua environment
@@ -911,7 +911,7 @@ pub struct RailRemnants {
     entity_base: EntityBase,
     corpse_base: CorpseBase,
     bending_type: BendingType,
-    pictures: RailRemnantsPictures
+    pictures: RailPictures
 }
 
 /// <https://wiki.factorio.com/Prototype/DeconstructibleTileProxy>
@@ -1930,6 +1930,28 @@ pub struct Radar {
     rotation_speed: f64, // Default: 0.01
 }
 
+/// <https://wiki.factorio.com/Prototype/CurvedRail>
+/// <https://wiki.factorio.com/Prototype/Rail>
+#[derive(Debug, EntityWithHealth)]
+pub struct CurvedRail {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    pictures: RailPictures,
+    walking_sound: Option<Sound>,
+    bending_type: BendingType // Must be "turn"
+}
+
+/// <https://wiki.factorio.com/Prototype/StraightRail>
+/// <https://wiki.factorio.com/Prototype/Rail>
+#[derive(Debug, EntityWithHealth)]
+pub struct StraightRail {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    pictures: RailPictures,
+    walking_sound: Option<Sound>,
+    bending_type: BendingType // Must be "straight"
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2026,8 +2048,8 @@ pub enum PrototypeGeneral {
     ProgrammableSpeaker(ProgrammableSpeaker),
     Pump(Pump),
     Radar(Radar),
-    CurvedRail,
-    StraightRail,
+    CurvedRail(CurvedRail),
+    StraightRail(StraightRail),
     RailChainSignal,
     RailSignal,
     Reactor,

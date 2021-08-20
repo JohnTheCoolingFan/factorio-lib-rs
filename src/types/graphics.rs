@@ -1041,9 +1041,9 @@ impl FromStr for SpritePriority {
 
 // ===== // Graphics Sets and Pictures // ===== //
 
-/// <https://wiki.factorio.com/Prototype/RailRemnants#pictures>
+/// <https://wiki.factorio.com/Prototype/Rail#pictures>
 #[derive(Debug)]
-pub struct RailRemnantsPictures {
+pub struct RailPictures {
     straight_rail_horizontal: RailPieceLayers,
     straight_rail_vertical: RailPieceLayers,
     straight_rail_diagonal_left_top: RailPieceLayers,
