@@ -2120,6 +2120,17 @@ pub struct SimpleEntityWithForce {
     visuals: SimpleEntityWithOwnerVisuals
 }
 
+/// <https://wiki.factorio.com/Prototype/SolarPanel>
+#[derive(Debug, EntityWithHealth)]
+pub struct SolarPanel {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_source: EnergySource, // Must be electric
+    picture: SpriteVariations,
+    production: Energy,
+    overlay: Option<SpriteVariations>
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2225,7 +2236,7 @@ pub enum PrototypeGeneral {
     SimpleEntity(SimpleEntity),
     SimpleEntityWithOwner(SimpleEntityWithOwner),
     SimpleEntityWithForce(SimpleEntityWithForce),
-    SolarPanel,
+    SolarPanel(SolarPanel),
     SpiderLeg,
     StorageTank,
     TrainStop,
