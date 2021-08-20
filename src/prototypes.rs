@@ -1914,6 +1914,22 @@ pub struct Pump {
     fluid_wagon_connector_graphics: PumpConnectorGraphicsFluidWagon
 }
 
+/// <https://wiki.factorio.com/Prototype/Radar>
+#[derive(Debug, EntityWithHealth)]
+pub struct Radar {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    energy_usage: Energy,
+    energy_per_sector: Energy,
+    energy_per_nearby_scan: Energy,
+    energy_source: EnergySource,
+    pictures: RotatedSprite,
+    max_distance_of_sector_revealed: u32,
+    max_distance_of_nearby_sector_revealed: u32,
+    radius_minimap_visualisation_color: Option<Color>,
+    rotation_speed: f64, // Default: 0.01
+}
+
 // Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2009,7 +2025,7 @@ pub enum PrototypeGeneral {
     PowerSwitch(PowerSwitch),
     ProgrammableSpeaker(ProgrammableSpeaker),
     Pump(Pump),
-    Radar,
+    Radar(Radar),
     CurvedRail,
     StraightRail,
     RailChainSignal,
