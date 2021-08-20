@@ -1952,23 +1952,55 @@ pub struct StraightRail {
     bending_type: BendingType // Must be "straight"
 }
 
+/// `collision_box` is hardcoded to ((-0.2, -0.2), (0.2, 0.2))
+/// "placeable-off-grid" flag is ignored
+/// Rail signals must collide with each other
 /// <https://wiki.factorio.com/Prototype/RailChainSignal>
 /// <https://wiki.factorio.com/Prototype/RailSignalBase>
 #[derive(Debug, EntityWithHealth)]
 pub struct RailChainSignal {
     name: String,
     entity_with_health_base: EntityWithHealthBase,
+    animation: RotatedAnimation,
+    rail_piece: Option<Animation>,
+    green_light: Option<LightDefinition>,
+    orange_light: Option<LightDefinition>,
+    red_light: Option<LightDefinition>,
+    default_red_output_signal: Option<SignalIDConnector>,
+    default_orange_output_signal: Option<SignalIDConnector>,
+    default_green_output_signal: Option<SignalIDConnector>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
     selection_box_offsets: [Factorio2DVector; 8],
     blue_light: Option<LightDefinition>,
     default_blue_output_signal: Option<SignalIDConnector>
 }
 
+/// `collision_box` is hardcoded to ((-0.2, -0.2), (0.2, 0.2))
+/// "placeable-off-grid" flag is ignored
+/// Rail signals must collide with each other
 /// <https://wiki.factorio.com/Prototype/RailSignal>
 /// <https://wiki.factorio.com/Prototype/RailSignalBase>
 #[derive(Debug, EntityWithHealth)]
 pub struct RailSignal {
     name: String,
     entity_with_health_base: EntityWithHealthBase,
+    animation: RotatedAnimation,
+    rail_piece: Option<Animation>,
+    green_light: Option<LightDefinition>,
+    orange_light: Option<LightDefinition>,
+    red_light: Option<LightDefinition>,
+    default_red_output_signal: Option<SignalIDConnector>,
+    default_orange_output_signal: Option<SignalIDConnector>,
+    default_green_output_signal: Option<SignalIDConnector>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
 }
 
 // Enum for all prototypes
