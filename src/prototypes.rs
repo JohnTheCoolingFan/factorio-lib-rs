@@ -108,7 +108,8 @@ use crate::types::{
     RailPictures,
     SimpleEntityVisuals,
     SimpleEntityWithOwnerVisuals,
-    SpiderLegGraphicsSet
+    SpiderLegGraphicsSet,
+    StorageTankPictures
 };
 
 // Struct representing global `data` table in lua environment
@@ -2147,6 +2148,24 @@ pub struct SpiderLeg {
     walking_sound_volume_modifier: f64, // Default: 1
 }
 
+/// <https://wiki.factorio.com/Prototype/StorageTank>
+#[derive(Debug, EntityWithHealth)]
+pub struct StorageTank {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    fluid_box: FluidBox,
+    window_bounding_box: BoundingBox,
+    pictures: StorageTankPictures,
+    flow_length_in_ticks: u32, // Must be positive
+    two_direction_only: bool, // Default: false
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
+    scale_info_icons: bool, // Default: true
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2254,7 +2273,7 @@ pub enum PrototypeGeneral {
     SimpleEntityWithForce(SimpleEntityWithForce),
     SolarPanel(SolarPanel),
     SpiderLeg(SpiderLeg),
-    StorageTank,
+    StorageTank(StorageTank),
     TrainStop,
     LinkedBelt,
     Loader1x1,

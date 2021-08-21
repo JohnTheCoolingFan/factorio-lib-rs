@@ -1382,3 +1382,13 @@ pub struct SpiderLegPart {
     top_end_length: f32, // Default: 0
     bottom_end_length: f32 // Default: 0
 }
+
+/// <https://wiki.factorio.com/Prototype/StorageTank#pictures>
+#[derive(Debug)]
+pub struct StorageTankPictures {
+    picture: Sprite4Way,
+    window_background: Sprite,
+    fluid_background: Sprite,
+    flow_sprite: Sprite,
+    gas_flow: Animation
+}
