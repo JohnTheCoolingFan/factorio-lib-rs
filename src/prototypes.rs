@@ -109,7 +109,9 @@ use crate::types::{
     SimpleEntityVisuals,
     SimpleEntityWithOwnerVisuals,
     SpiderLegGraphicsSet,
-    StorageTankPictures
+    StorageTankPictures,
+    TrainStopLight,
+    TrainStopDrawingBoxes
 };
 
 // Struct representing global `data` table in lua environment
@@ -2166,6 +2168,30 @@ pub struct StorageTank {
     scale_info_icons: bool, // Default: true
 }
 
+/// <https://wiki.factorio.com/Prototype/TrainStop>
+#[derive(Debug, EntityWithHealth)]
+pub struct TrainStop {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    animation_ticks_per_frame: u32,
+    rail_overlay_animations: Option<Animation4Way>,
+    animations: Option<Animation4Way>,
+    top_animations: Option<Animation4Way>,
+    default_train_stopped_signal: Option<SignalIDConnector>,
+    default_trains_count_signal: Option<SignalIDConnector>,
+    default_trains_limit_signal: Option<SignalIDConnector>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    color: Option<Color>,
+    chart_name: bool, // Default: true
+    light1: Option<TrainStopLight>,
+    light2: Option<TrainStopLight>,
+    drawing_boxes: Option<TrainStopDrawingBoxes>,
+    circuit_wire_connection_points: Vec<WireConnectionPoint>,
+    circuit_connector_sprites: Vec<CircuitConnectorSprites>
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2274,7 +2300,7 @@ pub enum PrototypeGeneral {
     SolarPanel(SolarPanel),
     SpiderLeg(SpiderLeg),
     StorageTank(StorageTank),
-    TrainStop,
+    TrainStop(TrainStop),
     LinkedBelt,
     Loader1x1,
     Loader1x2,

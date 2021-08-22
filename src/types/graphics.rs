@@ -2,7 +2,7 @@ use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
 use std::fmt;
 use std::str::FromStr;
 use crate::prototypes::PrototypesErr;
-use crate::types::{Factorio2DVector, Color, FileName};
+use crate::types::{Factorio2DVector, Color, FileName, BoundingBox};
 
 // ============ // Simple types // ============ //
 
@@ -1391,4 +1391,21 @@ pub struct StorageTankPictures {
     fluid_background: Sprite,
     flow_sprite: Sprite,
     gas_flow: Animation
+}
+
+/// <https://wiki.factorio.com/Prototype/TrainStop#light1>
+#[derive(Debug)]
+pub struct TrainStopLight {
+    sprite: Sprite4Way,
+    red_picture: Sprite4Way,
+    light: LightDefinition
+}
+
+/// <https://wiki.factorio.com/Prototype/TrainStop#drawing_boxes>
+#[derive(Debug)]
+pub struct TrainStopDrawingBoxes {
+    north: BoundingBox,
+    east: BoundingBox,
+    south: BoundingBox,
+    west: BoundingBox
 }
