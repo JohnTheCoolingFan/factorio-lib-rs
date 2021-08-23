@@ -59,19 +59,19 @@ pub fn entity_with_health_macro_derive(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(Combinator)]
-pub fn combinator_macro_derive(input:TokenStream) -> TokenStream {
+pub fn combinator_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_combinator_macro(&ast)
 }
 
 #[proc_macro_derive(CraftingMachine)]
-pub fn crafting_machine_macro_derive(input:TokenStream) -> TokenStream {
+pub fn crafting_machine_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_crafting_machine_macro(&ast)
 }
 
 #[proc_macro_derive(FlyingRobot)]
-pub fn flying_robot_macro_derive(input:TokenStream) -> TokenStream {
+pub fn flying_robot_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_flying_robot_macro(&ast)
 }
