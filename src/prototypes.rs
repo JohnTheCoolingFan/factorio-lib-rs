@@ -2195,6 +2195,7 @@ pub struct TrainStop {
     circuit_connector_sprites: Vec<CircuitConnectorSprites>
 }
 
+// TODO: Clean up graphics properties
 /// <https://wiki.factorio.com/Prototype/TransportBeltConnectable>
 #[derive(Debug)]
 pub struct TransportBeltConnectableBase {
