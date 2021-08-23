@@ -76,6 +76,12 @@ pub fn flying_robot_macro_derive(input:TokenStream) -> TokenStream {
     impl_flying_robot_macro(&ast)
 }
 
+#[proc_macro_derive(TransportBeltConnectable)]
+pub fn transport_belt_connectable_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_transport_belt_connectable_macro(&ast)
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -396,6 +402,19 @@ fn impl_flying_robot_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn min_to_charge(&self) -> f32 { self.flying_robot_base.min_to_charge }
             fn max_to_charge(&self) -> f32 { self.flying_robot_base.max_to_charge }
             fn speed_multiplier_when_out_of_energy(&self) -> f32 { self.flying_robot_base.speed_multiplier_when_out_of_energy }
+        }
+    };
+    gen.into()
+}
+
+fn impl_transport_belt_connectable_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl TransportBeltConnectable for #name {
+            fn speed(&self) -> f64 { self.transport_belt_connectable_base.speed }
+            fn animation_speed_coefficient(&self) -> f64 { self.transport_belt_connectable_base.animation_speed_coefficient }
+            fn belt_animation_set(&self) -> &Option<BeltAnimationSet> { &self.transport_belt_connectable_base.belt_animation_set }
+            fn belt_graphics_set(&self) -> &Option<BeltGraphicsSet> { &self.transport_belt_connectable_base.belt_graphics_set }
         }
     };
     gen.into()

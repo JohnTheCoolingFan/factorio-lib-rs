@@ -1409,3 +1409,38 @@ pub struct TrainStopDrawingBoxes {
     south: BoundingBox,
     west: BoundingBox
 }
+
+/// <https://wiki.factorio.com/Prototype/TransportBeltConnectable#belt_animation_set>
+#[derive(Debug)]
+pub struct BeltAnimationSet {
+    animation_set: RotatedAnimation,
+    east_index: u8, // Default: 1
+    west_index: u8, // Default: 2
+    north_index: u8, // Default: 3
+    south_index: u8, // Default: 4
+    starting_south_index: u8, // Default: 13
+    ending_south_index: u8, // Default: 14
+    starting_west_index: u8, // Default: 15
+    ending_west_index: u8, // Default: 16
+    starting_north_index: u8, // Default: 17
+    ending_north_index: u8, // Default: 18
+    starting_east_index: u8, // Default: 19
+    ending_east_index: u8, // Default: 20
+    ending_patch: Option<Sprite4Way>,
+    ends_with_stopper: bool, // Default: false
+}
+
+/// <https://wiki.factorio.com/Prototype/TransportBeltConnectable#belt_horizontal>
+#[derive(Debug)]
+pub struct BeltGraphicsSet {
+    belt_horizontal: Animation,
+    belt_vertical: Animation,
+    ending_top: Animation,
+    ending_bottom: Animation,
+    ending_side: Animation,
+    starting_top: Animation,
+    starting_bottom: Animation,
+    starting_side: Animation,
+    ending_patch: Option<Sprite4Way>,
+    ends_with_stopper: bool, // Default: false
+}

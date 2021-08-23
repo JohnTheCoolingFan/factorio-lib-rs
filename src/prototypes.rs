@@ -11,7 +11,8 @@ use factorio_lib_rs_derive::{
     EntityWithHealth,
     Combinator,
     CraftingMachine,
-    FlyingRobot
+    FlyingRobot,
+    TransportBeltConnectable
 };
 use crate::types::{
     ModSettingType,
@@ -111,7 +112,9 @@ use crate::types::{
     SpiderLegGraphicsSet,
     StorageTankPictures,
     TrainStopLight,
-    TrainStopDrawingBoxes
+    TrainStopDrawingBoxes,
+    BeltAnimationSet,
+    BeltGraphicsSet
 };
 
 // Struct representing global `data` table in lua environment
@@ -2190,6 +2193,25 @@ pub struct TrainStop {
     drawing_boxes: Option<TrainStopDrawingBoxes>,
     circuit_wire_connection_points: Vec<WireConnectionPoint>,
     circuit_connector_sprites: Vec<CircuitConnectorSprites>
+}
+
+/// <https://wiki.factorio.com/Prototype/TransportBeltConnectable>
+#[derive(Debug)]
+pub struct TransportBeltConnectableBase {
+    speed: f64,
+    animation_speed_coefficient: f64, // Default: 1
+    /// <https://wiki.factorio.com/Prototype/TransportBeltConnectable#belt_animation_set>
+    belt_animation_set: Option<BeltAnimationSet>,
+    /// <https://wiki.factorio.com/Prototype/TransportBeltConnectable#belt_horizontal>
+    belt_graphics_set: Option<BeltGraphicsSet>
+}
+
+/// <https://wiki.factorio.com/Prototype/TransportBeltConnectable>
+pub trait TransportBeltConnectable {
+    fn speed(&self) -> f64;
+    fn animation_speed_coefficient(&self) -> f64;
+    fn belt_animation_set(&self) -> Option<BeltAnimationSet>;
+    fn belt_graphics_set(&self) -> Option<BeltGraphicsSet>;
 }
 
 /// Enum for all prototypes
