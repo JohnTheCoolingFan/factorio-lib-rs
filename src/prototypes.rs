@@ -2210,8 +2210,8 @@ pub struct TransportBeltConnectableBase {
 pub trait TransportBeltConnectable {
     fn speed(&self) -> f64;
     fn animation_speed_coefficient(&self) -> f64;
-    fn belt_animation_set(&self) -> Option<BeltAnimationSet>;
-    fn belt_graphics_set(&self) -> Option<BeltGraphicsSet>;
+    fn belt_animation_set(&self) -> &Option<BeltAnimationSet>;
+    fn belt_graphics_set(&self) -> &Option<BeltGraphicsSet>;
 }
 
 /// Enum for all prototypes
