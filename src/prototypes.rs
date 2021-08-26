@@ -2246,6 +2246,19 @@ pub struct Loader1x1 {
     belt_length: f64, // Default: 0.5
 }
 
+/// <https://wiki.factorio.com/Prototype/Loader1x2>
+#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+pub struct Loader1x2 {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    transport_belt_connectable_base: TransportBeltConnectableBase,
+    structure: LoaderStructure,
+    filter_count: u8,
+    structure_render_layer: RenderLayer, // Default: "object"
+    container_distance: f64, // Default: 1.5
+    belt_length: f64, // Default: 0.5
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2357,7 +2370,7 @@ pub enum PrototypeGeneral {
     TrainStop(TrainStop),
     LinkedBelt(LinkedBelt),
     Loader1x1(Loader1x1),
-    Loader1x2,
+    Loader1x2(Loader1x2),
     Splitter,
     TransportBelt,
     UndergroundBelt,
