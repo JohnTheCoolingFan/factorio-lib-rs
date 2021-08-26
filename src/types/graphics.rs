@@ -1450,8 +1450,8 @@ pub struct BeltGraphicsSet {
 pub struct LinkedBeltStructure {
     direction_in: Sprite4Way,
     direction_out: Sprite4Way,
-    back_patch: Sprite4Way,
-    front_patch: Sprite4Way,
+    back_patch: Option<Sprite4Way>,
+    front_patch: Option<Sprite4Way>,
     direction_in_side_loading: Option<Sprite4Way>,
     direction_out_side_loading: Option<Sprite4Way>
 }
@@ -1461,6 +1461,6 @@ pub struct LinkedBeltStructure {
 pub struct LoaderStructure {
     direction_in: Sprite4Way,
     direction_out: Sprite4Way,
-    back_patch: Sprite4Way,
-    front_patch: Sprite4Way
+    back_patch: Option<Sprite4Way>,
+    front_patch: Option<Sprite4Way>
 }
