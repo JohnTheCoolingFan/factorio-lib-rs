@@ -119,7 +119,8 @@ use crate::types::{
     BeltStructureWithSideLoading,
     TransportBeltConnectorFrame,
     BeltAnimationSetIndexes,
-    TreeVisuals
+    TreeVisuals,
+    RotatedAnimation4Way
 };
 
 // Struct representing global `data` table in lua environment
@@ -2312,6 +2313,62 @@ pub struct Tree {
     darkness_of_burnt_tree: f32, // Default: 0.5
     visuals: TreeVisuals,
     // healing_per_tick: default 0.001666
+}
+
+// TODO: Accessors trait
+/// <https://wiki.factorio.com/Prototype/Turret>
+#[derive(Debug)]
+pub struct TurretBase {
+    attack_parameters: AttackParameters,
+    folded_animation: RotatedAnimation4Way,
+    call_for_help_radius: f64,
+    corpse: Option<String>, // Name of corpse entity
+    attack_target_mask: Option<TriggerTargetMask>, // Default: all
+    ignore_target_mask: Option<TriggerTargetMask>, // Default: no
+    shoot_in_prepare_state: bool, // Default: false
+    turret_base_has_direction: bool, // Default: false
+    random_animation_offset: bool, // Default: false
+    secondary_animation: bool, // Default: false
+    attack_from_start_frame: bool, // Default: false
+    allow_turning_when_starting_attack: bool, // Default: false
+    base_picture_secondary_draw_order: u8, // Default: 0
+    gun_animation_secondary_draw_order: u8, // Default: 0
+    base_picture_render_layer: RenderLayer, // Default: "lower-obejct"
+    gun_animation_render_layer: RenderLayer, // Default: "object"
+    base_picture: Option<Animation4Way>,
+    preparing_animation: Option<RotatedAnimation4Way>,
+    prepared_animation: Option<RotatedAnimation4Way>,
+    prepared_alternative_animation: Option<RotatedAnimation4Way>,
+    starting_attack_animation: Option<RotatedAnimation4Way>,
+    attacking_animation: Option<RotatedAnimation4Way>,
+    energy_glow_animation: Option<RotatedAnimation4Way>,
+    ending_attack_animation: Option<RotatedAnimation4Way>,
+    folding_animation: Option<RotatedAnimation4Way>,
+    integration: Option<Sprite>,
+    glow_light_intensity: f32, // Default: 0
+    starting_attack_sound: Option<Sound>,
+    dying_sound: Option<Sound>,
+    preparing_sound: Option<Sound>,
+    folding_sound: Option<Sound>,
+    prepared_sound: Option<Sound>,
+    prepared_alternative_sound: Option<Sound>,
+    rotation_speed: f32, // Default: 1
+    preparing_speed: f32, // Default: 1
+    folded_speed: f32, // Default: 1
+    folded_speed_secondary: f32, // Default: 1
+    prepared_speed: f32, // Default: 1
+    prepared_speed_secondary: f32, // Default: 1
+    prepared_alternative_speed: f32, // Default: 1
+    prepared_alternative_speed_secondary: f32, // Default: 1
+    prepared_alternative_chance: f32, // Default: 0
+    starting_attack_speed: f32, // Default: 1
+    attacking_speed: f32, // Default: 1
+    ending_attack_speed: f32, // Default: 1
+    folding_speed: f32, // Default: 1
+    prepare_range: f64, // Default: range defined in `attack_parameters`
+    alert_when_attacking: bool, // Default: true
+    spawn_decorations_on_expansion: bool, // Default: false,
+    spawn_decoration: Option<Vec<CreateDecorativesTriggerEffectItem>>
 }
 
 /// Enum for all prototypes

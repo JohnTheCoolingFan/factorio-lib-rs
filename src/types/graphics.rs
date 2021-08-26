@@ -710,6 +710,16 @@ pub enum RotatedAnimationVariation {
     Single(RotatedAnimation)
 }
 
+/// <https://wiki.factorio.com/Types/RotatedAnimation4Way>
+#[derive(Debug)]
+pub struct RotatedAnimation4Way {
+    north: RotatedAnimation,
+    east: RotatedAnimation,
+    // Next 2 are optional, north and west are used if these are not present
+    south: RotatedAnimation,
+    west: RotatedAnimation
+}
+
 /// <https://wiki.factorio.com/Prototype/Beam#light_animations>
 #[derive(Debug)]
 pub struct LightAnimations {
