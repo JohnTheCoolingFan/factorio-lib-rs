@@ -2390,6 +2390,15 @@ pub struct AmmoTurret {
     entity_info_icon_shift: Option<Factorio2DVector>
 }
 
+/// <https://wiki.factorio.com/Prototype/ElectricTurret>
+#[derive(Debug, EntityWithHealth)]
+pub struct ElectricTurret {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    turret_base: TurretBase,
+    energy_source: EnergySource
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2508,7 +2517,7 @@ pub enum PrototypeGeneral {
     Tree(Tree),
     Turret(TurretPrototype),
     AmmoTurret(AmmoTurret),
-    ElectricTurret,
+    ElectricTurret(ElectricTurret),
     FluidTurret,
     Unit,
     Car,
