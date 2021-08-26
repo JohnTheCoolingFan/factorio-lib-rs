@@ -2,7 +2,7 @@ use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
 use std::fmt;
 use std::str::FromStr;
 use crate::prototypes::PrototypesErr;
-use crate::types::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation};
+use crate::types::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
 
 // ============ // Simple types // ============ //
 
@@ -1502,4 +1502,31 @@ pub struct BeltAnimationSetIndexes {
     east_to_south_index: u8, // Default: 10
     south_to_west_index: u8, // Default: 11
     west_to_south_index: u8, // Default: 12
+}
+
+/// <https://wiki.factorio.com/Prototype/Tree#pictures>
+#[derive(Debug)]
+pub enum TreeVisuals {
+    Pictures(TreePictures),
+    Variations(Vec<TreePrototypeVariation>) // Non-empty array
+}
+
+/// <https://wiki.factorio.com/Prototype/Tree#pictures>
+#[derive(Debug)]
+pub struct TreePictures {
+    pictures: SpriteVariations,
+    color: Vec<Color>
+}
+
+/// <https://wiki.factorio.com/Prototype/Tree#variations>
+#[derive(Debug)]
+pub struct TreePrototypeVariation {
+    trunk: Animation,
+    leaves: Animation,
+    leaf_generation: CreateParticleTriggerEffectItem,
+    branch_generation: CreateParticleTriggerEffectItem,
+    shadow: Option<Animation>,
+    disable_shadow_distortion_beginning_at_frame: u32, // Default: shadow.frame_count - 1
+    normal: Option<Animation>,
+    water_reflection: Option<WaterReflectionDefinition>
 }

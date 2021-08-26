@@ -118,7 +118,8 @@ use crate::types::{
     BeltStructure,
     BeltStructureWithSideLoading,
     TransportBeltConnectorFrame,
-    BeltAnimationSetIndexes
+    BeltAnimationSetIndexes,
+    TreeVisuals
 };
 
 // Struct representing global `data` table in lua environment
@@ -2302,6 +2303,17 @@ pub struct UndergroundBelt {
     underground_remove_belts_sprite: Option<Sprite>
 }
 
+/// <https://wiki.factorio.com/Prototype/Tree>
+#[derive(Debug, EntityWithHealth)]
+pub struct Tree {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    variation_weights: Option<Vec<f64>>,
+    darkness_of_burnt_tree: f32, // Default: 0.5
+    visuals: TreeVisuals,
+    // healing_per_tick: default 0.001666
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2417,7 +2429,7 @@ pub enum PrototypeGeneral {
     Splitter(Splitter),
     TransportBelt(TransportBelt),
     UndergroundBelt(UndergroundBelt),
-    Tree,
+    Tree(Tree),
     Turret,
     AmmoTurret,
     ElectricTurret,
