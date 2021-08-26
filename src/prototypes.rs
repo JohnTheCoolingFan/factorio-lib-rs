@@ -116,7 +116,9 @@ use crate::types::{
     BeltAnimationSet,
     BeltGraphicsSet,
     LinkedBeltStructure,
-    LoaderStructure
+    LoaderStructure,
+    TransportBeltConnectorFrame,
+    BeltAnimationSetIndexes
 };
 
 // Struct representing global `data` table in lua environment
@@ -2271,6 +2273,23 @@ pub struct Splitter {
     structure_animation_movement_cooldown: u32, // Default: 10
 }
 
+/// <https://wiki.factorio.com/Prototype/TransportBelt>
+#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+pub struct TransportBelt {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    transport_belt_connectable_base: TransportBeltConnectableBase,
+    connector_frame_sprites: TransportBeltConnectorFrame,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_wire_connection_point: Option<Vec<WireConnectionPoint>>,
+    circuit_connector_sprites: Option<Vec<CircuitConnectorSprites>>,
+    belt_animation_set_indexes: Option<BeltAnimationSetIndexes>,
+    animations: Option<RotatedAnimation>, // Must have 12 animations
+    related_underground_belt: Option<String>, // Name of underground belt
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2384,7 +2403,7 @@ pub enum PrototypeGeneral {
     Loader1x1(Loader1x1),
     Loader1x2(Loader1x2),
     Splitter(Splitter),
-    TransportBelt,
+    TransportBelt(TransportBelt),
     UndergroundBelt,
     Tree,
     Turret,

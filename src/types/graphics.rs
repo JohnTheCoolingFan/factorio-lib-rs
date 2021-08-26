@@ -2,7 +2,7 @@ use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
 use std::fmt;
 use std::str::FromStr;
 use crate::prototypes::PrototypesErr;
-use crate::types::{Factorio2DVector, Color, FileName, BoundingBox};
+use crate::types::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation};
 
 // ============ // Simple types // ============ //
 
@@ -1463,4 +1463,46 @@ pub struct LoaderStructure {
     direction_out: Sprite4Way,
     back_patch: Option<Sprite4Way>,
     front_patch: Option<Sprite4Way>
+}
+
+/// <https://wiki.factorio.com/Types/TransportBeltConnectorFrame>
+#[derive(Debug)]
+pub struct TransportBeltConnectorFrame {
+    frame_main: AnimationVariations,
+    frame_shadow: AnimationVariations,
+    frame_main_scanner: Animation,
+    frame_main_scanner_movement_speed: f32,
+    frame_main_scanner_horizontal_start_shift: Factorio2DVector,
+    frame_main_scanner_horizontal_end_shift: Factorio2DVector,
+    frame_main_scanner_horizontal_y_scale: f32,
+    frame_main_scanner_horizontal_rotation: RealOrientation,
+    frame_main_scanner_vertical_start_shift: Factorio2DVector,
+    frame_main_scanner_vertical_end_shift: Factorio2DVector,
+    frame_main_scanner_vertical_y_scale: f32,
+    frame_main_scanner_vertical_rotation: RealOrientation,
+    frame_main_scanner_cross_horizontal_start_shift: Factorio2DVector,
+    frame_main_scanner_cross_horizontal_end_shift: Factorio2DVector,
+    frame_main_scanner_cross_horizontal_y_scale: f32,
+    frame_main_scanner_cross_horizontal_rotation: RealOrientation,
+    frame_main_scanner_cross_vertical_start_shift: Factorio2DVector,
+    frame_main_scanner_cross_vertical_end_shift: Factorio2DVector,
+    frame_main_scanner_cross_vertical_y_scale: f32,
+    frame_main_scanner_cross_vertical_rotation: RealOrientation,
+    frame_main_scanner_nw_ne: Animation,
+    frame_main_scanner_sw_se: Animation,
+    frame_back_patch: Option<SpriteVariations>,
+    frame_front_patch: Option<SpriteVariations>
+}
+
+/// <https://wiki.factorio.com/Prototype/TransportBelt#belt_animation_set>
+#[derive(Debug)]
+pub struct BeltAnimationSetIndexes {
+    east_to_north_index: u8, // Default: 5
+    north_to_east_index: u8, // Default: 6
+    west_to_north_index: u8, // Default: 7
+    north_to_west_index: u8, // Default: 8
+    south_to_east_index: u8, // Default: 9
+    east_to_south_index: u8, // Default: 10
+    south_to_west_index: u8, // Default: 11
+    west_to_south_index: u8, // Default: 12
 }
