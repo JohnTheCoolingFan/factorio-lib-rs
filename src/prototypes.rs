@@ -2259,6 +2259,18 @@ pub struct Loader1x2 {
     belt_length: f64, // Default: 0.5
 }
 
+/// <https://wiki.factorio.com/Prototype/Splitter>
+#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+pub struct Splitter {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    transport_belt_connectable_base: TransportBeltConnectableBase,
+    structure: Animation4Way,
+    structure_patch: Option<Animation4Way>,
+    structure_animation_speed_coefficient: f64, // Default: 1
+    structure_animation_movement_cooldown: u32, // Default: 10
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2371,7 +2383,7 @@ pub enum PrototypeGeneral {
     LinkedBelt(LinkedBelt),
     Loader1x1(Loader1x1),
     Loader1x2(Loader1x2),
-    Splitter,
+    Splitter(Splitter),
     TransportBelt,
     UndergroundBelt,
     Tree,
