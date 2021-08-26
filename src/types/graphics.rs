@@ -1444,3 +1444,14 @@ pub struct BeltGraphicsSet {
     ending_patch: Option<Sprite4Way>,
     ends_with_stopper: bool, // Default: false
 }
+
+/// <https://wiki.factorio.com/Prototype/LinkedBelt#structure>
+#[derive(Debug)]
+pub struct LinkedBeltStructure {
+    direction_in: Sprite4Way,
+    direction_out: Sprite4Way,
+    back_patch: Sprite4Way,
+    front_patch: Sprite4Way,
+    direction_in_side_loading: Option<Sprite4Way>,
+    direction_out_side_loading: Option<Sprite4Way>
+}
