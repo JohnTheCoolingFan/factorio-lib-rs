@@ -1455,3 +1455,12 @@ pub struct LinkedBeltStructure {
     direction_in_side_loading: Option<Sprite4Way>,
     direction_out_side_loading: Option<Sprite4Way>
 }
+
+/// <https://wiki.factorio.com/Prototype/Loader1x1#structure>
+#[derive(Debug)]
+pub struct LoaderStructure {
+    direction_in: Sprite4Way,
+    direction_out: Sprite4Way,
+    back_patch: Sprite4Way,
+    front_patch: Sprite4Way
+}

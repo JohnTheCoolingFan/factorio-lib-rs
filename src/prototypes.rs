@@ -115,7 +115,8 @@ use crate::types::{
     TrainStopDrawingBoxes,
     BeltAnimationSet,
     BeltGraphicsSet,
-    LinkedBeltStructure
+    LinkedBeltStructure,
+    LoaderStructure
 };
 
 // Struct representing global `data` table in lua environment
@@ -2232,6 +2233,19 @@ pub struct LinkedBelt {
     allow_side_loading: bool, // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/Loader1x1>
+#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+pub struct Loader1x1 {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    transport_belt_connectable_base: TransportBeltConnectableBase,
+    structure: LoaderStructure,
+    filter_count: u8,
+    structure_render_layer: RenderLayer, // Default: "object"
+    container_distance: f64, // Default: 1.5
+    belt_length: f64, // Default: 0.5
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2342,7 +2356,7 @@ pub enum PrototypeGeneral {
     StorageTank(StorageTank),
     TrainStop(TrainStop),
     LinkedBelt(LinkedBelt),
-    Loader1x1,
+    Loader1x1(Loader1x1),
     Loader1x2,
     Splitter,
     TransportBelt,
