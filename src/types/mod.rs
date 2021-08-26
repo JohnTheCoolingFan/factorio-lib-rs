@@ -1827,3 +1827,27 @@ pub struct Note {
     name: String,
     sound: Sound
 }
+
+/// <https://wiki.factorio.com/Types/AnimatedVector>
+#[derive(Debug)]
+pub struct AnimatedVector {
+    rotations: Vec<AnimatedVectorRotation>,
+    //render_layer: Option<RenderLayer>, // Just copied over to all rotations
+    direction_shift: Option<AnimatedVectorDirectionShift>
+}
+
+/// <https://wiki.factorio.com/Types/AnimatedVector#rotations>
+#[derive(Debug)]
+pub struct AnimatedVectorRotation {
+    frames: Vec<Factorio2DVector>, // Sizes of all arrays must be the same
+    render_layer: RenderLayer
+}
+
+/// <https://wiki.factorio.com/Types/AnimatedVector#direction_shift>
+#[derive(Debug)]
+pub struct AnimatedVectorDirectionShift {
+    north: Option<Factorio2DVector>,
+    east: Option<Factorio2DVector>,
+    south: Option<Factorio2DVector>,
+    west: Option<Factorio2DVector>
+}

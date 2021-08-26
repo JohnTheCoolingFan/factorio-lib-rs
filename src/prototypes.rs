@@ -120,7 +120,8 @@ use crate::types::{
     TransportBeltConnectorFrame,
     BeltAnimationSetIndexes,
     TreeVisuals,
-    RotatedAnimation4Way
+    RotatedAnimation4Way,
+    AnimatedVector
 };
 
 // Struct representing global `data` table in lua environment
@@ -2399,6 +2400,33 @@ pub struct ElectricTurret {
     energy_source: EnergySource
 }
 
+// `turret_base_has_direction` must = true
+/// <https://wiki.factorio.com/Prototype/FluidTurret>
+#[derive(Debug, EntityWithHealth)]
+pub struct FluidTurret {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    turret_base: TurretBase,
+    fluid_buffer_size: f32,
+    fluid_buffer_input_flow: f32,
+    activation_buffer_ratio: f32,
+    fluid_box: FluidBox,
+    muzzle_light: Option<LightDefinition>,
+    enough_fuel_indicator_light: Option<LightDefinition>,
+    not_enough_fuel_indicator_light: Option<LightDefinition>,
+    muzzle_animation: Option<Animation>,
+    folded_muzzle_animation_shift: Option<AnimatedVector>,
+    preparing_muzzle_animation_shift: Option<AnimatedVector>,
+    prepared_muzzle_animation_shift: Option<AnimatedVector>,
+    starting_attack_muzzle_animation_shift: Option<AnimatedVector>,
+    attacking_muzzle_animation_shift: Option<AnimatedVector>,
+    ending_attack_muzzle_animation_shift: Option<AnimatedVector>,
+    folding_muzzle_animation_shift: Option<AnimatedVector>,
+    enough_fuel_indicator_picture: Option<Sprite4Way>,
+    not_enough_fuel_indicator_picture: Option<Sprite4Way>,
+    out_of_ammo_alert_icon: Option<Sprite>
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2518,7 +2546,7 @@ pub enum PrototypeGeneral {
     Turret(TurretPrototype),
     AmmoTurret(AmmoTurret),
     ElectricTurret(ElectricTurret),
-    FluidTurret,
+    FluidTurret(FluidTurret),
     Unit,
     Car,
     ArtilleryWagon,
