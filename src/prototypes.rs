@@ -115,8 +115,8 @@ use crate::types::{
     TrainStopDrawingBoxes,
     BeltAnimationSet,
     BeltGraphicsSet,
-    LinkedBeltStructure,
-    LoaderStructure,
+    BeltStructure,
+    BeltStructureWithSideLoading,
     TransportBeltConnectorFrame,
     BeltAnimationSetIndexes
 };
@@ -2228,7 +2228,7 @@ pub struct LinkedBelt {
     name: String,
     entity_with_health_base: EntityWithHealthBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
-    structure: LinkedBeltStructure,
+    structure: BeltStructureWithSideLoading,
     structure_render_layer: RenderLayer, // Default: "object"
     allow_clone_connection: bool, // Default: true
     allow_blueprint_connection: bool, // Default: true
@@ -2241,7 +2241,7 @@ pub struct Loader1x1 {
     name: String,
     entity_with_health_base: EntityWithHealthBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
-    structure: LoaderStructure,
+    structure: BeltStructure,
     filter_count: u8,
     structure_render_layer: RenderLayer, // Default: "object"
     container_distance: f64, // Default: 1.5
@@ -2254,7 +2254,7 @@ pub struct Loader1x2 {
     name: String,
     entity_with_health_base: EntityWithHealthBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
-    structure: LoaderStructure,
+    structure: BeltStructure,
     filter_count: u8,
     structure_render_layer: RenderLayer, // Default: "object"
     container_distance: f64, // Default: 1.5
@@ -2288,6 +2288,18 @@ pub struct TransportBelt {
     belt_animation_set_indexes: Option<BeltAnimationSetIndexes>,
     animations: Option<RotatedAnimation>, // Must have 12 animations
     related_underground_belt: Option<String>, // Name of underground belt
+}
+
+/// <https://wiki.factorio.com/Prototype/UndergroundBelt>
+#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+pub struct UndergroundBelt {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    transport_belt_connectable_base: TransportBeltConnectableBase,
+    max_distance: u8,
+    structure: BeltStructureWithSideLoading,
+    underground_sprite: Sprite,
+    underground_remove_belts_sprite: Option<Sprite>
 }
 
 /// Enum for all prototypes
@@ -2404,7 +2416,7 @@ pub enum PrototypeGeneral {
     Loader1x2(Loader1x2),
     Splitter(Splitter),
     TransportBelt(TransportBelt),
-    UndergroundBelt,
+    UndergroundBelt(UndergroundBelt),
     Tree,
     Turret,
     AmmoTurret,

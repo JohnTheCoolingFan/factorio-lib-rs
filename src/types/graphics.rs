@@ -1445,24 +1445,21 @@ pub struct BeltGraphicsSet {
     ends_with_stopper: bool, // Default: false
 }
 
-/// <https://wiki.factorio.com/Prototype/LinkedBelt#structure>
-#[derive(Debug)]
-pub struct LinkedBeltStructure {
-    direction_in: Sprite4Way,
-    direction_out: Sprite4Way,
-    back_patch: Option<Sprite4Way>,
-    front_patch: Option<Sprite4Way>,
-    direction_in_side_loading: Option<Sprite4Way>,
-    direction_out_side_loading: Option<Sprite4Way>
-}
-
 /// <https://wiki.factorio.com/Prototype/Loader1x1#structure>
 #[derive(Debug)]
-pub struct LoaderStructure {
+pub struct BeltStructure {
     direction_in: Sprite4Way,
     direction_out: Sprite4Way,
     back_patch: Option<Sprite4Way>,
     front_patch: Option<Sprite4Way>
+}
+
+/// <https://wiki.factorio.com/Prototype/LinkedBelt#structure>
+#[derive(Debug)]
+pub struct BeltStructureWithSideLoading {
+    base_structure: BeltStructure,
+    direction_in_side_loading: Option<Sprite4Way>,
+    direction_out_side_loading: Option<Sprite4Way>
 }
 
 /// <https://wiki.factorio.com/Types/TransportBeltConnectorFrame>
