@@ -413,8 +413,7 @@ fn impl_transport_belt_connectable_macro(ast: &syn::DeriveInput) -> TokenStream 
         impl TransportBeltConnectable for #name {
             fn speed(&self) -> f64 { self.transport_belt_connectable_base.speed }
             fn animation_speed_coefficient(&self) -> f64 { self.transport_belt_connectable_base.animation_speed_coefficient }
-            fn belt_animation_set(&self) -> &Option<BeltAnimationSet> { &self.transport_belt_connectable_base.belt_animation_set }
-            fn belt_graphics_set(&self) -> &Option<BeltGraphicsSet> { &self.transport_belt_connectable_base.belt_graphics_set }
+            fn belt_animation_set(&self) -> &TransportBeltConnectableGraphics { &self.transport_belt_connectable_base.belt_animation_set }
         }
     };
     gen.into()
