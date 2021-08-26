@@ -2371,6 +2371,14 @@ pub struct TurretBase {
     spawn_decoration: Option<Vec<CreateDecorativesTriggerEffectItem>>
 }
 
+/// <https://wiki.factorio.com/Prototype/Turret>
+#[derive(Debug, EntityWithHealth)]
+pub struct TurretPrototype {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    turret_base: TurretBase
+}
+
 /// Enum for all prototypes
 #[derive(Debug)]
 pub enum PrototypeGeneral {
@@ -2487,7 +2495,7 @@ pub enum PrototypeGeneral {
     TransportBelt(TransportBelt),
     UndergroundBelt(UndergroundBelt),
     Tree(Tree),
-    Turret,
+    Turret(TurretPrototype),
     AmmoTurret,
     ElectricTurret,
     FluidTurret,
