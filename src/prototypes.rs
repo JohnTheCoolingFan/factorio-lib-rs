@@ -333,7 +333,7 @@ pub struct DataTable {
 
 // Prototype
 // Contains all values (accessors) for every prototype in the game
-pub trait Prototype: fmt::Debug {
+pub trait Prototype {
     fn name(&self) -> &String;
 }
 
