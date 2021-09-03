@@ -326,6 +326,12 @@ pub struct DataTable {
     */
 }
 
+impl DataTable {
+    pub fn find<T: PrototypeFind>(&self, name: &String) -> Result<T, PrototypesErr> {
+        T::find(self, name)
+    }
+}
+
 // Factorio prototypes
 // Source info:
 // For prototypes: https://wiki.factorio.com/Prototype_definitions
