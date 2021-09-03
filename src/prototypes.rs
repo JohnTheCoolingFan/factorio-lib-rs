@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
-use std::fmt;
 use factorio_lib_rs_derive::{
     Prototype,
     ModSetting,
