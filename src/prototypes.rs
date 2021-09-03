@@ -337,6 +337,10 @@ pub trait Prototype: fmt::Debug {
     fn name(&self) -> &String;
 }
 
+pub trait PrototypeFind: Prototype {
+    fn find(data_table: &DataTable, name: &String) -> Result<Self, PrototypesErr> where Self: Sized;
+}
+
 pub trait ModSetting: Prototype {
     fn localised_name(&self) -> &Option<LocalisedString>;
     fn localised_description(&self) -> &Option<LocalisedString>;
