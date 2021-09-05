@@ -2878,5 +2878,7 @@ pub enum PrototypesErr {
     #[error("Invalid mod setting type: {0}")]
     InvalidModSettingType(String),
     #[error("Invalid string for type {0}: {1}")]
-    InvalidTypeStr(String, String)
+    InvalidTypeStr(String, String),
+    #[error("Prototype \"{0}\" not found")]
+    PrototypeNotFound(String)
 }
