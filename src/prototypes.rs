@@ -327,18 +327,22 @@ pub struct DataTable {
 }
 
 impl DataTable {
-    pub fn find<T: PrototypeFind>(&self, name: &String) -> Result<&Rc<T>, PrototypesErr> {
+    pub fn find<T: DataTableAccessable>(&self, name: &String) -> Result<&Rc<T>, PrototypesErr> {
         T::find(self, name)
+    }
+
+    pub fn extend<T: DataTableAccessable>(&self, prototype: T) -> Result<(), PrototypesErr> {
+        prototype.extend(self)
     }
 }
 
 #[derive(Debug)]
-pub struct PrototypeReference<T: PrototypeFind> {
+pub struct PrototypeReference<T: DataTableAccessable> {
     name: String,
     pub prototype: Option<Rc<T>>
 }
 
-impl<T: PrototypeFind> PrototypeReference<T> {
+impl<T: DataTableAccessable> PrototypeReference<T> {
     /// Creates new unresolved Prototype reference
     pub fn new(name: String) -> Self {
         Self{name, prototype: None}
@@ -367,12 +371,12 @@ pub trait Prototype {
     fn name(&self) -> &String;
 }
 
-// TODO: Combine with Prototype trait
 // TODO: Add insert/append method, which inserts the prototype into DataTable
-/// Trait for types that can be found in [Data table](DataTable).
+/// Trait for manipulating prototypes in [Data table](DataTable).
 /// Primarily used for [`PrototypeReference`]
-pub trait PrototypeFind: Prototype {
+pub trait DataTableAccessable: Prototype {
     fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Rc<Self>, PrototypesErr> where Self: Sized;
+    fn extend(self, data_table: &DataTable) -> Result<(), PrototypesErr>;
 }
 
 pub trait ModSetting: Prototype {
