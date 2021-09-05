@@ -367,6 +367,8 @@ pub trait Prototype {
     fn name(&self) -> &String;
 }
 
+// TODO: Combine with Prototype trait
+// TODO: Add insert/append method, which inserts the prototype into DataTable
 /// Trait for types that can be found in [Data table](DataTable).
 /// Primarily used for [`PrototypeReference`]
 pub trait PrototypeFind: Prototype {
