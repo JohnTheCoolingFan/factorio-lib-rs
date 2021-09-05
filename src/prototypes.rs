@@ -335,7 +335,7 @@ impl DataTable {
 #[derive(Debug)]
 pub struct PrototypeReference<T: PrototypeFind> {
     name: String,
-    prototype: Option<Rc<T>>
+    pub prototype: Option<Rc<T>>
 }
 
 impl<T: PrototypeFind> PrototypeReference<T> {
