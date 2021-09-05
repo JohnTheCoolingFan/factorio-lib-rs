@@ -371,7 +371,6 @@ pub trait Prototype {
     fn name(&self) -> &String;
 }
 
-// TODO: Add insert/append method, which inserts the prototype into DataTable
 /// Trait for manipulating prototypes in [Data table](DataTable).
 /// Primarily used for [`PrototypeReference`]
 pub trait DataTableAccessable: Prototype {
