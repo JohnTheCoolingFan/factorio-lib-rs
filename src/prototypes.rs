@@ -331,6 +331,30 @@ impl DataTable {
     }
 }
 
+#[derive(Debug)]
+pub struct PrototypeReference<T: PrototypeFind> {
+    name: String,
+    prototype: Option<T>
+}
+
+impl<T: PrototypeFind> PrototypeReference<T> {
+    /// Creates new unresolved Prototype reference
+    pub fn new(name: String) -> Self {
+        Self{name, prototype: None}
+    }
+
+    /// Tries to resolve prototype and remember it. Errors if prototype is not found
+    pub fn resolve(&mut self, data_table: &DataTable) -> Result<(), PrototypesErr> {
+        self.prototype = Some(T::find(data_table, &self.name)?);
+        Ok(())
+    }
+
+    /// Checks if reference is valid. Always false if [`resolve`](Self::resolve) was never called
+    pub fn is_valid(&self) -> bool {
+        self.prototype.is_some()
+    }
+}
+
 // Factorio prototypes
 // Source info:
 // For prototypes: https://wiki.factorio.com/Prototype_definitions
@@ -342,6 +366,8 @@ pub trait Prototype {
     fn name(&self) -> &String;
 }
 
+/// Trait for types that can be found in [Data table](DataTable).
+/// Primarily used for [`PrototypeReference`]
 pub trait PrototypeFind: Prototype {
     fn find(data_table: &DataTable, name: &String) -> Result<Self, PrototypesErr> where Self: Sized;
 }
