@@ -2,6 +2,8 @@ use std::rc::Rc;
 use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
+use mlua::{Lua, Value, prelude::LuaResult};
+use std::fmt;
 use factorio_lib_rs_derive::{
     Prototype,
     ModSetting,
@@ -127,6 +129,7 @@ use crate::types::{
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
 pub struct DataTable {
+    // Prototypes
     ambient_sound: HashMap<String, Rc<AmbientSoundPrototype>>,
     animation: HashMap<String, Rc<Animation>>,
     editor_controller: HashMap<String, Rc<EditorController>>,
@@ -336,6 +339,10 @@ impl DataTable {
     }
 }
 
+pub trait PrototypeFromLua<'lua>: Sized {
+    fn prrototype_from_lua(lua_value: Value<'lua>, lua: &'lua Lua, data_table: &DataTable) -> LuaResult<Self>;
+}
+
 #[derive(Debug)]
 pub struct PrototypeReference<T: DataTableAccessable> {
     name: String,
@@ -367,7 +374,7 @@ impl<T: DataTableAccessable> PrototypeReference<T> {
 
 // Prototype
 // Contains all values (accessors) for every prototype in the game
-pub trait Prototype {
+pub trait Prototype: fmt::Debug {
     fn name(&self) -> &String;
 }
 
