@@ -1851,3 +1851,28 @@ pub struct AnimatedVectorDirectionShift {
     south: Option<Factorio2DVector>,
     west: Option<Factorio2DVector>
 }
+
+/// <https://wiki.factorio.com/Types/UnitAISettings>
+#[derive(Debug)]
+pub struct UnitAISettings {
+    destroy_when_commands_fail: bool, // Default: false
+    allow_try_return_to_spawner: bool, // Default: false
+    do_separation: bool, // Default: true
+    path_resolution_modifier: i8, // Default: 0 // Must be between -8 and 8
+}
+
+/// <https://wiki.factorio.com/Prototype/Unit#alternative_attacking_frame_sequence>
+#[derive(Debug)]
+pub struct UnitAlternativeAttackingFrameSequence {
+    warmup_frame_sequence: Vec<u16>,
+    warmup2_frame_sequence: Vec<u16>,
+    attacking_frame_sequence: Vec<u16>,
+    cooldown_frame_sequence: Vec<u16>,
+    prepared_frame_sequence: Vec<u16>,
+    back_to_walk_frame_sequence: Vec<u16>,
+    warmup_animation_speed: f32,
+    attacking_animation_speed: f32,
+    cooldown_animation_speed: f32,
+    prepared_animation_speed: f32,
+    back_to_walk_animation_speed: f32
+}

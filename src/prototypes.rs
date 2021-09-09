@@ -123,7 +123,9 @@ use crate::types::{
     BeltAnimationSetIndexes,
     TreeVisuals,
     RotatedAnimation4Way,
-    AnimatedVector
+    AnimatedVector,
+    UnitAISettings,
+    UnitAlternativeAttackingFrameSequence
 };
 
 pub type PrototypeCategory<T> = HashMap<String, Rc<T>>;
@@ -246,8 +248,8 @@ pub struct DataTable {
     ammo_turret: PrototypeCategory<AmmoTurret>,
     electric_turret: PrototypeCategory<ElectricTurret>,
     fluid_turret: PrototypeCategory<FluidTurret>,
-    /* Commented out until implemented
     unit: PrototypeCategory<Unit>,
+    /* Commented out until implemented
     car: PrototypeCategory<Car>,
     artillery_wagon: PrototypeCategory<ArtilleryWagon>,
     cargo_wagon: PrototypeCategory<CargoWagon>,
@@ -2695,6 +2697,36 @@ pub struct FluidTurret {
     enough_fuel_indicator_picture: Option<Sprite4Way>,
     not_enough_fuel_indicator_picture: Option<Sprite4Way>,
     out_of_ammo_alert_icon: Option<Sprite>
+}
+
+/// <https://wiki.factorio.com/Prototype/Unit>
+#[derive(Debug, EntityWithHealth)]
+pub struct Unit {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    run_animation: RotatedAnimation,
+    attack_parameters: AttackParameters, // Requires animation in attack_paramaters. Requires ammo_type in attack_paramaters
+    movement_speed: f32, // Must be >= 0
+    distance_per_frame: f32,
+    pollution_to_join_attack: f32,
+    distraction_cooldown: u32,
+    vision_distance: f64, // 100 max
+    rotation_speed: f32, // Default: 0.025
+    dying_sound: Option<Sound>,
+    min_pursue_time: u32, // Default: 600
+    has_belt_immunity: bool, // Default: false
+    spawning_time_modifier: f64, // Default: 1
+    max_pursue_distance: f64, // Default: 50
+    radar_range: u32, // Default: 0
+    ai_settings: Option<UnitAISettings>,
+    move_while_shooting: bool, // Default: false
+    can_open_gates: bool, // Default: false
+    affected_by_tiles: bool, // Default: false
+    render_layer: RenderLayer, // Default: "object"
+    light: Option<LightDefinition>,
+    walking_sound: Option<Sound>,
+    alternative_attacking_frame_sequence: Option<UnitAlternativeAttackingFrameSequence>,
+    running_sound_animation_positions: Option<Vec<f32>>, // Ignored if `walking_sound` is not defined
 }
 
 /// Enum for all prototypes
