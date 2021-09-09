@@ -129,6 +129,7 @@ use crate::types::{
 // Struct representing global `data` table in lua environment
 #[derive(Debug)]
 pub struct DataTable {
+    references: Vec<Rc<dyn PrototypereferenceValidate>>,
     // Prototypes
     ambient_sound: HashMap<String, Rc<AmbientSoundPrototype>>,
     animation: HashMap<String, Rc<Animation>>,
@@ -337,6 +338,19 @@ impl DataTable {
     pub fn extend<T: DataTableAccessable>(&self, prototype: T) -> Result<(), PrototypesErr> {
         prototype.extend(self)
     }
+
+    pub fn new_reference<T: 'static + DataTableAccessable>(&mut self, name: String) -> Rc<PrototypeReference<T>> {
+        let prot_reference = Rc::new(PrototypeReference::<T>::new(name));
+        self.references.push(Rc::clone(&prot_reference) as Rc<dyn PrototypereferenceValidate>);
+        prot_reference
+    }
+
+    pub fn validate_references(&self) -> Result<(), PrototypesErr> {
+        for prot_reference in &self.references {
+            prot_reference.validate(self)?
+        }
+        Ok(())
+    }
 }
 
 pub trait PrototypeFromLua<'lua>: Sized {
@@ -365,6 +379,16 @@ impl<T: DataTableAccessable> PrototypeReference<T> {
     pub fn is_valid(&self) -> bool {
         self.prototype.is_some()
     }
+}
+
+impl<T: DataTableAccessable> PrototypereferenceValidate for PrototypeReference<T> {
+    fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr> {
+        data_table.find::<T>(&self.name).map(|_| ())
+    }
+}
+
+trait PrototypereferenceValidate: fmt::Debug {
+    fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr>;
 }
 
 // Factorio prototypes
