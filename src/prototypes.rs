@@ -357,6 +357,10 @@ pub trait PrototypeFromLua<'lua>: Sized {
     fn prrototype_from_lua(lua_value: Value<'lua>, lua: &'lua Lua, data_table: &DataTable) -> LuaResult<Self>;
 }
 
+trait PrototypereferenceValidate: fmt::Debug {
+    fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr>;
+}
+
 #[derive(Debug)]
 pub struct PrototypeReference<T: DataTableAccessable> {
     name: String,
@@ -385,10 +389,6 @@ impl<T: DataTableAccessable> PrototypereferenceValidate for PrototypeReference<T
     fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr> {
         data_table.find::<T>(&self.name).map(|_| ())
     }
-}
-
-trait PrototypereferenceValidate: fmt::Debug {
-    fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr>;
 }
 
 // Factorio prototypes
