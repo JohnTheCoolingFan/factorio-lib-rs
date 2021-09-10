@@ -128,9 +128,10 @@ use crate::types::{
     UnitAlternativeAttackingFrameSequence
 };
 
+/// Shorthand for prototype category/type, used in [DataTable]
 pub type PrototypeCategory<T> = HashMap<String, Rc<T>>;
 
-// Struct representing global `data` table in lua environment
+/// Struct representing global `data` table in lua environment
 #[derive(Debug)]
 pub struct DataTable {
     references: Vec<Rc<dyn PrototypereferenceValidate>>,
@@ -335,20 +336,24 @@ pub struct DataTable {
 }
 
 impl DataTable {
+    /// Shorthand for [DataTableAccessable::find]
     pub fn find<T: DataTableAccessable>(&self, name: &String) -> Result<&Rc<T>, PrototypesErr> {
         T::find(self, name)
     }
 
+    /// Shorthand for [DataTableAccessable::extend]
     pub fn extend<T: DataTableAccessable>(&self, prototype: T) -> Result<(), PrototypesErr> {
         prototype.extend(self)
     }
 
+    /// Creates new reference and keeps track of it to later be validated through [Self::validate_references]
     pub fn new_reference<T: 'static + DataTableAccessable>(&mut self, name: String) -> Rc<PrototypeReference<T>> {
         let prot_reference = Rc::new(PrototypeReference::<T>::new(name));
         self.references.push(Rc::clone(&prot_reference) as Rc<dyn PrototypereferenceValidate>);
         prot_reference
     }
 
+    /// Validates all tracked references.
     pub fn validate_references(&self) -> Result<(), PrototypesErr> {
         for prot_reference in &self.references {
             prot_reference.validate(self)?
@@ -357,14 +362,17 @@ impl DataTable {
     }
 }
 
+/// [mlua::FromLua] alternative with [DataTable] reference being passed
 pub trait PrototypeFromLua<'lua>: Sized {
     fn prrototype_from_lua(lua_value: Value<'lua>, lua: &'lua Lua, data_table: &DataTable) -> LuaResult<Self>;
 }
 
+/// Validate PrototypeReference. Any type.
 trait PrototypereferenceValidate: fmt::Debug {
     fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr>;
 }
 
+/// Reference to a prototype by name.
 #[derive(Debug)]
 pub struct PrototypeReference<T: DataTableAccessable> {
     name: String,
@@ -390,6 +398,7 @@ impl<T: DataTableAccessable> PrototypeReference<T> {
 }
 
 impl<T: DataTableAccessable> PrototypereferenceValidate for PrototypeReference<T> {
+    /// Validates the reference
     fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr> {
         data_table.find::<T>(&self.name).map(|_| ())
     }
@@ -409,7 +418,9 @@ pub trait Prototype: fmt::Debug {
 /// Trait for manipulating prototypes in [Data table](DataTable).
 /// Primarily used for [`PrototypeReference`]
 pub trait DataTableAccessable: Prototype {
+    /// Find prototype in [Data table](DataTable) by it's name
     fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Rc<Self>, PrototypesErr> where Self: Sized;
+    /// Extend [Data table](DataTable) with this prototype
     fn extend(self, data_table: &DataTable) -> Result<(), PrototypesErr>;
 }
 
