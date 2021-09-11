@@ -251,8 +251,8 @@ pub struct DataTable {
     electric_turret: PrototypeCategory<ElectricTurret>,
     fluid_turret: PrototypeCategory<FluidTurret>,
     unit: PrototypeCategory<Unit>,
-    /* Commented out until implemented
     car: PrototypeCategory<Car>,
+    /* Commented out until implemented
     artillery_wagon: PrototypeCategory<ArtilleryWagon>,
     cargo_wagon: PrototypeCategory<CargoWagon>,
     fluid_wagon: PrototypeCategory<FluidWagon>,
@@ -2776,6 +2776,34 @@ pub trait Vehicle {
     fn minimap_representation(&self) -> &Option<Sprite>;
     fn selected_minimap_representation(&self) -> &Option<Sprite>;
     fn allow_passengers(&self) -> bool;
+}
+
+/// <https://wiki.factorio.com/Prototype/Car>
+#[derive(Debug, EntityWithHealth, Vehicle)]
+pub struct Car {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    vehicle_base: VehicleBase,
+    animation: RotatedAnimation,
+    effectivity: f64,
+    consumption: Energy,
+    rotation_speed: f64,
+    energy_source: EnergySource, // If used from `burner`, must be a burner energy source // Otherwise can also be a void energy source
+    inventory_size: ItemStackIndex,
+    turret_animation: Option<RotatedAnimation>,
+    light_animation: Option<RotatedAnimation>, // Must have the same frame count as `animation`
+    render_layer: RenderLayer, // Default: "object"
+    tank_driving: bool, // Default: false
+    has_belt_immunity: bool, // Default: false
+    immune_to_tree_impacts: bool, // Default: false
+    immune_to_rock_impacts: bool, // Default: false
+    turret_rotation_speed: f64, // Default: 0.01
+    turret_return_timeout: u32, // Default: 60
+    light: Option<LightDefinition>,
+    sound_no_fuel: Option<Sound>,
+    darkness_to_render_light_animation: f32, // Default: 0.3
+    track_particle_triggers: Option<FootstepTriggerEffectList>,
+    guns: Vec<String>, // (Names) Name of gun prototypes
 }
 
 #[derive(Clone, Debug, Error)]
