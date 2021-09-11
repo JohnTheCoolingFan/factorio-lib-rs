@@ -1540,3 +1540,24 @@ pub struct TreePrototypeVariation {
     normal: Option<Animation>,
     water_reflection: Option<WaterReflectionDefinition>
 }
+
+/// <https://wiki.factorio.com/Types/SpiderVehicleGraphicsSet>
+#[derive(Debug)]
+pub struct SpiderVehicleGraphicsSet {
+    base_animation: Option<RotatedAnimation>,
+    shadow_base_animation: Option<RotatedAnimation>,
+    animation: Option<RotatedAnimation>,
+    shadow_animation: Option<RotatedAnimation>,
+    base_render_layer: RenderLayer, // Default: "higher-object-under"
+    render_layer: RenderLayer, // Default: "wires-above"
+    autopilot_destination_visualisation_render_layer: RenderLayer, // Default: "object"
+    light: Option<LightDefinition>,
+    eye_light: Option<LightDefinition>,
+    autopilot_destination_on_map_visualisation: Option<Animation>,
+    autopilot_destination_queue_on_map_visualisation: Option<Animation>,
+    autopilot_destination_visualisation: Option<Animation>,
+    autopilot_destination_queue_visualisation: Option<Animation>,
+    autopilot_path_visualisation_line_width: f32, // Default: 0.125
+    autopilot_path_visualisation_on_map_line_width: f32, // Default: 2.0
+    light_positions: Vec<Vec<Factorio2DVector>>
+}

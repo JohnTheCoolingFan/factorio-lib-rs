@@ -127,7 +127,9 @@ use crate::types::{
     RotatedAnimation4Way,
     AnimatedVector,
     UnitAISettings,
-    UnitAlternativeAttackingFrameSequence
+    UnitAlternativeAttackingFrameSequence,
+    SpiderVehicleGraphicsSet,
+    SpiderEnginePrototype
 };
 
 /// Shorthand for prototype category/type, used in [DataTable]
@@ -257,8 +259,8 @@ pub struct DataTable {
     cargo_wagon: PrototypeCategory<CargoWagon>,
     fluid_wagon: PrototypeCategory<FluidWagon>,
     locomotive: PrototypeCategory<Locomotive>,
-    /* Commented out until implemented
     spider_vehicle: PrototypeCategory<SpiderVehicle>,
+    /* Commented out until implemented
     wall: PrototypeCategory<Wall>,
     explosion: PrototypeCategory<Explosion>,
     flame_thrower_explosion: PrototypeCategory<FlameThrowerExplosion>,
@@ -2908,6 +2910,26 @@ pub struct Locomotive {
     front_light: Option<LightDefinition>,
     front_light_pictures: Option<RotatedSprite>,
     darkness_to_render_light_animation: f32, // Default: 0.3
+}
+
+/// <https://wiki.factorio.com/Prototype/SpiderVehicle>
+#[derive(Debug, EntityWithHealth, Vehicle)]
+pub struct SpiderVehicle {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    vehicle_base: VehicleBase,
+    energy_source: EnergySource, // Must be burner if used through `burner`, otherwise can also be void
+    inventory_size: ItemStackIndex,
+    graphics_set: SpiderVehicleGraphicsSet,
+    spider_engine: SpiderEnginePrototype,
+    height: f32,
+    chunk_exploration_radius: u32,
+    movement_energy_consumption: Energy,
+    automatic_weapon_cycling: bool,
+    chain_shooting_cooldown_modifier: f32,
+    torso_rotation_speed: f32, // Default: 1
+    trash_inventory_size: ItemStackIndex, // Default: 0
+    guns: Vec<String>, // (Names) Name of gun
 }
 
 #[derive(Clone, Debug, Error)]

@@ -1876,3 +1876,20 @@ pub struct UnitAlternativeAttackingFrameSequence {
     prepared_animation_speed: f32,
     back_to_walk_animation_speed: f32
 }
+
+/// <https://wiki.factorio.com/Types/SpiderEnginePrototype>
+#[derive(Debug)]
+pub struct SpiderEnginePrototype {
+    military_target: String, // Name of simple entity with force prototype
+    legs: Vec<SpiderLegSpecification> // Single leg is converted to Vec with one leg
+}
+
+/// <https://wiki.factorio.com/Types/SpiderLegSpecification>
+#[derive(Debug)]
+pub struct SpiderLegSpecification {
+    leg: String, // Name of SpiderLeg
+    mount_position: Factorio2DVector,
+    ground_position: Factorio2DVector,
+    blocking_legs: Vec<u32>,
+    leg_hit_the_ground_trigger: Option<TriggerEffect>
+}
