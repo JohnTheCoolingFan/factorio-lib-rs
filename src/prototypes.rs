@@ -2874,6 +2874,15 @@ pub struct ArtilleryWagon {
     cannon_barrel_light_direction: Option<Factorio3DVector>, // Only loaded if `cannon_barrel_recoil_shiftings` is loaded
 }
 
+#[derive(Debug,EntityWithHealth, Vehicle, RollingStock)]
+pub struct CargoWagon {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    vehicle_base: VehicleBase,
+    rolling_stock_base: RollingStockBase,
+    inventory_size: ItemStackIndex
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
