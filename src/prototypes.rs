@@ -2874,7 +2874,8 @@ pub struct ArtilleryWagon {
     cannon_barrel_light_direction: Option<Factorio3DVector>, // Only loaded if `cannon_barrel_recoil_shiftings` is loaded
 }
 
-#[derive(Debug,EntityWithHealth, Vehicle, RollingStock)]
+/// <https://wiki.factorio.com/Prototype/CargoWagon>
+#[derive(Debug, EntityWithHealth, Vehicle, RollingStock)]
 pub struct CargoWagon {
     name: String,
     entity_with_health_base: EntityWithHealthBase,
