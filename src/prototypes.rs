@@ -15,7 +15,8 @@ use factorio_lib_rs_derive::{
     CraftingMachine,
     FlyingRobot,
     TransportBeltConnectable,
-    Vehicle
+    Vehicle,
+    RollingStock
 };
 use crate::types::{
     ModSettingType,
@@ -2804,6 +2805,47 @@ pub struct Car {
     darkness_to_render_light_animation: f32, // Default: 0.3
     track_particle_triggers: Option<FootstepTriggerEffectList>,
     guns: Vec<String>, // (Names) Name of gun prototypes
+}
+
+/// <https://wiki.factorio.com/Prototype/RollingStock>
+#[derive(Debug)]
+pub struct RollingStockBase {
+    max_speed: f64,
+    air_resistance: f64,
+    joint_distance: f64,
+    connection_distance: f64,
+    pictures: RotatedSprite,
+    vertical_selection_shift: f64,
+    drive_over_tie_trigger: Option<TriggerEffect>,
+    tie_distance: f64, // Default: 10.0
+    back_light: Option<LightDefinition>,
+    stand_by_light: Option<LightDefinition>,
+    wheels: Option<RotatedSprite>,
+    horizontal_doors: Option<Animation>,
+    vertical_doors: Option<Animation>,
+    color: Option<Color>,
+    allow_manual_color: bool, // Default: true
+    allow_robot_dispatch_in_automatic_mode: bool, // Default: false
+}
+
+/// <https://wiki.factorio.com/Prototype/RollingStock>
+pub trait RollingStock: Vehicle {
+    fn max_speed(&self) -> f64;
+    fn air_resistance(&self) -> f64;
+    fn joint_distance(&self) -> f64;
+    fn connection_distance(&self) -> f64;
+    fn pictures(&self) -> &RotatedSprite;
+    fn vertical_selection_shift(&self) -> f64;
+    fn drive_over_tie_trigger(&self) -> &Option<TriggerEffect>;
+    fn tie_distance(&self) -> f64;
+    fn back_light(&self) -> &Option<LightDefinition>;
+    fn stand_by_light(&self) -> &Option<LightDefinition>;
+    fn wheels(&self) -> &Option<RotatedSprite>;
+    fn horizontal_doors(&self) -> &Option<Animation>;
+    fn vertical_doors(&self) -> &Option<Animation>;
+    fn color(&self) -> &Option<Color>;
+    fn allow_manual_color(&self) -> bool;
+    fn allow_robot_dispatch_in_automatic_mode(&self) -> bool;
 }
 
 #[derive(Clone, Debug, Error)]

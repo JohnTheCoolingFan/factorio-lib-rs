@@ -88,6 +88,13 @@ pub fn vehicle_macro_derive(input: TokenStream) -> TokenStream {
     impl_vehicle_macro(&ast)
 }
 
+/// <https://wiki.factorio.com/Prototype/RollingStock>
+#[proc_macro_derive(RollingStock)]
+pub fn rolling_stock_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_rolling_stock_macro(&ast)
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -443,6 +450,31 @@ fn impl_vehicle_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn minimap_representation(&self) -> &Option<Sprite> { &self.vehicle_base.minimap_representation }
             fn selected_minimap_representation(&self) -> &Option<Sprite> { &self.vehicle_base.selected_minimap_representation }
             fn allow_passengers(&self) -> bool { self.vehicle_base.allow_passengers }
+        }
+    };
+    gen.into()
+}
+
+fn impl_rolling_stock_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl RollingStock for #name {
+            fn max_speed(&self) -> f64 { self.rolling_stock_base.max_speed }
+            fn air_resistance(&self) -> f64 { self.rolling_stock_base.air_resistance }
+            fn joint_distance(&self) -> f64 { self.rolling_stock_base.joint_distance }
+            fn connection_distance(&self) -> f64 { self.rolling_stock_base.connection_distance }
+            fn pictures(&self) -> &RotatedSprite { &self.rolling_stock_base.pictures }
+            fn vertical_selection_shift(&self) -> f64 { self.rolling_stock_base.vertical_selection_shift }
+            fn drive_over_tie_trigger(&self) -> &Option<TriggerEffect> { &self.rolling_stock_base.drive_over_tie_trigger }
+            fn tie_distance(&self) -> f64 { self.rolling_stock_base.tie_distance }
+            fn back_light(&self) -> &Option<LightDefinition> { &self.rolling_stock_base.back_light }
+            fn stand_by_light(&self) -> &Option<LightDefinition> { &self.rolling_stock_base.stand_by_light }
+            fn wheels(&self) -> &Option<RotatedSprite> { &self.rolling_stock_base.wheels }
+            fn horizontal_doors(&self) -> &Option<Animation> { &self.rolling_stock_base.horizontal_doors }
+            fn vertical_doors(&self) -> &Option<Animation> { &self.rolling_stock_base.vertical_doors }
+            fn color(&self) -> &Option<Color> { &self.rolling_stock_base.color }
+            fn allow_manual_color(&self) -> bool { self.rolling_stock_base.allow_manual_color }
+            fn allow_robot_dispatch_in_automatic_mode(&self) -> bool { self.rolling_stock_base.allow_robot_dispatch_in_automatic_mode }
         }
     };
     gen.into()
