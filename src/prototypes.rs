@@ -254,9 +254,9 @@ pub struct DataTable {
     unit: PrototypeCategory<Unit>,
     car: PrototypeCategory<Car>,
     artillery_wagon: PrototypeCategory<ArtilleryWagon>,
-    /* Commented out until implemented
     cargo_wagon: PrototypeCategory<CargoWagon>,
     fluid_wagon: PrototypeCategory<FluidWagon>,
+    /* Commented out until implemented
     locomotive: PrototypeCategory<Locomotive>,
     spider_vehicle: PrototypeCategory<SpiderVehicle>,
     wall: PrototypeCategory<Wall>,
@@ -2882,6 +2882,17 @@ pub struct CargoWagon {
     vehicle_base: VehicleBase,
     rolling_stock_base: RollingStockBase,
     inventory_size: ItemStackIndex
+}
+
+/// <https://wiki.factorio.com/Prototype/FluidWagon>
+#[derive(Debug, EntityWithHealth, Vehicle, RollingStock)]
+pub struct FluidWagon {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    vehicle_base: VehicleBase,
+    rolling_stock_base: RollingStockBase,
+    capacity: f64,
+    tank_count: u8, // Default: 3 // Must be one of: 1, 2, 3
 }
 
 #[derive(Clone, Debug, Error)]
