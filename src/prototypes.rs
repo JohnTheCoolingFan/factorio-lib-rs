@@ -14,7 +14,8 @@ use factorio_lib_rs_derive::{
     Combinator,
     CraftingMachine,
     FlyingRobot,
-    TransportBeltConnectable
+    TransportBeltConnectable,
+    Vehicle
 };
 use crate::types::{
     ModSettingType,
@@ -2738,6 +2739,43 @@ pub struct Unit {
     walking_sound: Option<Sound>,
     alternative_attacking_frame_sequence: Option<UnitAlternativeAttackingFrameSequence>,
     running_sound_animation_positions: Option<Vec<f32>>, // Ignored if `walking_sound` is not defined
+}
+
+/// <https://wiki.factorio.com/Prototype/Vehicle>
+#[derive(Debug)]
+pub struct VehicleBase {
+    weight: f64, // Mus be positive
+    braking_force: f64, // Must be positive // braking_power is converted to this
+    friction_force: f64, // Must be posotove // friction is converted to this
+    energy_per_hit_point: f64,
+    terrain_friction_modifier: f32, // Default: 1 // Must be [0, 1]
+    sound_minimum_speed: f64, // Default: 1 / 60.0
+    sound_scaling_ratio: f64, // Default: 1
+    stop_trigger_speed: f64, // Default: 0
+    crash_trigger: Option<TriggerEffect>,
+    stop_trigger: Option<TriggerEffect>,
+    equipment_grid: Option<String>, // Name of equipment grid
+    minimap_representation: Option<Sprite>,
+    selected_minimap_representation: Option<Sprite>,
+    allow_passengers: bool // Default: true
+}
+
+/// <https://wiki.factorio.com/Prototype/Vehicle>
+pub trait Vehicle {
+    fn weight(&self) -> f64;
+    fn braking_force(&self) -> f64;
+    fn friction_force(&self) -> f64;
+    fn energy_per_hit_point(&self) -> f64;
+    fn terrain_friction_modifier(&self) -> f32;
+    fn sound_minimum_speed(&self) -> f64;
+    fn sound_scaling_ratio(&self) -> f64;
+    fn stop_trigger_speed(&self) -> f64;
+    fn crash_trigger(&self) -> &Option<TriggerEffect>;
+    fn stop_trigger(&self) -> &Option<TriggerEffect>;
+    fn equipment_grid(&self) -> &Option<String>;
+    fn minimap_representation(&self) -> &Option<Sprite>;
+    fn selected_minimap_representation(&self) -> &Option<Sprite>;
+    fn allow_passengers(&self) -> bool;
 }
 
 #[derive(Clone, Debug, Error)]
