@@ -429,20 +429,20 @@ fn impl_vehicle_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
         impl Vehicle for #name {
-            fn weight(&self) -> f64 { self.vehicle_base.weight };
-            fn braking_force(&self) -> f64 { self.vehicle_base.braking_force };
-            fn friction_force(&self) -> f64 { self.vehicle_base.friction_force };
-            fn energy_per_hit_point(&self) -> f64 { self.vehicle_base.energy_per_hit_point };
-            fn terrain_friction_modifier(&self) -> f32 { self.vehicle_base.terrain_friction_modifier };
-            fn sound_minimum_speed(&self) -> f64 { self.vehicle_base.sound_minimum_speed };
-            fn sound_scaling_ratio(&self) -> f64 { self.vehicle_base.sound_scaling_ratio };
-            fn stop_trigger_speed(&self) -> f64 { self.vehicle_base.stop_trigger_speed };
-            fn crash_trigger(&self) -> &Option<TriggerEffect> { &self.vehicle_base.crash_trigger };
-            fn stop_trigger(&self) -> &Option<TriggerEffect> { &self.vehicle_base.stop_trigger };
-            fn equipment_grid(&self) -> &Option<String> { &self.vehicle_base.equipment_grid };
-            fn minimap_representation(&self) -> &Option<Sprite> { &self.vehicle_base.minimap_representation };
-            fn selected_minimap_representation(&self) -> &Option<Sprite> { &self.vehicle_base.selected_minimap_representation };
-            fn allow_passengers(&self) -> bool { self.vehicle_base.allow_passengers };
+            fn weight(&self) -> f64 { self.vehicle_base.weight }
+            fn braking_force(&self) -> f64 { self.vehicle_base.braking_force }
+            fn friction_force(&self) -> f64 { self.vehicle_base.friction_force }
+            fn energy_per_hit_point(&self) -> f64 { self.vehicle_base.energy_per_hit_point }
+            fn terrain_friction_modifier(&self) -> f32 { self.vehicle_base.terrain_friction_modifier }
+            fn sound_minimum_speed(&self) -> f64 { self.vehicle_base.sound_minimum_speed }
+            fn sound_scaling_ratio(&self) -> f64 { self.vehicle_base.sound_scaling_ratio }
+            fn stop_trigger_speed(&self) -> f64 { self.vehicle_base.stop_trigger_speed }
+            fn crash_trigger(&self) -> &Option<TriggerEffect> { &self.vehicle_base.crash_trigger }
+            fn stop_trigger(&self) -> &Option<TriggerEffect> { &self.vehicle_base.stop_trigger }
+            fn equipment_grid(&self) -> &Option<String> { &self.vehicle_base.equipment_grid }
+            fn minimap_representation(&self) -> &Option<Sprite> { &self.vehicle_base.minimap_representation }
+            fn selected_minimap_representation(&self) -> &Option<Sprite> { &self.vehicle_base.selected_minimap_representation }
+            fn allow_passengers(&self) -> bool { self.vehicle_base.allow_passengers }
         }
     };
     gen.into()
