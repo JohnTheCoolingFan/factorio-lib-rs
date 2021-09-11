@@ -253,8 +253,8 @@ pub struct DataTable {
     fluid_turret: PrototypeCategory<FluidTurret>,
     unit: PrototypeCategory<Unit>,
     car: PrototypeCategory<Car>,
-    /* Commented out until implemented
     artillery_wagon: PrototypeCategory<ArtilleryWagon>,
+    /* Commented out until implemented
     cargo_wagon: PrototypeCategory<CargoWagon>,
     fluid_wagon: PrototypeCategory<FluidWagon>,
     locomotive: PrototypeCategory<Locomotive>,
@@ -2846,6 +2846,32 @@ pub trait RollingStock: Vehicle {
     fn color(&self) -> &Option<Color>;
     fn allow_manual_color(&self) -> bool;
     fn allow_robot_dispatch_in_automatic_mode(&self) -> bool;
+}
+
+/// <https://wiki.factorio.com/Prototype/ArtilleryWagon>
+#[derive(Debug, EntityWithHealth, Vehicle, RollingStock)]
+pub struct ArtilleryWagon {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    vehicle_base: VehicleBase,
+    rolling_stock_base: RollingStockBase,
+    gun: String, // Name of Prototype/Gun
+    inventory_size: ItemStackIndex, // Must be > 0
+    ammo_stack_limit: ItemCountType, // Must be > 0
+    turret_rotation_speed: f64,
+    manual_range_modifier: f64, // Must be > 0
+    disable_automatic_firing: bool, // Default: false
+    cannon_base_pictures: Option<RotatedSprite>,
+    cannon_barrel_pictures: Option<RotatedSprite>,
+    rotating_sound: Option<InterruptibleSound>,
+    rotating_stopped_sound: Option<Sound>,
+    turn_after_shooting_cooldown: u16, // Default: 0
+    cannon_parking_frame_count: u16, // Default: 0
+    cannon_parking_speed: f32, // Default: 1
+    cannon_base_shiftings: Option<Vec<Factorio2DVector>>, // Must match `cannon_base_pictures` frame count
+    cannon_barrel_recoil_shiftings: Option<Vec<Factorio3DVector>>,
+    cannon_barrel_recoil_shiftings_load_correction_matrix: Option<Vec<Factorio3DVector>>, // Only loaded if `cannon_barrel_recoil_shiftings` is loaded
+    cannon_barrel_light_direction: Option<Factorio3DVector>, // Only loaded if `cannon_barrel_recoil_shiftings` is loaded
 }
 
 #[derive(Clone, Debug, Error)]
