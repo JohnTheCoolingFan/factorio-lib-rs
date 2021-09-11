@@ -129,7 +129,8 @@ use crate::types::{
     UnitAISettings,
     UnitAlternativeAttackingFrameSequence,
     SpiderVehicleGraphicsSet,
-    SpiderEnginePrototype
+    SpiderEnginePrototype,
+    WallPictures
 };
 
 /// Shorthand for prototype category/type, used in [DataTable]
@@ -260,8 +261,8 @@ pub struct DataTable {
     fluid_wagon: PrototypeCategory<FluidWagon>,
     locomotive: PrototypeCategory<Locomotive>,
     spider_vehicle: PrototypeCategory<SpiderVehicle>,
-    /* Commented out until implemented
     wall: PrototypeCategory<Wall>,
+    /* Commented out until implemented
     explosion: PrototypeCategory<Explosion>,
     flame_thrower_explosion: PrototypeCategory<FlameThrowerExplosion>,
     fire: PrototypeCategory<FireFlame>,
@@ -2930,6 +2931,32 @@ pub struct SpiderVehicle {
     torso_rotation_speed: f32, // Default: 1
     trash_inventory_size: ItemStackIndex, // Default: 0
     guns: Vec<String>, // (Names) Name of gun
+}
+
+/// <https://wiki.factorio.com/Prototype/Wall>
+#[derive(Debug, EntityWithHealth)]
+pub struct Wall {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    pictures: WallPictures,
+    visual_merge_group: u32, // Default: 0
+    circuit_wire_connection_point: Option<WireConnectionPoint>,
+    circuit_wire_max_distance: f64, // Default: 0
+    draw_copper_wires: bool, // Default: true
+    draw_circuit_wires: bool, // Default: true
+    circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    default_output_signal: Option<SignalIDConnector>,
+    wall_diode_green: Option<Sprite4Way>,
+    wall_diode_red: Option<Sprite4Way>,
+    wall_diode_green_light_top: Option<LightDefinition>,
+    wall_diode_green_light_right: Option<LightDefinition>,
+    wall_diode_green_light_bottom: Option<LightDefinition>,
+    wall_diode_green_light_left: Option<LightDefinition>,
+    wall_diode_red_light_top: Option<LightDefinition>,
+    wall_diode_red_light_right: Option<LightDefinition>,
+    wall_diode_red_light_bottom: Option<LightDefinition>,
+    wall_diode_red_light_left: Option<LightDefinition>,
+    connected_gate_visualization: Option<Sprite>
 }
 
 #[derive(Clone, Debug, Error)]

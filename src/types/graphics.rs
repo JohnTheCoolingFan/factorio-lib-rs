@@ -1561,3 +1561,19 @@ pub struct SpiderVehicleGraphicsSet {
     autopilot_path_visualisation_on_map_line_width: f32, // Default: 2.0
     light_positions: Vec<Vec<Factorio2DVector>>
 }
+
+/// <https://wiki.factorio.com/Prototype/Wall#pictures>
+#[derive(Debug)]
+pub struct WallPictures {
+    single: SpriteVariations,
+    straight_vertical: SpriteVariations,
+    straight_horizontal: SpriteVariations,
+    corner_right_down: SpriteVariations,
+    corner_left_down: SpriteVariations,
+    t_up: SpriteVariations,
+    ending_right: SpriteVariations,
+    ending_left: SpriteVariations,
+    filling: Option<SpriteVariations>,
+    water_connection_patch: Option<Sprite4Way>,
+    gate_connection_patch: Option<Sprite4Way>
+}
