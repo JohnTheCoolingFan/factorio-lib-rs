@@ -14,6 +14,9 @@ use thiserror::Error;
 use std::io::Read;
 use serde::Deserialize;
 
+// Credit for the most part goes to raiguard's factorio_mod_manager
+// https://github.com/raiguard/factorio_mod_manager
+
 #[derive(Debug, PartialEq)]
 pub struct ModDependency {
     pub dep_type: ModDependencyType,
