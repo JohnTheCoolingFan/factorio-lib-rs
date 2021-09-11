@@ -2,9 +2,10 @@ use std::str::FromStr;
 use std::fmt;
 use crate::prototypes::PrototypesErr;
 
+/// Enum for all Prototype types available in the game
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
 pub enum PrototypeType {
-    // General prototypes
+    // All prototypes
     AmbientSound,
     Animation,
     EditorController,
@@ -52,9 +53,6 @@ pub enum PrototypeType {
     RailRemnants,
     DeconstructibleTileProxy,
     EntityGhost,
-    // For migration, cannot be used
-    //EntityParticle,
-    //LeafParticle,
     Accumulator,
     ArtilleryTurret,
     Beacon,
@@ -142,7 +140,6 @@ pub enum PrototypeType {
     ResourceEntity,
     RocketSiloRocket,
     RocketSiloRocketShadow,
-    //SimpleSmoke, // note: for migration, cannot be used.
     SmokeWithTrigger,
     SpeechBubble,
     Sticker,
@@ -180,7 +177,6 @@ pub enum PrototypeType {
     SpidertronRemote,
     Tool,
     Armor,
-    //MiningTool, // note: for migration, cannot be used.
     RepairTool,
     ItemGroup,
     ItemSubGroup,
@@ -201,13 +197,14 @@ pub enum PrototypeType {
     UtilitySounds,
     UtilitySprites,
     VirtualSignal,
-    // Setting types
+    // Mod setting prototypes
     BoolSetting,
     IntSetting,
     DoubleSetting,
     StringSetting
 }
 
+// Conversion to string
 impl fmt::Display for PrototypeType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", match &self {
@@ -345,7 +342,6 @@ impl fmt::Display for PrototypeType {
             PrototypeType::ResourceEntity => "resource",
             PrototypeType::RocketSiloRocket => "rocket-silo-rocket",
             PrototypeType::RocketSiloRocketShadow => "rocket-silo-rocket-shadow",
-            //PrototypeType::SimpleSmoke => "smoke",
             PrototypeType::SmokeWithTrigger => "smoke-with-trigger",
             PrototypeType::SpeechBubble => "speech-bubble",
             PrototypeType::Sticker => "sticker",
@@ -383,7 +379,6 @@ impl fmt::Display for PrototypeType {
             PrototypeType::SpidertronRemote => "spidertron-remote",
             PrototypeType::Tool => "tool",
             PrototypeType::Armor => "armor",
-            //PrototypeType::MiningTool => "mining-tool",
             PrototypeType::RepairTool => "repair-tool",
             PrototypeType::ItemGroup => "item-group",
             PrototypeType::ItemSubGroup => "item-subgroup",
@@ -412,6 +407,7 @@ impl fmt::Display for PrototypeType {
     }
 }
 
+// Conversion from string
 impl FromStr for PrototypeType {
     type Err = PrototypesErr;
 
@@ -551,7 +547,6 @@ impl FromStr for PrototypeType {
             "resource" => Ok(PrototypeType::ResourceEntity),
             "rocket-silo-rocket" => Ok(PrototypeType::RocketSiloRocket),
             "rocket-silo-rocket-shadow" => Ok(PrototypeType::RocketSiloRocketShadow),
-            //"smoke" => Ok(PrototypeType::SimpleSmoke),
             "smoke-with-trigger" => Ok(PrototypeType::SmokeWithTrigger),
             "speech-bubble" => Ok(PrototypeType::SpeechBubble),
             "sticker" => Ok(PrototypeType::Sticker),
@@ -589,7 +584,6 @@ impl FromStr for PrototypeType {
             "spidertron-remote" => Ok(PrototypeType::SpidertronRemote),
             "tool" => Ok(PrototypeType::Tool),
             "armor" => Ok(PrototypeType::Armor),
-            //"mining-tool" => Ok(PrototypeType::MiningTool),
             "repair-tool" => Ok(PrototypeType::RepairTool),
             "item-group" => Ok(PrototypeType::ItemGroup),
             "item-subgroup" => Ok(PrototypeType::ItemSubGroup),
