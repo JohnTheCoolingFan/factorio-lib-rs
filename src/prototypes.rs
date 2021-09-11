@@ -256,8 +256,8 @@ pub struct DataTable {
     artillery_wagon: PrototypeCategory<ArtilleryWagon>,
     cargo_wagon: PrototypeCategory<CargoWagon>,
     fluid_wagon: PrototypeCategory<FluidWagon>,
-    /* Commented out until implemented
     locomotive: PrototypeCategory<Locomotive>,
+    /* Commented out until implemented
     spider_vehicle: PrototypeCategory<SpiderVehicle>,
     wall: PrototypeCategory<Wall>,
     explosion: PrototypeCategory<Explosion>,
@@ -2893,6 +2893,21 @@ pub struct FluidWagon {
     rolling_stock_base: RollingStockBase,
     capacity: f64,
     tank_count: u8, // Default: 3 // Must be one of: 1, 2, 3
+}
+
+/// <https://wiki.factorio.com/Prototype/Locomotive>
+#[derive(Debug, EntityWithHealth, Vehicle, RollingStock)]
+pub struct Locomotive {
+    name: String,
+    entity_with_health_base: EntityWithHealthBase,
+    vehicle_base: VehicleBase,
+    rolling_stock_base: RollingStockBase,
+    max_power: Energy,
+    reversing_power_modifier: f64,
+    energy_source: EnergySource, // Must be burner if used through `burner`, otherwise can also be void
+    front_light: Option<LightDefinition>,
+    front_light_pictures: Option<RotatedSprite>,
+    darkness_to_render_light_animation: f32, // Default: 0.3
 }
 
 #[derive(Clone, Debug, Error)]
