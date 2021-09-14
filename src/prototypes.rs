@@ -131,7 +131,9 @@ use crate::types::{
     UnitAlternativeAttackingFrameSequence,
     SpiderVehicleGraphicsSet,
     SpiderEnginePrototype,
-    WallPictures
+    WallPictures,
+    FireFlameBurntPatchAlphaVariation,
+    DamagePrototype
 };
 
 /// Shorthand for prototype category/type, used in [DataTable]
@@ -265,8 +267,8 @@ pub struct DataTable {
     wall: PrototypeCategory<Wall>,
     explosion: PrototypeCategory<Explosion>,
     flame_thrower_explosion: PrototypeCategory<FlameThrowerExplosion>,
-    /* Commented out until implemented
     fire: PrototypeCategory<FireFlame>,
+    /* Commented out until implemented
     stream: PrototypeCategory<FluidStream>,
     flying_text: PrototypeCategory<Flyingtext>,
     higlight_box: PrototypeCategory<HighlightBoxEntity>,
@@ -3034,6 +3036,60 @@ pub struct FlameThrowerExplosion {
     scale_initial_deviation: f32, // Default: 0
     scale: f32, // Default: 1
     scale_deviation: f32, // Default: 0
+}
+
+/// <https://wiki.factorio.com/Prototype/FireFlame>
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct FireFlame {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    damage_per_tick: DamagePrototype,
+    spread_delay: u32,
+    spread_delay_deviation: u32,
+    render_layer: RenderLayer, // Default: "object"
+    initial_render_layer: RenderLayer, // Default: "object"
+    secondary_render_layer: RenderLayer, // Default: "object"
+    small_tree_fire_pictures: Option<AnimationVariations>,
+    pictures: Option<AnimationVariations>,
+    smoke_source_pictures: Option<AnimationVariations>,
+    secondary_pictures: Option<AnimationVariations>,
+    burnt_patch_pictures: Option<SpriteVariations>,
+    secondary_picture_fade_out_start: u32, // Default: 0
+    secondary_picture_fade_out_duration: u32, // Default: 30
+    spawn_entity: Option<String>, // Name of entity
+    smoke: Option<Vec<SmokeSource>>,
+    maximum_spread_count: u16, // Default: 200
+    initial_flame_count: u8, // Default: 0
+    uses_alternative_behavior: bool, // Default: false
+    limit_overlapping_particles: bool, // Default: false
+    tree_dying_factor: f32, // Default: 0
+    fade_in_duration: u32, // Default: 30
+    fade_out_duration: u32, // Default: 30
+    initial_lifetime: u32, // Default: 300
+    damage_multiplier_decrease_per_tick: f32, // Default: 0
+    damage_multiplier_increase_per_added_fuel: f32, // Default: 0
+    maximum_damage_multiplier: f32, // default: 1
+    lifetime_increase_by: u32, // Default: 20
+    lifetime_increase_cooldown: u32, // Default: 10
+    maximum_lifetime: u32, // Default: u32::MAX
+    add_fuel_cooldown: u32, // Default: 10
+    delay_between_initial_flames: u32, // Default: 10
+    smoke_fade_in_duration: u32, // Default: 30
+    smoke_fade_out_duration: u32, // Default: 30
+    on_fuel_added_action: Option<Trigger>,
+    on_damage_tick_effect: Option<Trigger>,
+    light: Option<LightDefinition>,
+    particle_alpha_blend_duration: u16, // Default: 0
+    burnt_patch_lifetime: u32, // Default: 1800
+    burnt_patch_alpha_default: f32, // Default: 1
+    // Only loaded if `uses_alternative_behavior` is false
+    particle_alpha: f32, // Default: 1
+    particle_alpha_deviation: f32, // Default: 0
+    flame_alpha: f32, // Default: 1
+    flame_alpha_deviation: f32, // Default: 0
+    //
+    burnt_patch_alpha_variations: Option<Vec<FireFlameBurntPatchAlphaVariation>>
 }
 
 #[derive(Clone, Debug, Error)]

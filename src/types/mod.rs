@@ -1893,3 +1893,10 @@ pub struct SpiderLegSpecification {
     blocking_legs: Vec<u32>,
     leg_hit_the_ground_trigger: Option<TriggerEffect>
 }
+
+/// <https://wiki.factorio.com/Prototype/FireFlame#burnt_patch_alpha_variations>
+#[derive(Debug)]
+pub struct FireFlameBurntPatchAlphaVariation {
+    tile: String, // Name of a tile
+    alpha: f32
+}
