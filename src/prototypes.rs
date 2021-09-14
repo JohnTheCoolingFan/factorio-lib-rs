@@ -136,6 +136,23 @@ use crate::types::{
     DamagePrototype
 };
 
+// TODO
+// Current prototype definitions are based off Factorio wiki, which describe prototypes
+// *definitions*, meaning how they are defined in lua code and how they are parsed.
+// However, https://lua-api.factorio.com/ has a documentation on Lua*Prototype, which seems to have
+// less prototype types than wiki. And as it turns out, runtime prototypes are less diverse than
+// data-stage. For example, entire Entity abstract prtototype *and* it's subclasses are boiled down
+// to LuaEntityPrototype, which has all the protperties (read-only).
+// So, my idea is to implement all Lua*Prototype as legit structs and reuire all its subclasses
+// (trait implementors) to be able to convert into it. Also, conversion may be done at `data` table
+// parsing, as DataTable won't likely be used for reading specific prototype types (or maybe it
+// will, I don't know). This simplifies handling of PrototypeReference and Prototype::find
+// (DataTableAccessable::find ATM), as it would require only one HashMap to be checked. There are
+// cases of PrototypeReference of type Entity (and iirc, there are no cases of referencing specific
+// entity type). Another solution would be for Entity struct to have find() method just like all
+// Prototypes that checks all its subclasses. Which isn't very efficient for simple lookup, but
+// efficient for organization/structure.
+
 /// Shorthand for prototype category/type, used in [DataTable]
 pub type PrototypeCategory<T> = HashMap<String, Rc<T>>;
 
