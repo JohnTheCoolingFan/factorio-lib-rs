@@ -63,6 +63,7 @@ use crate::types::{
     ItemToPlace,
     WaterReflectionDefinition,
     AnimationVariation,
+    AnimationVariations,
     LightAnimations,
     OrientedCliffPrototypes,
     RotatedAnimationVariation,
@@ -262,9 +263,9 @@ pub struct DataTable {
     locomotive: PrototypeCategory<Locomotive>,
     spider_vehicle: PrototypeCategory<SpiderVehicle>,
     wall: PrototypeCategory<Wall>,
-    /* Commented out until implemented
     explosion: PrototypeCategory<Explosion>,
     flame_thrower_explosion: PrototypeCategory<FlameThrowerExplosion>,
+    /* Commented out until implemented
     fire: PrototypeCategory<FireFlame>,
     stream: PrototypeCategory<FluidStream>,
     flying_text: PrototypeCategory<Flyingtext>,
@@ -2957,6 +2958,82 @@ pub struct Wall {
     wall_diode_red_light_bottom: Option<LightDefinition>,
     wall_diode_red_light_left: Option<LightDefinition>,
     connected_gate_visualization: Option<Sprite>
+}
+
+/// <https://wiki.factorio.com/Prototype/Explosion>
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct Explosion {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    animations: AnimationVariations,
+    sound: Option<Sound>,
+    smoke: Option<String>, // Name of trivial-smoke prototype // Mandatory if `smoke_count` > 0
+    height: f32, // Default: 1
+    smoke_slow_down_factor: f32, // Default: 0
+    smoke_count: u16, // Default: 0
+    rotate: bool, // Default: false
+    beam: bool, // Default: false
+    correct_rotation: bool, // Default: false
+    scale_animation_speed: bool, // Default: false
+    fade_in_duration: u8, // Default: 0
+    fade_out_duration: u8, // Default: 0
+    render_layer: RenderLayer, // Default: "explosion"
+    scale_in_duration: u8, // Default: 0
+    scale_out_duration: u8, // Default: 0
+    scale_end: f32, // Default: 1
+    scale_increment_per_tick: f32, // Default: 0
+    light_intensity_factor_initial: f32, // Default: 0
+    light_intensity_factor_final: f32, // Default: 0
+    light_size_factor_initial: f32, // Default: 0.05
+    light_size_factor_final: f32, // Default: 0.1
+    light: Option<LightDefinition>,
+    light_intensity_peak_start_progress: f32, // Default: 0
+    light_intensity_peak_end_progress: f32, // Default: 0.9
+    light_size_peak_start_progress: f32, // Default: 0.1
+    light_size_peak_end_progress: f32, // Default: 0.5
+    scale_initial: f32, // Default: 1
+    scale_initial_deviation: f32, // Default: 0
+    scale: f32, // Default: 1
+    scale_deviation: f32, // Default: 0
+}
+
+/// <https://wiki.factorio.com/Prototype/FlameThrowerExplosion>
+#[derive(Debug, Prototype, PrototypeBase, Entity)]
+pub struct FlameThrowerExplosion {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    animations: AnimationVariations,
+    sound: Option<Sound>,
+    smoke: Option<String>, // Name of trivial-smoke prototype // Mandatory if `smoke_count` > 0
+    height: f32, // Default: 1
+    smoke_slow_down_factor: f32, // Default: 0
+    smoke_count: u16, // Default: 0
+    rotate: bool, // Default: false
+    beam: bool, // Default: false
+    correct_rotation: bool, // Default: false
+    scale_animation_speed: bool, // Default: false
+    fade_in_duration: u8, // Default: 0
+    fade_out_duration: u8, // Default: 0
+    render_layer: RenderLayer, // Default: "explosion"
+    scale_in_duration: u8, // Default: 0
+    scale_out_duration: u8, // Default: 0
+    scale_end: f32, // Default: 1
+    scale_increment_per_tick: f32, // Default: 0
+    light_intensity_factor_initial: f32, // Default: 0
+    light_intensity_factor_final: f32, // Default: 0
+    light_size_factor_initial: f32, // Default: 0.05
+    light_size_factor_final: f32, // Default: 0.1
+    light: Option<LightDefinition>,
+    light_intensity_peak_start_progress: f32, // Default: 0
+    light_intensity_peak_end_progress: f32, // Default: 0.9
+    light_size_peak_start_progress: f32, // Default: 0.1
+    light_size_peak_end_progress: f32, // Default: 0.5
+    scale_initial: f32, // Default: 1
+    scale_initial_deviation: f32, // Default: 0
+    scale: f32, // Default: 1
+    scale_deviation: f32, // Default: 0
 }
 
 #[derive(Clone, Debug, Error)]
