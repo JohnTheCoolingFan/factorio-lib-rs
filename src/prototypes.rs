@@ -159,7 +159,7 @@ pub type PrototypeCategory<T> = HashMap<String, Rc<T>>;
 /// Struct representing global `data` table in lua environment
 #[derive(Debug)]
 pub struct DataTable {
-    references: Vec<Rc<dyn PrototypereferenceValidate>>,
+    references: Vec<Rc<dyn PrototypeReferenceValidate>>,
     // Prototypes
     ambient_sound: PrototypeCategory<AmbientSoundPrototype>,
     animation: PrototypeCategory<Animation>,
@@ -374,7 +374,7 @@ impl DataTable {
     /// Creates new reference and keeps track of it to later be validated through [Self::validate_references]
     pub fn new_reference<T: 'static + DataTableAccessable>(&mut self, name: String) -> Rc<PrototypeReference<T>> {
         let prot_reference = Rc::new(PrototypeReference::<T>::new(name));
-        self.references.push(Rc::clone(&prot_reference) as Rc<dyn PrototypereferenceValidate>);
+        self.references.push(Rc::clone(&prot_reference) as Rc<dyn PrototypeReferenceValidate>);
         prot_reference
     }
 
@@ -393,7 +393,7 @@ pub trait PrototypeFromLua<'lua>: Sized {
 }
 
 /// Validate PrototypeReference. Any type.
-trait PrototypereferenceValidate: fmt::Debug {
+trait PrototypeReferenceValidate: fmt::Debug {
     fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr>;
 }
 
@@ -422,7 +422,7 @@ impl<T: DataTableAccessable> PrototypeReference<T> {
     }
 }
 
-impl<T: DataTableAccessable> PrototypereferenceValidate for PrototypeReference<T> {
+impl<T: DataTableAccessable> PrototypeReferenceValidate for PrototypeReference<T> {
     /// Validates the reference
     fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr> {
         data_table.find::<T>(&self.name).map(|_| ())
