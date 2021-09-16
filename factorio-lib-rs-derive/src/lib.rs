@@ -43,56 +43,88 @@ pub fn trigger_item_base_macro_derive(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(Entity)]
 pub fn entity_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_entity_macro(&ast)
+    let mut ts = impl_entity_macro(&ast);
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
 }
 
 #[proc_macro_derive(Corpse)]
 pub fn corpse_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_corpse_macro(&ast)
+    let mut ts = impl_corpse_macro(&ast);
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
 }
 
 #[proc_macro_derive(EntityWithHealth)]
 pub fn entity_with_health_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_entity_with_health_macro(&ast)
+    let mut ts = impl_entity_with_health_macro(&ast);
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
 }
 
 #[proc_macro_derive(Combinator)]
 pub fn combinator_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_combinator_macro(&ast)
+    let mut ts = impl_combinator_macro(&ast);
+    ts.extend(impl_entity_with_health_macro(&ast));
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
 }
 
 #[proc_macro_derive(CraftingMachine)]
 pub fn crafting_machine_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_crafting_machine_macro(&ast)
+    let mut ts = impl_crafting_machine_macro(&ast);
+    ts.extend(impl_entity_with_health_macro(&ast));
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
 }
 
 #[proc_macro_derive(FlyingRobot)]
 pub fn flying_robot_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_flying_robot_macro(&ast)
+    let mut ts = impl_flying_robot_macro(&ast);
+    ts.extend(impl_entity_with_health_macro(&ast));
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
 }
 
 #[proc_macro_derive(TransportBeltConnectable)]
 pub fn transport_belt_connectable_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_transport_belt_connectable_macro(&ast)
+    let mut ts = impl_transport_belt_connectable_macro(&ast);
+    ts.extend(impl_entity_with_health_macro(&ast));
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
 }
 
 #[proc_macro_derive(Vehicle)]
 pub fn vehicle_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_vehicle_macro(&ast)
+    let mut ts = impl_vehicle_macro(&ast);
+    ts.extend(impl_entity_with_health_macro(&ast));
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
 }
 
 /// <https://wiki.factorio.com/Prototype/RollingStock>
 #[proc_macro_derive(RollingStock)]
 pub fn rolling_stock_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_rolling_stock_macro(&ast)
+    let mut ts = impl_rolling_stock_macro(&ast);
+    ts.extend(impl_vehicle_macro(&ast));
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
 }
 
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
@@ -286,60 +318,6 @@ fn impl_entity_with_health_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn integration_patch_render_layer(&self) -> RenderLayer { self.entity_with_health_base.integration_patch_render_layer }
             fn corpse(&self) -> &Vec<String> { &self.entity_with_health_base.corpse }
             fn integration_patch(&self) -> &Sprite4Way { &self.entity_with_health_base.integration_patch }
-        }
-        impl Entity for #name {
-            fn icon(&self) -> &Option<IconSpecification> { &self.entity_with_health_base.entity_base.icon }
-            fn collision_box(&self) -> BoundingBox { self.entity_with_health_base.entity_base.collision_box }
-            fn collision_mask(&self) -> CollisionMask { self.entity_with_health_base.entity_base.collision_mask }
-            fn map_generator_bounding_box(&self) -> BoundingBox { self.entity_with_health_base.entity_base.map_generator_bounding_box }
-            fn selection_box(&self) -> BoundingBox { self.entity_with_health_base.entity_base.selection_box }
-            fn drawing_box(&self) -> BoundingBox { self.entity_with_health_base.entity_base.drawing_box }
-            fn sticker_box(&self) -> BoundingBox { self.entity_with_health_base.entity_base.sticker_box }
-            fn hit_visualization_box(&self) -> BoundingBox { self.entity_with_health_base.entity_base.hit_visualization_box }
-            fn trigger_target_mask(&self) -> &Option<TriggerTargetMask> { &self.entity_with_health_base.entity_base.trigger_target_mask }
-            fn flags(&self) -> Option<EntityPrototypeFlags> { self.entity_with_health_base.entity_base.flags }
-            fn minable(&self) -> &MinableProperties { &self.entity_with_health_base.entity_base.minable }
-            fn subgroup(&self) -> &Option<String> { &self.entity_with_health_base.entity_base.subgroup }
-            fn allow_copy_paste(&self) -> bool { self.entity_with_health_base.entity_base.allow_copy_paste }
-            fn selectable_in_game(&self) -> bool { self.entity_with_health_base.entity_base.selectable_in_game }
-            fn selection_priority(&self) -> u8 { self.entity_with_health_base.entity_base.selection_priority }
-            fn remove_decoratives(&self) -> RemoveDecoratives { self.entity_with_health_base.entity_base.remove_decoratives }
-            fn emissions_per_second(&self) -> f64 { self.entity_with_health_base.entity_base.emissions_per_second }
-            fn shooting_cursor_size(&self) -> Option<f64> { self.entity_with_health_base.entity_base.shooting_cursor_size }
-            fn created_smoke(&self) -> &CreateTrivialSmokeEffectItem { &self.entity_with_health_base.entity_base.created_smoke }
-            fn working_sound(&self) -> &Option<WorkingSound> { &self.entity_with_health_base.entity_base.working_sound }
-            fn created_effect(&self) -> &Option<Trigger> { &self.entity_with_health_base.entity_base.created_effect }
-            fn build_sound(&self) -> &Option<Sound> { &self.entity_with_health_base.entity_base.build_sound }
-            fn mined_sound(&self) -> &Option<Sound> { &self.entity_with_health_base.entity_base.mined_sound }
-            fn mining_sound(&self) -> &Option<Sound> { &self.entity_with_health_base.entity_base.mining_sound }
-            fn rotated_sound(&self) -> &Option<Sound> { &self.entity_with_health_base.entity_base.rotated_sound }
-            fn vehicle_impact_sound(&self) -> &Option<Sound> { &self.entity_with_health_base.entity_base.vehicle_impact_sound }
-            fn open_sound(&self) -> &Option<Sound> { &self.entity_with_health_base.entity_base.open_sound }
-            fn close_sound(&self) -> &Option<Sound> { &self.entity_with_health_base.entity_base.close_sound }
-            fn radius_visualization_specification(&self) -> &Option<RadiusVisualizationSpecification> { &self.entity_with_health_base.entity_base.radius_visualization_specification }
-            fn build_base_evolution_requirement(&self) -> f64 { self.entity_with_health_base.entity_base.build_base_evolution_requirement }
-            fn alert_icon_shift(&self) -> Option<Factorio2DVector> { self.entity_with_health_base.entity_base.alert_icon_shift }
-            fn alert_icon_scale(&self) -> Option<f32> { self.entity_with_health_base.entity_base.alert_icon_scale }
-            fn fast_replaceable_group(&self) -> &String { &self.entity_with_health_base.entity_base.fast_replaceable_group }
-            fn next_upgrade(&self) -> &Option<String> { &self.entity_with_health_base.entity_base.next_upgrade }
-            fn placeable_by(&self) -> &Option<Vec<ItemToPlace>> { &self.entity_with_health_base.entity_base.placeable_by }
-            fn remains_when_mined(&self) -> &Option<Vec<String>> { &self.entity_with_health_base.entity_base.remains_when_mined }
-            fn additional_pastable_entities(&self) -> &Option<Vec<String>> { &self.entity_with_health_base.entity_base.additional_pastable_entities }
-            fn tile_width(&self) -> u32 { self.entity_with_health_base.entity_base.tile_width }
-            fn tile_height(&self) -> u32 { self.entity_with_health_base.entity_base.tile_height }
-            fn autoplace(&self) -> &Option<AutoplaceSpecification> { &self.entity_with_health_base.entity_base.autoplace }
-            fn map_color(&self) -> Option<Color> { self.entity_with_health_base.entity_base.map_color }
-            fn friendly_map_color(&self) -> Option<Color> { self.entity_with_health_base.entity_base.friendly_map_color }
-            fn enemy_map_color(&self) -> Option<Color> { self.entity_with_health_base.entity_base.enemy_map_color }
-            fn water_reflection(&self) -> &Option<WaterReflectionDefinition> { &self.entity_with_health_base.entity_base.water_reflection }
-        }
-        impl PrototypeBase for #name {
-            fn localised_name(&self) -> &Option<LocalisedString> { &self.entity_with_health_base.prototype_base.localised_name }
-            fn localised_description(&self) -> &Option<LocalisedString> { &self.entity_with_health_base.prototype_base.localised_description }
-            fn order(&self) -> &String { &self.entity_with_health_base.prototype_base.order }
-        }
-        impl Prototype for #name {
-            fn name(&self) -> &String { &self.name }
         }
     };
     gen.into()

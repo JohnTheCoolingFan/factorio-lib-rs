@@ -1053,7 +1053,7 @@ pub trait Entity: PrototypeBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Arrow>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct Arrow {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -1064,7 +1064,7 @@ pub struct Arrow {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryFlare>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct ArtilleryFlare {
     // map_color is mandatory
     // selection_priority default: 48
@@ -1091,7 +1091,7 @@ pub struct ArtilleryFlare {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryProjectile>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct ArtilleryProjectile {
     // Bounding box must be zero
     // map_color is mandatory
@@ -1109,7 +1109,7 @@ pub struct ArtilleryProjectile {
 }
 
 /// <https://wiki.factorio.com/Prototype/Beam>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct Beam {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -1139,7 +1139,7 @@ pub struct Beam {
 }
 
 /// <https://wiki.factorio.com/Prototype/CharacterCorpse>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct CharacterCorpse {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -1151,7 +1151,7 @@ pub struct CharacterCorpse {
 }
 
 /// <https://wiki.factorio.com/Prototype/Cliff>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct Cliff {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -1221,7 +1221,7 @@ pub trait Corpse: Entity {
 }
 
 /// <https://wiki.factorio.com/Prototype/Corpse>
-#[derive(Debug, Prototype, PrototypeBase, Entity, Corpse)]
+#[derive(Debug, Prototype, Corpse)]
 pub struct CorpsePrototype {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -1230,7 +1230,7 @@ pub struct CorpsePrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/RailRemnants>
-#[derive(Debug, Prototype, PrototypeBase, Entity, Corpse)]
+#[derive(Debug, Prototype, Corpse)]
 pub struct RailRemnants {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -1241,7 +1241,7 @@ pub struct RailRemnants {
 }
 
 /// <https://wiki.factorio.com/Prototype/DeconstructibleTileProxy>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct DeconstructibleTileProxy {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -1249,7 +1249,7 @@ pub struct DeconstructibleTileProxy {
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityGhost>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct EntityGhost {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -1261,9 +1261,6 @@ pub struct EntityGhost {
 /// <https://wiki.factorio.com/Prototype/EntityWithHealth>
 #[derive(Debug)]
 pub struct EntityWithHealthBase {
-    // Yes, this one includes PrototypeBase and Entity
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
     max_health: f32, // Default: 10
     healing_per_tick: f32, // Default: 0.001666 for Prototype/Tree, 0 for the rest
     repair_speed_multiplier: f32, // Default: 1
@@ -1305,9 +1302,11 @@ pub trait EntityWithHealth: Entity {
 }
 
 /// <https://wiki.factorio.com/Prototype/Accumulator>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Accumulator {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_source: EnergySource,
     picture: Sprite,
@@ -1326,9 +1325,11 @@ pub struct Accumulator {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryTurret>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct ArtilleryTurret {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     gun: String, // Name of a gun item
     inventory_size: u16, // Must be > 0
@@ -1355,9 +1356,11 @@ pub struct ArtilleryTurret {
 }
 
 /// <https://wiki.factorio.com/Prototype/Beacon>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Beacon {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_usage: Energy,
     energy_source: EnergySource,
@@ -1372,9 +1375,11 @@ pub struct Beacon {
 }
 
 /// <https://wiki.factorio.com/Prototype/Boiler>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Boiler {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_source: EnergySource,
     fluid_box: FluidBox,
@@ -1392,9 +1397,11 @@ pub struct Boiler {
 }
 
 /// <https://wiki.factorio.com/Prototype/BurnerGenerator>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct BurnerGenerator {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_source: EnergySource, // Emissions are ignored
     burner: EnergySource, // Must be a burner energy source
@@ -1407,9 +1414,11 @@ pub struct BurnerGenerator {
 }
 
 /// <https://wiki.factorio.com/Prototype/Character>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Character {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     mining_speed: f64,
     running_speed: f64,
@@ -1491,9 +1500,11 @@ pub trait Combinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArithmeticCombinator>
-#[derive(Debug, EntityWithHealth, Combinator)]
+#[derive(Debug, Prototype, Combinator)]
 pub struct ArithmeticCombinator {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     combinator_base: CombinatorBase,
     plus_symbol_sprites: Sprite4Way,
@@ -1510,9 +1521,11 @@ pub struct ArithmeticCombinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/DeciderCombinator>
-#[derive(Debug, EntityWithHealth, Combinator)]
+#[derive(Debug, Prototype, Combinator)]
 pub struct DeciderCombinator {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     combinator_base: CombinatorBase,
     equal_symbol_sprites: Sprite4Way,
@@ -1524,9 +1537,11 @@ pub struct DeciderCombinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstantCombinator>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct ConstantCombinator {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     item_slot_count: u32,
     sprites: Sprite4Way,
@@ -1540,9 +1555,11 @@ pub struct ConstantCombinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/Container>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Container {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     inventory_size: u16,
     picture: Sprite,
@@ -1556,9 +1573,11 @@ pub struct Container {
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticContainer>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct LogisticContainer {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     inventory_size: u16,
     picture: Option<Sprite>,
@@ -1579,9 +1598,11 @@ pub struct LogisticContainer {
 }
 
 /// <https://wiki.factorio.com/Prototype/InfinityContainer>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct InfinityContainer {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     inventory_size: u16, // Can't be 0
     picture: Option<Sprite>,
@@ -1661,9 +1682,11 @@ pub trait CraftingMachine {
 }
 
 /// <https://wiki.factorio.com/Prototype/AssemblingMachine>
-#[derive(Debug, EntityWithHealth, CraftingMachine)]
+#[derive(Debug, Prototype, CraftingMachine)]
 pub struct AssemblingMachine {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     crafting_machine_base: CraftingMachineBase,
     fixed_recipe: String, // Default: "" // Name of Recipe
@@ -1672,9 +1695,11 @@ pub struct AssemblingMachine {
 }
 
 /// <https://wiki.factorio.com/Prototype/RocketSilo>
-#[derive(Debug, EntityWithHealth, CraftingMachine)]
+#[derive(Debug, Prototype, CraftingMachine)]
 pub struct RocketSilo {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     crafting_machine_base: CraftingMachineBase,
     fixed_recipe: String, // Default: "" // Name of Recipe
@@ -1727,9 +1752,11 @@ pub struct RocketSilo {
 }
 
 /// <https://wiki.factorio.com/Prototype/Furnace>
-#[derive(Debug, EntityWithHealth, CraftingMachine)]
+#[derive(Debug, Prototype, CraftingMachine)]
 pub struct Furnace {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     crafting_machine_base: CraftingMachineBase,
     result_inventory_size: u16,
@@ -1737,9 +1764,11 @@ pub struct Furnace {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct ElectricEnergyInterface {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_source: EnergySource, // Must be electric
     energy_production: Energy, // Default: 0
@@ -1761,9 +1790,11 @@ pub enum ElectricEnergyInterfaceVisuals {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricPole>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct ElectricPole {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     pictures: RotatedSprite,
     supply_area_distance: f64, // Max value: 64
@@ -1778,9 +1809,11 @@ pub struct ElectricPole {
 }
 
 /// <https://wiki.factorio.com/Prototype/EnemySpawner>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct EnemySpawner {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     animations: Vec<AnimationVariation>,
     max_count_of_owned_units: u32,
@@ -1804,9 +1837,11 @@ pub struct EnemySpawner {
 }
 
 /// <https://wiki.factorio.com/Prototype/Fish>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Fish {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     pictures: Vec<SpriteVariation>
 }
@@ -1837,9 +1872,11 @@ pub trait FlyingRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/CombatRobot>
-#[derive(Debug, EntityWithHealth, FlyingRobot)]
+#[derive(Debug, Prototype, FlyingRobot)]
 pub struct CombatRobot {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     flying_robot_base: FlyingRobotBase,
     time_to_live: u32,
@@ -1856,10 +1893,12 @@ pub struct CombatRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstructionRobot>
-#[derive(Debug, EntityWithHealth, FlyingRobot)]
+#[derive(Debug, Prototype, FlyingRobot)]
 pub struct ConstructionRobot {
     // Must have collision box of zero
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     flying_robot_base: FlyingRobotBase,
     // RobotWithLogisticInterface
@@ -1882,10 +1921,12 @@ pub struct ConstructionRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticRobot>
-#[derive(Debug, EntityWithHealth, FlyingRobot)]
+#[derive(Debug, Prototype, FlyingRobot)]
 pub struct LogisticRobot {
     // Must have collision box of zero
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     flying_robot_base: FlyingRobotBase,
     // RobotWithLogisticInterface
@@ -1905,9 +1946,11 @@ pub struct LogisticRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/Gate>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Gate {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     vertical_animation: Animation,
     horizontal_animation: Animation,
@@ -1928,9 +1971,11 @@ pub struct Gate {
 }
 
 /// <https://wiki.factorio.com/Prototype/Generator>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Generator {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_source: EnergySource, // Must be electric
     fluid_box: FluidBox,
@@ -1948,9 +1993,11 @@ pub struct Generator {
 }
 
 /// <https://wiki.factorio.com/Prototype/HeatInterface>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct HeatInterface {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     heat_buffer: HeatBuffer,
     picture: Option<Sprite>,
@@ -1958,9 +2005,11 @@ pub struct HeatInterface {
 }
 
 /// <https://wiki.factorio.com/Prototype/HeatPipe>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct HeatPipe {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     connection_sprites: ConnectableEntityGraphics,
     heat_glow_sprites: ConnectableEntityGraphics,
@@ -1968,9 +2017,11 @@ pub struct HeatPipe {
 }
 
 /// <https://wiki.factorio.com/Prototype/Inserter>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Inserter {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     extension_speed: f64,
     rotation_speed: f64,
@@ -2005,9 +2056,11 @@ pub struct Inserter {
 }
 
 /// <https://wiki.factorio.com/Prototype/Lab>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Lab {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_usage: Energy,
     energy_source: EnergySource,
@@ -2023,9 +2076,11 @@ pub struct Lab {
 }
 
 /// <https://wiki.factorio.com/Prototype/Lamp>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Lamp {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     picture_on: Sprite,
     picture_off: Sprite,
@@ -2048,9 +2103,11 @@ pub struct Lamp {
 }
 
 /// <https://wiki.factorio.com/Prototype/LandMine>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct LandMine {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     picture_safe: Sprite,
     picture_set: Sprite,
@@ -2064,9 +2121,11 @@ pub struct LandMine {
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedContainer>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct LinkedContainer {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     inventory_size: u16, // Must be >0
     picture: Option<Sprite>,
@@ -2075,18 +2134,22 @@ pub struct LinkedContainer {
 }
 
 /// <https://wiki.factorio.com/Prototype/Market>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Market {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     picture: Sprite,
     allow_access_to_all_forces: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Prototype/MiningDrill>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct MiningDrill {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     vector_to_place_result: Factorio2DVector,
     resource_searching_radius: f64,
@@ -2114,9 +2177,11 @@ pub struct MiningDrill {
 }
 
 /// <https://wiki.factorio.com/Prototype/OffshorePump>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct OffshorePump {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     fluid_box: FluidBox,
     pumping_speed: f32, // Must be > 0
@@ -2140,9 +2205,11 @@ pub struct OffshorePump {
 }
 
 /// <https://wiki.factorio.com/Prototype/Pipe>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Pipe {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     fluid_box: FluidBox,
     horizontal_window_bounding_box: BoundingBox,
@@ -2151,9 +2218,11 @@ pub struct Pipe {
 }
 
 /// <https://wiki.factorio.com/Prototype/InfinityPipe>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct InfinityPipe {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     fluid_box: FluidBox,
     horizontal_window_bounding_box: BoundingBox,
@@ -2163,9 +2232,11 @@ pub struct InfinityPipe {
 }
 
 /// <https://wiki.factorio.com/Prototype/PipeToGround>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct PipeToGround {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     fluid_box: FluidBox,
     pictures: PipeToGroundPictures,
@@ -2173,17 +2244,21 @@ pub struct PipeToGround {
 }
 
 /// <https://wiki.factorio.com/Prototype/PlayerPort>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct PlayerPort {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     animation: Animation
 }
 
 /// <https://wiki.factorio.com/Prototype/PowerSwitch>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct PowerSwitch {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     power_on_animation: Animation,
     overlay_start: Animation,
@@ -2200,9 +2275,11 @@ pub struct PowerSwitch {
 }
 
 /// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct ProgrammableSpeaker {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_source: EnergySource, // Must be electric
     energy_usage_per_tick: Energy,
@@ -2218,9 +2295,11 @@ pub struct ProgrammableSpeaker {
 }
 
 /// <https://wiki.factorio.com/Prototype/Pump>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Pump {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     fluid_box: FluidBox,
     energy_source: EnergySource,
@@ -2241,9 +2320,11 @@ pub struct Pump {
 }
 
 /// <https://wiki.factorio.com/Prototype/Radar>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Radar {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_usage: Energy,
     energy_per_sector: Energy,
@@ -2258,9 +2339,11 @@ pub struct Radar {
 
 /// <https://wiki.factorio.com/Prototype/CurvedRail>
 /// <https://wiki.factorio.com/Prototype/Rail>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct CurvedRail {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     pictures: RailPictures,
     walking_sound: Option<Sound>,
@@ -2269,9 +2352,11 @@ pub struct CurvedRail {
 
 /// <https://wiki.factorio.com/Prototype/StraightRail>
 /// <https://wiki.factorio.com/Prototype/Rail>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct StraightRail {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     pictures: RailPictures,
     walking_sound: Option<Sound>,
@@ -2283,9 +2368,11 @@ pub struct StraightRail {
 /// Rail signals must collide with each other
 /// <https://wiki.factorio.com/Prototype/RailChainSignal>
 /// <https://wiki.factorio.com/Prototype/RailSignalBase>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct RailChainSignal {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     animation: RotatedAnimation,
     rail_piece: Option<Animation>,
@@ -2310,9 +2397,11 @@ pub struct RailChainSignal {
 /// Rail signals must collide with each other
 /// <https://wiki.factorio.com/Prototype/RailSignal>
 /// <https://wiki.factorio.com/Prototype/RailSignalBase>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct RailSignal {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     animation: RotatedAnimation,
     rail_piece: Option<Animation>,
@@ -2330,9 +2419,11 @@ pub struct RailSignal {
 }
 
 /// <https://wiki.factorio.com/Prototype/Reactor>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Reactor {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     working_light_picture: Sprite,
     heat_buffer: HeatBuffer,
@@ -2356,9 +2447,11 @@ pub struct Reactor {
 }
 
 /// <https://wiki.factorio.com/Prototype/Roboport>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Roboport {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     energy_source: EnergySource, // Must be electric or void
     energy_usage: Energy,
@@ -2405,9 +2498,11 @@ pub struct Roboport {
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntity>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct SimpleEntity {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     count_as_rock_for_filtered_deconstruction: bool, // Default: false
     render_layer: RenderLayer, // Default: "object"
@@ -2418,9 +2513,11 @@ pub struct SimpleEntity {
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntityWithOwner>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct SimpleEntityWithOwner {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     render_layer: RenderLayer, // default: "object"
     secondary_draw_order: i8, // Default: 0
@@ -2431,9 +2528,11 @@ pub struct SimpleEntityWithOwner {
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntityWithForce>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct SimpleEntityWithForce {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     render_layer: RenderLayer, // Default: "object"
     secondary_draw_order: i8, // Default: 0
@@ -2443,10 +2542,13 @@ pub struct SimpleEntityWithForce {
 }
 
 /// <https://wiki.factorio.com/Prototype/SolarPanel>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct SolarPanel {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+
     energy_source: EnergySource, // Must be electric
     picture: SpriteVariations,
     production: Energy,
@@ -2454,9 +2556,11 @@ pub struct SolarPanel {
 }
 
 /// <https://wiki.factorio.com/Prototype/SpiderLeg>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct SpiderLeg {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     part_length: f64, // Must be > 0
     initial_movement_speed: f64,
@@ -2469,9 +2573,11 @@ pub struct SpiderLeg {
 }
 
 /// <https://wiki.factorio.com/Prototype/StorageTank>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct StorageTank {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     fluid_box: FluidBox,
     window_bounding_box: BoundingBox,
@@ -2487,10 +2593,13 @@ pub struct StorageTank {
 }
 
 /// <https://wiki.factorio.com/Prototype/TrainStop>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct TrainStop {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+
     animation_ticks_per_frame: u32,
     rail_overlay_animations: Option<Animation4Way>,
     animations: Option<Animation4Way>,
@@ -2534,9 +2643,11 @@ pub trait TransportBeltConnectable {
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedBelt>
-#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+#[derive(Debug, Prototype, TransportBeltConnectable)]
 pub struct LinkedBelt {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
     structure: BeltStructureWithSideLoading,
@@ -2547,9 +2658,11 @@ pub struct LinkedBelt {
 }
 
 /// <https://wiki.factorio.com/Prototype/Loader1x1>
-#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+#[derive(Debug, Prototype, TransportBeltConnectable)]
 pub struct Loader1x1 {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
     structure: BeltStructure,
@@ -2560,9 +2673,11 @@ pub struct Loader1x1 {
 }
 
 /// <https://wiki.factorio.com/Prototype/Loader1x2>
-#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+#[derive(Debug, Prototype, TransportBeltConnectable)]
 pub struct Loader1x2 {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
     structure: BeltStructure,
@@ -2573,9 +2688,11 @@ pub struct Loader1x2 {
 }
 
 /// <https://wiki.factorio.com/Prototype/Splitter>
-#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+#[derive(Debug, Prototype, TransportBeltConnectable)]
 pub struct Splitter {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
     structure: Animation4Way,
@@ -2585,9 +2702,11 @@ pub struct Splitter {
 }
 
 /// <https://wiki.factorio.com/Prototype/TransportBelt>
-#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+#[derive(Debug, Prototype, TransportBeltConnectable)]
 pub struct TransportBelt {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
     connector_frame_sprites: TransportBeltConnectorFrame,
@@ -2602,9 +2721,11 @@ pub struct TransportBelt {
 }
 
 /// <https://wiki.factorio.com/Prototype/UndergroundBelt>
-#[derive(Debug, EntityWithHealth, TransportBeltConnectable)]
+#[derive(Debug, Prototype, TransportBeltConnectable)]
 pub struct UndergroundBelt {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
     max_distance: u8,
@@ -2614,9 +2735,11 @@ pub struct UndergroundBelt {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tree>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Tree {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     variation_weights: Option<Vec<f64>>,
     darkness_of_burnt_tree: f32, // Default: 0.5
@@ -2681,17 +2804,21 @@ pub struct TurretBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Turret>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct TurretPrototype {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     turret_base: TurretBase
 }
 
 /// <https://wiki.factorio.com/Prototype/AmmoTurret>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct AmmoTurret {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     turret_base: TurretBase,
     inventory_size: ItemStackIndex,
@@ -2700,9 +2827,11 @@ pub struct AmmoTurret {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricTurret>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct ElectricTurret {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     turret_base: TurretBase,
     energy_source: EnergySource
@@ -2710,9 +2839,11 @@ pub struct ElectricTurret {
 
 // `turret_base_has_direction` must = true
 /// <https://wiki.factorio.com/Prototype/FluidTurret>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct FluidTurret {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     turret_base: TurretBase,
     fluid_buffer_size: f32,
@@ -2736,9 +2867,11 @@ pub struct FluidTurret {
 }
 
 /// <https://wiki.factorio.com/Prototype/Unit>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Unit {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     run_animation: RotatedAnimation,
     attack_parameters: AttackParameters, // Requires animation in attack_paramaters. Requires ammo_type in attack_paramaters
@@ -2803,9 +2936,11 @@ pub trait Vehicle {
 }
 
 /// <https://wiki.factorio.com/Prototype/Car>
-#[derive(Debug, EntityWithHealth, Vehicle)]
+#[derive(Debug, Prototype, Vehicle)]
 pub struct Car {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     vehicle_base: VehicleBase,
     animation: RotatedAnimation,
@@ -2872,9 +3007,11 @@ pub trait RollingStock: Vehicle {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryWagon>
-#[derive(Debug, EntityWithHealth, Vehicle, RollingStock)]
+#[derive(Debug, Prototype, RollingStock)]
 pub struct ArtilleryWagon {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     vehicle_base: VehicleBase,
     rolling_stock_base: RollingStockBase,
@@ -2898,9 +3035,11 @@ pub struct ArtilleryWagon {
 }
 
 /// <https://wiki.factorio.com/Prototype/CargoWagon>
-#[derive(Debug, EntityWithHealth, Vehicle, RollingStock)]
+#[derive(Debug, Prototype, RollingStock)]
 pub struct CargoWagon {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     vehicle_base: VehicleBase,
     rolling_stock_base: RollingStockBase,
@@ -2908,9 +3047,11 @@ pub struct CargoWagon {
 }
 
 /// <https://wiki.factorio.com/Prototype/FluidWagon>
-#[derive(Debug, EntityWithHealth, Vehicle, RollingStock)]
+#[derive(Debug, Prototype, RollingStock)]
 pub struct FluidWagon {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     vehicle_base: VehicleBase,
     rolling_stock_base: RollingStockBase,
@@ -2919,9 +3060,11 @@ pub struct FluidWagon {
 }
 
 /// <https://wiki.factorio.com/Prototype/Locomotive>
-#[derive(Debug, EntityWithHealth, Vehicle, RollingStock)]
+#[derive(Debug, Prototype, RollingStock)]
 pub struct Locomotive {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     vehicle_base: VehicleBase,
     rolling_stock_base: RollingStockBase,
@@ -2934,9 +3077,11 @@ pub struct Locomotive {
 }
 
 /// <https://wiki.factorio.com/Prototype/SpiderVehicle>
-#[derive(Debug, EntityWithHealth, Vehicle)]
+#[derive(Debug, Prototype, Vehicle)]
 pub struct SpiderVehicle {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     vehicle_base: VehicleBase,
     energy_source: EnergySource, // Must be burner if used through `burner`, otherwise can also be void
@@ -2954,9 +3099,11 @@ pub struct SpiderVehicle {
 }
 
 /// <https://wiki.factorio.com/Prototype/Wall>
-#[derive(Debug, EntityWithHealth)]
+#[derive(Debug, Prototype, EntityWithHealth)]
 pub struct Wall {
     name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
     pictures: WallPictures,
     visual_merge_group: u32, // Default: 0
@@ -2980,7 +3127,7 @@ pub struct Wall {
 }
 
 /// <https://wiki.factorio.com/Prototype/Explosion>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct Explosion {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -3018,7 +3165,7 @@ pub struct Explosion {
 }
 
 /// <https://wiki.factorio.com/Prototype/FlameThrowerExplosion>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct FlameThrowerExplosion {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -3056,7 +3203,7 @@ pub struct FlameThrowerExplosion {
 }
 
 /// <https://wiki.factorio.com/Prototype/FireFlame>
-#[derive(Debug, Prototype, PrototypeBase, Entity)]
+#[derive(Debug, Prototype, Entity)]
 pub struct FireFlame {
     name: String,
     prototype_base: PrototypeBaseSpec,
