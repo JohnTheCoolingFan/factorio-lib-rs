@@ -353,11 +353,11 @@ pub struct DataTable {
     utility_sounds: PrototypeCategory<UtilitySounds>,
     utility_sprites: PrototypeCategory<UtilitySprites>,
     virtual_signal: PrototypeCategory<VirtualSignal>,
-    bool_setting: PrototypeCategory<BoolSetting>,
-    int_setting: PrototypeCategory<IntSetting>,
-    double_setting: PrototypeCategory<DoubleSetting>,
-    string_setting: PrototypeCategory<StringSetting>,
     */
+    bool_setting: PrototypeCategory<BoolModSetting>,
+    int_setting: PrototypeCategory<IntModSetting>,
+    double_setting: PrototypeCategory<DoubleModSetting>,
+    string_setting: PrototypeCategory<StringModSetting>,
 }
 
 impl DataTable {
