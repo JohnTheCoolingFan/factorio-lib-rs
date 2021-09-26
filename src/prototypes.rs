@@ -3333,6 +3333,32 @@ pub struct ItemRequestProxy {
     use_target_entity_alert_icon_shift: bool, // Default: true
 }
 
+/// <https://wiki.factorio.com/Prototype/ParticleSource>
+#[derive(Debug, Prototype, Entity)]
+pub struct ParticleSource {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    time_to_live: f32,
+    time_before_start: f32,
+    height: f32,
+    vertical_speed: f32,
+    horizontal_speed: f32,
+    particle_or_smoke: ParticleSourceParticleOrSmoke,
+    time_to_live_deviation: f32, // Default: 0
+    time_before_start_deviation: f32, // Default: 0
+    height_deviation: f32, // Default: 0
+    vertical_speed_deviation: f32, // Default: 0
+    horizontal_speed_deviation: f32, // Default: 0
+}
+
+/// <https://wiki.factorio.com/Prototype/ParticleSource#particle>
+#[derive(Debug)]
+pub enum ParticleSourceParticleOrSmoke {
+    Particle(String), // Name of Particle prototype
+    Smoke(Vec<SmokeSource>) // 1 or more
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
