@@ -285,8 +285,8 @@ pub struct DataTable {
     explosion: PrototypeCategory<Explosion>,
     flame_thrower_explosion: PrototypeCategory<FlameThrowerExplosion>,
     fire: PrototypeCategory<FireFlame>,
-    /* Commented out until implemented
     stream: PrototypeCategory<FluidStream>,
+    /* Commented out until implemented
     flying_text: PrototypeCategory<Flyingtext>,
     higlight_box: PrototypeCategory<HighlightBoxEntity>,
     item_entity: PrototypeCategory<ItemEntity>,
@@ -3254,6 +3254,43 @@ pub struct FireFlame {
     flame_alpha_deviation: f32, // Default: 0
     //
     burnt_patch_alpha_variations: Option<Vec<FireFlameBurntPatchAlphaVariation>>
+}
+
+/// <https://wiki.factorio.com/Prototype/FluidStream>
+#[derive(Debug, Prototype, Entity)]
+pub struct FluidStream {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    particle_spawn_interval: u16,
+    particle_horizontal_speed: f64, // Must be higher than 0 // Must be greater than `particle_horizontal_speed_deviation`
+    particle_horizontal_speed_deviation: f64,
+    particle_vertical_acceleration: f64,
+    initial_action: Option<Trigger>,
+    action: Option<Trigger>,
+    special_neutral_target_damage: Option<DamagePrototype>,
+    width: f32, // Default: 0.5
+    particle_buffer_size: u32, // Default: 20 // Must be less than 256 // So u8?
+    particle_spawn_timeout: u16, // Default: 4 * `particle_spawn_interval`
+    particle_start_alpha: f32, // Default: 1
+    particle_end_alpha: f32, // Default: 1
+    particle_start_scale: f32, // Default: 1
+    particle_alpha_per_part: f32, // Default: 1
+    particle_scale_per_part: f32, // Default: 1
+    particle_fade_out_threshold: f32, // Defayklt: 1, // Between 0 and 1
+    particle_loop_exit_threshold: f32, // Default: 0 // Between 0 and 1
+    particle_loop_frame_count: u16, // Default: 1 // If less than 1, force 1
+    particle_fade_out_duration: u16, // Default: u16::MAX // If less than 1, force 1
+    spine_animation: Option<Animation>,
+    particle: Option<Animation>,
+    shadow: Option<Animation>,
+    smoke_sources: Option<Vec<SmokeSource>>,
+    progress_to_create_smoke: f32, // Default: 0.5
+    stream_light: Option<LightDefinition>,
+    ground_light: Option<LightDefinition>,
+    target_position_deviation: f64, // Default: 0
+    oriented_particle: bool, // Default: false
+    shadow_scale_enabled: bool, // Default: false
 }
 
 #[derive(Clone, Debug, Error)]
