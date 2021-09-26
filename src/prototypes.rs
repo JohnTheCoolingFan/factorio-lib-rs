@@ -3323,6 +3323,16 @@ pub struct ItemEntity {
     entity_base: EntityBase,
 }
 
+/// <https://wiki.factorio.com/Prototype/ItemRequestProxy>
+#[derive(Debug, Prototype, Entity)]
+pub struct ItemRequestProxy {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    picture: Sprite,
+    use_target_entity_alert_icon_shift: bool, // Default: true
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
