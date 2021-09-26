@@ -287,8 +287,7 @@ pub struct DataTable {
     flame_thrower_explosion: PrototypeCategory<FlameThrowerExplosion>,
     fire: PrototypeCategory<FireFlame>,
     stream: PrototypeCategory<FluidStream>,
-    /* Commented out until implemented
-    flying_text: PrototypeCategory<Flyingtext>,
+    flying_text: PrototypeCategory<FlyingText>,
     higlight_box: PrototypeCategory<HighlightBoxEntity>,
     item_entity: PrototypeCategory<ItemEntity>,
     item_request_proxy: PrototypeCategory<ItemRequestProxy>,
@@ -296,6 +295,7 @@ pub struct DataTable {
     projectile: PrototypeCategory<Projectile>,
     resource: PrototypeCategory<ResourceEntity>,
     rocket_silo_rocket: PrototypeCategory<RocketSiloRocket>,
+    /* Commented out until implemented
     rocket_silo_rocket_shadow: PrototypeCategory<RocketSiloRocketShadow>,
     smoke_with_trigger: PrototypeCategory<SmokeWithTrigger>,
     speech_bubble: PrototypeCategory<SpeechBubble>,

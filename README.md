@@ -135,7 +135,6 @@ Done:
 - FlameThrowerExplosion
 - FireFlame
 - FluidStream
-todo:
 - Flyingtext
 - HighlightBoxEntity
 - ItemEntity
@@ -144,6 +143,7 @@ todo:
 - Projectile
 - ResourceEntity
 - RocketSiloRocket
+todo:
 - RocketSiloRocketShadow
 - SmokeWithTrigger
 - SpeechBubble
