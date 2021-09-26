@@ -3387,6 +3387,35 @@ pub struct Projectile {
     shadow: Option<Animation>
 }
 
+/// <https://wiki.factorio.com/Prototype/ResourceEntity>
+#[derive(Debug, Prototype, Entity)]
+pub struct ResourceEntity {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    stages: AnimationVariations,
+    stage_counts: Vec<u32>,
+    infinite: bool, // Default: false
+    highlight: bool, // Default: false
+    randomize_visual_position: bool, // Default: true
+    map_grid: bool, // Default: true
+    minimum: u32, // Must be != 0 if `infinite` is true
+    normal: u32, // Must be != 0 if `infinite` is true
+    infinite_depletion_amount: u32, // Default: 1
+    resource_patch_search_radius: u32, // Default: 3
+    category: String, // Default: "basic-solid"
+    walking_sound: Option<Sound>,
+    stages_effect: Option<AnimationVariations>,
+    effect_animation_period: f32, // Default: 0
+    effect_animation_period_deviation: f32, // Default: 0
+    effect_darkness_multiplier: f32, // Default; 1
+    min_effect_alpha: f32, // Default: 0
+    max_effect_alpha: f32, // Default: 1
+    tree_removal_probability: f64, // Default: 0 // Must be positive
+    tree_removal_max_distance: f64, // Default: 0 // Must be positive when `tree_removal_probability` is set
+    mining_visualisation_tint: Color, // Default: resource map color OR white if both unset
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
