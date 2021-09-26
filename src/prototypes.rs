@@ -3305,6 +3305,15 @@ pub struct FlyingText {
     text_alignment: TextAlignment // Default: "left"
 }
 
+/// <https://wiki.factorio.com/Prototype/HighlightBoxEntity>
+#[derive(Debug, Prototype, Entity)]
+pub struct HighlightBoxEntity {
+    // Bruh
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
