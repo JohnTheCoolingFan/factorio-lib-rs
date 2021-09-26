@@ -3416,6 +3416,48 @@ pub struct ResourceEntity {
     mining_visualisation_tint: Color, // Default: resource map color OR white if both unset
 }
 
+/// <https://wiki.factorio.com/Prototype/RocketSiloRocket>
+#[derive(Debug, Prototype, Entity)]
+pub struct RocketSiloRocket {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    rocket_sprite: Sprite,
+    rocket_shadow_sprite: Sprite,
+    rocket_glare_overlay_sprite: Sprite,
+    rocket_smoke_bottom1_animation: Animation,
+    rocket_smoke_bottom2_animation: Animation,
+    rocket_smoke_top1_animation: Animation,
+    rocket_smoke_top2_animation: Animation,
+    rocket_smoke_top3_animation: Animation,
+    rocket_flame_animation: Animation,
+    rocket_flame_left_animation: Animation,
+    rocket_flame_right_animation: Animation,
+    rocket_rise_offset: Factorio2DVector,
+    rocket_flame_left_rotation: f32,
+    rocket_flame_right_rotation: f32,
+    rocket_render_layer_switch_distance: f64,
+    full_render_layer_switch_distance: f64,
+    rocket_launch_offset: Factorio2DVector,
+    effects_fade_in_start_distance: f64,
+    effects_fade_in_end_distance: f64,
+    shadow_fade_out_start_ratio: f64,
+    shadow_fade_out_end_ratio: f64,
+    rocket_visible_distance_from_center: f64,
+    rising_speed: f64,
+    engine_starting_speed: f64,
+    flying_speed: f64,
+    flying_acceleration: f64,
+    inventory_size: ItemStackIndex,
+    shadow_slave_entity: Option<String>, // Name of an entity
+    dying_explosion: Option<String>, // Name of an entity
+    glow_light: Option<LightDefinition>,
+    rocket_initial_offset: Factorio2DVector,
+    rocket_above_wires_slice_offset_from_center: f64, // Default: -3
+    rocket_air_object_slice_offset_from_center: f64, // Default: -5.5
+    flying_trigger: Option<TriggerEffect>
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
