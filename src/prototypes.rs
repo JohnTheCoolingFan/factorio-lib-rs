@@ -3314,6 +3314,15 @@ pub struct HighlightBoxEntity {
     entity_base: EntityBase,
 }
 
+/// <https://wiki.factorio.com/Prototype/ItemEntity>
+#[derive(Debug, Prototype, Entity)]
+pub struct ItemEntity {
+    // Bruh
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
