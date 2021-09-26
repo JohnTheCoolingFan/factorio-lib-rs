@@ -133,7 +133,8 @@ use crate::types::{
     SpiderEnginePrototype,
     WallPictures,
     FireFlameBurntPatchAlphaVariation,
-    DamagePrototype
+    DamagePrototype,
+    TextAlignment 
 };
 
 // TODO
@@ -3291,6 +3292,17 @@ pub struct FluidStream {
     target_position_deviation: f64, // Default: 0
     oriented_particle: bool, // Default: false
     shadow_scale_enabled: bool, // Default: false
+}
+
+/// <https://wiki.factorio.com/Prototype/FlyingText>
+#[derive(Debug, Prototype, Entity)]
+pub struct FlyingText {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    speed: f32,
+    time_to_live: u32,
+    text_alignment: TextAlignment // Default: "left"
 }
 
 #[derive(Clone, Debug, Error)]

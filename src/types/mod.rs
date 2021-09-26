@@ -1900,3 +1900,34 @@ pub struct FireFlameBurntPatchAlphaVariation {
     tile: String, // Name of a tile
     alpha: f32
 }
+
+/// <https://wiki.factorio.com/Prototype/FlyingText>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum TextAlignment {
+    Left,
+    Center,
+    Right,
+}
+
+impl FromStr for TextAlignment {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "left" => Ok(Self::Left),
+            "center" => Ok(Self::Center),
+            "right" => Ok(Self::Right),
+            _ => Err(PrototypesErr::InvalidTypeStr("TextAlignment".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for TextAlignment {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Left => "left",
+            Self::Center => "center",
+            Self::Right => "right",
+        })
+    }
+}
