@@ -3359,6 +3359,34 @@ pub enum ParticleSourceParticleOrSmoke {
     Smoke(Vec<SmokeSource>) // 1 or more
 }
 
+/// <https://wiki.factorio.com/Prototype/Projectile>
+#[derive(Debug, Prototype, Entity)]
+pub struct Projectile {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    acceleration: f64, // Must be != 0 if `turning_speed_increases_exponentially_with_projectile_spee` is true
+    animation: Option<Animation>,
+    rotatable: bool, // Default: true
+    enable_drawing_with_mask: bool, // Default: false
+    direction_only: bool, // Default: false
+    hit_at_collision_position: bool, // Default: false
+    force_condition: ForceCondition, // Default: "all"
+    piercing_damage: f32, // Default: 0
+    max_speed: f64, // Default: f64::MAX
+    turn_speed: Factorio2DVector, // Default: (1, 1)
+    speed_modifier: f32, // Default: 1
+    height: f64, // Default: 1
+    action: Option<Trigger>,
+    final_action: Option<Trigger>,
+    light: Option<LightDefinition>,
+    smoke: Vec<SmokeSource>,
+    hit_collision_mask: CollisionMask, // Default: ["player-layer", "train-layer"]
+    // This property name is insanely verbose
+    turning_speed_increases_exponentially_with_projectile_speed: bool, // Default: false
+    shadow: Option<Animation>
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
