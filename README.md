@@ -143,9 +143,9 @@ Done:
 - Projectile
 - ResourceEntity
 - RocketSiloRocket
-todo:
 - RocketSiloRocketShadow
 - SmokeWithTrigger
+todo:
 - SpeechBubble
 - Sticker
 - TileGhost

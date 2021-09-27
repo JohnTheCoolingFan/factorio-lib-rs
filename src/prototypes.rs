@@ -295,9 +295,9 @@ pub struct DataTable {
     projectile: PrototypeCategory<Projectile>,
     resource: PrototypeCategory<ResourceEntity>,
     rocket_silo_rocket: PrototypeCategory<RocketSiloRocket>,
-    /* Commented out until implemented
     rocket_silo_rocket_shadow: PrototypeCategory<RocketSiloRocketShadow>,
     smoke_with_trigger: PrototypeCategory<SmokeWithTrigger>,
+    /* Commented out until implemented
     speech_bubble: PrototypeCategory<SpeechBubble>,
     sticker: PrototypeCategory<Sticker>,
     tile_ghost: PrototypeCategory<TileGhost>,
