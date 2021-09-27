@@ -3542,6 +3542,14 @@ pub struct Sticker {
     selection_box_type: CursorBoxType, // Default: "entity"
 }
 
+/// <https://wiki.factorio.com/Prototype/TileGhost>
+#[derive(Debug, Prototype, Entity)]
+pub struct TileGhost {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
