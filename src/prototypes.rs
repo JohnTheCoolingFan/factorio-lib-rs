@@ -298,10 +298,10 @@ pub struct DataTable {
     rocket_silo_rocket: PrototypeCategory<RocketSiloRocket>,
     rocket_silo_rocket_shadow: PrototypeCategory<RocketSiloRocketShadow>,
     smoke_with_trigger: PrototypeCategory<SmokeWithTrigger>,
-    /* Commented out until implemented
     speech_bubble: PrototypeCategory<SpeechBubble>,
     sticker: PrototypeCategory<Sticker>,
     tile_ghost: PrototypeCategory<TileGhost>,
+    /* Commented out until implemented
     active_defense_equipment: PrototypeCategory<ActiveDefenseEquipment>,
     battery_equipment: PrototypeCategory<BatteryEquipment>,
     belt_immunity_equipment: PrototypeCategory<BeltImmunityEquipment>,

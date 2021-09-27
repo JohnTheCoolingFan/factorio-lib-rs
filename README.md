@@ -145,10 +145,10 @@ Done:
 - RocketSiloRocket
 - RocketSiloRocketShadow
 - SmokeWithTrigger
-todo:
 - SpeechBubble
 - Sticker
 - TileGhost
+todo:
 - ActiveDefenseEquipment
 - BatteryEquipment
 - BeltImmunityEquipment
