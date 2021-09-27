@@ -3466,6 +3466,41 @@ pub struct RocketSiloRocketShadow {
     entity_base: EntityBase
 }
 
+/// <https://wiki.factorio.com/Prototype/SmokeWithTrigger>
+#[derive(Debug, Prototype, Entity)]
+pub struct SmokeWithTrigger {
+    // Collision box must be zero
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    animation: Animation,
+    cyclic: bool, // Default: false
+    duration: u32, // Default: 0 // May not be 0 if `cyclic` is true
+    spread_duration: u32, // Default: 0
+    // `fade_in_duration` + `fade_away_duration` must be <= `duration`
+    fade_away_duration: u32, // Default: 0
+    fade_in_duration: u32, // Default: 0
+    start_scale: f64, // Default: 1
+    end_scale: f64, // Default: 1
+    color: Color, // Default: (0.375, 0.375, 0.375, 0.375) [rgba]
+    affected_by_wind: bool, // Default: true
+    show_when_smoke_off: bool, // Default: false
+    render_layer: RenderLayer, // Default: "smoke"
+    movement_slow_down_factor: f64, // Default: 0.995 // Must be [0; 1]
+    glow_fade_away_duration: u32, // Default: `fade_away_duration`
+    glow_animation: Option<Animation>,
+    action: Option<Trigger>,
+    action_cooldown: u32, // Default: 0
+    particle_count: u8, // Default: 1
+    particle_distance_scale_factor: f32, // Default: 0
+    spread_duration_variation: u32, // Default: 0
+    particle_duration_variation: u32, // Default: 0
+    particle_spread: Option<Factorio2DVector>,
+    particle_scale_factor: Option<Factorio2DVector>,
+    wave_distance: Option<Factorio2DVector>,
+    wave_speed: Option<Factorio2DVector>
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
