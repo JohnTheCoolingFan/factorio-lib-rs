@@ -1931,3 +1931,49 @@ impl fmt::Display for TextAlignment {
         })
     }
 }
+
+/// <https://wiki.factorio.com/Types/CursorBoxType>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum CursorBoxType {
+    Entity,
+    NotAllowed,
+    Electricity,
+    Pair,
+    Copy,
+    TrainVisualization,
+    Logistics,
+    BlueprintSnapRectangle,
+}
+
+impl FromStr for CursorBoxType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "entity" => Ok(Self::Entity),
+            "not-allowed" => Ok(Self::NotAllowed),
+            "electricity" => Ok(Self::Electricity),
+            "pair" => Ok(Self::Pair),
+            "copy" => Ok(Self::Copy),
+            "train-visualization" => Ok(Self::TrainVisualization),
+            "logistics" => Ok(Self::Logistics),
+            "blueprint-snap-rectangle" => Ok(Self::BlueprintSnapRectangle),
+            _ => Err(PrototypesErr::InvalidTypeStr("CursorBoxType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for CursorBoxType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Entity => "entity",
+            Self::NotAllowed => "not-allowed",
+            Self::Electricity => "electricity",
+            Self::Pair => "pair",
+            Self::Copy => "copy",
+            Self::TrainVisualization => "train-visualization",
+            Self::Logistics => "logistics",
+            Self::BlueprintSnapRectangle => "blueprint-snap-rectangle",
+        })
+    }
+}

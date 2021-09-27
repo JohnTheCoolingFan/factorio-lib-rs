@@ -134,7 +134,8 @@ use crate::types::{
     WallPictures,
     FireFlameBurntPatchAlphaVariation,
     DamagePrototype,
-    TextAlignment 
+    TextAlignment,
+    CursorBoxType
 };
 
 // TODO
@@ -3511,6 +3512,34 @@ pub struct SpeechBubble {
     wrapper_flow_style: String, // Default: "flow_style" // Needs a style of the type "flow_style", defined inside the gui styles.
     y_offset: f64, // Default: 0
     fade_in_out_ticks: u32, // Default: 60
+}
+
+/// <https://wiki.factorio.com/Prototype/Sticker>
+#[derive(Debug, Prototype, Entity)]
+pub struct Sticker {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    duration_in_ticks: u32, // Must be > 0
+    animation: Option<Animation>,
+    damage_interval: u32, // Default: 1
+    spread_fire_entity: Option<String>, // Name of an entity
+    fire_spread_cooldown: u8, // Default: 30
+    fire_spread_radius: f32, // Default: 1
+    stickers_per_square_meter: f32, // Default: 15
+    force_visibility: ForceCondition, // Default: "all"
+    single_particle: bool, // Default: false
+    damage_per_tick: Option<DamagePrototype>,
+    target_movement_modifier: f32, // Default: 1
+    target_movement_modifier_from: f32, // Default: `target_movement_modifier`
+    target_movement_modifier_to: f32, // Default: `target_movement_modifier`
+    vehicle_speed_modifier: f32, // Default: 1
+    vehicle_speed_modifier_from: f32, // Default: `vehicle_speed_modifier`
+    vehicle_speed_modifier_to: f32, // Default: `vehicle_speed_modifier`
+    vehicle_friction_modifier: f32, // Default: 1
+    vehicle_friction_modifier_from: f32, // Default: `vehicle_friction_modifier`
+    vehicle_friction_modifier_to: f32, // Default: `vehicle_friction_modifier`
+    selection_box_type: CursorBoxType, // Default: "entity"
 }
 
 #[derive(Clone, Debug, Error)]
