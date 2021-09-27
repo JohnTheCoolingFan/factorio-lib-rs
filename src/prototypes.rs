@@ -3501,6 +3501,18 @@ pub struct SmokeWithTrigger {
     wave_speed: Option<Factorio2DVector>
 }
 
+/// <https://wiki.factorio.com/Prototype/SpeechBubble>
+#[derive(Debug, Prototype, Entity)]
+pub struct SpeechBubble {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    style: String, // Needs a style of the type "speech_bubble_style", defined inside the gui styles.
+    wrapper_flow_style: String, // Default: "flow_style" // Needs a style of the type "flow_style", defined inside the gui styles.
+    y_offset: f64, // Default: 0
+    fade_in_out_ticks: u32, // Default: 60
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
