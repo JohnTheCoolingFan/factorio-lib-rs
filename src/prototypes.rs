@@ -3458,6 +3458,14 @@ pub struct RocketSiloRocket {
     flying_trigger: Option<TriggerEffect>
 }
 
+/// <https://wiki.factorio.com/Prototype/RocketSiloRocketShadow>
+#[derive(Debug, Prototype, Entity)]
+pub struct RocketSiloRocketShadow {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
