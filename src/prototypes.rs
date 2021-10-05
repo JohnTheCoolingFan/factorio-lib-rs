@@ -3624,6 +3624,16 @@ pub struct GeneratorEquipment {
     burner: Option<EnergySource> // Must be a burner
 }
 
+/// <https://wiki.factorio.com/Prototype/MovementBonusEquipment>
+#[derive(Debug, Prototype, Equipment)]
+pub struct MovementBonusEquipment {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_base: EquipmentBase,
+    energy_consumption: Energy,
+    movement_bonus: f64
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
