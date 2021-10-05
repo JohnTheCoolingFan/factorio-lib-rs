@@ -3704,6 +3704,25 @@ pub struct EquipmentGrid {
     locked: bool // Default: false
 }
 
+/// <https://wiki.factorio.com/Prototype/Fluid>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct Fluid {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    icon: IconSpecification,
+    default_temperature: f64,
+    base_color: Color,
+    flow_color: Color,
+    max_temperature: f64, // Default: `default_temperature`
+    heat_capacity: Energy, // Default: 1KJ
+    fuel_value: Energy, // Default: "0J"
+    emissions_multiplier: f64, // Default: 1
+    subgroup: String, // Default: "fluid" // Can'be empty string - either nil or a non-empty string
+    gas_temperature: f64, // Default: f64::MAX
+    hidden: bool, // Default: false
+    //auto_barrel: bool, // Default: true // Ignored by mod loader
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
