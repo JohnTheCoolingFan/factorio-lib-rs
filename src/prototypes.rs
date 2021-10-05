@@ -3677,6 +3677,15 @@ pub struct RoboportEquipment {
     power: Option<Energy>, // Mandatory if `burner` is present
 }
 
+/// <https://wiki.factorio.com/Prototype/SolarPanelEquipment>
+#[derive(Debug, Prototype, Equipment)]
+pub struct SolarPanelEquipment {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_base: EquipmentBase,
+    power: Energy
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
