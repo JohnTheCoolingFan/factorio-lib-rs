@@ -3723,6 +3723,13 @@ pub struct Fluid {
     //auto_barrel: bool, // Default: true // Ignored by mod loader
 }
 
+/// <https://wiki.factorio.com/Prototype/FuelCategory>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct FuelCategory {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
