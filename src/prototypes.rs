@@ -3558,8 +3558,8 @@ pub struct EquipmentBase {
     sprite: Sprite,
     shape: EquipmentShape,
     categories: Vec<String>, // (Names) Name of EquipmentCategory
-    energy_source: EnergySource,
-    take_result: Option<String>,
+    energy_source: EnergySource, // Must be electric
+    take_result: String, // Default: name of this prototype
     background_color: Color, // Default: value of equipment_default_background_color in the utility constants
     background_border_color: Color, // Default: value of equipment_default_background_border_color in the utility constants
     grabbed_background_color: Color, // Default: value of equipment_default_grabbed_background_color in the utility constants
@@ -3571,7 +3571,7 @@ pub trait Equipment: PrototypeBase {
     fn shape(&self) -> &EquipmentShape;
     fn categories(&self) -> &Vec<String>;
     fn energy_source(&self) -> &EnergySource;
-    fn take_result(&self) -> &Option<String>;
+    fn take_result(&self) -> &String;
     fn background_color(&self) -> &Color;
     fn background_border_color(&self) -> &Color;
     fn grabbed_background_color(&self) -> &Color;
@@ -3612,6 +3612,16 @@ pub struct EnergyShieldEquipment {
     equipment_base: EquipmentBase,
     max_shield_value: f32,
     energy_per_shield: Energy
+}
+
+/// <https://wiki.factorio.com/Prototype/GeneratorEquipment>
+#[derive(Debug, Prototype, Equipment)]
+pub struct GeneratorEquipment {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_base: EquipmentBase,
+    power: Energy,
+    burner: Option<EnergySource> // Must be a burner
 }
 
 #[derive(Clone, Debug, Error)]
