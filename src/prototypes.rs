@@ -3587,6 +3587,14 @@ pub struct ActiveDefenseEquipment {
     attack_parameters: AttackParameters
 }
 
+/// <https://wiki.factorio.com/Prototype/BatteryEquipment>
+#[derive(Debug, Prototype, Equipment)]
+pub struct BatteryEquipment {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_base: EquipmentBase,
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
