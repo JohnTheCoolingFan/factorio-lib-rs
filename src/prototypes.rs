@@ -3693,6 +3693,17 @@ pub struct EquipmentCategory {
     prototype_base: PrototypeBaseSpec,
 }
 
+/// <https://wiki.factorio.com/Prototype/EquipmentGrid>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct EquipmentGrid {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_categories: Vec<String>, // (Names) Name of Equipment category // HashSet::intersection can be used here if I were to implement it runtime
+    width: u32,
+    height: u32,
+    locked: bool // Default: false
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
