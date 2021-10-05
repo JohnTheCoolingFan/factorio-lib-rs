@@ -3648,6 +3648,35 @@ pub struct NightVisionEquipment {
     deactivate_sound: Option<Sound>
 }
 
+/// <https://wiki.factorio.com/Prototype/RoboportEquipment>
+#[derive(Debug, Prototype, Equipment)]
+pub struct RoboportEquipment {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_base: EquipmentBase,
+    recharging_animation: Animation,
+    spawn_and_station_height: f32,
+    charge_approach_distance: f32,
+    construction_radius: f32,
+    charging_energy: Energy,
+    spawn_and_station_shadow_height_offset: f32, // Default: 0
+    draw_logistic_radius_visualization: bool, // Default: true
+    draw_construction_radius_visualization: bool, // Default: true
+    recharging_light: Option<LightDefinition>,
+    charging_station_count: u32, // Default: 0
+    charging_distance: f32, // Default: 0
+    charging_station_shift: Option<Factorio2DVector>,
+    charging_threshold_distance: f32, // Default: 1
+    robot_vertical_acceleration: f32, // Default: 0.01
+    stationing_offset: Option<Factorio2DVector>,
+    robot_limit: ItemCountType, // Default: u32::MAX
+    robots_shrink_when_entering_and_exiting: bool, // Default: false
+    charging_offsets: Vec<Factorio2DVector>,
+    spawn_minimum: Energy, // Default: 0.2 * `energy_source.buffer_capacity`
+    burner: Option<EnergySource>, // Must be a burner
+    power: Option<Energy>, // Mandatory if `burner` is present
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
