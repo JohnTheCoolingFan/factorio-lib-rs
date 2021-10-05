@@ -135,7 +135,8 @@ use crate::types::{
     FireFlameBurntPatchAlphaVariation,
     DamagePrototype,
     TextAlignment,
-    CursorBoxType
+    CursorBoxType,
+    EquipmentShape
 };
 
 // TODO
@@ -3548,6 +3549,31 @@ pub struct TileGhost {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase
+}
+
+/// <https://wiki.factorio.com/Prototype/Equipment>
+#[derive(Debug)]
+pub struct EquipmentBase {
+    sprite: Sprite,
+    shape: EquipmentShape,
+    categories: Vec<String>, // (Names) Name of EquipmentCategory
+    energy_source: EnergySource,
+    take_result: Option<String>,
+    background_color: Color, // Default: value of equipment_default_background_color in the utility constants
+    background_border_color: Color, // Default: value of equipment_default_background_border_color in the utility constants
+    grabbed_background_color: Color, // Default: value of equipment_default_grabbed_background_color in the utility constants
+}
+
+/// <https://wiki.factorio.com/Prototype/Equipment>
+pub trait Equipment {
+    fn sprite(&self) -> &Sprite;
+    fn shape(&self) -> &EquipmentShape;
+    fn categories(&self) -> &Vec<String>;
+    fn energy_source(&self) -> &EnergySource;
+    fn take_result(&self) -> &Option<String>;
+    fn background_color(&self) -> &Color;
+    fn background_border_color(&self) -> &Color;
+    fn grabbed_background_color(&self) -> &Color;
 }
 
 #[derive(Clone, Debug, Error)]

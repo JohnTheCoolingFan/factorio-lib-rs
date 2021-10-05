@@ -127,6 +127,15 @@ pub fn rolling_stock_macro_derive(input: TokenStream) -> TokenStream {
     ts
 }
 
+/// <https://wiki.factorio.com/Prototype/Equipment>
+#[proc_macro_derive(Equipment)]
+pub fn equipment_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    let mut ts = impl_equipment_macro(&ast);
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -453,6 +462,23 @@ fn impl_rolling_stock_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn color(&self) -> &Option<Color> { &self.rolling_stock_base.color }
             fn allow_manual_color(&self) -> bool { self.rolling_stock_base.allow_manual_color }
             fn allow_robot_dispatch_in_automatic_mode(&self) -> bool { self.rolling_stock_base.allow_robot_dispatch_in_automatic_mode }
+        }
+    };
+    gen.into()
+}
+
+fn impl_equipment_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl Equipment for #name {
+            fn sprite(&self) -> &Sprite { &self.equipment_base.sprite }
+            fn shape(&self) -> &EquipmentShape { &self.equipment_base.shape }
+            fn categories(&self) -> &table { &self.equipment_base.categories }
+            fn energy_source(&self) -> &EnergySource { &self.equipment_base.energy_source }
+            fn take_result(&self) -> &Option<String> { &self.equipment_base.take_result }
+            fn background_color(&self) -> &Color { &self.equipment_base.background_color }
+            fn background_border_color(&self) -> &Color { &self.equipment_base.background_border_color }
+            fn grabbed_background_color(&self) -> &Color { &self.equipment_base.grabbed_background_color }
         }
     };
     gen.into()

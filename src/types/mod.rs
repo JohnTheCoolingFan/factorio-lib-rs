@@ -1977,3 +1977,45 @@ impl fmt::Display for CursorBoxType {
         })
     }
 }
+
+/// <https://wiki.factorio.com/Types/EquipmentShape>
+#[derive(Debug)]
+pub struct EquipmentShape {
+    width: u32,
+    height: u32,
+    shape_type: EquipmentShapeType,
+    points: Option<EquipmentShapePoints> // Mandatory if type is manual
+}
+
+/// <https://wiki.factorio.com/Types/EquipmentShape#type>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum EquipmentShapeType {
+    Full,
+    Manual,
+}
+
+impl FromStr for EquipmentShapeType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "full" => Ok(Self::Full),
+            "manual" => Ok(Self::Manual),
+            _ => Err(PrototypesErr::InvalidTypeStr("EquipmentShapeType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for EquipmentShapeType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Full => "full",
+            Self::Manual => "manual",
+        })
+    }
+}
+
+// Constructor should accept width and height, as points can't exceed them.
+/// <https://wiki.factorio.com/Types/EquipmentShape#points>
+#[derive(Debug)]
+pub struct EquipmentShapePoints(Vec<Vec<u32>>);
