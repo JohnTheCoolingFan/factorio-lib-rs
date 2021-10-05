@@ -138,7 +138,10 @@ use crate::types::{
     TextAlignment,
     CursorBoxType,
     EquipmentShape,
-    DaytimeColorLookupTable
+    DaytimeColorLookupTable,
+    FileName,
+    SpritePriority,
+    StyleSpecification
 };
 
 // TODO
@@ -3728,6 +3731,19 @@ pub struct Fluid {
 pub struct FuelCategory {
     name: String,
     prototype_base: PrototypeBaseSpec,
+}
+
+// Documentation is confusing, not deriving PrototypeBase because it's probably the intended way
+/// <https://wiki.factorio.com/Prototype/GuiStyle>
+#[derive(Debug, Prototype)]
+pub struct GuiStyle {
+    name: String,
+    // Some styles are mandatory
+    styles: HashMap<String, StyleSpecification>, // God damnit
+    // If it's not obious, these are optional.
+    default_tileset: FileName, // Default: ""
+    default_sprite_scale: f64, // Default: 1
+    default_sprite_priority: SpritePriority, // Default: "medium"
 }
 
 #[derive(Clone, Debug, Error)]

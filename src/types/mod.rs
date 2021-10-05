@@ -2,12 +2,14 @@ mod attack_parameters;
 mod autoplace;
 mod graphics;
 mod sound;
+mod style_specification;
 mod trigger;
 
 pub use attack_parameters::*;
 pub use autoplace::*;
 pub use graphics::*;
 pub use sound::*;
+pub use style_specification::*;
 pub use trigger::*;
 
 use std::collections::HashMap;
