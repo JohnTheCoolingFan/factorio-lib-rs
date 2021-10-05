@@ -3686,6 +3686,13 @@ pub struct SolarPanelEquipment {
     power: Energy
 }
 
+/// <https://wiki.factorio.com/Prototype/EquipmentCategory>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct EquipmentCategory {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
