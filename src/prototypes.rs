@@ -304,7 +304,6 @@ pub struct DataTable {
     speech_bubble: PrototypeCategory<SpeechBubble>,
     sticker: PrototypeCategory<Sticker>,
     tile_ghost: PrototypeCategory<TileGhost>,
-    /* Commented out until implemented
     active_defense_equipment: PrototypeCategory<ActiveDefenseEquipment>,
     battery_equipment: PrototypeCategory<BatteryEquipment>,
     belt_immunity_equipment: PrototypeCategory<BeltImmunityEquipment>,
@@ -314,6 +313,7 @@ pub struct DataTable {
     night_vision_equipment: PrototypeCategory<NightVisionEquipment>,
     roboport_equipment: PrototypeCategory<RoboportEquipment>,
     solar_panel_equipment: PrototypeCategory<SolarPanelEquipment>,
+    /* Commented out until implemented
     equipment_category: PrototypeCategory<EquipmentCategory>,
     equipment_grid: PrototypeCategory<EquipmentGrid>,
     fluid: PrototypeCategory<Fluid>,

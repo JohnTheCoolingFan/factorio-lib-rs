@@ -148,7 +148,6 @@ Done:
 - SpeechBubble
 - Sticker
 - TileGhost
-todo:
 - ActiveDefenseEquipment
 - BatteryEquipment
 - BeltImmunityEquipment
@@ -158,6 +157,7 @@ todo:
 - NightVisionEquipment
 - RoboportEquipment
 - SolarPanelEquipment
+todo:
 - EquipmentCategory
 - EquipmentGrid
 - Fluid
