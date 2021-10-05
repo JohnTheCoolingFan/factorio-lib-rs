@@ -473,7 +473,7 @@ fn impl_equipment_macro(ast: &syn::DeriveInput) -> TokenStream {
         impl Equipment for #name {
             fn sprite(&self) -> &Sprite { &self.equipment_base.sprite }
             fn shape(&self) -> &EquipmentShape { &self.equipment_base.shape }
-            fn categories(&self) -> &table { &self.equipment_base.categories }
+            fn categories(&self) -> &Vec<String> { &self.equipment_base.categories }
             fn energy_source(&self) -> &EnergySource { &self.equipment_base.energy_source }
             fn take_result(&self) -> &Option<String> { &self.equipment_base.take_result }
             fn background_color(&self) -> &Color { &self.equipment_base.background_color }

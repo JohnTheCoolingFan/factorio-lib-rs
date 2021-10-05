@@ -16,7 +16,8 @@ use factorio_lib_rs_derive::{
     FlyingRobot,
     TransportBeltConnectable,
     Vehicle,
-    RollingStock
+    RollingStock,
+    Equipment
 };
 use crate::types::{
     ModSettingType,
@@ -3565,7 +3566,7 @@ pub struct EquipmentBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Equipment>
-pub trait Equipment {
+pub trait Equipment: PrototypeBase {
     fn sprite(&self) -> &Sprite;
     fn shape(&self) -> &EquipmentShape;
     fn categories(&self) -> &Vec<String>;
@@ -3574,6 +3575,16 @@ pub trait Equipment {
     fn background_color(&self) -> &Color;
     fn background_border_color(&self) -> &Color;
     fn grabbed_background_color(&self) -> &Color;
+}
+
+/// <https://wiki.factorio.com/Prototype/ActiveDefenseEquipment>
+#[derive(Debug, Prototype, Equipment)]
+pub struct ActiveDefenseEquipment {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_base: EquipmentBase,
+    automatic: bool,
+    attack_parameters: AttackParameters
 }
 
 #[derive(Clone, Debug, Error)]
