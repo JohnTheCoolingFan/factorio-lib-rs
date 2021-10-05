@@ -2019,3 +2019,14 @@ impl fmt::Display for EquipmentShapeType {
 /// <https://wiki.factorio.com/Types/EquipmentShape#points>
 #[derive(Debug)]
 pub struct EquipmentShapePoints(Vec<Vec<u32>>);
+
+/// <https://wiki.factorio.com/Prototype/NightVisionEquipment>
+#[derive(Debug)]
+pub struct DaytimeColorLookupTable(Vec<(f64, ColorLookupTable)>);
+
+/// <https://wiki.factorio.com/Types/DaytimeColorLookupTable#Second_member>
+#[derive(Debug)]
+pub enum ColorLookupTable {
+    Identity,
+    Filename(FileName)
+}

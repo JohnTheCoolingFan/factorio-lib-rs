@@ -137,7 +137,8 @@ use crate::types::{
     DamagePrototype,
     TextAlignment,
     CursorBoxType,
-    EquipmentShape
+    EquipmentShape,
+    DaytimeColorLookupTable
 };
 
 // TODO
@@ -3632,6 +3633,19 @@ pub struct MovementBonusEquipment {
     equipment_base: EquipmentBase,
     energy_consumption: Energy,
     movement_bonus: f64
+}
+
+/// <https://wiki.factorio.com/Prototype/NightVisionEquipment>
+#[derive(Debug, Prototype, Equipment)]
+pub struct NightVisionEquipment {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_base: EquipmentBase,
+    energy_input: Energy,
+    color_lookup: DaytimeColorLookupTable,
+    darkness_to_turn_on: f32, // Default: 0.5 // Must be >= 0 and <= 1
+    activate_sound: Option<Sound>,
+    deactivate_sound: Option<Sound>
 }
 
 #[derive(Clone, Debug, Error)]
