@@ -3595,6 +3595,15 @@ pub struct BatteryEquipment {
     equipment_base: EquipmentBase,
 }
 
+/// <https://wiki.factorio.com/Prototype/BeltImmunityEquipment>
+#[derive(Debug, Prototype, Equipment)]
+pub struct BeltImmunityEquipment {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_base: EquipmentBase,
+    energy_consumption: Energy
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
