@@ -157,11 +157,11 @@ Done:
 - NightVisionEquipment
 - RoboportEquipment
 - SolarPanelEquipment
-todo:
 - EquipmentCategory
 - EquipmentGrid
 - Fluid
 - FuelCategory
+todo:
 - GuiStyle
 - Item
 - AmmoItem

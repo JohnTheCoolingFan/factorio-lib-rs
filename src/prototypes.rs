@@ -316,12 +316,12 @@ pub struct DataTable {
     night_vision_equipment: PrototypeCategory<NightVisionEquipment>,
     roboport_equipment: PrototypeCategory<RoboportEquipment>,
     solar_panel_equipment: PrototypeCategory<SolarPanelEquipment>,
-    /* Commented out until implemented
     equipment_category: PrototypeCategory<EquipmentCategory>,
     equipment_grid: PrototypeCategory<EquipmentGrid>,
     fluid: PrototypeCategory<Fluid>,
     fuel_category: PrototypeCategory<FuelCategory>,
     gui_style: PrototypeCategory<GuiStyle>,
+    /* Commented out until implemented
     item: PrototypeCategory<Item>,
     ammo: PrototypeCategory<AmmoItem>,
     capsule: PrototypeCategory<Capsule>,
