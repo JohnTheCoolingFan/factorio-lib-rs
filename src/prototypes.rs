@@ -3604,6 +3604,16 @@ pub struct BeltImmunityEquipment {
     energy_consumption: Energy
 }
 
+/// <https://wiki.factorio.com/Prototype/EnergyShieldEquipment>
+#[derive(Debug, Prototype, Equipment)]
+pub struct EnergyShieldEquipment {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    equipment_base: EquipmentBase,
+    max_shield_value: f32,
+    energy_per_shield: Energy
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
