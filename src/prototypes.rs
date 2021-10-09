@@ -3848,6 +3848,16 @@ pub struct Gun {
     attack_parameters: AttackParameters
 }
 
+/// <https://wiki.factorio.com/Prototype/ItemWithEntityData>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct ItemWithEntityData {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    icon_tintable: Option<IconSpecification>,
+    icon_tintable_mask: Option<IconSpecification>
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
