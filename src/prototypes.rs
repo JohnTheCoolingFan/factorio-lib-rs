@@ -3808,6 +3808,14 @@ pub trait Item {
     fn rocket_launch_product(&self) -> &Option<ItemProductPrototype>;
 }
 
+/// <https://wiki.factorio.com/Prototype/Item>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct ItemPrototype {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
