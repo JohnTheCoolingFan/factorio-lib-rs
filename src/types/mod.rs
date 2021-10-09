@@ -479,6 +479,7 @@ pub struct CustomCursor {
     hot_pixel_y: i16
 }
 
+// Make different constructors for variants with different field names, like `icon_tintable` in https://wiki.factorio.com/Prototype/ItemWithEntityData
 /// <https://wiki.factorio.com/Types/IconSpecification>
 #[derive(Debug)]
 pub enum IconSpecification {
