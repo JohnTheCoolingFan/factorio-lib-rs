@@ -18,7 +18,8 @@ use factorio_lib_rs_derive::{
     TransportBeltConnectable,
     Vehicle,
     RollingStock,
-    Equipment
+    Equipment,
+    Item
 };
 use crate::types::{
     ModSettingType,
@@ -142,7 +143,10 @@ use crate::types::{
     DaytimeColorLookupTable,
     FileName,
     SpritePriority,
-    StyleSpecification
+    StyleSpecification,
+    ItemProductPrototype,
+    PlaceAsTile,
+    ItemPrototypeFlags
 };
 
 // TODO
@@ -3749,6 +3753,59 @@ pub struct GuiStyle {
     default_tileset: FileName, // Default: ""
     default_sprite_scale: f64, // Default: 1
     default_sprite_priority: SpritePriority, // Default: "medium"
+}
+
+/// <https://wiki.factorio.com/Prototype/Item>
+#[derive(Debug)]
+pub struct ItemBase {
+    icon: IconSpecification,
+    stack_size: u32, // Must be 1 when "not-stackable" flag is set
+    place_result: String, // Default: "" // Name of Entity
+    placed_as_equipment_result: String, // Default: ""
+    subgroup: String, // Default: "other" // Empty text is not allowed
+    fuel_category: String, // Default: "" // Must exist when fuel_value is defined // Name of FuelCategory
+    burnt_result: String, // Default: "" // Name of Item
+    place_as_tile: Option<PlaceAsTile>,
+    pictures: Option<SpriteVariations>, // 16 max
+    flags: Option<ItemPrototypeFlags>,
+    default_request_amount: u32, // Default: `stack_size`
+    wire_count: u32, // Default: 0
+    fuel_value: Energy, // Default: "0J" // Mandatory for: `fuel_acceleration_multiplier`, `fuel_top_speed_multiplier`, `fuel_emissions_multiplier`, `fuel_glow_color`
+    fuel_acceleration_multiplier: f64, // Default: 1.0
+    fuel_top_speed_multiplier: f64, // Default: 1.0
+    fuel_emissions_multiplier: f64, // Default: 1.0
+    fuel_glow_color: Color, // Default: {r=0, g=0, b=0, a=1}
+    open_sound: Option<Sound>,
+    close_sound: Option<Sound>,
+    dark_background_icon: Option<IconSpecification>,
+    rocket_launch_products: Option<Vec<ItemProductPrototype>>,
+    rocket_launch_product: Option<ItemProductPrototype>,
+}
+
+/// <https://wiki.factorio.com/Prototype/Item>
+pub trait Item {
+    fn icon(&self) -> &IconSpecification;
+    fn stack_size(&self) -> u32;
+    fn place_result(&self) -> &String;
+    fn placed_as_equipment_result(&self) -> &String;
+    fn subgroup(&self) -> &String;
+    fn fuel_category(&self) -> &String;
+    fn burnt_result(&self) -> &String;
+    fn place_as_tile(&self) -> &Option<PlaceAsTile>;
+    fn pictures(&self) -> &Option<SpriteVariations>;
+    fn flags(&self) -> &Option<ItemPrototypeFlags>;
+    fn default_request_amount(&self) -> u32;
+    fn wire_count(&self) -> u32;
+    fn fuel_value(&self) -> Energy;
+    fn fuel_acceleration_multiplier(&self) -> f64;
+    fn fuel_top_speed_multiplier(&self) -> f64;
+    fn fuel_emissions_multiplier(&self) -> f64;
+    fn fuel_glow_color(&self) -> &Color;
+    fn open_sound(&self) -> &Option<Sound>;
+    fn close_sound(&self) -> &Option<Sound>;
+    fn dark_background_icon(&self) -> &Option<IconSpecification>;
+    fn rocket_launch_products(&self) -> &Option<Vec<ItemProductPrototype>>;
+    fn rocket_launch_product(&self) -> &Option<ItemProductPrototype>;
 }
 
 #[derive(Clone, Debug, Error)]

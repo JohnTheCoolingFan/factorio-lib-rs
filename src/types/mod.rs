@@ -2032,3 +2032,90 @@ pub enum ColorLookupTable {
     Identity,
     Filename(FileName)
 }
+
+/// <https://wiki.factorio.com/Types/PlaceAsTile>
+#[derive(Debug)]
+pub struct PlaceAsTile {
+    result: String, // Name of Tile
+    condition: CollisionMask,
+    condition_size: i32
+}
+
+/// <https://wiki.factorio.com/Types/ItemPrototypeFlags>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub struct ItemPrototypeFlags(u16);
+
+impl ItemPrototypeFlags {
+    pub const DRAW_LOGISTIC_OVERLAY: Self = Self(1);
+    pub const HIDDEN: Self = Self(1 << 1);
+    pub const ALWAYS_SHOW: Self = Self(1 << 2);
+    pub const HIDE_FROM_BONUS_GUI: Self = Self(1 << 3);
+    pub const HIDE_FROM_FUEL_TOOLTIP: Self = Self(1 << 4);
+    pub const NOT_STACKABLE: Self = Self(1 << 5);
+    pub const CAN_EXTEND_INVENTORY: Self = Self(1 << 6);
+    pub const PRIMARY_PLACE_RESULT: Self = Self(1 << 7);
+    pub const MOD_OPENABLE: Self = Self(1 << 8);
+    pub const ONLY_IN_CURSOR: Self = Self(1 << 9);
+    pub const SPAWNABLE: Self = Self(1 << 10);
+}
+
+impl From<Vec<&str>> for ItemPrototypeFlags {
+    fn from(in_arr: Vec<&str>) -> Self {
+        let mut result = Self(0);        for item in in_arr {
+            match item {
+                "draw-logistic-overlay" => result |= Self::DRAW_LOGISTIC_OVERLAY,
+                "hidden" => result |= Self::HIDDEN,
+                "always-show" => result |= Self::ALWAYS_SHOW,
+                "hide-from-bonus-gui" => result |= Self::HIDE_FROM_BONUS_GUI,
+                "hide-from-fuel-tooltip" => result |= Self::HIDE_FROM_FUEL_TOOLTIP,
+                "not-stackable" => result |= Self::NOT_STACKABLE,
+                "can-extend-inventory" => result |= Self::CAN_EXTEND_INVENTORY,
+                "primary-place-result" => result |= Self::PRIMARY_PLACE_RESULT,
+                "mod-openable" => result |= Self::MOD_OPENABLE,
+                "only-in-cursor" => result |= Self::ONLY_IN_CURSOR,
+                "spawnable" => result |= Self::SPAWNABLE,
+                _ => {}            }
+        }
+        result
+    }
+}
+
+impl BitAnd for ItemPrototypeFlags {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        Self(self.0 & rhs.0)
+    }
+}
+
+impl BitAndAssign for ItemPrototypeFlags {
+    fn bitand_assign(&mut self, rhs: Self) {
+        *self = Self(self.0 & rhs.0)
+    }
+}
+
+impl BitOr for ItemPrototypeFlags {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self(self.0 | rhs.0)
+    }
+}
+
+impl BitOrAssign for ItemPrototypeFlags {
+    fn bitor_assign(&mut self, rhs: Self) {
+        *self = Self(self.0 | rhs.0)
+    }
+}
+
+impl BitXor for ItemPrototypeFlags {
+    type Output = Self;
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        Self(self.0 ^ rhs.0)
+    }
+}
+
+impl BitXorAssign for ItemPrototypeFlags {
+    fn bitxor_assign(&mut self, rhs: Self) {
+        *self = Self(self.0 ^ rhs.0)
+    }
+}
+

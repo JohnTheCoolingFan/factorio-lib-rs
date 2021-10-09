@@ -136,6 +136,13 @@ pub fn equipment_macro_derive(input: TokenStream) -> TokenStream {
     ts
 }
 
+/// <https://wiki.factorio.com/Prototype/Item>
+#[proc_macro_derive(Item)]
+pub fn item_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_item_macro(&ast)
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -479,6 +486,37 @@ fn impl_equipment_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn background_color(&self) -> &Color { &self.equipment_base.background_color }
             fn background_border_color(&self) -> &Color { &self.equipment_base.background_border_color }
             fn grabbed_background_color(&self) -> &Color { &self.equipment_base.grabbed_background_color }
+        }
+    };
+    gen.into()
+}
+
+fn impl_item_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl Item for #name {
+            fn icon(&self) -> &IconSpecification { &self.item_base.None }
+            fn stack_size(&self) -> u32 { self.item_base.stack_size }
+            fn place_result(&self) -> &String { &self.item_base.place_result }
+            fn placed_as_equipment_result(&self) -> &String { &self.item_base.placed_as_equipment_result }
+            fn subgroup(&self) -> &String { &self.item_base.subgroup }
+            fn fuel_category(&self) -> &String { &self.item_base.fuel_category }
+            fn burnt_result(&self) -> &String { &self.item_base.burnt_result }
+            fn place_as_tile(&self) -> &Option<PlaceAsTile> { &self.item_base.place_as_tile }
+            fn pictures(&self) -> &Option<SpriteVariations> { &self.item_base.pictures }
+            fn flags(&self) -> &Option<ItemPrototypeFlags> { &self.item_base.flags }
+            fn default_request_amount(&self) -> u32 { self.item_base.default_request_amount }
+            fn wire_count(&self) -> u32 { self.item_base.wire_count }
+            fn fuel_value(&self) -> Energy { self.item_base.fuel_value }
+            fn fuel_acceleration_multiplier(&self) -> f64 { self.item_base.fuel_acceleration_multiplier }
+            fn fuel_top_speed_multiplier(&self) -> f64 { self.item_base.fuel_top_speed_multiplier }
+            fn fuel_emissions_multiplier(&self) -> f64 { self.item_base.fuel_emissions_multiplier }
+            fn fuel_glow_color(&self) -> &Color { &self.item_base.fuel_glow_color }
+            fn open_sound(&self) -> &Option<Sound> { &self.item_base.open_sound }
+            fn close_sound(&self) -> &Option<Sound> { &self.item_base.close_sound }
+            fn dark_background_icon(&self) -> &Option<IconSpecification> { &self.item_base.None }
+            fn rocket_launch_products(&self) -> &Option<Vec<ItemProductPrototype>> { &self.item_base.rocket_launch_products }
+            fn rocket_launch_product(&self) -> &Option<ItemProductPrototype> { &self.item_base.rocket_launch_product }
         }
     };
     gen.into()
