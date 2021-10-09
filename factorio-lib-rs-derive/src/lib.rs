@@ -495,7 +495,7 @@ fn impl_item_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
         impl Item for #name {
-            fn icon(&self) -> &IconSpecification { &self.item_base.None }
+            fn icon(&self) -> &IconSpecification { &self.item_base.icon }
             fn stack_size(&self) -> u32 { self.item_base.stack_size }
             fn place_result(&self) -> &String { &self.item_base.place_result }
             fn placed_as_equipment_result(&self) -> &String { &self.item_base.placed_as_equipment_result }
@@ -514,7 +514,7 @@ fn impl_item_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn fuel_glow_color(&self) -> &Color { &self.item_base.fuel_glow_color }
             fn open_sound(&self) -> &Option<Sound> { &self.item_base.open_sound }
             fn close_sound(&self) -> &Option<Sound> { &self.item_base.close_sound }
-            fn dark_background_icon(&self) -> &Option<IconSpecification> { &self.item_base.None }
+            fn dark_background_icon(&self) -> &Option<IconSpecification> { &self.item_base.dark_background_icon }
             fn rocket_launch_products(&self) -> &Option<Vec<ItemProductPrototype>> { &self.item_base.rocket_launch_products }
             fn rocket_launch_product(&self) -> &Option<ItemProductPrototype> { &self.item_base.rocket_launch_product }
         }
