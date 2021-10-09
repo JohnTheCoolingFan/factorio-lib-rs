@@ -161,13 +161,13 @@ Done:
 - EquipmentGrid
 - Fluid
 - FuelCategory
-todo:
 - GuiStyle
 - Item
 - AmmoItem
 - Capsule
 - Gun
 - ItemWithEntityData
+todo:
 - ItemWithLabel
 - ItemWithInventory
 - BlueprintBook

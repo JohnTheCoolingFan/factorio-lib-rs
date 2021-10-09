@@ -328,12 +328,12 @@ pub struct DataTable {
     fluid: PrototypeCategory<Fluid>,
     fuel_category: PrototypeCategory<FuelCategory>,
     gui_style: PrototypeCategory<GuiStyle>,
-    /* Commented out until implemented
-    item: PrototypeCategory<Item>,
+    item: PrototypeCategory<ItemPrototype>,
     ammo: PrototypeCategory<AmmoItem>,
     capsule: PrototypeCategory<Capsule>,
     gun: PrototypeCategory<Gun>,
     item_with_entity_data: PrototypeCategory<ItemWithEntityData>,
+    /* Commented out until implemented
     entity_with_label: PrototypeCategory<ItemWithLabel>,
     item_with_inventory: PrototypeCategory<ItemWithInventory>,
     blueprint_book: PrototypeCategory<BlueprintBook>,
