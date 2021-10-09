@@ -1,4 +1,5 @@
-use std::rc::Rc;
+use std::rc::{Rc, Weak};
+use std::marker::PhantomData;
 use std::collections::HashMap;
 use crate::concepts::LocalisedString;
 use thiserror::Error;
@@ -162,12 +163,12 @@ use crate::types::{
 // efficient for organization/structure.
 
 /// Shorthand for prototype category/type, used in [DataTable]
-pub type PrototypeCategory<T> = HashMap<String, Rc<T>>;
+pub type PrototypeCategory<T> = HashMap<String, T>;
 
 /// Struct representing global `data` table in lua environment
 #[derive(Debug)]
 pub struct DataTable {
-    references: Vec<Rc<dyn PrototypeReferenceValidate>>,
+    references: Vec<Weak<dyn PrototypeReferenceValidate>>,
     // Prototypes
     ambient_sound: PrototypeCategory<AmbientSoundPrototype>,
     animation: PrototypeCategory<Animation>,
@@ -370,7 +371,7 @@ pub struct DataTable {
 
 impl DataTable {
     /// Shorthand for [DataTableAccessable::find]
-    pub fn find<T: DataTableAccessable>(&self, name: &String) -> Result<&Rc<T>, PrototypesErr> {
+    pub fn find<T: DataTableAccessable>(&self, name: &String) -> Result<&T, PrototypesErr> {
         T::find(self, name)
     }
 
@@ -382,14 +383,17 @@ impl DataTable {
     /// Creates new reference and keeps track of it to later be validated through [Self::validate_references]
     pub fn new_reference<T: 'static + DataTableAccessable>(&mut self, name: String) -> Rc<PrototypeReference<T>> {
         let prot_reference = Rc::new(PrototypeReference::<T>::new(name));
-        self.references.push(Rc::clone(&prot_reference) as Rc<dyn PrototypeReferenceValidate>);
+        self.references.push(Rc::downgrade(&(prot_reference.clone() as Rc<dyn PrototypeReferenceValidate>)));
         prot_reference
     }
 
     /// Validates all tracked references.
     pub fn validate_references(&self) -> Result<(), PrototypesErr> {
         for prot_reference in &self.references {
-            prot_reference.validate(self)?
+            match prot_reference.upgrade() {
+                Some(pref) => pref.validate(self)?,
+                None => {}
+            }
         }
         Ok(())
     }
@@ -409,24 +413,25 @@ trait PrototypeReferenceValidate: fmt::Debug {
 #[derive(Debug)]
 pub struct PrototypeReference<T: DataTableAccessable> {
     name: String,
-    pub prototype: Option<Rc<T>>
+    prot: PhantomData<T>
 }
 
 impl<T: DataTableAccessable> PrototypeReference<T> {
     /// Creates new unresolved Prototype reference
     pub fn new(name: String) -> Self {
-        Self{name, prototype: None}
+        Self{name, prot: PhantomData}
     }
 
-    /// Tries to resolve prototype and remember it. Errors if prototype is not found
-    pub fn resolve(&mut self, data_table: &DataTable) -> Result<(), PrototypesErr> {
-        self.prototype = Some(data_table.find::<T>(&self.name)?.clone());
-        Ok(())
+    pub fn find<'a>(&self, data_table: &'a DataTable) -> Result<&'a T, PrototypesErr> {
+        data_table.find::<T>(&self.name)
     }
 
-    /// Checks if reference is valid. Always false if [`resolve`](Self::resolve) was never called
-    pub fn is_valid(&self) -> bool {
-        self.prototype.is_some()
+    /// Checks if reference is valid.
+    pub fn is_valid(&self, data_table: &DataTable) -> bool {
+        match self.find(data_table) as Result<&T, PrototypesErr> {
+            Ok(_) => true,
+            _ => false
+        }
     }
 }
 
@@ -452,7 +457,7 @@ pub trait Prototype: fmt::Debug {
 /// Primarily used for [`PrototypeReference`]
 pub trait DataTableAccessable: Prototype {
     /// Find prototype in [Data table](DataTable) by it's name
-    fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Rc<Self>, PrototypesErr> where Self: Sized;
+    fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr> where Self: Sized;
     /// Extend [Data table](DataTable) with this prototype
     fn extend(self, data_table: &DataTable) -> Result<(), PrototypesErr>;
 }
