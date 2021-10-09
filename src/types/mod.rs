@@ -1,5 +1,6 @@
 mod attack_parameters;
 mod autoplace;
+mod capsule_action;
 mod graphics;
 mod sound;
 mod style_specification;
@@ -7,6 +8,7 @@ mod trigger;
 
 pub use attack_parameters::*;
 pub use autoplace::*;
+pub use capsule_action::*;
 pub use graphics::*;
 pub use sound::*;
 pub use style_specification::*;

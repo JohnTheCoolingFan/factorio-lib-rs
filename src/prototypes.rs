@@ -147,7 +147,8 @@ use crate::types::{
     ItemProductPrototype,
     PlaceAsTile,
     ItemPrototypeFlags,
-    AmmoItemAmmoType
+    AmmoItemAmmoType,
+    CapsuleAction
 };
 
 // TODO
@@ -3826,6 +3827,16 @@ pub struct AmmoItem {
     ammo_type: Vec<AmmoItemAmmoType>, // if `ammo_type` field is not array - use as definition of ammotype
     magazine_size: f32, // Default: 1 // Must be >= 1
     reload_time: f32, // Default: 0 // Must be >= 0
+}
+
+/// <https://wiki.factorio.com/Prototype/Capsule>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct Capsule {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    capsule_action: CapsuleAction,
+    radius_color: Option<Color>
 }
 
 #[derive(Clone, Debug, Error)]
