@@ -3839,6 +3839,15 @@ pub struct Capsule {
     radius_color: Option<Color>
 }
 
+/// <https://wiki.factorio.com/Prototype/Gun>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct Gun {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    attack_parameters: AttackParameters
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
