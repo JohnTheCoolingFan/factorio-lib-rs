@@ -2119,3 +2119,43 @@ impl BitXorAssign for ItemPrototypeFlags {
     }
 }
 
+/// <https://wiki.factorio.com/Prototype/AmmoItem#ammo_type>
+#[derive(Debug)]
+pub struct AmmoItemAmmoType {
+    ammo_type: AmmoType,
+    source_type: AmmoSourceType
+}
+
+/// <https://wiki.factorio.com/Types/AmmoSourceType>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum AmmoSourceType {
+    Default,
+    Player,
+    Turret,
+    Vehicle,
+}
+
+impl FromStr for AmmoSourceType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "default" => Ok(Self::Default),
+            "player" => Ok(Self::Player),
+            "turret" => Ok(Self::Turret),
+            "vehicle" => Ok(Self::Vehicle),
+            _ => Err(PrototypesErr::InvalidTypeStr("AmmoSourceType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for AmmoSourceType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Default => "default",
+            Self::Player => "player",
+            Self::Turret => "turret",
+            Self::Vehicle => "vehicle",
+        })
+    }
+}
