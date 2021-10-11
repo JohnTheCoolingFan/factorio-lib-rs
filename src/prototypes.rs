@@ -4165,6 +4165,20 @@ pub struct Armor {
     inventory_size_bonus: Option<ItemStackIndex>
 }
 
+/// <https://wiki.factorio.com/Prototype/RepairTool>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct RepairTool {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    durability: f64, // Must be positive // Mandatory if `infinite` is false
+    durability_description_key: String, // Default: "description.durability-key" // May not be longer than 200 characters
+    durability_description_value: String, // Default: "description.durability-value" // May not be longer than 200 characters
+    infinite: bool, // Default: true
+    speed: f32,
+    repair_result: Option<Trigger>
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
