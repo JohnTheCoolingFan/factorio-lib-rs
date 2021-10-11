@@ -167,7 +167,6 @@ Done:
 - Capsule
 - Gun
 - ItemWithEntityData
-todo:
 - ItemWithLabel
 - ItemWithInventory
 - BlueprintBook
@@ -177,6 +176,7 @@ todo:
 - CopyPasteTool
 - DeconstructionItem
 - UpgradeItem
+todo:
 - Module
 - RailPlanner
 - SpidertronRemote

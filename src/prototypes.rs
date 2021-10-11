@@ -337,16 +337,16 @@ pub struct DataTable {
     capsule: PrototypeCategory<Capsule>,
     gun: PrototypeCategory<Gun>,
     item_with_entity_data: PrototypeCategory<ItemWithEntityData>,
-    /* Commented out until implemented
     entity_with_label: PrototypeCategory<ItemWithLabel>,
     item_with_inventory: PrototypeCategory<ItemWithInventory>,
     blueprint_book: PrototypeCategory<BlueprintBook>,
     item_with_tags: PrototypeCategory<ItemWithTags>,
-    selection_tool: PrototypeCategory<SelectionTool>,
+    selection_tool: PrototypeCategory<SelectionToolPrototype>,
     blueprint: PrototypeCategory<BlueprintItem>,
     copy_paste_tool: PrototypeCategory<CopyPasteTool>,
     deconstruction_item: PrototypeCategory<DeconstructionItem>,
     upgrade_item: PrototypeCategory<UpgradeItem>,
+    /* Commented out until implemented
     module: PrototypeCategory<Module>,
     rail_planner: PrototypeCategory<RailPlanner>,
     spidertron_remote: PrototypeCategory<SpidertronRemote>,
