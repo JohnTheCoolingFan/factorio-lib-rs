@@ -182,7 +182,6 @@ Done:
 - Tool
 - Armor
 - RepairTool
-todo:
 - ItemGroup
 - ItemSubGroup
 - ModuleCategory
@@ -193,6 +192,7 @@ todo:
 - RecipeCategory
 - ResourceCategory
 - Shortcut
+todo:
 - Technology
 - Tile
 - TipsAndTricksItem

@@ -358,7 +358,6 @@ pub struct DataTable {
     tool: PrototypeCategory<Tool>,
     armor: PrototypeCategory<Armor>,
     repair_tool: PrototypeCategory<RepairTool>,
-    /* Commented out until implemented
     item_group: PrototypeCategory<ItemGroup>,
     item_subgroup: PrototypeCategory<ItemSubGroup>,
     module_category: PrototypeCategory<ModuleCategory>,
@@ -369,6 +368,7 @@ pub struct DataTable {
     recipe_category: PrototypeCategory<RecipeCategory>,
     resource_category: PrototypeCategory<ResourceCategory>,
     shortcut: PrototypeCategory<Shortcut>,
+    /* Commented out until implemented
     technology: PrototypeCategory<Technology>,
     tile: PrototypeCategory<Tile>,
     tip_and_tricks_item: PrototypeCategory<TipsAndTricksItem>,
