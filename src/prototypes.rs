@@ -153,7 +153,8 @@ use crate::types::{
     FilterMode,
     InsertionPriorityMode,
     SelectionMode,
-    Effect
+    Effect,
+    Resistances
 };
 
 // TODO
@@ -4147,6 +4148,21 @@ pub struct Tool {
     durability_description_key: String, // Default: "description.durability-key" // May not be longer than 200 characters
     durability_description_value: String, // Default: "description.durability-value" // May not be longer than 200 characters
     infinite: bool, // Default: true
+}
+
+/// <https://wiki.factorio.com/Prototype/Armor>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct Armor {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    durability: f64, // Must be positive // Mandatory if `infinite` is false
+    durability_description_key: String, // Default: "description.durability-key" // May not be longer than 200 characters
+    durability_description_value: String, // Default: "description.durability-value" // May not be longer than 200 characters
+    infinite: bool, // Default: true
+    equipment_grid: Option<String>, // Name of EquipmentGrid
+    resistances: Option<Resistances>,
+    inventory_size_bonus: Option<ItemStackIndex>
 }
 
 #[derive(Clone, Debug, Error)]

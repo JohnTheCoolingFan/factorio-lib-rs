@@ -2335,3 +2335,7 @@ pub struct Effect {
 /// <https://wiki.factorio.com/Types/Effect#consumption>
 #[derive(Debug)]
 pub struct EffectSpec(f64); // `bonus` key // Pecision is ignored beyond two decimals: 17.567 -> 17.56
+
+/// https://wiki.factorio.com/Types/Resistances
+#[derive(Debug)]
+pub struct Resistances(Vec<Resistance>);
