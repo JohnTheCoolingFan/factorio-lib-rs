@@ -148,7 +148,9 @@ use crate::types::{
     PlaceAsTile,
     ItemPrototypeFlags,
     AmmoItemAmmoType,
-    CapsuleAction
+    CapsuleAction,
+    FilterMode,
+    InsertionPriorityMode
 };
 
 // TODO
@@ -3856,6 +3858,35 @@ pub struct ItemWithEntityData {
     item_base: ItemBase,
     icon_tintable: Option<IconSpecification>,
     icon_tintable_mask: Option<IconSpecification>
+}
+
+/// <https://wiki.factorio.com/Prototype/ItemWithLabel>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct ItemWithLabel {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    default_label_color: Color, // Default: default item text color
+    draw_label_for_cursor_render: bool, // Default: false
+}
+
+/// <https://wiki.factorio.com/Prototype/ItemWithInventory>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct ItemWithInventory {
+    // Stack size must be 1
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    default_label_color: Color, // Default: default item text color
+    draw_label_for_cursor_render: bool, // Default: false
+    inventory_size: ItemStackIndex,
+    item_filters: Vec<String>, // (Names) Name of item
+    item_group_filters: Vec<String>, // (Names) Name of item groups
+    item_subgroup_filters: Vec<String>, // (Names) Name of item subgroups
+    filter_mode: FilterMode, // Default: "whitelist" // If no filters are defined, automatically set to "none"
+    filter_message_key: String, // Default: "item-limitation.item-not-allowed-in-this-container-item" // Locale key, probably doesn't need checking
+    extends_inventory_by_default: bool, // Default: false
+    insertion_priority_mode: InsertionPriorityMode, // Default: "default"
 }
 
 #[derive(Clone, Debug, Error)]

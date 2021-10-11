@@ -2162,3 +2162,68 @@ impl fmt::Display for AmmoSourceType {
         })
     }
 }
+
+/// <https://wiki.factorio.com/Prototype/ItemWithInventory#filter_mode>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum FilterMode {
+    Whitelist,
+    Blacklist,
+    None,
+}
+
+impl FromStr for FilterMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "whitelist" => Ok(Self::Whitelist),
+            "blacklist" => Ok(Self::Blacklist),
+            "none" => Ok(Self::None),
+            _ => Err(PrototypesErr::InvalidTypeStr("FilterMode".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for FilterMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Whitelist => "whitelist",
+            Self::Blacklist => "blacklist",
+            Self::None => "none",
+        })
+    }
+}
+
+/// <https://wiki.factorio.com/Prototype/ItemWithInventory#insertion_priority_mode>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum InsertionPriorityMode {
+    Default,
+    Never,
+    Always,
+    When_Manually_Filtered,
+}
+
+impl FromStr for InsertionPriorityMode {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "default" => Ok(Self::Default),
+            "never" => Ok(Self::Never),
+            "always" => Ok(Self::Always),
+            "when_manually_filtered" => Ok(Self::When_Manually_Filtered),
+            _ => Err(PrototypesErr::InvalidTypeStr("InsertionPriorityMode".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for InsertionPriorityMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Default => "default",
+            Self::Never => "never",
+            Self::Always => "always",
+            Self::When_Manually_Filtered => "when_manually_filtered",
+        })
+    }
+}
