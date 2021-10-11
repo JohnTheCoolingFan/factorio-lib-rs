@@ -155,7 +155,8 @@ use crate::types::{
     SelectionMode,
     Effect,
     Resistances,
-    NoiseExpression
+    NoiseExpression,
+    RecipeData
 };
 
 // TODO
@@ -4240,6 +4241,22 @@ pub struct Particle {
     vertical_acceleration: f32, // Default: -0.004 // Has to be >= -0.01 and <= 0.01
     mining_particle_frame_speed: f32, // Default: 0
     fade_away_duration: u16, // Degault: `life-time`, capped to 60. If equals to 0, silently(?) changed to 1
+}
+
+/// <https://wiki.factorio.com/Prototype/Recipe>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct Recipe {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    category: String, // Default: "crafting" // Name of RecipeCategory
+    subgroup: String, // Default: subgroup of product (if only 1) or main_product if multiple. Required either.
+    icon: IconSpecification, // Mandatory for recipe with multiple products and no main_product. Defaults to icon of `main_product` or index 1
+    crafting_machine_tint: RecipeTint, // Defaults to all zeros
+    // If one difficulty defined, and otehr set to false, it sets enabled = false in other and
+    // copies other protperties. If one difficulty is not defined (set to nil) it uses other
+    // difficulty's properties. If RecipeData defined directly in table body, set only `normal`
+    normal: RecipeData,
+    expensive: Option<RecipeData>
 }
 
 #[derive(Clone, Debug, Error)]

@@ -2336,6 +2336,58 @@ pub struct Effect {
 #[derive(Debug)]
 pub struct EffectSpec(f64); // `bonus` key // Pecision is ignored beyond two decimals: 17.567 -> 17.56
 
-/// https://wiki.factorio.com/Types/Resistances
+/// <https://wiki.factorio.com/Types/Resistances>
 #[derive(Debug)]
 pub struct Resistances(Vec<Resistance>);
+
+/// <https://wiki.factorio.com/Prototype/Recipe#Recipe_data>
+#[derive(Debug)]
+pub struct RecipeData {
+    ingredients: Vec<IngredientPrototype>, // Max amount is 65535 // can be empty // Duplicates are not allowed
+    results: Vec<ProductPrototype>, // `result` and `result_count` are converted to this // Duplicate entries not allowed
+    // result_count: u32 // Default: 1
+    energy_required: f64, // Default: 0.5
+    emissions_multiplier: f64, // Default: 1
+    requester_paste_multiplier: u32, // Default: 30
+    overload_multiplier: u32, // Default: 0
+    allow_inserter_overload: bool, // Default: true
+    enabled: bool, // Default: true
+    hidden: bool, // default: false
+    hide_from_stats: bool, // Default: false
+    hide_from_player_crafting: bool, // Default: false
+    allow_decomposition: bool, // Default: true
+    allow_as_intermediate: bool, // Default: true
+    allow_intermediates: bool, // Default: true
+    always_show_made_in: bool, // Default: false
+    show_amount_in_title: bool, // Default: true
+    always_show_products: bool, // Default: false
+    unlock_results: bool, // Default: true
+    main_product: Option<String> // Name (not prototype reference) of recipe from `results`
+}
+
+/// <https://wiki.factorio.com/Types/IngredientPrototype>
+#[derive(Debug)]
+pub enum IngredientPrototype { // Determined by type
+    Item(ItemIngredientPrototype),
+    Fluid(FluidIngredientPrototype)
+}
+
+/// <https://wiki.factorio.com/Types/ItemIngredientPrototype>
+#[derive(Debug)]
+pub struct ItemIngredientPrototype {
+    name: String, // Name of Item // Also index 1
+    amount: u16, // Also index 2
+    catalyst_amount: u16, // Default: 0
+}
+
+/// <https://wiki.factorio.com/Types/FluidIngredientPrototype>
+#[derive(Debug)]
+pub struct FluidIngredientPrototype {
+    name: String, // Name of Fluid
+    amount: f64,
+    temperature: Option<f64>,
+    minimum_temperature: Option<f64>,
+    maximum_temperature: Option<f64>,
+    catalyst_amount: f64, // Default: 0
+    fluidbox_index: u32, // Default: 0
+}
