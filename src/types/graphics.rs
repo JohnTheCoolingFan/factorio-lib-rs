@@ -522,7 +522,7 @@ pub struct LightFlickeringDefinition {
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#default_recipe_tint>
 #[derive(Debug)]
 pub struct RecipeTint {
-    // All default to (1, 1, 1, 1)
+    // All default to (1, 1, 1, 1), except special cases
     primary: Color,
     secondary: Color,
     tertiary: Color,
