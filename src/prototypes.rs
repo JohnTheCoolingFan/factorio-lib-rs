@@ -4220,6 +4220,28 @@ pub struct NoiseLayer {
     prototype_base: PrototypeBaseSpec
 }
 
+/// <https://wiki.factorio.com/Prototype/Particle>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct Particle {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    pictures: AnimationVariations,
+    life_time: u16, // Can't be 1
+    shadows: Option<AnimationVariations>,
+    draw_shadow_when_on_ground: bool, // Default: true
+    regular_trigger_effect: Option<TriggerEffect>,
+    ended_in_water_trigger_effect: Option<TriggerEffect>,
+    ended_on_ground_trigger_effect: Option<TriggerEffect>,
+    render_layer: RenderLayer, // Default: "object"
+    render_layer_when_on_ground: RenderLayer, // Default: "lower-object"
+    regular_trigger_effect_frequency: u32, // Default: 0 // Can't be 1
+    movement_modifier_when_on_ground: f64, // Default: 0.8
+    movement_modifier: f64, // Default: 1
+    vertical_acceleration: f32, // Default: -0.004 // Has to be >= -0.01 and <= 0.01
+    mining_particle_frame_speed: f32, // Default: 0
+    fade_away_duration: u16, // Degault: `life-time`, capped to 60. If equals to 0, silently(?) changed to 1
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
