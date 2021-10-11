@@ -4128,6 +4128,15 @@ pub struct RailPlanner {
     curved_rail: String, // Name of entity of type "curved-rail"
 }
 
+/// <https://wiki.factorio.com/Prototype/SpidertronRemote>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct SpidertronRemote {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    icon_color_indicator_mask: IconSpecification
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
