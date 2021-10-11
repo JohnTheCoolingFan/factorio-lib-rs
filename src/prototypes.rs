@@ -4118,6 +4118,16 @@ pub struct Module {
     beacon_tint: RecipeTint
 }
 
+/// <https://wiki.factorio.com/Prototype/RailPlanner>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct RailPlanner {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    straight_rail: String, // Name of entity of type "straight-rail" // First item to place must be this rail planner
+    curved_rail: String, // Name of entity of type "curved-rail"
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
