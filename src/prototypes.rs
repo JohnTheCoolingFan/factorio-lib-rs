@@ -156,7 +156,9 @@ use crate::types::{
     Effect,
     Resistances,
     NoiseExpression,
-    RecipeData
+    RecipeData,
+    ShortcutAction,
+    ShortcutStyle
 };
 
 // TODO
@@ -4271,6 +4273,23 @@ pub struct RecipeCategory {
 pub struct ResourceCategory {
     name: String,
     prototype_base: PrototypeBaseSpec
+}
+
+/// <https://wiki.factorio.com/Prototype/Shortcut>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct Shortcut {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    action: ShortcutAction,
+    icon: Sprite,
+    item_to_spawn: Option<String>, // Name of Item
+    technology_to_unlock: Option<String>, // Name of technology
+    toggleable: bool, // Default: false
+    associated_control_input: String, // Default: ""
+    small_icon: Option<Sprite>, // Default: `icon`
+    disabled_icon: Option<Sprite>, // Default: `icon`
+    disabled_small_icon: Option<Sprite>, // Default: `icon`
+    style: ShortcutStyle, // Default: "default"
 }
 
 #[derive(Clone, Debug, Error)]

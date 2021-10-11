@@ -2391,3 +2391,89 @@ pub struct FluidIngredientPrototype {
     catalyst_amount: f64, // Default: 0
     fluidbox_index: u32, // Default: 0
 }
+
+/// <https://wiki.factorio.com/Prototype/Shortcut#action>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum ShortcutAction {
+    ToggleAltMode,
+    Undo,
+    Copy,
+    Cut,
+    Paste,
+    ImportString,
+    TogglePersonalRoboport,
+    RoggleEquipmentMovementBonus,
+    SpawnItem,
+    Lua,
+}
+
+impl FromStr for ShortcutAction {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "toggle-alt-mode" => Ok(Self::ToggleAltMode),
+            "undo" => Ok(Self::Undo),
+            "copy" => Ok(Self::Copy),
+            "cut" => Ok(Self::Cut),
+            "paste" => Ok(Self::Paste),
+            "import-string" => Ok(Self::ImportString),
+            "toggle-personal-roboport" => Ok(Self::TogglePersonalRoboport),
+            "roggle-equipment-movement-bonus" => Ok(Self::RoggleEquipmentMovementBonus),
+            "spawn-item" => Ok(Self::SpawnItem),
+            "lua" => Ok(Self::Lua),
+            _ => Err(PrototypesErr::InvalidTypeStr("ShortcutAction".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ShortcutAction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::ToggleAltMode => "toggle-alt-mode",
+            Self::Undo => "undo",
+            Self::Copy => "copy",
+            Self::Cut => "cut",
+            Self::Paste => "paste",
+            Self::ImportString => "import-string",
+            Self::TogglePersonalRoboport => "toggle-personal-roboport",
+            Self::RoggleEquipmentMovementBonus => "roggle-equipment-movement-bonus",
+            Self::SpawnItem => "spawn-item",
+            Self::Lua => "lua",
+        })
+    }
+}
+
+/// <https://wiki.factorio.com/Prototype/Shortcut#style>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum ShortcutStyle {
+    Default,
+    Blue,
+    Red,
+    Green,
+}
+
+impl FromStr for ShortcutStyle {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "default" => Ok(Self::Default),
+            "blue" => Ok(Self::Blue),
+            "red" => Ok(Self::Red),
+            "green" => Ok(Self::Green),
+            _ => Err(PrototypesErr::InvalidTypeStr("ShortcutStyle".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ShortcutStyle {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Default => "default",
+            Self::Blue => "blue",
+            Self::Red => "red",
+            Self::Green => "green",
+        })
+    }
+}
