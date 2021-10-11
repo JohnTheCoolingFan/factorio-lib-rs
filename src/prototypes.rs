@@ -4188,6 +4188,14 @@ pub struct ItemGroup {
     order_in_recipe: String, // Default: `order`
 }
 
+/// <https://wiki.factorio.com/Prototype/ItemSubGroup>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct ItemSubGroup {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    group: String, // Name of ItemGroup
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
