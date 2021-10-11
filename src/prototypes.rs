@@ -152,7 +152,8 @@ use crate::types::{
     CapsuleAction,
     FilterMode,
     InsertionPriorityMode,
-    SelectionMode
+    SelectionMode,
+    Effect
 };
 
 // TODO
@@ -4098,6 +4099,23 @@ pub struct UpgradeItem {
     draw_label_for_cursor_render: bool, // Default: false
     selection_tool_base: SelectionToolBase,
     mapper_count: ItemStackIndex, // Default: 0 // Can't be > 255
+}
+
+/// <https://wiki.factorio.com/Prototype/Module>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct Module {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    category: String, // Name of ModuleCategory
+    tier: u32,
+    effect: Effect,
+    requires_beacon_alt_mode: bool, // Default: true
+    limitation: Vec<String>, // (Names) Name of recipe // Not sure if invalid names are accepted
+    limitation_blacklist: Vec<String>, // Same as above
+    limitation_message_key: String, // Locale key // Not checked at data load
+    art_style: Option<String>,
+    beacon_tint: RecipeTint
 }
 
 #[derive(Clone, Debug, Error)]
