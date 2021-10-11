@@ -3953,7 +3953,7 @@ pub struct SelectionToolBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/SelectionTool>
-pub trait SelectionTool {
+pub trait SelectionTool: Item {
     fn selection_color(&self) -> &Color;
     fn alt_selection_color(&self) -> &Color;
     fn selection_mode(&self) -> SelectionMode;
@@ -3981,6 +3981,17 @@ pub trait SelectionTool {
     fn alt_entity_filter_mode(&self) -> FilterMode;
     fn tile_filter_mode(&self) -> FilterMode;
     fn alt_tile_filter_mode(&self) -> FilterMode;
+}
+
+/// <https://wiki.factorio.com/Prototype/SelectionTool>
+#[derive(Debug, Prototype, PrototypeBase, Item, SelectionTool)]
+pub struct SelectionToolPrototype {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    default_label_color: Color, // Default: default item text color
+    draw_label_for_cursor_render: bool, // Default: false
+    selection_tool_base: SelectionToolBase
 }
 
 #[derive(Clone, Debug, Error)]
