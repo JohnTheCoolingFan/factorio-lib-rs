@@ -4213,6 +4213,13 @@ pub struct NamedNoiseExpression {
     intended_protperty: String,
 }
 
+/// <https://wiki.factorio.com/Prototype/NoiseLayer>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct NoiseLayer {
+    name: String,
+    prototype_base: PrototypeBaseSpec
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
