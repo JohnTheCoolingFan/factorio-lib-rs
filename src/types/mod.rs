@@ -2512,6 +2512,7 @@ pub enum TechnologyMaxLevel {
 /// <https://wiki.factorio.com/Types/ModifierPrototype>
 #[derive(Debug)]
 pub struct ModifierPrototype {
+    // TODO
     body: ModifierPrototypeBody,
     icon: IconSpecification,
     infer_icon: Option<bool>,
