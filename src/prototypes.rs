@@ -3785,7 +3785,7 @@ pub struct ItemBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Item>
-pub trait Item {
+pub trait Item: PrototypeBase {
     fn icon(&self) -> &IconSpecification;
     fn stack_size(&self) -> u32;
     fn place_result(&self) -> &String;
