@@ -4259,6 +4259,13 @@ pub struct Recipe {
     expensive: Option<RecipeData>
 }
 
+/// <https://wiki.factorio.com/Prototype/RecipeCategory>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct RecipeCategory {
+    name: String,
+    prototype_base: PrototypeBaseSpec
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
