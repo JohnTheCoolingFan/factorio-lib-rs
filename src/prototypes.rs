@@ -4137,6 +4137,18 @@ pub struct SpidertronRemote {
     icon_color_indicator_mask: IconSpecification
 }
 
+/// <https://wiki.factorio.com/Prototype/Tool>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct Tool {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    durability: f64, // Must be positive // Mandatory if `infinite` is false
+    durability_description_key: String, // Default: "description.durability-key" // May not be longer than 200 characters
+    durability_description_value: String, // Default: "description.durability-value" // May not be longer than 200 characters
+    infinite: bool, // Default: true
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
