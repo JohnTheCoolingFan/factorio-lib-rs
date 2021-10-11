@@ -2477,3 +2477,43 @@ impl fmt::Display for ShortcutStyle {
         })
     }
 }
+
+/// <https://wiki.factorio.com/Prototype/Technology#Technology_data>
+#[derive(Debug)]
+pub struct TechnologyData {
+    upgrade: bool, // Default: false
+    enabled: bool, // Default: true
+    hidden: bool, // Default: false
+    visible_when_disabled: bool, // Default: false
+    ignore_tech_cost_multiplier: bool, // Default: false
+    unit: TechnologyUnit,
+    max_level: TechnologyMaxLevel,
+    prerequisites: Vec<String>, // (Names) Name of Technology
+    effects: Vec<ModifierPrototype>
+}
+
+/// <https://wiki.factorio.com/Prototype/Technology#unit>
+#[derive(Debug)]
+pub struct TechnologyUnit {
+    // One of these 2 or both can be defined
+    count: Option<u64>, // Must be > 0
+    count_formula: Option<String>,
+    time: f64,
+    ingredients: Vec<IngredientPrototype>, // All Items must be tools
+}
+
+/// <https://wiki.factorio.com/Prototype/Technology#max_level>
+#[derive(Debug)]
+pub enum TechnologyMaxLevel {
+    Level(u32),
+    Infinite // "infinite"
+}
+
+/// <https://wiki.factorio.com/Types/ModifierPrototype>
+#[derive(Debug)]
+pub struct ModifierPrototype {
+    body: ModifierPrototypeBody,
+    icon: IconSpecification,
+    infer_icon: Option<bool>,
+    use_icon_overlay_constant: Option<bool> // This is stupid
+}

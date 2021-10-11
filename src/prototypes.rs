@@ -4292,6 +4292,17 @@ pub struct Shortcut {
     style: ShortcutStyle, // Default: "default"
 }
 
+/// <https://wiki.factorio.com/Prototype/Technology>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct Technology {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    icon: IconSpecification,
+    // Same deal as with Recipe prototype
+    normal: TechnologyData,
+    expensive: Option<TechnologyData>
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
