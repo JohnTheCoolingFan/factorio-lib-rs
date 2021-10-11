@@ -19,7 +19,8 @@ use factorio_lib_rs_derive::{
     Vehicle,
     RollingStock,
     Equipment,
-    Item
+    Item,
+    SelectionTool
 };
 use crate::types::{
     ModSettingType,
@@ -150,7 +151,8 @@ use crate::types::{
     AmmoItemAmmoType,
     CapsuleAction,
     FilterMode,
-    InsertionPriorityMode
+    InsertionPriorityMode,
+    SelectionMode
 };
 
 // TODO
@@ -3902,7 +3904,7 @@ pub struct BlueprintBook {
     item_filters: Vec<String>, // (Names) Name of item
     item_group_filters: Vec<String>, // (Names) Name of item groups
     item_subgroup_filters: Vec<String>, // (Names) Name of item subgroups
-    filter_mode: FilterMode, // Default: "whitelist" // If no filters are defined, automatically set to "none"
+    filter_mode: Option<FilterMode>, // Default: "whitelist" // If no filters are defined, automatically set to None
     filter_message_key: String, // Default: "item-limitation.item-not-allowed-in-this-container-item" // Locale key, probably doesn't need checking
     extends_inventory_by_default: bool, // Default: false
     insertion_priority_mode: InsertionPriorityMode, // Default: "default"
@@ -3916,6 +3918,69 @@ pub struct ItemWithTags {
     item_base: ItemBase,
     default_label_color: Color, // Default: default item text color
     draw_label_for_cursor_render: bool, // Default: false
+}
+
+/// <https://wiki.factorio.com/Prototype/SelectionTool>
+#[derive(Debug)]
+pub struct SelectionToolBase {
+    selection_color: Color,
+    alt_selection_color: Color,
+    selection_mode: SelectionMode,
+    alt_selection_mode: SelectionMode,
+    selection_cursor_box_type: CursorBoxType,
+    alt_selection_cursor_box_type: CursorBoxType,
+    reverse_selection_color: Color, // Default: Value of `selection_color`
+    selection_count_button_color: Color, // Default: Value of `selection_color`
+    alt_selection_count_button_color: Color, // Default: Value of `alt_selection_color`
+    reverse_selection_count_button_color: Color, // Default: Value of `reverse_selection_color`
+    chart_selection_color: Color, // Default: Value of `selection_color`
+    chart_alt_selection_color: Color, // Default: Value of alt_selection_color
+    chart_reverse_selection_color: Color, // Default: Value of `reverse_selection_color`
+    reverse_selection_mode: SelectionMode, // Default: Value of `selection_mode`
+    reverse_selection_cursor_box_type: CursorBoxType, // Default: Value of `selection_cursor_box_type`
+    always_include_tiles: bool, // Default: false
+    mouse_cursor: String, // Default: "selection-tool-cursor" // Name of Prototype/MouseCursor
+    entity_filters: Option<Vec<String>>, // (Names) Name of Entity
+    alt_entity_filters: Option<Vec<String>>, // (Names) Name of Entity
+    entity_type_filters: Option<Vec<String>>, // (Names) Name of Entity
+    alt_entity_type_filters: Option<Vec<String>>, // (Names) Name of Entity
+    tile_filters: Option<Vec<String>>, // (Names) Name of a Tile
+    alt_tile_filters: Option<Vec<String>>, // (Names) Name of a Tile
+    entity_filter_mode: FilterMode, // Default: "whitelist"
+    alt_entity_filter_mode: FilterMode, // Default: "whitelist"
+    tile_filter_mode: FilterMode, // Default: "whitelist"
+    alt_tile_filter_mode: FilterMode, // Default: "whitelist"
+}
+
+/// <https://wiki.factorio.com/Prototype/SelectionTool>
+pub trait SelectionTool {
+    fn selection_color(&self) -> &Color;
+    fn alt_selection_color(&self) -> &Color;
+    fn selection_mode(&self) -> SelectionMode;
+    fn alt_selection_mode(&self) -> SelectionMode;
+    fn selection_cursor_box_type(&self) -> CursorBoxType;
+    fn alt_selection_cursor_box_type(&self) -> CursorBoxType;
+    fn reverse_selection_color(&self) -> &Color;
+    fn selection_count_button_color(&self) -> &Color;
+    fn alt_selection_count_button_color(&self) -> &Color;
+    fn reverse_selection_count_button_color(&self) -> &Color;
+    fn chart_selection_color(&self) -> &Color;
+    fn chart_alt_selection_color(&self) -> &Color;
+    fn chart_reverse_selection_color(&self) -> &Color;
+    fn reverse_selection_mode(&self) -> SelectionMode;
+    fn reverse_selection_cursor_box_type(&self) -> CursorBoxType;
+    fn always_include_tiles(&self) -> bool;
+    fn mouse_cursor(&self) -> &String;
+    fn entity_filters(&self) -> &Option<Vec<String>>;
+    fn alt_entity_filters(&self) -> &Option<Vec<String>>;
+    fn entity_type_filters(&self) -> &Option<Vec<String>>;
+    fn alt_entity_type_filters(&self) -> &Option<Vec<String>>;
+    fn tile_filters(&self) -> &Option<Vec<String>>;
+    fn alt_tile_filters(&self) -> &Option<Vec<String>>;
+    fn entity_filter_mode(&self) -> FilterMode;
+    fn alt_entity_filter_mode(&self) -> FilterMode;
+    fn tile_filter_mode(&self) -> FilterMode;
+    fn alt_tile_filter_mode(&self) -> FilterMode;
 }
 
 #[derive(Clone, Debug, Error)]

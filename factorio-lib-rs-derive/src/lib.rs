@@ -143,6 +143,13 @@ pub fn item_macro_derive(input: TokenStream) -> TokenStream {
     impl_item_macro(&ast)
 }
 
+/// <https://wiki.factorio.com/Prototype/SelectionTool>
+#[proc_macro_derive(SelectionTool)]
+pub fn selection_tool_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_selection_tool_macro(&ast)
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -517,6 +524,42 @@ fn impl_item_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn dark_background_icon(&self) -> &Option<IconSpecification> { &self.item_base.dark_background_icon }
             fn rocket_launch_products(&self) -> &Option<Vec<ItemProductPrototype>> { &self.item_base.rocket_launch_products }
             fn rocket_launch_product(&self) -> &Option<ItemProductPrototype> { &self.item_base.rocket_launch_product }
+        }
+    };
+    gen.into()
+}
+
+fn impl_selection_tool_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl SelectionTool for #name {
+            fn selection_color(&self) -> &Color { &self.selection_tool_base.selection_color }
+            fn alt_selection_color(&self) -> &Color { &self.selection_tool_base.alt_selection_color }
+            fn selection_mode(&self) -> SelectionMode { self.selection_tool_base.selection_mode }
+            fn alt_selection_mode(&self) -> SelectionMode { self.selection_tool_base.alt_selection_mode }
+            fn selection_cursor_box_type(&self) -> CursorBoxType { self.selection_tool_base.selection_cursor_box_type }
+            fn alt_selection_cursor_box_type(&self) -> CursorBoxType { self.selection_tool_base.alt_selection_cursor_box_type }
+            fn reverse_selection_color(&self) -> &Color { &self.selection_tool_base.reverse_selection_color }
+            fn selection_count_button_color(&self) -> &Color { &self.selection_tool_base.selection_count_button_color }
+            fn alt_selection_count_button_color(&self) -> &Color { &self.selection_tool_base.alt_selection_count_button_color }
+            fn reverse_selection_count_button_color(&self) -> &Color { &self.selection_tool_base.reverse_selection_count_button_color }
+            fn chart_selection_color(&self) -> &Color { &self.selection_tool_base.chart_selection_color }
+            fn chart_alt_selection_color(&self) -> &Color { &self.selection_tool_base.chart_alt_selection_color }
+            fn chart_reverse_selection_color(&self) -> &Color { &self.selection_tool_base.chart_reverse_selection_color }
+            fn reverse_selection_mode(&self) -> SelectionMode { self.selection_tool_base.reverse_selection_mode }
+            fn reverse_selection_cursor_box_type(&self) -> CursorBoxType { self.selection_tool_base.reverse_selection_cursor_box_type }
+            fn always_include_tiles(&self) -> bool { self.selection_tool_base.always_include_tiles }
+            fn mouse_cursor(&self) -> &String { &self.selection_tool_base.mouse_cursor }
+            fn entity_filters(&self) -> &Option<Vec<String>> { &self.selection_tool_base.entity_filters }
+            fn alt_entity_filters(&self) -> &Option<Vec<String>> { &self.selection_tool_base.alt_entity_filters }
+            fn entity_type_filters(&self) -> &Option<Vec<String>> { &self.selection_tool_base.entity_type_filters }
+            fn alt_entity_type_filters(&self) -> &Option<Vec<String>> { &self.selection_tool_base.alt_entity_type_filters }
+            fn tile_filters(&self) -> &Option<Vec<String>> { &self.selection_tool_base.tile_filters }
+            fn alt_tile_filters(&self) -> &Option<Vec<String>> { &self.selection_tool_base.alt_tile_filters }
+            fn entity_filter_mode(&self) -> FilterMode { self.selection_tool_base.entity_filter_mode }
+            fn alt_entity_filter_mode(&self) -> FilterMode { self.selection_tool_base.alt_entity_filter_mode }
+            fn tile_filter_mode(&self) -> FilterMode { self.selection_tool_base.tile_filter_mode }
+            fn alt_tile_filter_mode(&self) -> FilterMode { self.selection_tool_base.alt_tile_filter_mode }
         }
     };
     gen.into()

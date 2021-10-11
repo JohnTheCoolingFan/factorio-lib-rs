@@ -2168,7 +2168,6 @@ impl fmt::Display for AmmoSourceType {
 pub enum FilterMode {
     Whitelist,
     Blacklist,
-    None,
 }
 
 impl FromStr for FilterMode {
@@ -2178,7 +2177,6 @@ impl FromStr for FilterMode {
         match s {
             "whitelist" => Ok(Self::Whitelist),
             "blacklist" => Ok(Self::Blacklist),
-            "none" => Ok(Self::None),
             _ => Err(PrototypesErr::InvalidTypeStr("FilterMode".into(), s.into()))
         }
     }
@@ -2189,7 +2187,6 @@ impl fmt::Display for FilterMode {
         write!(f, "{}", match self {
             Self::Whitelist => "whitelist",
             Self::Blacklist => "blacklist",
-            Self::None => "none",
         })
     }
 }
@@ -2200,7 +2197,7 @@ pub enum InsertionPriorityMode {
     Default,
     Never,
     Always,
-    When_Manually_Filtered,
+    WhenManuallyFiltered,
 }
 
 impl FromStr for InsertionPriorityMode {
@@ -2211,7 +2208,7 @@ impl FromStr for InsertionPriorityMode {
             "default" => Ok(Self::Default),
             "never" => Ok(Self::Never),
             "always" => Ok(Self::Always),
-            "when_manually_filtered" => Ok(Self::When_Manually_Filtered),
+            "when_manually_filtered" => Ok(Self::WhenManuallyFiltered),
             _ => Err(PrototypesErr::InvalidTypeStr("InsertionPriorityMode".into(), s.into()))
         }
     }
@@ -2223,7 +2220,105 @@ impl fmt::Display for InsertionPriorityMode {
             Self::Default => "default",
             Self::Never => "never",
             Self::Always => "always",
-            Self::When_Manually_Filtered => "when_manually_filtered",
+            Self::WhenManuallyFiltered => "when_manually_filtered",
         })
+    }
+}
+
+/// <https://wiki.factorio.com/Prototype/SelectionTool#selection_mode>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub struct SelectionMode(u32);
+
+impl SelectionMode {
+    pub const BLUEPRINT: Self = Self(1);
+    pub const DECONSTRUCT: Self = Self(1 << 1);
+    pub const CANCEL_DECONSTRUCT: Self = Self(1 << 2);
+    pub const ITEMS: Self = Self(1 << 3);
+    pub const TREES: Self = Self(1 << 4);
+    pub const BUILDABLE_TYPE: Self = Self(1 << 5);
+    pub const NOTHING: Self = Self(1 << 6);
+    pub const ITEMS_TO_PLACE: Self = Self(1 << 7);
+    pub const ANY_ENTITY: Self = Self(1 << 8);
+    pub const ANY_TILE: Self = Self(1 << 9);
+    pub const SAME_FORCE: Self = Self(1 << 10);
+    pub const NOT_SAME_FORCE: Self = Self(1 << 11);
+    pub const FRIEND: Self = Self(1 << 12);
+    pub const ENEMY: Self = Self(1 << 13);
+    pub const UPGRADE: Self = Self(1 << 14);
+    pub const CANCEL_UPGRADE: Self = Self(1 << 15);
+    pub const DOWNGRADE: Self = Self(1 << 16);
+    pub const ENTITY_WITH_HEALTH: Self = Self(1 << 17);
+    pub const ENTITY_WITH_FORCE: Self = Self(1 << 18);
+    pub const ENTITY_WITH_OWNER: Self = Self(1 << 19);
+    pub const AVOID_ROLLING_STOCK: Self = Self(1 << 20);
+}
+
+impl From<Vec<&str>> for SelectionMode {
+    fn from(in_arr: Vec<&str>) -> Self {
+        let mut result = Self(0);        for item in in_arr {
+            match item {
+                "blueprint" => result |= Self::BLUEPRINT,
+                "deconstruct" => result |= Self::DECONSTRUCT,
+                "cancel-deconstruct" => result |= Self::CANCEL_DECONSTRUCT,
+                "items" => result |= Self::ITEMS,
+                "trees" => result |= Self::TREES,
+                "buildable-type" => result |= Self::BUILDABLE_TYPE,
+                "nothing" => result |= Self::NOTHING,
+                "items-to-place" => result |= Self::ITEMS_TO_PLACE,
+                "any-entity" => result |= Self::ANY_ENTITY,
+                "any-tile" => result |= Self::ANY_TILE,
+                "same-force" => result |= Self::SAME_FORCE,
+                "not-same-force" => result |= Self::NOT_SAME_FORCE,
+                "friend" => result |= Self::FRIEND,
+                "enemy" => result |= Self::ENEMY,
+                "upgrade" => result |= Self::UPGRADE,
+                "cancel-upgrade" => result |= Self::CANCEL_UPGRADE,
+                "downgrade" => result |= Self::DOWNGRADE,
+                "entity-with-health" => result |= Self::ENTITY_WITH_HEALTH,
+                "entity-with-force" => result |= Self::ENTITY_WITH_FORCE,
+                "entity-with-owner" => result |= Self::ENTITY_WITH_OWNER,
+                "avoid-rolling-stock" => result |= Self::AVOID_ROLLING_STOCK,
+                _ => {}            }
+        }
+        result
+    }
+}
+
+impl BitAnd for SelectionMode {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        Self(self.0 & rhs.0)
+    }
+}
+
+impl BitAndAssign for SelectionMode {
+    fn bitand_assign(&mut self, rhs: Self) {
+        *self = Self(self.0 & rhs.0)
+    }
+}
+
+impl BitOr for SelectionMode {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self(self.0 | rhs.0)
+    }
+}
+
+impl BitOrAssign for SelectionMode {
+    fn bitor_assign(&mut self, rhs: Self) {
+        *self = Self(self.0 | rhs.0)
+    }
+}
+
+impl BitXor for SelectionMode {
+    type Output = Self;
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        Self(self.0 ^ rhs.0)
+    }
+}
+
+impl BitXorAssign for SelectionMode {
+    fn bitxor_assign(&mut self, rhs: Self) {
+        *self = Self(self.0 ^ rhs.0)
     }
 }
