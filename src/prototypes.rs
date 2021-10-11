@@ -3942,8 +3942,8 @@ pub struct SelectionToolBase {
     mouse_cursor: String, // Default: "selection-tool-cursor" // Name of Prototype/MouseCursor
     entity_filters: Option<Vec<String>>, // (Names) Name of Entity
     alt_entity_filters: Option<Vec<String>>, // (Names) Name of Entity
-    entity_type_filters: Option<Vec<String>>, // (Names) Name of Entity
-    alt_entity_type_filters: Option<Vec<String>>, // (Names) Name of Entity
+    entity_type_filters: Option<Vec<String>>, // (Names) Name of Entity type
+    alt_entity_type_filters: Option<Vec<String>>, // (Names) Name of Entity type
     tile_filters: Option<Vec<String>>, // (Names) Name of a Tile
     alt_tile_filters: Option<Vec<String>>, // (Names) Name of a Tile
     entity_filter_mode: FilterMode, // Default: "whitelist"
@@ -4018,6 +4018,31 @@ pub struct BlueprintItem {
     default_label_color: Color, // Default: default item text color
     draw_label_for_cursor_render: bool, // Default: false
     selection_tool_base: SelectionToolBase
+}
+
+/// <https://wiki.factorio.com/Prototype/CopyPasteTool>
+#[derive(Debug, Prototype, PrototypeBase, Item, SelectionTool)]
+pub struct CopyPasteTool {
+    // Stack size must be 1
+    // Ignored/forced properties:
+    // always_include_tiles = false
+    // entity_filters
+    // entity_type_filters
+    // tile_filters
+    // entity_filter_mode
+    // tile_filter_mode
+    // alt_entity_filters
+    // alt_entity_type_filters
+    // alt_tile_filters
+    // alt_entity_filter_mode
+    // alt_tile_filter_mode
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    default_label_color: Color, // Default: default item text color
+    draw_label_for_cursor_render: bool, // Default: false
+    selection_tool_base: SelectionToolBase,
+    cuts: bool, // Default: false
 }
 
 #[derive(Clone, Debug, Error)]
