@@ -4070,7 +4070,34 @@ pub struct DeconstructionItem {
     draw_label_for_cursor_render: bool, // Default: false
     selection_tool_base: SelectionToolBase,
     entity_filter_count: ItemStackIndex, // Default: 0 // Can't be > 255 // So u8? Kappa
-    tile_filter_count: ItemStackIndex, // Default: 0, // Can't be > 255
+    tile_filter_count: ItemStackIndex, // Default: 0 // Can't be > 255
+}
+
+/// <https://wiki.factorio.com/Prototype/UpgradeItem>
+#[derive(Debug, Prototype, PrototypeBase, Item, SelectionTool)]
+pub struct UpgradeItem {
+    // Stack size must be 1
+    // Ignored/forced properties:
+    // selection_mode = "upgrade"
+    // alt_selection_mode = "cancel-upgrade"
+    // always_include_tiles = false
+    // entity_filters
+    // entity_type_filters
+    // tile_filters
+    // entity_filter_mode
+    // tile_filter_mode
+    // alt_entity_filters
+    // alt_entity_type_filters
+    // alt_tile_filters
+    // alt_entity_filter_mode
+    // alt_tile_filter_mode
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    default_label_color: Color, // Default: default item text color
+    draw_label_for_cursor_render: bool, // Default: false
+    selection_tool_base: SelectionToolBase,
+    mapper_count: ItemStackIndex, // Default: 0 // Can't be > 255
 }
 
 #[derive(Clone, Debug, Error)]
