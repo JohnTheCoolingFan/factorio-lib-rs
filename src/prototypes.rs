@@ -4196,6 +4196,13 @@ pub struct ItemSubGroup {
     group: String, // Name of ItemGroup
 }
 
+/// <https://wiki.factorio.com/Prototype/ModuleCategory>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct ModuleCategory {
+    name: String,
+    prototype_base: PrototypeBaseSpec
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
