@@ -4179,6 +4179,15 @@ pub struct RepairTool {
     repair_result: Option<Trigger>
 }
 
+/// <https://wiki.factorio.com/Prototype/ItemGroup>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct ItemGroup {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    icon: IconSpecification,
+    order_in_recipe: String, // Default: `order`
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
