@@ -154,7 +154,8 @@ use crate::types::{
     InsertionPriorityMode,
     SelectionMode,
     Effect,
-    Resistances
+    Resistances,
+    NoiseExpression
 };
 
 // TODO
@@ -4201,6 +4202,15 @@ pub struct ItemSubGroup {
 pub struct ModuleCategory {
     name: String,
     prototype_base: PrototypeBaseSpec
+}
+
+/// <https://wiki.factorio.com/Prototype/NamedNoiseExpression>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct NamedNoiseExpression {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    expression: NoiseExpression,
+    intended_protperty: String,
 }
 
 #[derive(Clone, Debug, Error)]
