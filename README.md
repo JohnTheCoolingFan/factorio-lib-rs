@@ -176,13 +176,13 @@ Done:
 - CopyPasteTool
 - DeconstructionItem
 - UpgradeItem
-todo:
 - Module
 - RailPlanner
 - SpidertronRemote
 - Tool
 - Armor
 - RepairTool
+todo:
 - ItemGroup
 - ItemSubGroup
 - ModuleCategory

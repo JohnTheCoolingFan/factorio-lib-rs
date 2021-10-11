@@ -348,13 +348,13 @@ pub struct DataTable {
     copy_paste_tool: PrototypeCategory<CopyPasteTool>,
     deconstruction_item: PrototypeCategory<DeconstructionItem>,
     upgrade_item: PrototypeCategory<UpgradeItem>,
-    /* Commented out until implemented
     module: PrototypeCategory<Module>,
     rail_planner: PrototypeCategory<RailPlanner>,
     spidertron_remote: PrototypeCategory<SpidertronRemote>,
     tool: PrototypeCategory<Tool>,
     armor: PrototypeCategory<Armor>,
     repair_tool: PrototypeCategory<RepairTool>,
+    /* Commented out until implemented
     item_group: PrototypeCategory<ItemGroup>,
     item_subgroup: PrototypeCategory<ItemSubGroup>,
     module_category: PrototypeCategory<ModuleCategory>,
