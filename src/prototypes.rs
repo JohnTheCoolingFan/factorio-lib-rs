@@ -3908,6 +3908,16 @@ pub struct BlueprintBook {
     insertion_priority_mode: InsertionPriorityMode, // Default: "default"
 }
 
+/// <https://wiki.factorio.com/Prototype/ItemWithTags>
+#[derive(Debug, Prototype, PrototypeBase, Item)]
+pub struct ItemWithTags {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    item_base: ItemBase,
+    default_label_color: Color, // Default: default item text color
+    draw_label_for_cursor_render: bool, // Default: false
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
