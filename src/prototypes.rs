@@ -4266,6 +4266,13 @@ pub struct RecipeCategory {
     prototype_base: PrototypeBaseSpec
 }
 
+/// <https://wiki.factorio.com/Prototype/ResourceCategory>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct ResourceCategory {
+    name: String,
+    prototype_base: PrototypeBaseSpec
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
