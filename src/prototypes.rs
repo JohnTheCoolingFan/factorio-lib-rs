@@ -158,7 +158,8 @@ use crate::types::{
     NoiseExpression,
     RecipeData,
     ShortcutAction,
-    ShortcutStyle
+    ShortcutStyle,
+    TechnologyData
 };
 
 // TODO

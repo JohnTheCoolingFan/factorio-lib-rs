@@ -19,6 +19,7 @@ use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
 use std::fmt;
 use crate::prototypes::PrototypesErr;
+use crate::concepts::LocalisedString;
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
 pub type FileName = String;
@@ -2512,9 +2513,268 @@ pub enum TechnologyMaxLevel {
 /// <https://wiki.factorio.com/Types/ModifierPrototype>
 #[derive(Debug)]
 pub struct ModifierPrototype {
-    // TODO
+    mp_type: ModifierPrototypeType,
     body: ModifierPrototypeBody,
     icon: IconSpecification,
     infer_icon: Option<bool>,
     use_icon_overlay_constant: Option<bool> // This is stupid
+}
+
+/// <https://wiki.factorio.com/Types/ModifierPrototype>
+#[derive(Debug)]
+pub enum ModifierPrototypeBody {
+    /// Variant for the types:
+    /// "inserter-stack-size-bonus"
+    /// "stack-inserter-capacity-bonus"
+    /// "laboratory-speed"
+    /// "character-logistic-trash-slots"
+    /// "maximum-following-robots-count"
+    /// "worker-robot-speed"
+    /// "worker-robot-storage"
+    /// "ghost-time-to-live"
+    /// "character-crafting-speed"
+    /// "character-mining-speed"
+    /// "character-running-speed"
+    /// "character-build-distance"
+    /// "character-item-drop-distance"
+    /// "character-reach-distance"
+    /// "character-resource-reach-distance"
+    /// "character-item-pickup-distance"
+    /// "character-loot-pickup-distance"
+    /// "character-inventory-slots-bonus"
+    /// "deconstruction-time-to-live"
+    /// "max-failed-attempts-per-tick-per-construction-queue"
+    /// "max-successful-attempts-per-tick-per-construction-queue"
+    /// "character-health-bonus"
+    /// "mining-drill-productivity-bonus"
+    /// "train-braking-force-bonus"
+    /// "worker-robot-battery"
+    /// "laboratory-productivity"
+    /// "follower-robot-lifetime"
+    /// "artillery-range"
+    Simple(SimpleModifierPrototype),
+    /// Variant for the types:
+    /// "turret-attack"
+    TurretAttack(TurretAttackModifierPrototype),
+    /// Variant for the types:
+    /// "ammo-damage"
+    AmmoDamage(AmmoDamageModifierPrototype),
+    /// Variant for the types:
+    /// "give-item"
+    GiveItem(GiveItemModifierPrototype),
+    /// Variant for the types:
+    /// "gun-speed"
+    GunSpeed(GunSpeedModifierPrototype),
+    /// Variant for the types:
+    /// "unlock-recipe"
+    UnlockRecipe(UnlockRecipeModifierPrototype),
+    /// Variant for the types:
+    /// "zoom-to-world-enabled"
+    /// "zoom-to-world-ghost-building-enabled"
+    /// "zoom-to-world-blueprint-enabled"
+    /// "zoom-to-world-deconstruction-planner-enabled"
+    /// "zoom-to-world-upgrade-planner-enabled"
+    /// "zoom-to-world-selection-tool-enabled"
+    /// "character-logistic-requests"
+    Bool(BoolModifierPrototype),
+    /// Variant for the types:
+    /// "nothing"
+    Mothing(NothingModifierPrototype)
+}
+
+/// <https://wiki.factorio.com/Types/SimpleModifierPrototype>
+#[derive(Debug)]
+pub struct SimpleModifierPrototype {
+    modifier: f64
+}
+
+/// <https://wiki.factorio.com/Types/TurretAttackModifierPrototype>
+#[derive(Debug)]
+pub struct TurretAttackModifierPrototype {
+    turret_id: String, // Name of Entity
+    modifier: f64
+}
+
+/// <https://wiki.factorio.com/Types/AmmoDamageModifierPrototype>
+#[derive(Debug)]
+pub struct AmmoDamageModifierPrototype {
+    ammo_category: String, // Name of AmmoCategory
+    modifier: f64
+}
+
+/// <https://wiki.factorio.com/Types/GiveItemModifierPrototype>
+#[derive(Debug)]
+pub struct GiveItemModifierPrototype {
+    item: String, // Name of Item
+    count: ItemCountType // Default: 1 // Must be > 0
+}
+
+/// <https://wiki.factorio.com/Types/GunSpeedModifierPrototype>
+#[derive(Debug)]
+pub struct GunSpeedModifierPrototype {
+    ammo_category: String, // Name of AmmoCategory
+    modifier: f64
+}
+
+/// <https://wiki.factorio.com/Types/UnlockRecipeModifierPrototype>
+#[derive(Debug)]
+pub struct UnlockRecipeModifierPrototype {
+    recipe: String // Name of the recipe
+}
+
+/// <https://wiki.factorio.com/Types/BoolModifierPrototype>
+#[derive(Debug)]
+pub struct BoolModifierPrototype {
+    modifier: bool
+}
+
+/// <https://wiki.factorio.com/Types/NothingModifierPrototype>
+#[derive(Debug)]
+pub struct NothingModifierPrototype {
+    effect_description: LocalisedString
+}
+
+/// <https://wiki.factorio.com/Types/ModifierPrototype#type>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum ModifierPrototypeType {
+    InserterStackSizeBonus,
+    StackInserterCapacityBonus,
+    LaboratorySpeed,
+    CharacterLogisticTrashSlots,
+    MaximumFollowingRobotsCount,
+    WorkerRobotSpeed,
+    WorkerRobotStorage,
+    GhostTimeToLive,
+    TurretAttack,
+    AmmoDamage,
+    GiveItem,
+    GunSpeed,
+    UnlockRecipe,
+    CharacterCraftingSpeed,
+    CharacterMiningSpeed,
+    CharacterRunningSpeed,
+    CharacterBuildDistance,
+    CharacterItemDropDistance,
+    CharacterReachDistance,
+    CharacterResourceReachDistance,
+    CharacterItemPickupDistance,
+    CharacterLootPickupDistance,
+    CharacterInventorySlotsBonus,
+    DeconstructionTimeToLive,
+    MaxFailedAttemptsPerTickPerConstructionQueue,
+    MaxSuccessfulAttemptsPerTickPerConstructionQueue,
+    CharacterHealthBonus,
+    MiningDrillProductivityBonus,
+    TrainBrakingForceBonus,
+    ZoomToWorldEnabled,
+    ZoomToWorldGhostBuildingEnabled,
+    ZoomToWorldBlueprintEnabled,
+    ZoomToWorldDeconstructionPlannerEnabled,
+    ZoomToWorldUpgradePlannerEnabled,
+    ZoomToWorldSelectionToolEnabled,
+    WorkerRobotBattery,
+    LaboratoryProductivity,
+    FollowerRobotLifetime,
+    ArtilleryRange,
+    Nothing,
+    CharacterLogisticRequests,
+}
+
+impl FromStr for ModifierPrototypeType {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "inserter-stack-size-bonus" => Ok(Self::InserterStackSizeBonus),
+            "stack-inserter-capacity-bonus" => Ok(Self::StackInserterCapacityBonus),
+            "laboratory-speed" => Ok(Self::LaboratorySpeed),
+            "character-logistic-trash-slots" => Ok(Self::CharacterLogisticTrashSlots),
+            "maximum-following-robots-count" => Ok(Self::MaximumFollowingRobotsCount),
+            "worker-robot-speed" => Ok(Self::WorkerRobotSpeed),
+            "worker-robot-storage" => Ok(Self::WorkerRobotStorage),
+            "ghost-time-to-live" => Ok(Self::GhostTimeToLive),
+            "turret-attack" => Ok(Self::TurretAttack),
+            "ammo-damage" => Ok(Self::AmmoDamage),
+            "give-item" => Ok(Self::GiveItem),
+            "gun-speed" => Ok(Self::GunSpeed),
+            "unlock-recipe" => Ok(Self::UnlockRecipe),
+            "character-crafting-speed" => Ok(Self::CharacterCraftingSpeed),
+            "character-mining-speed" => Ok(Self::CharacterMiningSpeed),
+            "character-running-speed" => Ok(Self::CharacterRunningSpeed),
+            "character-build-distance" => Ok(Self::CharacterBuildDistance),
+            "character-item-drop-distance" => Ok(Self::CharacterItemDropDistance),
+            "character-reach-distance" => Ok(Self::CharacterReachDistance),
+            "character-resource-reach-distance" => Ok(Self::CharacterResourceReachDistance),
+            "character-item-pickup-distance" => Ok(Self::CharacterItemPickupDistance),
+            "character-loot-pickup-distance" => Ok(Self::CharacterLootPickupDistance),
+            "character-inventory-slots-bonus" => Ok(Self::CharacterInventorySlotsBonus),
+            "deconstruction-time-to-live" => Ok(Self::DeconstructionTimeToLive),
+            "max-failed-attempts-per-tick-per-construction-queue" => Ok(Self::MaxFailedAttemptsPerTickPerConstructionQueue),
+            "max-successful-attempts-per-tick-per-construction-queue" => Ok(Self::MaxSuccessfulAttemptsPerTickPerConstructionQueue),
+            "character-health-bonus" => Ok(Self::CharacterHealthBonus),
+            "mining-drill-productivity-bonus" => Ok(Self::MiningDrillProductivityBonus),
+            "train-braking-force-bonus" => Ok(Self::TrainBrakingForceBonus),
+            "zoom-to-world-enabled" => Ok(Self::ZoomToWorldEnabled),
+            "zoom-to-world-ghost-building-enabled" => Ok(Self::ZoomToWorldGhostBuildingEnabled),
+            "zoom-to-world-blueprint-enabled" => Ok(Self::ZoomToWorldBlueprintEnabled),
+            "zoom-to-world-deconstruction-planner-enabled" => Ok(Self::ZoomToWorldDeconstructionPlannerEnabled),
+            "zoom-to-world-upgrade-planner-enabled" => Ok(Self::ZoomToWorldUpgradePlannerEnabled),
+            "zoom-to-world-selection-tool-enabled" => Ok(Self::ZoomToWorldSelectionToolEnabled),
+            "worker-robot-battery" => Ok(Self::WorkerRobotBattery),
+            "laboratory-productivity" => Ok(Self::LaboratoryProductivity),
+            "follower-robot-lifetime" => Ok(Self::FollowerRobotLifetime),
+            "artillery-range" => Ok(Self::ArtilleryRange),
+            "nothing" => Ok(Self::Nothing),
+            "character-logistic-requests" => Ok(Self::CharacterLogisticRequests),
+            _ => Err(PrototypesErr::InvalidTypeStr("ModifierPrototypeType".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for ModifierPrototypeType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::InserterStackSizeBonus => "inserter-stack-size-bonus",
+            Self::StackInserterCapacityBonus => "stack-inserter-capacity-bonus",
+            Self::LaboratorySpeed => "laboratory-speed",
+            Self::CharacterLogisticTrashSlots => "character-logistic-trash-slots",
+            Self::MaximumFollowingRobotsCount => "maximum-following-robots-count",
+            Self::WorkerRobotSpeed => "worker-robot-speed",
+            Self::WorkerRobotStorage => "worker-robot-storage",
+            Self::GhostTimeToLive => "ghost-time-to-live",
+            Self::TurretAttack => "turret-attack",
+            Self::AmmoDamage => "ammo-damage",
+            Self::GiveItem => "give-item",
+            Self::GunSpeed => "gun-speed",
+            Self::UnlockRecipe => "unlock-recipe",
+            Self::CharacterCraftingSpeed => "character-crafting-speed",
+            Self::CharacterMiningSpeed => "character-mining-speed",
+            Self::CharacterRunningSpeed => "character-running-speed",
+            Self::CharacterBuildDistance => "character-build-distance",
+            Self::CharacterItemDropDistance => "character-item-drop-distance",
+            Self::CharacterReachDistance => "character-reach-distance",
+            Self::CharacterResourceReachDistance => "character-resource-reach-distance",
+            Self::CharacterItemPickupDistance => "character-item-pickup-distance",
+            Self::CharacterLootPickupDistance => "character-loot-pickup-distance",
+            Self::CharacterInventorySlotsBonus => "character-inventory-slots-bonus",
+            Self::DeconstructionTimeToLive => "deconstruction-time-to-live",
+            Self::MaxFailedAttemptsPerTickPerConstructionQueue => "max-failed-attempts-per-tick-per-construction-queue",
+            Self::MaxSuccessfulAttemptsPerTickPerConstructionQueue => "max-successful-attempts-per-tick-per-construction-queue",
+            Self::CharacterHealthBonus => "character-health-bonus",
+            Self::MiningDrillProductivityBonus => "mining-drill-productivity-bonus",
+            Self::TrainBrakingForceBonus => "train-braking-force-bonus",
+            Self::ZoomToWorldEnabled => "zoom-to-world-enabled",
+            Self::ZoomToWorldGhostBuildingEnabled => "zoom-to-world-ghost-building-enabled",
+            Self::ZoomToWorldBlueprintEnabled => "zoom-to-world-blueprint-enabled",
+            Self::ZoomToWorldDeconstructionPlannerEnabled => "zoom-to-world-deconstruction-planner-enabled",
+            Self::ZoomToWorldUpgradePlannerEnabled => "zoom-to-world-upgrade-planner-enabled",
+            Self::ZoomToWorldSelectionToolEnabled => "zoom-to-world-selection-tool-enabled",
+            Self::WorkerRobotBattery => "worker-robot-battery",
+            Self::LaboratoryProductivity => "laboratory-productivity",
+            Self::FollowerRobotLifetime => "follower-robot-lifetime",
+            Self::ArtilleryRange => "artillery-range",
+            Self::Nothing => "nothing",
+            Self::CharacterLogisticRequests => "character-logistic-requests",
+        })
+    }
 }
