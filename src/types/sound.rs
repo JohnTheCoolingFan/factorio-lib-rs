@@ -66,3 +66,11 @@ pub struct CyclicSound {
     middle_sound: Option<Sound>,
     end_sound: Option<Sound>
 }
+
+/// <https://wiki.factorio.com/Prototype/Tile#build_sound>
+#[derive(Debug)]
+pub struct TileBuildSound {
+    small: Sound,
+    medium: Option<Sound>,
+    large: Option<Sound>
+}

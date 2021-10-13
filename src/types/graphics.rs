@@ -13,6 +13,8 @@ pub type AnimationFrameSequence = Vec<u16>;
 pub type SpritePosition = (i16, i16);
 /// Width and Height <https://wiki.factorio.com/Types/Sprite#width>
 pub type SpriteSize = (i16, i16);
+/// <https://wiki.factorio.com/Types/SpriteSizeType>
+pub type SpriteSizeType = i16;
 
 // =========== // General types // ============ //
         // Enums with FromStr

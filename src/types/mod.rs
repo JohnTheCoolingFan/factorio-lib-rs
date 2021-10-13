@@ -4,6 +4,7 @@ mod capsule_action;
 mod graphics;
 mod sound;
 mod style_specification;
+mod tile_transitions;
 mod trigger;
 
 pub use attack_parameters::*;
@@ -12,6 +13,7 @@ pub use capsule_action::*;
 pub use graphics::*;
 pub use sound::*;
 pub use style_specification::*;
+pub use tile_transitions::*;
 pub use trigger::*;
 
 use std::collections::HashMap;

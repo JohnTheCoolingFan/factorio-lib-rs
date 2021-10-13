@@ -159,7 +159,12 @@ use crate::types::{
     RecipeData,
     ShortcutAction,
     ShortcutStyle,
-    TechnologyData
+    TechnologyData,
+    MainTileTransitions,
+    ExtraTileTransitions,
+    BetweenTileTransitions,
+    LayerGroup,
+    TileBuildSound
 };
 
 // TODO
@@ -4302,6 +4307,46 @@ pub struct Technology {
     // Same deal as with Recipe prototype
     normal: TechnologyData,
     expensive: Option<TechnologyData>
+}
+
+/// <https://wiki.factorio.com/Prototype/Tile>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct Tile {
+    // 255 instances max
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    collision_mask: CollisionMask,
+    layer: u8,
+    variants: MainTileTransitions,
+    map_color: Color,
+    pollution_absorption_per_second: f64,
+    transition_overlay_layer_offset: u8, // Default: 0
+    layer_group: LayerGroup, // Default: "water" if `draw_in_water_layer` else "ground"
+    draw_in_water_layer: bool, // Default: false
+    transition_merges_with_tile: Option<String>, // Name of a tile
+    effect_color: Color, // Default: all 1
+    tint: Color, // Default: all 1
+    walking_sound: Option<Sound>,
+    build_sound: Option<TileBuildSound>,
+    mined_sound: Option<Sound>,
+    walking_speed_modifier: f64, // Default: 1
+    vehicle_friction_modifier: f64, // Default: 1
+    decorative_removal_probability: f32, // Default: 0
+    allowed_neighbors: Option<Vec<String>>, // (Names) Name of Tile
+    needs_correction: bool, // Default: false
+    minable: Option<MinableProperties>,
+    next_direction: Option<String>, // Name of a Tile
+    can_be_part_of_blueprint: bool, // Default: true
+    effect: Option<String>, // Name of TileEffect
+    trigger_effect: Option<TriggerEffect>,
+    scorch_mark_color: Option<Color>,
+    icon: Option<IconSpecification>,
+    effect_color_secondary: Option<Color>,
+    effect_is_opaque: Option<bool>, // Why is there no default
+    transitions: Option<Vec<ExtraTileTransitions>>,
+    transitions_between_transitions: Option<Vec<BetweenTileTransitions>>,
+    autoplace: Option<AutoplaceSpecification>,
+    placeable_by: Option<Vec<ItemToPlace>>
 }
 
 #[derive(Clone, Debug, Error)]
