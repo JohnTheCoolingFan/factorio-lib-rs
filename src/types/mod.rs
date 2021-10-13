@@ -5,6 +5,7 @@ mod graphics;
 mod sound;
 mod style_specification;
 mod tile_transitions;
+mod tip_trigger;
 mod trigger;
 
 pub use attack_parameters::*;
@@ -14,6 +15,7 @@ pub use graphics::*;
 pub use sound::*;
 pub use style_specification::*;
 pub use tile_transitions::*;
+pub use tip_trigger::*;
 pub use trigger::*;
 
 use std::collections::HashMap;
@@ -2777,6 +2779,68 @@ impl fmt::Display for ModifierPrototypeType {
             Self::ArtilleryRange => "artillery-range",
             Self::Nothing => "nothing",
             Self::CharacterLogisticRequests => "character-logistic-requests",
+        })
+    }
+}
+
+/// <https://wiki.factorio.com/Types/SimulationDefinition>
+#[derive(Debug)]
+pub struct SimulationDefinition {
+    save: Option<FileName>,
+    init_file: Option<FileName>,
+    init: String, // Default: "" // Only loaded if `init_file` is not present
+    update_file: Option<FileName>,
+    update: String, // Default: "" // Only loaded if `update_file` is not present
+    init_update_count: u32, // Default: 0
+    length: u32, // Default: 0
+    generate_map: bool, // Default: false
+    checkboard: bool, // Default: true
+    volume_modifier: Option<f32>,
+    override_volume: bool, // Default: false // default not confirmed
+}
+
+/// <https://wiki.factorio.com/Types/TipStatus>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum TipStatus {
+    Locked,
+    Optional,
+    DependenciesNotMet,
+    Unlocked,
+    Suggested,
+    NotToBeSuggested,
+    CompletedWithoutTutorial,
+    Completed,
+}
+
+impl FromStr for TipStatus {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "locked" => Ok(Self::Locked),
+            "optional" => Ok(Self::Optional),
+            "dependencies-not-met" => Ok(Self::DependenciesNotMet),
+            "unlocked" => Ok(Self::Unlocked),
+            "suggested" => Ok(Self::Suggested),
+            "not-to-be-suggested" => Ok(Self::NotToBeSuggested),
+            "completed-without-tutorial" => Ok(Self::CompletedWithoutTutorial),
+            "completed" => Ok(Self::Completed),
+            _ => Err(PrototypesErr::InvalidTypeStr("TipStatus".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for TipStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Locked => "locked",
+            Self::Optional => "optional",
+            Self::DependenciesNotMet => "dependencies-not-met",
+            Self::Unlocked => "unlocked",
+            Self::Suggested => "suggested",
+            Self::NotToBeSuggested => "not-to-be-suggested",
+            Self::CompletedWithoutTutorial => "completed-without-tutorial",
+            Self::Completed => "completed",
         })
     }
 }

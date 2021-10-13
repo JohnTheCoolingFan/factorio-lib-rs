@@ -164,7 +164,10 @@ use crate::types::{
     ExtraTileTransitions,
     BetweenTileTransitions,
     LayerGroup,
-    TileBuildSound
+    TileBuildSound,
+    SimulationDefinition,
+    TipTrigger,
+    TipStatus
 };
 
 // TODO
@@ -4347,6 +4350,24 @@ pub struct Tile {
     transitions_between_transitions: Option<Vec<BetweenTileTransitions>>,
     autoplace: Option<AutoplaceSpecification>,
     placeable_by: Option<Vec<ItemToPlace>>
+}
+
+/// <https://wiki.factorio.com/Prototype/TipsAndTricksItem>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct TipsAndTricksItem {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    image: FileName, // Default: ""
+    simulation: Option<SimulationDefinition>,
+    tag: String, // Default: ""
+    category: String, // Default: `name` // Name of TipsAndTricksItemCategory
+    indent: u8, // Default: 0
+    is_title: bool, // Default: false
+    trigger: Option<TipTrigger>,
+    skip_trigger: Option<TipTrigger>,
+    tutorial: String, // Default: "" // Name of prototype/Tutorial
+    starting_status: TipStatus, // Default: "locked"
+    dependencies: Vec<String> // (Names) Name of TipsAndTricksItem
 }
 
 #[derive(Clone, Debug, Error)]
