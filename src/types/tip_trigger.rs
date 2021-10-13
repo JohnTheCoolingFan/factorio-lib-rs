@@ -50,7 +50,7 @@ pub struct SequenceTipTrigger {
 #[derive(Debug)]
 pub struct DependenciesMetTipTrigger;
 
-/// https://wiki.factorio.com/Types/TipTrigger#TimeElapsedTipTrigger
+/// <https://wiki.factorio.com/Types/TipTrigger#TimeElapsedTipTrigger>
 #[derive(Debug)]
 pub struct TimeElapsedTipTrigger {
     ticks: u32
