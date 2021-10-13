@@ -377,10 +377,10 @@ pub struct DataTable {
     recipe_category: PrototypeCategory<RecipeCategory>,
     resource_category: PrototypeCategory<ResourceCategory>,
     shortcut: PrototypeCategory<Shortcut>,
-    /* Commented out until implemented
     technology: PrototypeCategory<Technology>,
     tile: PrototypeCategory<Tile>,
     tip_and_tricks_item: PrototypeCategory<TipsAndTricksItem>,
+    /* Commented out until implemented
     trivial_smoke: PrototypeCategory<TrivialSmoke>,
     tutorial: PrototypeCategory<Tutorial>,
     utility_constants: PrototypeCategory<UnilityConstants>,

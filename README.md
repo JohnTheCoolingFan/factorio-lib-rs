@@ -192,10 +192,10 @@ Done:
 - RecipeCategory
 - ResourceCategory
 - Shortcut
-todo:
 - Technology
 - Tile
 - TipsAndTricksItem
+todo:
 - TrivialSmoke
 - Tutorial
 - UnilityConstants
