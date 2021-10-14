@@ -4372,6 +4372,28 @@ pub struct TipsAndTricksItem {
     dependencies: Vec<String> // (Names) Name of TipsAndTricksItem
 }
 
+/// <https://wiki.factorio.com/Prototype/TrivialSmoke>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct TrivialSmoke {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    animation: Animation,
+    duration: u32, // Can't be 0
+    glow_animation: Option<Animation>,
+    color: Color, // Default: all 0.375
+    start_scale: f64, // Default: 1
+    movement_slow_down_factor: f64, // Default: 0.995 // Between 1 and 0 (inclusive both sides)
+    spread_duration: u32, // Default: 0
+    // `fade_in_duration` + `fade_away_duration` must be <= `duration`
+    fade_away_duration: u32, // Default: 0
+    fade_in_duration: u32, // Default: 0
+    glow_fade_away_duration: u32, // Default: `fade_away_duration`
+    cyclic: bool, // Default: false
+    affected_by_wind: bool, // Default: true
+    show_when_smoke_off: bool, // Default: false
+    render_layer: RenderLayer, // Default: "smoke"
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
