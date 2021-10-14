@@ -384,14 +384,12 @@ pub struct DataTable {
     technology: PrototypeCategory<Technology>,
     tile: PrototypeCategory<Tile>,
     tip_and_tricks_item: PrototypeCategory<TipsAndTricksItem>,
-    /* Commented out until implemented
     trivial_smoke: PrototypeCategory<TrivialSmoke>,
     tutorial: PrototypeCategory<Tutorial>,
     utility_constants: PrototypeCategory<UnilityConstants>,
     utility_sounds: PrototypeCategory<UtilitySounds>,
     utility_sprites: PrototypeCategory<UtilitySprites>,
     virtual_signal: PrototypeCategory<VirtualSignal>,
-    */
     bool_setting: PrototypeCategory<BoolModSetting>,
     int_setting: PrototypeCategory<IntModSetting>,
     double_setting: PrototypeCategory<DoubleModSetting>,
