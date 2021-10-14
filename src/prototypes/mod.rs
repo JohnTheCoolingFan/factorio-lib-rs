@@ -4407,6 +4407,15 @@ pub struct Tutorial {
     // trigger // Not listed in other properties but listed in table of contents
 }
 
+/// <https://wiki.factorio.com/Prototype/VirtualSignal>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct VirtualSignal {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    icon: IconSpecification,
+    subgroup: String, // Default: "virtual-signal" // Name of ItemSubGroup
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
