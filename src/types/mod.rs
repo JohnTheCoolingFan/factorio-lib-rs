@@ -2844,3 +2844,16 @@ impl fmt::Display for TipStatus {
         })
     }
 }
+
+/// <https://wiki.factorio.com/Types/BoxSpecification>
+#[derive(Debug)]
+pub struct BoxSpecification {
+    sprite: Sprite,
+    dimension_spec: BoxSpecificationDimensionSpec
+}
+
+#[derive(Debug)]
+pub enum BoxSpecificationDimensionSpec {
+    WholeBox(f64, f64), // `is_whole_box` = true; `side_length` and `side_height`
+    NotWholeBox(f64), // `is_whole_box` = false (Default); `max_side_length`
+}
