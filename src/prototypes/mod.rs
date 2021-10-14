@@ -1,3 +1,7 @@
+mod utility;
+
+pub use utility::*;
+
 use std::rc::{Rc, Weak};
 use std::marker::PhantomData;
 use std::collections::HashMap;
