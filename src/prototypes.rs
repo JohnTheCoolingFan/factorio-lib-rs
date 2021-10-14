@@ -4394,6 +4394,15 @@ pub struct TrivialSmoke {
     render_layer: RenderLayer, // Default: "smoke"
 }
 
+/// <https://wiki.factorio.com/Prototype/Tutorial>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct Tutorial {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    scenario: String, // filename?
+    // trigger // Not listed in other properties but listed in table of contents
+}
+
 #[derive(Clone, Debug, Error)]
 pub enum PrototypesErr {
     #[error("Invalid prototype type: {0}")]
