@@ -3765,12 +3765,14 @@ pub struct FuelCategory {
 
 // Documentation is confusing, not deriving PrototypeBase because it's probably the intended way
 /// <https://wiki.factorio.com/Prototype/GuiStyle>
-#[derive(Debug, Prototype)]
+#[derive(Debug, Prototype, PrototypeBase)]
 pub struct GuiStyle {
     name: String,
+    prototype_base: PrototypeBaseSpec,
     // Some styles are mandatory
+    // All properties that are not prototype properties should be considered styles. I'm not sure
+    // whether non-style values are allowed, probably not.
     styles: HashMap<String, StyleSpecification>, // God damnit
-    // If it's not obious, these are optional.
     default_tileset: FileName, // Default: ""
     default_sprite_scale: f64, // Default: 1
     default_sprite_priority: SpritePriority, // Default: "medium"
