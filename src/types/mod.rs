@@ -26,7 +26,7 @@ use crate::prototypes::PrototypesErr;
 use crate::concepts::LocalisedString;
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
-pub type FileName = String;
+pub struct FileName(String);
 /// <https://wiki.factorio.com/Types/ItemStackIndex>
 pub type ItemStackIndex = u16;
 /// <https://wiki.factorio.com/Types/ItemCountType>
@@ -38,12 +38,12 @@ pub type Factorio2DVector = (f32, f32);
 pub type Factorio3DVector = (f32, f32, f32);
 // Parser and checker maybe?
 /// Keyboard keys sequence <https://wiki.factorio.com/Prototype/CustomInput#key_sequence>
-pub type KeySequence = String;
+pub struct KeySequence(String);
 // Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox? It's kinda undocumented
 /// <https://wiki.factorio.com/Types/BoundingBox>
-pub type BoundingBox = (Position, Position);
+pub struct BoundingBox(Position, Position);
 /// Value range: [0.0; 1.0) <https://wiki.factorio.com/Types/RealOrientation>
-pub type RealOrientation = f32;
+pub struct RealOrientation(f32);
 
 /// Can be constructed from an array or table with x and y values <https://wiki.factorio.com/Types/Position>
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
