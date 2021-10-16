@@ -1667,6 +1667,8 @@ pub struct InfinityContainer {
 /// <https://wiki.factorio.com/Prototype/CraftingMachine>
 #[derive(Debug)]
 pub struct CraftingMachineBase {
+    // If module inventory size > 0 and no effects allowed, its' and error
+    // https://discord.com/channels/139677590393716737/306402592265732098/898733801679757332
     energy_usage: Energy, // Must be positive
     crafting_speed: f64, // Must be positive
     crafting_categories: Vec<String>, // (Names) Name of crafting category
