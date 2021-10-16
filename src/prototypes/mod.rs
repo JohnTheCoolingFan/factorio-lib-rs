@@ -386,7 +386,7 @@ pub struct DataTable {
     tip_and_tricks_item: PrototypeCategory<TipsAndTricksItem>,
     trivial_smoke: PrototypeCategory<TrivialSmoke>,
     tutorial: PrototypeCategory<Tutorial>,
-    utility_constants: PrototypeCategory<UnilityConstants>,
+    utility_constants: PrototypeCategory<UtilityConstants>,
     utility_sounds: PrototypeCategory<UtilitySounds>,
     utility_sprites: PrototypeCategory<UtilitySprites>,
     virtual_signal: PrototypeCategory<VirtualSignal>,
