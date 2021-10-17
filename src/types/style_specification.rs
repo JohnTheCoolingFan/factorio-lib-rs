@@ -377,3 +377,10 @@ pub struct BorderImageSet {
     bottom_end: Option<Sprite>,
     left_end: Option<Sprite>
 }
+
+/// <https://wiki.factorio.com/Types/GlowStyleSpecification>
+#[derive(Debug)]
+pub struct GlowStyleSpecification {
+    base: StyleSpecificationBase,
+    image_set: Option<ElementImageSet>
+}
