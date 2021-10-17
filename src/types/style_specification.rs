@@ -384,3 +384,23 @@ pub struct GlowStyleSpecification {
     base: StyleSpecificationBase,
     image_set: Option<ElementImageSet>
 }
+
+/// <https://wiki.factorio.com/Types/GraphStyleSpecification>
+#[derive(Debug)]
+pub struct GraphStyleSpecification {
+    base: StyleSpecificationBase,
+    background_color: Color,
+    line_colors: Vec<Color>,
+    horizontal_label_style: Option<LabelStyleSpecification>,
+    vertical_label_style: Option<LabelStyleSpecification>,
+    minimal_horizontal_label_spacing: u32,
+    minimal_vertical_label_spacing: u32,
+    horizontal_labels_margin: u32,
+    vertical_labels_margin: u32,
+    graph_top_margin: u32,
+    graph_right_margin: u32,
+    data_line_highlight_distance: u32,
+    selection_dot_radius: u32,
+    grid_lines_color: Color,
+    guide_lines_color: Color
+}
