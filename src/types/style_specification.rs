@@ -177,6 +177,13 @@ pub struct ActivityBarStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/EmptyWidgetStyleSpecification>
+#[derive(Debug)]
+pub enum EmptyWidgetStyleSpecification {
+    Camera(CameraStyleSpecification),
+    Minimap(MinimapStyleSpecification)
+}
+
+/// <https://wiki.factorio.com/Types/EmptyWidgetStyleSpecification>
 /// <https://wiki.factorio.com/Types/CameraStyleSpecification>
 #[derive(Debug)]
 pub struct CameraStyleSpecification {
@@ -329,4 +336,44 @@ pub struct FlowStyleSpecification {
     max_on_row: i32,
     horizontal_spacing: i32,
     vertical_spacing: i32
+}
+
+/// <https://wiki.factorio.com/Types/FrameStyleSpecification>
+#[derive(Debug)]
+pub struct FrameStyleSpecification {
+    base: StyleSpecificationBase,
+    graphical_set: Option<ElementImageSet>,
+    flow_style: Option<FlowStyleSpecification>,
+    horizontal_flow_style: Option<HorizontalFlowStyleSpecification>,
+    vertical_flow_style: Option<VerticalFlowStyleSpecification>,
+    header_flow_style: Option<HorizontalFlowStyleSpecification>,
+    header_filler_style: Option<EmptyWidgetStyleSpecification>,
+    title_style: Option<LabelStyleSpecification>,
+    use_header_filler: bool,
+    drag_by_title: bool,
+    header_background: Option<ElementImageSet>,
+    background_graphical_set: Option<ElementImageSet>,
+    border: Option<BorderImageSet>
+}
+
+/// <https://wiki.factorio.com/Types/BorderImageSet>
+#[derive(Debug)]
+pub struct BorderImageSet {
+    scale: f64, // Default: 1
+    border_width: u32, // Default: 0
+    vertical_line: Option<Sprite>,
+    horizontal_line: Option<Sprite>,
+    top_right_corner: Option<Sprite>,
+    bottom_right_corner: Option<Sprite>,
+    bottom_left_corner: Option<Sprite>,
+    top_left_coner: Option<Sprite>,
+    top_t: Option<Sprite>,
+    right_t: Option<Sprite>,
+    bottom_t: Option<Sprite>,
+    left_t: Option<Sprite>,
+    cross: Option<Sprite>,
+    top_end: Option<Sprite>,
+    right_end: Option<Sprite>,
+    bottom_end: Option<Sprite>,
+    left_end: Option<Sprite>
 }
