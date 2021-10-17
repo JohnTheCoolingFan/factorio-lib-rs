@@ -418,3 +418,11 @@ pub struct VerticalFlowStyleSpecification {
     base: StyleSpecificationBase,
     vertical_spacing: i32
 }
+
+/// <https://wiki.factorio.com/Types/ImageStyleSpecification>
+#[derive(Debug)]
+pub struct ImageStyleSpecification {
+    base: StyleSpecificationBase,
+    graphical_set: Option<ElementImageSet>,
+    stretch_image_to_widget_size: bool
+}
