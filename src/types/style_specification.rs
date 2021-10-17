@@ -1,7 +1,7 @@
 use std::{str::FromStr, fmt};
 use crate::prototypes::PrototypesErr;
 use crate::concepts::LocalisedString;
-use crate::types::{Color, Sprite, FileName, Position, SpriteSizeType};
+use crate::types::{Color, Sprite, FileName, Position, SpriteSizeType, Sound};
 
 // FIXME?
 // There is a big problem for recreating prototype API from public documentation which is intended
@@ -308,4 +308,15 @@ impl fmt::Display for ElementImageSetLayerType {
             Self::Composition => "composition",
         })
     }
+}
+
+/// <https://wiki.factorio.com/Types/DropDownStyleSpecification>
+#[derive(Debug)]
+pub struct DropDownStyleSpecification {
+    base: StyleSpecificationBase,
+    button_style: Option<ButtonStyleSpecification>,
+    icon: Option<Sprite>,
+    list_box_style: Option<ListBoxStyleSpecification>,
+    selector_and_title_spacing: i16, // Default: 0 (unconfirmed)
+    opened_sound: Option<Sound>
 }
