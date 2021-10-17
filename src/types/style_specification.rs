@@ -404,3 +404,17 @@ pub struct GraphStyleSpecification {
     grid_lines_color: Color,
     guide_lines_color: Color
 }
+
+/// <https://wiki.factorio.com/Types/HorizontalFlowStyleSpecification>
+#[derive(Debug)]
+pub struct HorizontalFlowStyleSpecification {
+    base: StyleSpecificationBase,
+    horizontal_spacing: i32
+}
+
+/// <https://wiki.factorio.com/Types/VerticalFlowStyleSpecification>
+#[derive(Debug)]
+pub struct VerticalFlowStyleSpecification {
+    base: StyleSpecificationBase,
+    vertical_spacing: i32
+}
