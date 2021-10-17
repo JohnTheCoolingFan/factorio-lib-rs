@@ -426,3 +426,51 @@ pub struct ImageStyleSpecification {
     graphical_set: Option<ElementImageSet>,
     stretch_image_to_widget_size: bool
 }
+
+/// <https://wiki.factorio.com/Types/LabelStyleSpecification>
+#[derive(Debug)]
+pub struct LabelStyleSpecification {
+    base: StyleSpecificationBase,
+    font: Option<String>, // Name of Font prototype
+    font_color: Color,
+    hovered_font_color: Color,
+    clicked_font_color: Color,
+    disabled_font_color: Color,
+    rich_text_setting: RichTextSetting,
+    single_line: bool,
+    underlined: bool,
+    rich_text_highlight_error_color: Color,
+    rich_text_highlight_warning_color: Color,
+    rich_text_highlight_ok_color: Color
+}
+
+/// <https://wiki.factorio.com/Types/LabelStyleSpecification#rich_text_setting>
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+pub enum RichTextSetting {
+    Enabled,
+    Disabled,
+    Highlight,
+}
+
+impl FromStr for RichTextSetting {
+    type Err = PrototypesErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "enabled" => Ok(Self::Enabled),
+            "disabled" => Ok(Self::Disabled),
+            "highlight" => Ok(Self::Highlight),
+            _ => Err(PrototypesErr::InvalidTypeStr("RichTextSetting".into(), s.into()))
+        }
+    }
+}
+
+impl fmt::Display for RichTextSetting {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            Self::Enabled => "enabled",
+            Self::Disabled => "disabled",
+            Self::Highlight => "highlight",
+        })
+    }
+}
