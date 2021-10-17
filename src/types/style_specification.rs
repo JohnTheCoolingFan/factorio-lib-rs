@@ -320,3 +320,13 @@ pub struct DropDownStyleSpecification {
     selector_and_title_spacing: i16, // Default: 0 (unconfirmed)
     opened_sound: Option<Sound>
 }
+
+/// <https://wiki.factorio.com/Types/FlowStyleSpecification>
+#[derive(Debug)]
+pub struct FlowStyleSpecification {
+    base: StyleSpecificationBase,
+    // Default 0 (unconfirmed)
+    max_on_row: i32,
+    horizontal_spacing: i32,
+    vertical_spacing: i32
+}
