@@ -1,6 +1,4 @@
-use std::fmt;
-use std::str::FromStr;
-use crate::prototypes::PrototypesErr;
+use strum_macros::{EnumString, AsRefStr};
 
 /// <https://wiki.factorio.com/Types/TipTrigger>
 #[derive(Debug)]
@@ -78,34 +76,12 @@ pub struct CraftItemTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#event_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum CraftItemTipTriggerEventType {
     CraftingOfSingleItemOrdered,
     CraftingOfMultipleItemsOrdered,
     CraftingFinished,
-}
-
-impl FromStr for CraftItemTipTriggerEventType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "crafting-of-single-item-ordered" => Ok(Self::CraftingOfSingleItemOrdered),
-            "crafting-of-multiple-items-ordered" => Ok(Self::CraftingOfMultipleItemsOrdered),
-            "crafting-finished" => Ok(Self::CraftingFinished),
-            _ => Err(PrototypesErr::InvalidTypeStr("CraftItemTipTriggerEventType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for CraftItemTipTriggerEventType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::CraftingOfSingleItemOrdered => "crafting-of-single-item-ordered",
-            Self::CraftingOfMultipleItemsOrdered => "crafting-of-multiple-items-ordered",
-            Self::CraftingFinished => "crafting-finished",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#BuildEntityTipTrigger>
@@ -131,34 +107,12 @@ pub struct StackTransferTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#transfer>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum StackTransferType {
     Stack,
     Inventory,
     WholeInventory,
-}
-
-impl FromStr for StackTransferType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "stack" => Ok(Self::Stack),
-            "inventory" => Ok(Self::Inventory),
-            "whole-inventory" => Ok(Self::WholeInventory),
-            _ => Err(PrototypesErr::InvalidTypeStr("StackTransferType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for StackTransferType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Stack => "stack",
-            Self::Inventory => "inventory",
-            Self::WholeInventory => "whole-inventory",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#EntityTransferTipTrigger>
@@ -169,31 +123,11 @@ pub struct EntityTransferTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#transfer_2>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum EntityTransferType {
     In,
     Out,
-}
-
-impl FromStr for EntityTransferType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "in" => Ok(Self::In),
-            "out" => Ok(Self::Out),
-            _ => Err(PrototypesErr::InvalidTypeStr("EntitytransferType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for EntityTransferType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::In => "in",
-            Self::Out => "out",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#SetRecipeTipTrigger>

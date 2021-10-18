@@ -21,9 +21,9 @@ pub use trigger::*;
 use std::collections::HashMap;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
-use std::fmt;
 use crate::prototypes::PrototypesErr;
 use crate::concepts::LocalisedString;
+use strum_macros::{EnumString, AsRefStr};
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
 #[derive(Debug)]
@@ -82,93 +82,29 @@ impl Color {
 }
 
 /// <https://lua-api.factorio.com/latest/defines.html#defines.difficulty_settings>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum DifficultySetting {
     Normal,
     Expensive
 }
 
-impl FromStr for DifficultySetting {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "normal" => Ok(Self::Normal),
-            "expensive" => Ok(Self::Expensive),
-            _ => Err(PrototypesErr::InvalidTypeStr(String::from("DifficultySetting"), String::from(s)))
-        }
-    }
-}
-
-impl fmt::Display for DifficultySetting {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Normal => "normal",
-            Self::Expensive => "expensive",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Prototype/MapSettings#difficulty_settings>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ResearchQueueSetting {
     AfterVictory,
     Always,
     Never
 }
 
-impl FromStr for ResearchQueueSetting {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "after-victory" => Ok(Self::AfterVictory),
-            "always" => Ok(Self::Always),
-            "never" => Ok(Self::Never),
-            _ => Err(PrototypesErr::InvalidTypeStr(String::from("ResearchQueueSetting"), String::from(s)))
-        }
-    }
-}
-
-impl fmt::Display for ResearchQueueSetting {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::AfterVictory => "after-victory",
-            Self::Always => "always",
-            Self::Never => "never",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Tutorial:Mod_settings#The_setting_type_property>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ModSettingType {
     Startup,
     RuntimeGlobal,
     RuntimePerUser,
-}
-
-impl fmt::Display for ModSettingType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            ModSettingType::Startup => "startup",
-            ModSettingType::RuntimeGlobal => "runtime-global",
-            ModSettingType::RuntimePerUser => "runtime-per-user",
-        })
-    }
-}
-
-impl FromStr for ModSettingType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "startup" => Ok(ModSettingType::Startup),
-            "runtime-global" => Ok(ModSettingType::RuntimeGlobal),
-            "runtime-per-user" => Ok(ModSettingType::RuntimePerUser),
-            _ => Err(PrototypesErr::InvalidModSettingType(s.to_string()))
-        }
-    }
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset>
@@ -209,7 +145,7 @@ impl FromStr for MapGenSize {
             "normal" | "medium" | "regular" => Ok(Self(1.0)),
             "high" | "big" | "good" => Ok(Self((2.0 as f64).sqrt())),
             "very-high" | "very-big" | "very-good" => Ok(Self(2.0)),
-            _ => Err(PrototypesErr::InvalidTypeStr(String::from("MapGenSize"), String::from(s)))
+            _ => Err(PrototypesErr::InvalidTypeStr("MapGenSize".into(), s.into()))
         }
     }
 }
@@ -438,7 +374,8 @@ pub enum MouseCursorType {
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor#system_cursor>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum SystemCursor {
     Arrow,
     IBeam,
@@ -447,37 +384,6 @@ pub enum SystemCursor {
     SizeAll,
     No,
     Hand
-}
-
-impl FromStr for SystemCursor {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "arrow" => Ok(Self::Arrow),
-            "i-beam" => Ok(Self::IBeam),
-            "crosshair" => Ok(Self::Crosshair),
-            "wait-arrow" => Ok(Self::WaitArrow),
-            "size-all" => Ok(Self::SizeAll),
-            "no" => Ok(Self::No),
-            "hand" => Ok(Self::Hand),
-            _ => Err(PrototypesErr::InvalidTypeStr(String::from("SystemCursor"), String::from(s)))
-        }
-    }
-}
-
-impl fmt::Display for SystemCursor {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Arrow => "arrow",
-            Self::IBeam => "i-beam",
-            Self::Crosshair => "crosshair",
-            Self::WaitArrow => "wait-arrow",
-            Self::SizeAll => "size-all",
-            Self::No => "no",
-            Self::Hand => "hand",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
@@ -592,99 +498,31 @@ pub enum ResearchTarget {
 }
 
 /// <https://wiki.factorio.com/Prototype/AutoplaceControl#category>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum AutoplaceControlCategory {
     Resource,
     Terrain,
     Enemy
 }
 
-impl FromStr for AutoplaceControlCategory {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "resource" => Ok(Self::Resource),
-            "terrain" => Ok(Self::Terrain),
-            "enemy" => Ok(Self::Enemy),
-            _ => Err(PrototypesErr::InvalidTypeStr(String::from("AutoplaceControlCategory"), String::from(s)))
-        }
-    }
-}
-
-impl fmt::Display for AutoplaceControlCategory {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Resource => "resource",
-            Self::Terrain => "terrain",
-            Self::Enemy => "enemy",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Prototype/CustomInput#consuming>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ConsumingType {
     None,
     GameOnly
 }
 
-impl FromStr for ConsumingType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "none" => Ok(Self::None),
-            "game-only" => Ok(Self::GameOnly),
-            _ => Err(PrototypesErr::InvalidTypeStr(String::from("ConsumingType"), String::from(s)))
-        }
-    }
-}
-
-impl fmt::Display for ConsumingType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::None => "none",
-            Self::GameOnly => "game-only",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Prototype/CustomInput#action>
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum CustomInputAction {
     Lua,
     SpawnItem,
     TogglePersonalRoboport,
     TogglePersonalLogisticRequests,
     ToggleEquipmentMovementBonus
-}
-
-impl FromStr for CustomInputAction {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "lua" => Ok(Self::Lua),
-            "spawn-item" => Ok(Self::SpawnItem),
-            "toggle-personal-roboport" => Ok(Self::TogglePersonalRoboport),
-            "toggle-personal-logistic-requests" => Ok(Self::TogglePersonalLogisticRequests),
-            "toggle-equipment-movement-bonus" => Ok(Self::ToggleEquipmentMovementBonus),
-            _ => Err(PrototypesErr::InvalidTypeStr("CustomInputAction".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for CustomInputAction {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Lua => "lua",
-            Self::SpawnItem => "spawn-item",
-            Self::TogglePersonalRoboport => "toggle-personal-roboport",
-            Self::TogglePersonalLogisticRequests => "toggle-personal-logistic-requests",
-            Self::ToggleEquipmentMovementBonus => "toggle-equipment-movement-bonus",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/CollisionMask>
@@ -995,7 +833,8 @@ pub struct DamageTypeFilters {
 }
 
 /// <https://wiki.factorio.com/Types/ForceCondition>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ForceCondition {
     All,
     Enemy,
@@ -1006,63 +845,12 @@ pub enum ForceCondition {
     NotSame
 }
 
-impl fmt::Display for ForceCondition {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::All => "all",
-            Self::Enemy => "enemy",
-            Self::Ally => "ally",
-            Self::Friend => "friend",
-            Self::NotFriend => "not-friend",
-            Self::Same => "same",
-            Self::NotSame => "not-same",
-        })
-    }
-}
-
-impl FromStr for ForceCondition {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "all" => Ok(Self::All),
-            "enemy" => Ok(Self::Enemy),
-            "ally" => Ok(Self::Ally),
-            "friend" => Ok(Self::Friend),
-            "not-friend" => Ok(Self::NotFriend),
-            "same" => Ok(Self::Same),
-            "not-same" => Ok(Self::NotSame),
-            _ => Err(PrototypesErr::InvalidTypeStr("ForceCondition".into(), s.into()))
-        }
-    }
-}
-
 /// <https://wiki.factorio.com/Types/AreaTriggerItem#collision_mode>
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum CollisionMode {
     DistanceFromCollisionBox,
     DistanceFromCenter,
-}
-
-impl fmt::Display for CollisionMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::DistanceFromCollisionBox => "distance-from-collision-box",
-            Self::DistanceFromCenter => "distance-from-center",
-        })
-    }
-}
-
-impl FromStr for CollisionMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "distance-from-collision-box" => Ok(Self::DistanceFromCollisionBox),
-            "distance-from-center" => Ok(Self::DistanceFromCenter),
-            _ => Err(PrototypesErr::InvalidTypeStr("CollisionMode".into(), s.into()))
-        }
-    }
 }
 
 /// <https://wiki.factorio.com/Types/MinableProperties>
@@ -1117,34 +905,12 @@ pub struct FluidProductPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity#remove_decoratives>
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum RemoveDecoratives {
     Automatic,
     True,
     False,
-}
-
-impl fmt::Display for RemoveDecoratives {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Automatic => "automatic",
-            Self::True => "true",
-            Self::False => "false",
-        })
-    }
-}
-
-impl FromStr for RemoveDecoratives {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "automatic" => Ok(Self::Automatic),
-            "true" => Ok(Self::True),
-            "false" => Ok(Self::False),
-            _ => Err(PrototypesErr::InvalidTypeStr("RemoveDecoratives".into(), s.into()))
-        }
-    }
 }
 
 /// <https://wiki.factorio.com/Types/ItemToPlace>
@@ -1188,31 +954,11 @@ pub struct OrientedCliffPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/RailRemnants#bending_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum BendingType {
     Straight,
     Turn,
-}
-
-impl FromStr for BendingType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "straight" => Ok(Self::Straight),
-            "turn" => Ok(Self::Turn),
-            _ => Err(PrototypesErr::InvalidTypeStr("BendingType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for BendingType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Straight => "straight",
-            Self::Turn => "turn",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/ExplosionDefinition>
@@ -1327,7 +1073,8 @@ pub struct FluidEnergySource {
 }
 
 /// <https://wiki.factorio.com/Types/ElectricUsagePriority>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ElectricUsagePriority {
     PrimaryInput,
     PrimaryOutput,
@@ -1338,37 +1085,6 @@ pub enum ElectricUsagePriority {
     Solar,
     /// Can only be used by Prototype/Lamp
     Lamp,
-}
-
-impl FromStr for ElectricUsagePriority {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "primary-input" => Ok(Self::PrimaryInput),
-            "primary-output" => Ok(Self::PrimaryOutput),
-            "secondary-input" => Ok(Self::SecondaryInput),
-            "secondary-output" => Ok(Self::SecondaryOutput),
-            "tertiary" => Ok(Self::Tertiary),
-            "solar" => Ok(Self::Solar),
-            "lamp" => Ok(Self::Lamp),
-            _ => Err(PrototypesErr::InvalidTypeStr("ElectricUsagePriority".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ElectricUsagePriority {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::PrimaryInput => "primary-input",
-            Self::PrimaryOutput => "primary-output",
-            Self::SecondaryInput => "secondary-input",
-            Self::SecondaryOutput => "secondary-output",
-            Self::Tertiary => "tertiary",
-            Self::Solar => "solar",
-            Self::Lamp => "lamp",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/SmokeSource>
@@ -1444,34 +1160,12 @@ impl Into<u32> for Direction {
 }
 
 /// <https://wiki.factorio.com/Types/FluidBox#production_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ProductionType {
     Input,
     InputOutput,
     Output,
-}
-
-impl FromStr for ProductionType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "input" => Ok(Self::Input),
-            "input-output" => Ok(Self::InputOutput),
-            "output" => Ok(Self::Output),
-            _ => Err(PrototypesErr::InvalidTypeStr("ProductionType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ProductionType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Input => "input",
-            Self::InputOutput => "input-output",
-            Self::Output => "output",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/WireConnectionPoint>
@@ -1492,40 +1186,8 @@ pub struct WirePosition {
 /// <https://wiki.factorio.com/Types/SignalIDConnector>
 #[derive(Debug)]
 pub struct SignalIDConnector {
-    r#type: SignalIDConnectorType,
+    r#type: SignalType,
     name: String, // Name of a circuit network signal
-}
-
-/// <https://wiki.factorio.com/Types/SignalIDConnector#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
-pub enum SignalIDConnectorType {
-    Virtual,
-    Item,
-    Fluid,
-}
-
-impl FromStr for SignalIDConnectorType {
-    type Err = PrototypesErr;
-    // All fancy shenanigans are omitted, this program/library behaves like a game
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "virtual" => Ok(Self::Virtual),
-            "item" => Ok(Self::Item),
-            "fluid" => Ok(Self::Fluid),
-            _ => Err(PrototypesErr::InvalidTypeStr("SignalIDConnectorType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for SignalIDConnectorType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Virtual => "virtual",
-            Self::Item => "item",
-            Self::Fluid => "fluid",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/ModuleSpecification>
@@ -1605,31 +1267,11 @@ impl BitXorAssign for EffectTypeLimitation {
 }
 
 /// <https://wiki.factorio.com/Prototype/Boiler#mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum BoilerMode {
     HeatWaterInside,
     OutputToSeparatePipe,
-}
-
-impl FromStr for BoilerMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "heat-water-inside" => Ok(Self::HeatWaterInside),
-            "output-to-separate-pipe" => Ok(Self::OutputToSeparatePipe),
-            _ => Err(PrototypesErr::InvalidTypeStr("BoilerMode".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for BoilerMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::HeatWaterInside => "heat-water-inside",
-            Self::OutputToSeparatePipe => "output-to-separate-pipe",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/FootprintParticle>
@@ -1641,7 +1283,8 @@ pub struct FootprintParticle {
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticContainer#logistic_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum LogisticMode {
     PassiveProvider,
     ActiveProvider,
@@ -1650,63 +1293,14 @@ pub enum LogisticMode {
     Requester,
 }
 
-impl FromStr for LogisticMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "passive-provider" => Ok(Self::PassiveProvider),
-            "active-provider" => Ok(Self::ActiveProvider),
-            "storage" => Ok(Self::Storage),
-            "buffer" => Ok(Self::Buffer),
-            "requester" => Ok(Self::Requester),
-            _ => Err(PrototypesErr::InvalidTypeStr("LogisticMode".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for LogisticMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::PassiveProvider => "passive-provider",
-            Self::ActiveProvider => "active-provider",
-            Self::Storage => "storage",
-            Self::Buffer => "buffer",
-            Self::Requester => "requester",
-        })
-    }
-}
-
 /// Used in many places, specified as string
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface#gui_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum GuiMode {
     All,
     None,
     Admins,
-}
-
-impl FromStr for GuiMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "all" => Ok(Self::All),
-            "none" => Ok(Self::None),
-            "admins" => Ok(Self::Admins),
-            _ => Err(PrototypesErr::InvalidTypeStr("GuiMode".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for GuiMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::All => "all",
-            Self::None => "none",
-            Self::Admins => "admins",
-        })
-    }
 }
 
 // Can also be converted from array
@@ -1739,34 +1333,12 @@ pub struct AmmoType {
 }
 
 /// <https://wiki.factorio.com/Types/AmmoType#target_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum TargetType {
     Entity,
     Position,
     Direction,
-}
-
-impl FromStr for TargetType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "entity" => Ok(Self::Entity),
-            "position" => Ok(Self::Position),
-            "direction" => Ok(Self::Direction),
-            _ => Err(PrototypesErr::InvalidTypeStr("TargetType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for TargetType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Entity => "entity",
-            Self::Position => "position",
-            Self::Direction => "direction",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/CircularProjectileCreationSpecification>
@@ -1798,34 +1370,12 @@ pub struct SignalColorMapping {
 }
 
 /// <https://wiki.factorio.com/Types/SignalColorMapping#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum SignalType {
     Virtual,
     Item,
     Fluid,
-}
-
-impl FromStr for SignalType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "virtual" => Ok(Self::Virtual),
-            "item" => Ok(Self::Item),
-            "fluid" => Ok(Self::Fluid),
-            _ => Err(PrototypesErr::InvalidTypeStr("SignalType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for SignalType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Virtual => "virtual",
-            Self::Item => "item",
-            Self::Fluid => "fluid",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker#instruments>
@@ -1916,38 +1466,17 @@ pub struct FireFlameBurntPatchAlphaVariation {
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingText>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum TextAlignment {
     Left,
     Center,
     Right,
 }
 
-impl FromStr for TextAlignment {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "left" => Ok(Self::Left),
-            "center" => Ok(Self::Center),
-            "right" => Ok(Self::Right),
-            _ => Err(PrototypesErr::InvalidTypeStr("TextAlignment".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for TextAlignment {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Left => "left",
-            Self::Center => "center",
-            Self::Right => "right",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/CursorBoxType>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum CursorBoxType {
     Entity,
     NotAllowed,
@@ -1957,39 +1486,6 @@ pub enum CursorBoxType {
     TrainVisualization,
     Logistics,
     BlueprintSnapRectangle,
-}
-
-impl FromStr for CursorBoxType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "entity" => Ok(Self::Entity),
-            "not-allowed" => Ok(Self::NotAllowed),
-            "electricity" => Ok(Self::Electricity),
-            "pair" => Ok(Self::Pair),
-            "copy" => Ok(Self::Copy),
-            "train-visualization" => Ok(Self::TrainVisualization),
-            "logistics" => Ok(Self::Logistics),
-            "blueprint-snap-rectangle" => Ok(Self::BlueprintSnapRectangle),
-            _ => Err(PrototypesErr::InvalidTypeStr("CursorBoxType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for CursorBoxType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Entity => "entity",
-            Self::NotAllowed => "not-allowed",
-            Self::Electricity => "electricity",
-            Self::Pair => "pair",
-            Self::Copy => "copy",
-            Self::TrainVisualization => "train-visualization",
-            Self::Logistics => "logistics",
-            Self::BlueprintSnapRectangle => "blueprint-snap-rectangle",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/EquipmentShape>
@@ -2002,31 +1498,11 @@ pub struct EquipmentShape {
 }
 
 /// <https://wiki.factorio.com/Types/EquipmentShape#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum EquipmentShapeType {
     Full,
     Manual,
-}
-
-impl FromStr for EquipmentShapeType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "full" => Ok(Self::Full),
-            "manual" => Ok(Self::Manual),
-            _ => Err(PrototypesErr::InvalidTypeStr("EquipmentShapeType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for EquipmentShapeType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Full => "full",
-            Self::Manual => "manual",
-        })
-    }
 }
 
 // Constructor should accept width and height, as points can't exceed them.
@@ -2139,7 +1615,8 @@ pub struct AmmoItemAmmoType {
 }
 
 /// <https://wiki.factorio.com/Types/AmmoSourceType>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum AmmoSourceType {
     Default,
     Player,
@@ -2147,91 +1624,22 @@ pub enum AmmoSourceType {
     Vehicle,
 }
 
-impl FromStr for AmmoSourceType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "default" => Ok(Self::Default),
-            "player" => Ok(Self::Player),
-            "turret" => Ok(Self::Turret),
-            "vehicle" => Ok(Self::Vehicle),
-            _ => Err(PrototypesErr::InvalidTypeStr("AmmoSourceType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for AmmoSourceType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Default => "default",
-            Self::Player => "player",
-            Self::Turret => "turret",
-            Self::Vehicle => "vehicle",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Prototype/ItemWithInventory#filter_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum FilterMode {
     Whitelist,
     Blacklist,
 }
 
-impl FromStr for FilterMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "whitelist" => Ok(Self::Whitelist),
-            "blacklist" => Ok(Self::Blacklist),
-            _ => Err(PrototypesErr::InvalidTypeStr("FilterMode".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for FilterMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Whitelist => "whitelist",
-            Self::Blacklist => "blacklist",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Prototype/ItemWithInventory#insertion_priority_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum InsertionPriorityMode {
     Default,
     Never,
     Always,
     WhenManuallyFiltered,
-}
-
-impl FromStr for InsertionPriorityMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "default" => Ok(Self::Default),
-            "never" => Ok(Self::Never),
-            "always" => Ok(Self::Always),
-            "when_manually_filtered" => Ok(Self::WhenManuallyFiltered),
-            _ => Err(PrototypesErr::InvalidTypeStr("InsertionPriorityMode".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for InsertionPriorityMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Default => "default",
-            Self::Never => "never",
-            Self::Always => "always",
-            Self::WhenManuallyFiltered => "when_manually_filtered",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Prototype/SelectionTool#selection_mode>
@@ -2402,7 +1810,8 @@ pub struct FluidIngredientPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/Shortcut#action>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ShortcutAction {
     ToggleAltMode,
     Undo,
@@ -2416,75 +1825,14 @@ pub enum ShortcutAction {
     Lua,
 }
 
-impl FromStr for ShortcutAction {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "toggle-alt-mode" => Ok(Self::ToggleAltMode),
-            "undo" => Ok(Self::Undo),
-            "copy" => Ok(Self::Copy),
-            "cut" => Ok(Self::Cut),
-            "paste" => Ok(Self::Paste),
-            "import-string" => Ok(Self::ImportString),
-            "toggle-personal-roboport" => Ok(Self::TogglePersonalRoboport),
-            "roggle-equipment-movement-bonus" => Ok(Self::RoggleEquipmentMovementBonus),
-            "spawn-item" => Ok(Self::SpawnItem),
-            "lua" => Ok(Self::Lua),
-            _ => Err(PrototypesErr::InvalidTypeStr("ShortcutAction".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ShortcutAction {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::ToggleAltMode => "toggle-alt-mode",
-            Self::Undo => "undo",
-            Self::Copy => "copy",
-            Self::Cut => "cut",
-            Self::Paste => "paste",
-            Self::ImportString => "import-string",
-            Self::TogglePersonalRoboport => "toggle-personal-roboport",
-            Self::RoggleEquipmentMovementBonus => "roggle-equipment-movement-bonus",
-            Self::SpawnItem => "spawn-item",
-            Self::Lua => "lua",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Prototype/Shortcut#style>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ShortcutStyle {
     Default,
     Blue,
     Red,
     Green,
-}
-
-impl FromStr for ShortcutStyle {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "default" => Ok(Self::Default),
-            "blue" => Ok(Self::Blue),
-            "red" => Ok(Self::Red),
-            "green" => Ok(Self::Green),
-            _ => Err(PrototypesErr::InvalidTypeStr("ShortcutStyle".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ShortcutStyle {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Default => "default",
-            Self::Blue => "blue",
-            Self::Red => "red",
-            Self::Green => "green",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Prototype/Technology#Technology_data>
@@ -2643,7 +1991,8 @@ pub struct NothingModifierPrototype {
 }
 
 /// <https://wiki.factorio.com/Types/ModifierPrototype#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ModifierPrototypeType {
     InserterStackSizeBonus,
     StackInserterCapacityBonus,
@@ -2688,105 +2037,6 @@ pub enum ModifierPrototypeType {
     CharacterLogisticRequests,
 }
 
-impl FromStr for ModifierPrototypeType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "inserter-stack-size-bonus" => Ok(Self::InserterStackSizeBonus),
-            "stack-inserter-capacity-bonus" => Ok(Self::StackInserterCapacityBonus),
-            "laboratory-speed" => Ok(Self::LaboratorySpeed),
-            "character-logistic-trash-slots" => Ok(Self::CharacterLogisticTrashSlots),
-            "maximum-following-robots-count" => Ok(Self::MaximumFollowingRobotsCount),
-            "worker-robot-speed" => Ok(Self::WorkerRobotSpeed),
-            "worker-robot-storage" => Ok(Self::WorkerRobotStorage),
-            "ghost-time-to-live" => Ok(Self::GhostTimeToLive),
-            "turret-attack" => Ok(Self::TurretAttack),
-            "ammo-damage" => Ok(Self::AmmoDamage),
-            "give-item" => Ok(Self::GiveItem),
-            "gun-speed" => Ok(Self::GunSpeed),
-            "unlock-recipe" => Ok(Self::UnlockRecipe),
-            "character-crafting-speed" => Ok(Self::CharacterCraftingSpeed),
-            "character-mining-speed" => Ok(Self::CharacterMiningSpeed),
-            "character-running-speed" => Ok(Self::CharacterRunningSpeed),
-            "character-build-distance" => Ok(Self::CharacterBuildDistance),
-            "character-item-drop-distance" => Ok(Self::CharacterItemDropDistance),
-            "character-reach-distance" => Ok(Self::CharacterReachDistance),
-            "character-resource-reach-distance" => Ok(Self::CharacterResourceReachDistance),
-            "character-item-pickup-distance" => Ok(Self::CharacterItemPickupDistance),
-            "character-loot-pickup-distance" => Ok(Self::CharacterLootPickupDistance),
-            "character-inventory-slots-bonus" => Ok(Self::CharacterInventorySlotsBonus),
-            "deconstruction-time-to-live" => Ok(Self::DeconstructionTimeToLive),
-            "max-failed-attempts-per-tick-per-construction-queue" => Ok(Self::MaxFailedAttemptsPerTickPerConstructionQueue),
-            "max-successful-attempts-per-tick-per-construction-queue" => Ok(Self::MaxSuccessfulAttemptsPerTickPerConstructionQueue),
-            "character-health-bonus" => Ok(Self::CharacterHealthBonus),
-            "mining-drill-productivity-bonus" => Ok(Self::MiningDrillProductivityBonus),
-            "train-braking-force-bonus" => Ok(Self::TrainBrakingForceBonus),
-            "zoom-to-world-enabled" => Ok(Self::ZoomToWorldEnabled),
-            "zoom-to-world-ghost-building-enabled" => Ok(Self::ZoomToWorldGhostBuildingEnabled),
-            "zoom-to-world-blueprint-enabled" => Ok(Self::ZoomToWorldBlueprintEnabled),
-            "zoom-to-world-deconstruction-planner-enabled" => Ok(Self::ZoomToWorldDeconstructionPlannerEnabled),
-            "zoom-to-world-upgrade-planner-enabled" => Ok(Self::ZoomToWorldUpgradePlannerEnabled),
-            "zoom-to-world-selection-tool-enabled" => Ok(Self::ZoomToWorldSelectionToolEnabled),
-            "worker-robot-battery" => Ok(Self::WorkerRobotBattery),
-            "laboratory-productivity" => Ok(Self::LaboratoryProductivity),
-            "follower-robot-lifetime" => Ok(Self::FollowerRobotLifetime),
-            "artillery-range" => Ok(Self::ArtilleryRange),
-            "nothing" => Ok(Self::Nothing),
-            "character-logistic-requests" => Ok(Self::CharacterLogisticRequests),
-            _ => Err(PrototypesErr::InvalidTypeStr("ModifierPrototypeType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ModifierPrototypeType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::InserterStackSizeBonus => "inserter-stack-size-bonus",
-            Self::StackInserterCapacityBonus => "stack-inserter-capacity-bonus",
-            Self::LaboratorySpeed => "laboratory-speed",
-            Self::CharacterLogisticTrashSlots => "character-logistic-trash-slots",
-            Self::MaximumFollowingRobotsCount => "maximum-following-robots-count",
-            Self::WorkerRobotSpeed => "worker-robot-speed",
-            Self::WorkerRobotStorage => "worker-robot-storage",
-            Self::GhostTimeToLive => "ghost-time-to-live",
-            Self::TurretAttack => "turret-attack",
-            Self::AmmoDamage => "ammo-damage",
-            Self::GiveItem => "give-item",
-            Self::GunSpeed => "gun-speed",
-            Self::UnlockRecipe => "unlock-recipe",
-            Self::CharacterCraftingSpeed => "character-crafting-speed",
-            Self::CharacterMiningSpeed => "character-mining-speed",
-            Self::CharacterRunningSpeed => "character-running-speed",
-            Self::CharacterBuildDistance => "character-build-distance",
-            Self::CharacterItemDropDistance => "character-item-drop-distance",
-            Self::CharacterReachDistance => "character-reach-distance",
-            Self::CharacterResourceReachDistance => "character-resource-reach-distance",
-            Self::CharacterItemPickupDistance => "character-item-pickup-distance",
-            Self::CharacterLootPickupDistance => "character-loot-pickup-distance",
-            Self::CharacterInventorySlotsBonus => "character-inventory-slots-bonus",
-            Self::DeconstructionTimeToLive => "deconstruction-time-to-live",
-            Self::MaxFailedAttemptsPerTickPerConstructionQueue => "max-failed-attempts-per-tick-per-construction-queue",
-            Self::MaxSuccessfulAttemptsPerTickPerConstructionQueue => "max-successful-attempts-per-tick-per-construction-queue",
-            Self::CharacterHealthBonus => "character-health-bonus",
-            Self::MiningDrillProductivityBonus => "mining-drill-productivity-bonus",
-            Self::TrainBrakingForceBonus => "train-braking-force-bonus",
-            Self::ZoomToWorldEnabled => "zoom-to-world-enabled",
-            Self::ZoomToWorldGhostBuildingEnabled => "zoom-to-world-ghost-building-enabled",
-            Self::ZoomToWorldBlueprintEnabled => "zoom-to-world-blueprint-enabled",
-            Self::ZoomToWorldDeconstructionPlannerEnabled => "zoom-to-world-deconstruction-planner-enabled",
-            Self::ZoomToWorldUpgradePlannerEnabled => "zoom-to-world-upgrade-planner-enabled",
-            Self::ZoomToWorldSelectionToolEnabled => "zoom-to-world-selection-tool-enabled",
-            Self::WorkerRobotBattery => "worker-robot-battery",
-            Self::LaboratoryProductivity => "laboratory-productivity",
-            Self::FollowerRobotLifetime => "follower-robot-lifetime",
-            Self::ArtilleryRange => "artillery-range",
-            Self::Nothing => "nothing",
-            Self::CharacterLogisticRequests => "character-logistic-requests",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/SimulationDefinition>
 #[derive(Debug)]
 pub struct SimulationDefinition {
@@ -2804,7 +2054,8 @@ pub struct SimulationDefinition {
 }
 
 /// <https://wiki.factorio.com/Types/TipStatus>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum TipStatus {
     Locked,
     Optional,
@@ -2814,39 +2065,6 @@ pub enum TipStatus {
     NotToBeSuggested,
     CompletedWithoutTutorial,
     Completed,
-}
-
-impl FromStr for TipStatus {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "locked" => Ok(Self::Locked),
-            "optional" => Ok(Self::Optional),
-            "dependencies-not-met" => Ok(Self::DependenciesNotMet),
-            "unlocked" => Ok(Self::Unlocked),
-            "suggested" => Ok(Self::Suggested),
-            "not-to-be-suggested" => Ok(Self::NotToBeSuggested),
-            "completed-without-tutorial" => Ok(Self::CompletedWithoutTutorial),
-            "completed" => Ok(Self::Completed),
-            _ => Err(PrototypesErr::InvalidTypeStr("TipStatus".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for TipStatus {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Locked => "locked",
-            Self::Optional => "optional",
-            Self::DependenciesNotMet => "dependencies-not-met",
-            Self::Unlocked => "unlocked",
-            Self::Suggested => "suggested",
-            Self::NotToBeSuggested => "not-to-be-suggested",
-            Self::CompletedWithoutTutorial => "completed-without-tutorial",
-            Self::Completed => "completed",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/BoxSpecification>

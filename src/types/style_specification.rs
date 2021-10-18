@@ -1,7 +1,6 @@
-use std::{str::FromStr, fmt};
-use crate::prototypes::PrototypesErr;
 use crate::concepts::LocalisedString;
 use crate::types::{Color, Sprite, FileName, Position, SpriteSizeType, Sound};
+use strum_macros::{EnumString, AsRefStr};
 
 // FIXME?
 // There is a big problem for recreating prototype API from public documentation which is intended
@@ -69,99 +68,31 @@ pub struct StyleSpecificationBase {
 }
 
 /// <https://wiki.factorio.com/Types/StyleSpecification#horizontal_align>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum HorizontalAlignment {
     Left,
     Center,
     Right,
 }
 
-impl FromStr for HorizontalAlignment {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "left" => Ok(Self::Left),
-            "center" => Ok(Self::Center),
-            "right" => Ok(Self::Right),
-            _ => Err(PrototypesErr::InvalidTypeStr("HorizontalAlignment".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for HorizontalAlignment {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Left => "left",
-            Self::Center => "center",
-            Self::Right => "right",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/StyleSpecification#vertical_align>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum VerticalAlignment {
     Top,
     Center,
     Bottom,
 }
 
-impl FromStr for VerticalAlignment {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "top" => Ok(Self::Top),
-            "center" => Ok(Self::Center),
-            "bottom" => Ok(Self::Bottom),
-            _ => Err(PrototypesErr::InvalidTypeStr("VerticalAlignment".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for VerticalAlignment {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Top => "top",
-            Self::Center => "center",
-            Self::Bottom => "bottom",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/StretchRule>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "snake_case")]
 pub enum StretchRule {
     On,
     Off,
     Auto,
     StretchAndExpand,
-}
-
-impl FromStr for StretchRule {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "on" => Ok(Self::On),
-            "off" => Ok(Self::Off),
-            "auto" => Ok(Self::Auto),
-            "stretch_and_expand" => Ok(Self::StretchAndExpand),
-            _ => Err(PrototypesErr::InvalidTypeStr("StretchRule".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for StretchRule {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::On => "on",
-            Self::Off => "off",
-            Self::Auto => "auto",
-            Self::StretchAndExpand => "stretch_and_expand",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/ActivityBarStyleSpecification>
@@ -262,59 +193,19 @@ pub struct ElementImageSetLayer {
 }
 
 /// <https://wiki.factorio.com/Types/ElementImageSetLayer#draw_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum DrawType {
     Inner,
     Outer,
 }
 
-impl FromStr for DrawType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "inner" => Ok(Self::Inner),
-            "outer" => Ok(Self::Outer),
-            _ => Err(PrototypesErr::InvalidTypeStr("DrawType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for DrawType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Inner => "inner",
-            Self::Outer => "outer",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/ElementImageSetLayer#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ElementImageSetLayerType {
     None,
     Composition,
-}
-
-impl FromStr for ElementImageSetLayerType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "none" => Ok(Self::None),
-            "composition" => Ok(Self::Composition),
-            _ => Err(PrototypesErr::InvalidTypeStr("ElementImageSetLayerType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ElementImageSetLayerType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::None => "none",
-            Self::Composition => "composition",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/DropDownStyleSpecification>
@@ -445,32 +336,10 @@ pub struct LabelStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/LabelStyleSpecification#rich_text_setting>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum RichTextSetting {
     Enabled,
     Disabled,
     Highlight,
-}
-
-impl FromStr for RichTextSetting {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "enabled" => Ok(Self::Enabled),
-            "disabled" => Ok(Self::Disabled),
-            "highlight" => Ok(Self::Highlight),
-            _ => Err(PrototypesErr::InvalidTypeStr("RichTextSetting".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for RichTextSetting {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Enabled => "enabled",
-            Self::Disabled => "disabled",
-            Self::Highlight => "highlight",
-        })
-    }
 }

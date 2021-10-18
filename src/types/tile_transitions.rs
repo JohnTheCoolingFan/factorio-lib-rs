@@ -1,6 +1,4 @@
-use std::fmt;
-use std::str::FromStr;
-use crate::{types::{Sprite, Animation, FileName, SpriteSizeType}, prototypes::PrototypesErr};
+use crate::types::{Sprite, Animation, FileName, SpriteSizeType};
 
 /// <https://wiki.factorio.com/Types/TileTransitions>
 #[derive(Debug)]
@@ -41,40 +39,14 @@ pub struct TileTransitionsBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#layer_group>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum LayerGroup {
     Zero,
     Water,
     WaterOverlay,
     Ground,
     Top,
-}
-
-impl FromStr for LayerGroup {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "zero" => Ok(Self::Zero),
-            "water" => Ok(Self::Water),
-            "water-overlay" => Ok(Self::WaterOverlay),
-            "ground" => Ok(Self::Ground),
-            "top" => Ok(Self::Top),
-            _ => Err(PrototypesErr::InvalidTypeStr("LayerGroup".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for LayerGroup {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Zero => "zero",
-            Self::Water => "water",
-            Self::WaterOverlay => "water-overlay",
-            Self::Ground => "ground",
-            Self::Top => "top",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/TileTransitionSprite>

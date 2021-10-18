@@ -1,8 +1,7 @@
-use std::str::FromStr;
-use std::fmt;
-use crate::types::{Factorio2DVector, PrototypesErr, RangeMode, AmmoType, CircularParticleCreationSpecification};
+use crate::types::{Factorio2DVector, RangeMode, AmmoType, CircularParticleCreationSpecification};
 use super::graphics::{RotatedAnimation};
 use super::sound::{LayeredSound, CyclicSound};
+use strum_macros::{EnumString, AsRefStr};
 
 // ========== // AttackParameters // ========== //
 
@@ -114,37 +113,13 @@ pub struct StreamAttackParameters {
 // =============== // Other // ================ //
 
 /// <https://wiki.factorio.com/Types/BaseAttackParameters#activation_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ActivationType {
     Shoot,
     Throw,
     Consume,
     Activate,
-}
-
-impl FromStr for ActivationType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "shoot" => Ok(Self::Shoot),
-            "throw" => Ok(Self::Throw),
-            "consume" => Ok(Self::Consume),
-            "activate" => Ok(Self::Activate),
-            _ => Err(PrototypesErr::InvalidTypeStr("ActivationType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ActivationType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Shoot => "shoot",
-            Self::Throw => "throw",
-            Self::Consume => "consume",
-            Self::Activate => "activate",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/StreamAttackParameters#gun_center_shift>

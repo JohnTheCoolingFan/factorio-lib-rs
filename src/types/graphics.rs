@@ -1,8 +1,6 @@
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
-use std::fmt;
-use std::str::FromStr;
-use crate::prototypes::PrototypesErr;
 use crate::types::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
+use strum_macros::{EnumString, AsRefStr};
 
 // ============ // Simple types // ============ //
 
@@ -20,7 +18,8 @@ pub type SpriteSizeType = i16;
         // Enums with FromStr
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_recipe_tint>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ApplyRecipeTint {
     Primary,
     Secondary,
@@ -29,35 +28,9 @@ pub enum ApplyRecipeTint {
     None,
 }
 
-impl FromStr for ApplyRecipeTint {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "primary" => Ok(Self::Primary),
-            "secondary" => Ok(Self::Secondary),
-            "tertiary" => Ok(Self::Tertiary),
-            "quaternary" => Ok(Self::Quaternary),
-            "none" => Ok(Self::None),
-            _ => Err(PrototypesErr::InvalidTypeStr("ApplyRecipeTint".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ApplyRecipeTint {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Primary => "primary",
-            Self::Secondary => "secondary",
-            Self::Tertiary => "tertiary",
-            Self::Quaternary => "quaternary",
-            Self::None => "none",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_tint>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ApplyTint {
     ResourceColor,
     InputFluidBaseColor,
@@ -66,35 +39,10 @@ pub enum ApplyTint {
     None,
 }
 
-impl FromStr for ApplyTint {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "resource-color" => Ok(Self::ResourceColor),
-            "input-fluid-base-color" => Ok(Self::InputFluidBaseColor),
-            "input-fluid-flow-color" => Ok(Self::InputFluidFlowColor),
-            "status" => Ok(Self::Status),
-            "none" => Ok(Self::None),
-            _ => Err(PrototypesErr::InvalidTypeStr("ApplyTint".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ApplyTint {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::ResourceColor => "resource-color",
-            Self::InputFluidBaseColor => "input-fluid-base-color",
-            Self::InputFluidFlowColor => "input-fluid-flow-color",
-            Self::Status => "status",
-            Self::None => "none",
-        })
-    }
-}
 
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet#apply_module_tint>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ApplyModuleTint {
     Primary,
     Secondary,
@@ -102,145 +50,41 @@ pub enum ApplyModuleTint {
     Quaternary,
 }
 
-impl FromStr for ApplyModuleTint {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "primary" => Ok(Self::Primary),
-            "secondary" => Ok(Self::Secondary),
-            "tertiary" => Ok(Self::Tertiary),
-            "quaternary" => Ok(Self::Quaternary),
-            _ => Err(PrototypesErr::InvalidTypeStr("ApplyModuleTint".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ApplyModuleTint {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Primary => "primary",
-            Self::Secondary => "secondary",
-            Self::Tertiary => "tertiary",
-            Self::Quaternary => "quaternary",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet#module_tint_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum ModuleTintMode {
     SingleModule,
     Mix,
 }
 
-impl FromStr for ModuleTintMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "single-module" => Ok(Self::SingleModule),
-            "mix" => Ok(Self::Mix),
-            _ => Err(PrototypesErr::InvalidTypeStr("ModuleTintMode".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for ModuleTintMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::SingleModule => "single-module",
-            Self::Mix => "mix",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/LightDefinition#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum LightDefinitionType {
     Basic,
     Oriented,
 }
 
-impl FromStr for LightDefinitionType {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "basic" => Ok(Self::Basic),
-            "oriented" => Ok(Self::Oriented),
-            _ => Err(PrototypesErr::InvalidTypeStr("LightDefinitionType".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for LightDefinitionType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Basic => "basic",
-            Self::Oriented => "oriented",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/BaseAttackParameters#range_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum RangeMode {
     CenterToCenter,
     BoundingBoxToBoundingBox,
 }
 
-impl FromStr for RangeMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "center-to-center" => Ok(Self::CenterToCenter),
-            "bounding-box-to-bounding-box" => Ok(Self::BoundingBoxToBoundingBox),
-            _ => Err(PrototypesErr::InvalidTypeStr("RangeMode".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for RangeMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::CenterToCenter => "center-to-center",
-            Self::BoundingBoxToBoundingBox => "bounding-box-to-bounding-box",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Prototype/Lamp#glow_render_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum GlowRenderMode {
     Additive,
     Multiplicative,
 }
 
-impl FromStr for GlowRenderMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "additive" => Ok(Self::Additive),
-            "multiplicative" => Ok(Self::Multiplicative),
-            _ => Err(PrototypesErr::InvalidTypeStr("GlowRenderMode".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for GlowRenderMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Additive => "additive",
-            Self::Multiplicative => "multiplicative",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/RenderLayer>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum RenderLayer {
     WaterTile,
     GroundTile,
@@ -287,109 +131,6 @@ pub enum RenderLayer {
     Cursor
 }
 
-impl FromStr for RenderLayer {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "water-tile" => Ok(Self::WaterTile),
-            "ground-tile" => Ok(Self::GroundTile),
-            "tile-transition" => Ok(Self::TileTransition),
-            "decals" => Ok(Self::Decals),
-            "lower-radius-visualization" => Ok(Self::LowerRadiusVisualization),
-            "radius-visualization" => Ok(Self::RadiusVisualization),
-            "transport-belt-integration" => Ok(Self::TransportBeltIntegration),
-            "resource" => Ok(Self::Resource),
-            "building-smoke" => Ok(Self::BuildingSmoke),
-            "decorative" => Ok(Self::Decorative),
-            "ground-patch" => Ok(Self::GroundPatch),
-            "ground-patch-higher" => Ok(Self::GroundPatchHigher),
-            "ground-patch-higher2" => Ok(Self::GroundPatchHigher2),
-            "remnants" => Ok(Self::Remnants),
-            "floor" => Ok(Self::Floor),
-            "transport-belt" => Ok(Self::TransportBelt),
-            "transport-belt-endings" => Ok(Self::TransportBeltEndings),
-            "floor-mechanics-under-corpse" => Ok(Self::FloorMechanicsUnderCorpse),
-            "corpse" => Ok(Self::Corpse),
-            "floor-mechanics" => Ok(Self::FloorMechanics),
-            "item" => Ok(Self::Item),
-            "lower-object" => Ok(Self::LowerObject),
-            "transport-belt-circuit-connector" => Ok(Self::TransportBeltCircuitConnector),
-            "lower-object-above-shadow" => Ok(Self::LowerObjectAboveShadow),
-            "object" => Ok(Self::Object),
-            "higher-object-under" => Ok(Self::HigherObjectUnder),
-            "higher-object-above" => Ok(Self::HigherObjectAbove),
-            "item-in-inserter-hand" => Ok(Self::ItemInInserterHand),
-            "wires" => Ok(Self::Wires),
-            "wires-above" => Ok(Self::WiresAbove),
-            "entity-info-icon" => Ok(Self::EntityInfoIcon),
-            "entity-info-icon-above" => Ok(Self::EntityInfoIconAbove),
-            "explosion" => Ok(Self::Explosion),
-            "projectile" => Ok(Self::Projectile),
-            "smoke" => Ok(Self::Smoke),
-            "air-object" => Ok(Self::AirObject),
-            "air-entity-info-icon" => Ok(Self::AirEntityInfoIcon),
-            "light-effect" => Ok(Self::LightEffect),
-            "selection-box" => Ok(Self::SelectionBox),
-            "higher-selection-box" => Ok(Self::HigherSelectionBox),
-            "collision-selection-box" => Ok(Self::CollisionSelectionBox),
-            "arrow" => Ok(Self::Arrow),
-            "cursor" => Ok(Self::Cursor),
-            _ => Err(PrototypesErr::InvalidTypeStr("RenderLayer".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for RenderLayer {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::WaterTile => "water-tile",
-            Self::GroundTile => "ground-tile",
-            Self::TileTransition => "tile-transition",
-            Self::Decals => "decals",
-            Self::LowerRadiusVisualization => "lower-radius-visualization",
-            Self::RadiusVisualization => "radius-visualization",
-            Self::TransportBeltIntegration => "transport-belt-integration",
-            Self::Resource => "resource",
-            Self::BuildingSmoke => "building-smoke",
-            Self::Decorative => "decorative",
-            Self::GroundPatch => "ground-patch",
-            Self::GroundPatchHigher => "ground-patch-higher",
-            Self::GroundPatchHigher2 => "ground-patch-higher2",
-            Self::Remnants => "remnants",
-            Self::Floor => "floor",
-            Self::TransportBelt => "transport-belt",
-            Self::TransportBeltEndings => "transport-belt-endings",
-            Self::FloorMechanicsUnderCorpse => "floor-mechanics-under-corpse",
-            Self::Corpse => "corpse",
-            Self::FloorMechanics => "floor-mechanics",
-            Self::Item => "item",
-            Self::LowerObject => "lower-object",
-            Self::TransportBeltCircuitConnector => "transport-belt-circuit-connector",
-            Self::LowerObjectAboveShadow => "lower-object-above-shadow",
-            Self::Object => "object",
-            Self::HigherObjectUnder => "higher-object-under",
-            Self::HigherObjectAbove => "higher-object-above",
-            Self::ItemInInserterHand => "item-in-inserter-hand",
-            Self::Wires => "wires",
-            Self::WiresAbove => "wires-above",
-            Self::EntityInfoIcon => "entity-info-icon",
-            Self::EntityInfoIconAbove => "entity-info-icon-above",
-            Self::Explosion => "explosion",
-            Self::Projectile => "projectile",
-            Self::Smoke => "smoke",
-            Self::AirObject => "air-object",
-            Self::AirEntityInfoIcon => "air-entity-info-icon",
-            Self::LightEffect => "light-effect",
-            Self::SelectionBox => "selection-box",
-            Self::HigherSelectionBox => "higher-selection-box",
-            Self::CollisionSelectionBox => "collision-selection-box",
-            Self::Arrow => "arrow",
-            Self::Cursor => "cursor",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/Sprite#draw_as_shadow>
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum DrawAs {
@@ -414,7 +155,8 @@ impl DrawAs {
 }
 
 /// <https://wiki.factorio.com/Types/Sprite#blend_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum BlendMode {
     Normal,
     Additive,
@@ -423,62 +165,13 @@ pub enum BlendMode {
     Overwrite
 }
 
-impl FromStr for BlendMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "normal" => Ok(Self::Normal),
-            "additive" => Ok(Self::Additive),
-            "additive-soft" => Ok(Self::AdditiveSoft),
-            "multiplicative" => Ok(Self::Multiplicative),
-            "overwrite" => Ok(Self::Overwrite),
-            _ => Err(PrototypesErr::InvalidTypeStr(String::from("BlendMode"), String::from(s)))
-        }
-    }
-}
-
-impl fmt::Display for BlendMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Normal => "normal",
-            Self::Additive => "additive",
-            Self::AdditiveSoft => "additive-soft",
-            Self::Multiplicative => "multiplicative",
-            Self::Overwrite => "overwrite",
-        })
-    }
-}
-
 /// <https://wiki.factorio.com/Types/Animation#run_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum RunMode {
     Forward,
     Backward,
     ForwardThenBackward
-}
-
-impl FromStr for RunMode {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "forward" => Ok(Self::Forward),
-            "backward" => Ok(Self::Backward),
-            "forward-then-backward" => Ok(Self::ForwardThenBackward),
-            _ => Err(PrototypesErr::InvalidTypeStr(String::from("RunMode"), String::from(s)))
-        }
-    }
-}
-
-impl fmt::Display for RunMode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Forward => "forward",
-            Self::Backward => "backward",
-            Self::ForwardThenBackward => "forward-then-backward",
-        })
-    }
 }
 
         // Structs
@@ -1009,7 +702,8 @@ impl BitXorAssign for SpriteFlags {
 }
 
 /// <https://wiki.factorio.com/Types/Sprite#priority>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum SpritePriority {
     ExtraHighNoScale,
     ExtraHigh,
@@ -1018,37 +712,6 @@ pub enum SpritePriority {
     Low,
     VeryLow,
     NoAtlas
-}
-
-impl fmt::Display for SpritePriority {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::ExtraHighNoScale => "extra-high-no-scale",
-            Self::ExtraHigh => "extra-high",
-            Self::High => "high",
-            Self::Medium => "medium",
-            Self::Low => "low",
-            Self::VeryLow => "very-low",
-            Self::NoAtlas => "no-atlas",
-        })
-    }
-}
-
-impl FromStr for SpritePriority {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "extra-high-no-scale" => Ok(Self::ExtraHighNoScale),
-            "extra-high" => Ok(Self::ExtraHigh),
-            "high" => Ok(Self::High),
-            "medium" => Ok(Self::Medium),
-            "low" => Ok(Self::Low),
-            "very-low" => Ok(Self::VeryLow),
-            "no-atlas" => Ok(Self::NoAtlas),
-            _ => Err(PrototypesErr::InvalidTypeStr("SpritePriority".into(), s.into()))
-        }
-    }
 }
 
 // ===== // Graphics Sets and Pictures // ===== //
@@ -1188,34 +851,12 @@ pub struct WorkingVisualisation {
 }
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#effect>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 pub enum WorkingVisualisationEffect {
     Flicker,
     UraniumGlow,
     None,
-}
-
-impl FromStr for WorkingVisualisationEffect {
-    type Err = PrototypesErr;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "flicker" => Ok(Self::Flicker),
-            "uranium-glow" => Ok(Self::UraniumGlow),
-            "none" => Ok(Self::None),
-            _ => Err(PrototypesErr::InvalidTypeStr("WorkingVisualisationEffect".into(), s.into()))
-        }
-    }
-}
-
-impl fmt::Display for WorkingVisualisationEffect {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            Self::Flicker => "flicker",
-            Self::UraniumGlow => "uranium-glow",
-            Self::None => "none",
-        })
-    }
 }
 
 /// <https://wiki.factorio.com/Types/ConnectableEntityGraphics>
