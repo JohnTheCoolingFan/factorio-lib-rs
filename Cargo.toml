@@ -18,3 +18,5 @@ itertools = "0.10.1"
 regex = "1.5.4"
 once_cell = "1.8.0"
 rust-ini = "0.17"
+strum = { version = "0.22", features = ["derive"] }
+strum_macros = "0.22"
