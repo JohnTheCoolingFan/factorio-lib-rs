@@ -1,4 +1,5 @@
 use crate::types::{Sprite, Animation, FileName, SpriteSizeType};
+use strum_macros::{EnumString, AsRefStr};
 
 /// <https://wiki.factorio.com/Types/TileTransitions>
 #[derive(Debug)]
