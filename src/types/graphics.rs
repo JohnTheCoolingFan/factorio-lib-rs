@@ -1,4 +1,5 @@
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
+use std::iter::FromIterator;
 use crate::types::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
 use strum_macros::{EnumString, AsRefStr};
 
@@ -535,7 +536,7 @@ pub struct SpriteVariationSpec {
 }
 
 /// <https://wiki.factorio.com/Types/SpriteFlags>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 pub struct SpriteFlags(u32);
 
 impl SpriteFlags {
@@ -573,11 +574,11 @@ impl SpriteFlags {
     pub const COMPRESSED: SpriteFlags = SpriteFlags(1 << 31);
 }
 
-impl From<Vec<&str>> for SpriteFlags {
-    fn from(flags: Vec<&str>) -> Self {
+impl<T: AsRef<str>> FromIterator<T> for SpriteFlags {
+    fn from_iter<I: IntoIterator<Item = T>>(flags: I) -> Self {
         let mut result = Self(0);
         for flag in flags {
-            match flag {
+            match flag.as_ref() {
                 "no-crop" => result |= SpriteFlags::NO_CROP,
                 "not-compressed" => result |= SpriteFlags::NOT_COMPRESSED,
                 "always-compressed" => result |= SpriteFlags::ALWAYS_COMPRESSED,
@@ -612,7 +613,6 @@ impl From<Vec<&str>> for SpriteFlags {
                     SpriteFlags::MIPMAP |
                     SpriteFlags::LINEAR_MINIFICATION |
                     SpriteFlags::LINEAR_MAGNIFICATION |
-                    SpriteFlags::LINEAR_MIP_LEVEL |
                     SpriteFlags::NOT_COMPRESSED |
                     SpriteFlags::GROUP_ICON,
                 "light" => result |= SpriteFlags::LIGHT |
@@ -653,7 +653,8 @@ impl From<Vec<&str>> for SpriteFlags {
                 "group=low-object" => result |= SpriteFlags::GROUP_LOW_OBJECT,
                 "group=gui" => result |= SpriteFlags::GROUP_GUI,
                 "group=icon" => result |= SpriteFlags::GROUP_ICON,
-                "group=icon-background" => result |= SpriteFlags::GROUP_ICON_BACKGROUND, */
+                "group=icon-background" => result |= SpriteFlags::GROUP_ICON_BACKGROUND,
+                */
                 "compressed" => result |= SpriteFlags::COMPRESSED,
                 _ => {}
             }
