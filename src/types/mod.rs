@@ -1222,7 +1222,8 @@ impl<T: AsRef<str>> FromIterator<T> for EffectTypeLimitation {
                 "productivity" => result |= Self::PRODUCTIVITY,
                 "consumption" => result |= Self::CONSUMPTION,
                 "pollution" => result |= Self::POLLUTION,
-                _ => {}            }
+                _ => {}
+            }
         }
         result
     }
@@ -1564,7 +1565,8 @@ impl<T: AsRef<str>> FromIterator<T> for ItemPrototypeFlags {
                 "mod-openable" => result |= Self::MOD_OPENABLE,
                 "only-in-cursor" => result |= Self::ONLY_IN_CURSOR,
                 "spawnable" => result |= Self::SPAWNABLE,
-                _ => {}            }
+                _ => {}
+            }
         }
         result
     }
@@ -1672,10 +1674,10 @@ impl SelectionMode {
     pub const AVOID_ROLLING_STOCK: Self = Self(1 << 20);
 }
 
-impl From<Vec<&str>> for SelectionMode {
-    fn from(in_arr: Vec<&str>) -> Self {
+impl<T: AsRef<str>> FromIterator<T> for SelectionMode {
+    fn from_iter<I: IntoIterator<Item = T>>(in_arr: I) -> Self {
         let mut result = Self(0);        for item in in_arr {
-            match item {
+            match item.as_ref() {
                 "blueprint" => result |= Self::BLUEPRINT,
                 "deconstruct" => result |= Self::DECONSTRUCT,
                 "cancel-deconstruct" => result |= Self::CANCEL_DECONSTRUCT,
@@ -1697,7 +1699,8 @@ impl From<Vec<&str>> for SelectionMode {
                 "entity-with-force" => result |= Self::ENTITY_WITH_FORCE,
                 "entity-with-owner" => result |= Self::ENTITY_WITH_OWNER,
                 "avoid-rolling-stock" => result |= Self::AVOID_ROLLING_STOCK,
-                _ => {}            }
+                _ => {}
+            }
         }
         result
     }
