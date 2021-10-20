@@ -8,4 +8,3 @@ pub mod types;
 
 // TODO: FromLua for prototypes
 // TODO: rest of the prototypes
-// TODO: try strum crate
