@@ -1204,7 +1204,7 @@ pub struct ModuleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/EffectTypeLimitation>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 pub struct EffectTypeLimitation(u8);
 
 impl EffectTypeLimitation {
@@ -1214,10 +1214,10 @@ impl EffectTypeLimitation {
     pub const POLLUTION: Self = Self(1 << 3);
 }
 
-impl From<Vec<&str>> for EffectTypeLimitation {
-    fn from(in_arr: Vec<&str>) -> Self {
+impl<T: AsRef<str>> FromIterator<T> for EffectTypeLimitation {
+    fn from_iter<I: IntoIterator<Item = T>>(in_arr: I) -> Self {
         let mut result = Self(0);        for item in in_arr {
-            match item {
+            match item.as_ref() {
                 "speed" => result |= Self::SPEED,
                 "productivity" => result |= Self::PRODUCTIVITY,
                 "consumption" => result |= Self::CONSUMPTION,
