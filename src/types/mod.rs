@@ -708,7 +708,7 @@ impl BitXorAssign for CollisionMask {
 }
 
 /// <https://wiki.factorio.com/Types/EntityPrototypeFlags>
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 pub struct EntityPrototypeFlags(u32);
 
 impl EntityPrototypeFlags {
@@ -737,14 +737,14 @@ impl EntityPrototypeFlags {
     pub const NOT_SELECTABLE_IN_GAME: Self = Self(1 << 22);
     pub const NOT_UPGRADABLE: Self = Self(1 << 23);
     pub const NOT_IN_KILL_STATISTICS: Self = Self(1 << 24);
-    pub const ALL: Self = Self(u32::MAX);
+    pub const ALL: Self = Self((1 << 25) - 1);
 }
 
-impl From<Vec<&str>> for EntityPrototypeFlags {
-    fn from(flags: Vec<&str>) -> Self {
+impl<T: AsRef<str>> FromIterator<T> for EntityPrototypeFlags {
+    fn from_iter<I: IntoIterator<Item = T>>(flags: I) -> Self {
         let mut result = Self(0);
         for flag in flags {
-            match flag {
+            match flag.as_ref() {
                 "not-rotatable" => result |= Self::NOT_ROTATABLE,
                 "placeable-player" => result |= Self::PLACEABLE_PLAYER,
                 "placeable-neutral" => result |= Self::PLACEABLE_NEUTRAL,
