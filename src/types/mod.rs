@@ -1548,10 +1548,11 @@ impl ItemPrototypeFlags {
     pub const SPAWNABLE: Self = Self(1 << 10);
 }
 
-impl From<Vec<&str>> for ItemPrototypeFlags {
-    fn from(in_arr: Vec<&str>) -> Self {
-        let mut result = Self(0);        for item in in_arr {
-            match item {
+impl<T: AsRef<str>> FromIterator<T> for ItemPrototypeFlags {
+    fn from_iter<I: IntoIterator<Item = T>>(in_arr: I) -> Self {
+        let mut result = Self(0);
+        for item in in_arr {
+            match item.as_ref() {
                 "draw-logistic-overlay" => result |= Self::DRAW_LOGISTIC_OVERLAY,
                 "hidden" => result |= Self::HIDDEN,
                 "always-show" => result |= Self::ALWAYS_SHOW,
