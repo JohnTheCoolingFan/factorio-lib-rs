@@ -526,7 +526,7 @@ pub enum CustomInputAction {
 }
 
 /// <https://wiki.factorio.com/Types/CollisionMask>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 pub struct CollisionMask(u64);
 
 impl CollisionMask {
@@ -588,7 +588,6 @@ impl CollisionMask {
     pub const NOT_COLLIDING_WITH_ITSELF: CollisionMask = CollisionMask(1 << 55);
     pub const CONSIDER_TILE_TRANSITIONS: CollisionMask = CollisionMask(1 << 56);
     pub const COLLIDING_WITH_TILES_ONLY: CollisionMask = CollisionMask(1 << 57);
-    pub const ALL: CollisionMask = CollisionMask(u64::MAX); // Just sets all bits 1, instead of setting all usable bits
 }
 
 impl From<Vec<&str>> for CollisionMask {
