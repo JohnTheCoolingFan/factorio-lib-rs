@@ -18,6 +18,7 @@ pub use tile_transitions::*;
 pub use tip_trigger::*;
 pub use trigger::*;
 
+use std::iter::FromIterator;
 use std::collections::HashMap;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
@@ -591,11 +592,11 @@ impl CollisionMask {
     pub const ALL: CollisionMask = CollisionMask((1 << 58) - 1); // Just sets all bits 1, instead of setting all usable bits
 }
 
-impl From<Vec<&str>> for CollisionMask {
-    fn from(layers: Vec<&str>) -> Self {
+impl<T: AsRef<str>> FromIterator<T> for CollisionMask {
+    fn from_iter<I: IntoIterator<Item = T>>(layers: I) -> Self {
         let mut result = Self(0);
         for layer in layers {
-            match layer {
+            match layer.as_ref() {
                 "ground-tile" => result |= Self::GROUND_TILE,
                 "water-tile" => result |= Self::WATER_TILE,
                 "resource-layer" => result |= Self::RESOURCE_LAYER,
