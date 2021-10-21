@@ -38,7 +38,7 @@ pub enum StyleSpecification {
     CheckBox(CheckBoxStyleSpecification),
     RadioButton(RadioButtonStyleSpecification),
     Switch(SwitchStyleSpecification),
-    Tabbed(TabbedStyleSpecification),
+    TabbedPane(TabbedPaneStyleSpecification),
     Table(TableStyleSpecification),
     Tab(TabStyleSpecification),
     TextBox(TextBoxStyleSpecification),
