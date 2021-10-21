@@ -451,3 +451,23 @@ pub struct SpeechBubbleStyleSpecification {
     arrow_indent: f64,
     pass_through_mouse: bool
 }
+
+/// <https://wiki.factorio.com/Types/ButtonStyleSpecification>
+#[derive(Debug)]
+pub struct ButtonStyleSpecification {
+    base: StyleSpecificationBase,
+    font: Option<String>, // Name of Font prototype
+    default_font_color: Color,
+    hovered_font_color: Color,
+    clicked_font_color: Color,
+    disabled_font_color: Color,
+    selected_font_color: Color,
+    selected_hovered_font_color: Color,
+    selected_clicked_font_color: Color,
+    strikethrough_color: Color,
+    pie_progress_color: Color,
+    clicked_vertical_offset: u32,
+    draw_shadow_under_picture: bool,
+    draw_grayscale_picture: bool,
+    icon_horizontal_align: HorizontalAlignment
+}
