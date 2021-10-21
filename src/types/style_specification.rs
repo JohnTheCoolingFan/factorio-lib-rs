@@ -350,3 +350,11 @@ pub struct LineStyleSpecification {
     base: StyleSpecificationBase,
     border: Option<BorderImageSet>
 }
+
+/// <https://wiki.factorio.com/Types/ListBoxStyleSpecification>
+#[derive(Debug)]
+pub struct ListBoxStyleSpecification {
+    base: StyleSpecificationBase,
+    item_style: Option<ButtonStyleSpecification>,
+    scroll_pane_style: Option<ScrollPaneStyleSpecification>
+}
