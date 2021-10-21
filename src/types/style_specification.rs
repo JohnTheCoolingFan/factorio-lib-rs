@@ -37,7 +37,7 @@ pub enum StyleSpecification {
     TechnologySlot(TechnologySlotStyleSpecification),
     CheckBox(CheckBoxStyleSpecification),
     RadioButton(RadioButtonStyleSpecification),
-    Switch(SwitcjStyleSpecification),
+    Switch(SwitchStyleSpecification),
     Tabbed(TabbedStyleSpecification),
     Table(TableStyleSpecification),
     Tab(TabStyleSpecification),
