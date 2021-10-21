@@ -415,6 +415,7 @@ pub struct ScrollPaneStyleSpecification {
 /// <https://wiki.factorio.com/Types/SliderStyleSpecification>
 #[derive(Debug)]
 pub struct SliderStyleSpecification {
+    base: StyleSpecificationBase,
     full_bar: Option<ElementImageSet>,
     full_bar_disabled: Option<ElementImageSet>,
     empty_bar: Option<ElementImageSet>,
@@ -428,6 +429,7 @@ pub struct SliderStyleSpecification {
 /// <https://wiki.factorio.com/Types/DoubleSliderStyleSpecification>
 #[derive(Debug)]
 pub struct DoubleSliderStyleSpecification {
+    base: StyleSpecificationBase,
     full_bar: Option<ElementImageSet>,
     full_bar_disabled: Option<ElementImageSet>,
     empty_bar: Option<ElementImageSet>,
@@ -436,4 +438,16 @@ pub struct DoubleSliderStyleSpecification {
     notch: Option<ElementImageSet>,
     button: Option<ButtonStyleSpecification>,
     high_button: Option<ButtonStyleSpecification>
+}
+
+/// <https://wiki.factorio.com/Types/SpeechBubbleStyleSpecification>
+#[derive(Debug)]
+pub struct SpeechBubbleStyleSpecification {
+    base: StyleSpecificationBase,
+    frame_style: Option<FrameStyleSpecification>,
+    label_style: Option<LabelStyleSpecification>,
+    arrow_graphical_set: Option<ElementImageSet>,
+    close_color: Color,
+    arrow_indent: f64,
+    pass_through_mouse: bool
 }
