@@ -560,3 +560,20 @@ pub struct CheckBoxStyleSpecification {
     intermediate_mark: Option<Sprite>,
     text_padding: u32
 }
+
+/// <https://wiki.factorio.com/Types/RadioButtonStyleSpecification>
+#[derive(Debug)]
+pub struct RadioButtonStyleSpecification {
+    base: StyleSpecificationBase,
+    default_graphical_set: Option<ElementImageSet>,
+    hovered_graphical_set: Option<ElementImageSet>,
+    clicked_graphical_set: Option<ElementImageSet>,
+    disabled_graphical_set: Option<ElementImageSet>,
+    selected_graphical_set: Option<ElementImageSet>,
+    selected_hovered_graphical_set: Option<ElementImageSet>,
+    selected_clicked_graphical_set: Option<ElementImageSet>,
+    left_click_sound: Option<Sound>,
+    font: Option<String>, // Name of Font prototype
+    font_color: Color,
+    text_padding: u32
+}
