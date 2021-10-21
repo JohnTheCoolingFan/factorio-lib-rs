@@ -663,3 +663,33 @@ pub enum ColumnAlignmentStr {
     MiddleRight,
     BottomRight
 }
+
+/// <https://wiki.factorio.com/Types/TabStyleSpecification>
+#[derive(Debug)]
+pub struct TabStyleSpecification {
+    base: StyleSpecificationBase,
+    font: Option<String>, // Name of Font prototype
+    badge_font: Option<String>, // Name of Font prototype
+    badge_horizontal_spacing: i16,
+    default_font_color: Color,
+    selected_font_color: Color,
+    disabled_font_color: Color,
+    default_badge_font_color: Color,
+    selected_badge_font_color: Color,
+    disabled_badge_font_color: Color,
+    default_graphical_set: Option<ElementImageSet>,
+    selected_graphical_set: Option<ElementImageSet>,
+    hover_graphical_set: Option<ElementImageSet>,
+    press_graphical_set: Option<ElementImageSet>,
+    disabled_graphical_set: Option<ElementImageSet>,
+    override_graphics_on_edges: bool,
+    left_edge_selected_graphical_set: Option<ElementImageSet>,
+    right_edge_selected_graphical_set: Option<ElementImageSet>,
+    default_badge_graphical_set: Option<ElementImageSet>,
+    selected_badge_graphical_set: Option<ElementImageSet>,
+    hover_badge_graphical_set: Option<ElementImageSet>,
+    press_badge_graphical_set: Option<ElementImageSet>,
+    disabled_badge_graphical_set: Option<ElementImageSet>,
+    draw_grayscale_picture: bool,
+    left_click_sound: Option<Sound>
+}
