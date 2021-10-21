@@ -456,6 +456,14 @@ pub struct SpeechBubbleStyleSpecification {
 #[derive(Debug)]
 pub struct ButtonStyleSpecification {
     base: StyleSpecificationBase,
+    default_graphical_set: Option<ElementImageSet>,
+    hovered_graphical_set: Option<ElementImageSet>,
+    clicked_graphical_set: Option<ElementImageSet>,
+    disabled_graphical_set: Option<ElementImageSet>,
+    selected_graphical_set: Option<ElementImageSet>,
+    selected_hovered_graphical_set: Option<ElementImageSet>,
+    selected_clicked_graphical_set: Option<ElementImageSet>,
+    left_click_sound: Option<Sound>,
     font: Option<String>, // Name of Font prototype
     default_font_color: Color,
     hovered_font_color: Color,
@@ -476,6 +484,14 @@ pub struct ButtonStyleSpecification {
 #[derive(Debug)]
 pub struct TechnologySlotStyleSpecification {
     base: StyleSpecificationBase,
+    default_graphical_set: Option<ElementImageSet>,
+    hovered_graphical_set: Option<ElementImageSet>,
+    clicked_graphical_set: Option<ElementImageSet>,
+    disabled_graphical_set: Option<ElementImageSet>,
+    selected_graphical_set: Option<ElementImageSet>,
+    selected_hovered_graphical_set: Option<ElementImageSet>,
+    selected_clicked_graphical_set: Option<ElementImageSet>,
+    left_click_sound: Option<Sound>,
     font: Option<String>, // Name of Font prototype
     default_font_color: Color,
     hovered_font_color: Color,
