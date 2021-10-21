@@ -439,7 +439,7 @@ trait PrototypeReferenceValidate: fmt::Debug {
 /// Reference to a prototype by name.
 #[derive(Debug)]
 pub struct PrototypeReference<T: DataTableAccessable> {
-    name: String,
+    pub name: String,
     prot: PhantomData<T>
 }
 
