@@ -397,3 +397,17 @@ pub struct VerticalScrollBarStyleSpecification {
     background_graphical_set: Option<ElementImageSet>,
     thumb_button_style: Option<ButtonStyleSpecification>
 }
+
+/// <https://wiki.factorio.com/Types/ScrollPaneStyleSpecification>
+#[derive(Debug)]
+pub struct ScrollPaneStyleSpecification {
+    base: StyleSpecificationBase,
+    vertical_flow_style: Option<VerticalFlowStyleSpecification>,
+    horizontal_scrollbar_style: Option<HorizontalScrollBarStyleSpecification>,
+    vertical_scrollbar_style: Option<VerticalScrollBarStyleSpecification>,
+    graphical_set: Option<ElementImageSet>,
+    background_graphical_set: Option<ElementImageSet>,
+    extra_padding_when_activated: [i32; 4], // `extra_top_padding_when_activated`, `extra_bottom_padding_when_activated`, `extra_left_padding_when_activated` and `extra_right_padding_when_activated` // Default 0
+    extra_margin_when_activated: [i32; 4], // `extra_top_margin_when_activated`, `extra_bottom_margin_when_activated`, `extra_left_margin_when_activated` and `extra_right_margin_when_activated` // Default 0
+    dont_force_clipping_rect_for_contents: bool
+}
