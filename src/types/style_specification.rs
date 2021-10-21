@@ -381,3 +381,19 @@ pub struct OtherColor {
     color: Option<Color>,
     bar: Option<ElementImageSet>
 }
+
+/// <https://wiki.factorio.com/Types/HorizontalScrollBarStyleSpecification>
+#[derive(Debug)]
+pub struct HorizontalScrollBarStyleSpecification {
+    base: StyleSpecificationBase,
+    background_graphical_set: Option<ElementImageSet>,
+    thumb_button_style: Option<ButtonStyleSpecification>
+}
+
+/// <https://wiki.factorio.com/Types/VerticalScrollBarStyleSpecification>
+#[derive(Debug)]
+pub struct VerticalScrollBarStyleSpecification {
+    base: StyleSpecificationBase,
+    background_graphical_set: Option<ElementImageSet>,
+    thumb_button_style: Option<ButtonStyleSpecification>
+}
