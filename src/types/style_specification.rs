@@ -592,3 +592,12 @@ pub struct SwitchStyleSpecification {
     active_label: Option<LabelStyleSpecification>,
     inactive_label: Option<LabelStyleSpecification>
 }
+
+/// <https://wiki.factorio.com/Types/TabbedPaneStyleSpecification>
+#[derive(Debug)]
+pub struct TabbedPaneStyleSpecification {
+    base: StyleSpecificationBase,
+    vertical_spacing: u32,
+    tab_content_frame: Option<FrameStyleSpecification>,
+    tab_container: Option<HorizontalFlowStyleSpecification>
+}
