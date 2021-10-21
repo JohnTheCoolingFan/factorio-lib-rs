@@ -411,3 +411,29 @@ pub struct ScrollPaneStyleSpecification {
     extra_margin_when_activated: [i32; 4], // `extra_top_margin_when_activated`, `extra_bottom_margin_when_activated`, `extra_left_margin_when_activated` and `extra_right_margin_when_activated` // Default 0
     dont_force_clipping_rect_for_contents: bool
 }
+
+/// <https://wiki.factorio.com/Types/SliderStyleSpecification>
+#[derive(Debug)]
+pub struct SliderStyleSpecification {
+    full_bar: Option<ElementImageSet>,
+    full_bar_disabled: Option<ElementImageSet>,
+    empty_bar: Option<ElementImageSet>,
+    empty_bar_disabled: Option<ElementImageSet>,
+    draw_notches: bool,
+    notch: Option<ElementImageSet>,
+    button: Option<ButtonStyleSpecification>,
+    high_button: Option<ButtonStyleSpecification>
+}
+
+/// <https://wiki.factorio.com/Types/DoubleSliderStyleSpecification>
+#[derive(Debug)]
+pub struct DoubleSliderStyleSpecification {
+    full_bar: Option<ElementImageSet>,
+    full_bar_disabled: Option<ElementImageSet>,
+    empty_bar: Option<ElementImageSet>,
+    empty_bar_disabled: Option<ElementImageSet>,
+    draw_notches: bool,
+    notch: Option<ElementImageSet>,
+    button: Option<ButtonStyleSpecification>,
+    high_button: Option<ButtonStyleSpecification>
+}
