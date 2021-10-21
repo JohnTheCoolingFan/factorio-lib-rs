@@ -343,3 +343,10 @@ pub enum RichTextSetting {
     Disabled,
     Highlight,
 }
+
+/// <https://wiki.factorio.com/Types/LineStyleSpecification>
+#[derive(Debug)]
+pub struct LineStyleSpecification {
+    base: StyleSpecificationBase,
+    border: Option<BorderImageSet>
+}
