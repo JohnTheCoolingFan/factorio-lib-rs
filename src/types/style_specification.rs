@@ -577,3 +577,18 @@ pub struct RadioButtonStyleSpecification {
     font_color: Color,
     text_padding: u32
 }
+
+/// <https://wiki.factorio.com/Types/SwitchStyleSpecification>
+#[derive(Debug)]
+pub struct SwitchStyleSpecification {
+    base: StyleSpecificationBase,
+    left_button_position: u32,
+    middle_button_position: u32,
+    right_button_position: u32,
+    default_background: Option<Sprite>,
+    hover_background: Option<Sprite>,
+    disabled_background: Option<Sprite>,
+    button: Option<ButtonStyleSpecification>,
+    active_label: Option<LabelStyleSpecification>,
+    inactive_label: Option<LabelStyleSpecification>
+}
