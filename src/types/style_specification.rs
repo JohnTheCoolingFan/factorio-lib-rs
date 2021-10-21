@@ -358,3 +358,26 @@ pub struct ListBoxStyleSpecification {
     item_style: Option<ButtonStyleSpecification>,
     scroll_pane_style: Option<ScrollPaneStyleSpecification>
 }
+
+/// <https://wiki.factorio.com/Types/ProgressBarStyleSpecification>
+#[derive(Debug)]
+pub struct ProgressBarStyleSpecification {
+    base: StyleSpecificationBase,
+    bar_width: u32,
+    color: Color,
+    other_colors: Vec<OtherColor>,
+    bar: Option<ElementImageSet>,
+    bar_background: Option<ElementImageSet>,
+    font: Option<String>, // Name of Font Prototype
+    font_color: Color,
+    filled_font_color: Color,
+    embed_text_in_bar: bool
+}
+
+/// <https://wiki.factorio.com/Types/ProgressBarStyleSpecification#other_colors>
+#[derive(Debug)]
+pub struct OtherColor {
+    less_than: f64,
+    color: Option<Color>,
+    bar: Option<ElementImageSet>
+}
