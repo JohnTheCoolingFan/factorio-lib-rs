@@ -693,3 +693,23 @@ pub struct TabStyleSpecification {
     draw_grayscale_picture: bool,
     left_click_sound: Option<Sound>
 }
+
+/// <https://wiki.factorio.com/Types/TextBoxStyleSpecification>
+#[derive(Debug)]
+pub struct TextBoxStyleSpecification {
+    base: StyleSpecificationBase,
+    font: Option<String>, // Name of Font prototype
+    font_color: Color,
+    disabled_font_color: Color,
+    selection_background_color: Color,
+    default_background: Option<ElementImageSet>,
+    active_background: Option<ElementImageSet>,
+    disabled_background: Option<ElementImageSet>,
+    rich_text_setting: RichTextSetting,
+    rich_text_highlight_error_color: Color,
+    rich_text_highlight_warning_color: Color,
+    rich_text_highlight_ok_color: Color,
+    selected_rich_text_highlight_error_color: Color,
+    selected_rich_text_highlight_warning_color: Color,
+    selected_rich_text_highlight_ok_color: Color
+}
