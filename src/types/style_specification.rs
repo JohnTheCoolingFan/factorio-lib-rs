@@ -471,3 +471,56 @@ pub struct ButtonStyleSpecification {
     draw_grayscale_picture: bool,
     icon_horizontal_align: HorizontalAlignment
 }
+
+/// <https://wiki.factorio.com/Types/TechnologySlotStyleSpecification>
+#[derive(Debug)]
+pub struct TechnologySlotStyleSpecification {
+    base: StyleSpecificationBase,
+    font: Option<String>, // Name of Font prototype
+    default_font_color: Color,
+    hovered_font_color: Color,
+    clicked_font_color: Color,
+    disabled_font_color: Color,
+    selected_font_color: Color,
+    selected_hovered_font_color: Color,
+    selected_clicked_font_color: Color,
+    strikethrough_color: Color,
+    pie_progress_color: Color,
+    clicked_vertical_offset: u32,
+    draw_shadow_under_picture: bool,
+    draw_grayscale_picture: bool,
+    icon_horizontal_align: HorizontalAlignment,
+    highlighted_graphical_set: Option<ElementImageSet>,
+    default_background_shadow: Option<ElementImageSet>,
+    level_band: Option<ElementImageSet>,
+    hovered_level_band: Option<ElementImageSet>,
+    level_offset_x: f32,
+    level_offset_y: f32,
+    level_band_width: u32,
+    level_band_height: u32,
+    level_font: String, // Name of Font prototype
+    level_range_font: String, // Name of Font prototype
+    level_font_color: Color,
+    hovered_level_font_color: Color,
+    level_range_font_color: Color,
+    hovered_level_range_font_color: Color,
+    level_range_band: Option<ElementImageSet>,
+    hovered_level_range_band: Option<ElementImageSet>,
+    level_range_offset_x: f32,
+    level_range_offset_y: f32,
+    ingredients_height: u32,
+    default_ingredients_background: Option<ElementImageSet>,
+    hovered_ingredients_background: Option<ElementImageSet>,
+    clicked_ingredients_background: Option<ElementImageSet>,
+    disabled_ingredients_background: Option<ElementImageSet>,
+    highlighted_ingredients_background: Option<ElementImageSet>,
+    ingredients_padding: u32,
+    ingredient_icon_size: u32,
+    ingredient_icon_overlap: u32,
+    clicked_overlay: Option<ElementImageSet>,
+    progress_bar_background: Option<ElementImageSet>,
+    progress_bar: Option<ElementImageSet>,
+    progress_bar_shadow: Option<ElementImageSet>,
+    progress_bar_height: u32,
+    progress_bar_color: Color
+}
