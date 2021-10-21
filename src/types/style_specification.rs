@@ -601,3 +601,65 @@ pub struct TabbedPaneStyleSpecification {
     tab_content_frame: Option<FrameStyleSpecification>,
     tab_container: Option<HorizontalFlowStyleSpecification>
 }
+
+/// <https://wiki.factorio.com/Types/TableStyleSpecification>
+#[derive(Debug)]
+pub struct TableStyleSpecification {
+    base: StyleSpecificationBase,
+    horizontal_spacing: i32,
+    vertical_spacing: i32,
+    cell_padding: [i16; 4], // `top_cell_padding`, `right_cell_padding`, `bottom_cell_padding` and `left_cell_padding`
+    apply_row_graphical_set_per_column: bool,
+    column_graphical_set: Option<ElementImageSet>,
+    default_row_graphical_set: Option<ElementImageSet>,
+    even_row_graphical_set: Option<ElementImageSet>,
+    odd_row_graphical_set: Option<ElementImageSet>,
+    hovered_graphical_set: Option<ElementImageSet>,
+    clicked_graphical_set: Option<ElementImageSet>,
+    selected_graphical_set: Option<ElementImageSet>,
+    selected_hovered_graphical_set: Option<ElementImageSet>,
+    selected_clicked_graphical_set: Option<ElementImageSet>,
+    background_graphical_set: Option<ElementImageSet>,
+    column_alignments: Vec<ColumnAlignment>,
+    column_widths: Vec<ColumnWidth>,
+    hovered_row_color: Color,
+    selected_row_color: Color,
+    vertical_line_color: Color,
+    horizontal_line_color: Color,
+    column_ordering_ascending_button_style: Option<ButtonStyleSpecification>,
+    column_ordering_descending_button_style: Option<ButtonStyleSpecification>,
+    inactive_column_ordering_ascending_button_style: Option<ButtonStyleSpecification>,
+    inactive_column_ordering_descending_button_style: Option<ButtonStyleSpecification>,
+    border: Option<BorderImageSet>
+}
+
+/// <https://wiki.factorio.com/Types/TableStyleSpecification#column_alignments>
+#[derive(Debug)]
+pub struct ColumnAlignment {
+    column: u32,
+    alignment: ColumnAlignmentStr
+}
+
+/// <https://wiki.factorio.com/Types/TableStyleSpecification#column_widths>
+#[derive(Debug)]
+pub struct ColumnWidth {
+    column: u32,
+    width: [i32; 2], // `minimal_width` and `maximal_width` // Default: 0
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
+pub enum ColumnAlignmentStr {
+    Center,
+    Left,
+    Right,
+    TopLeft,
+    MiddleLeft,
+    BottomLeft,
+    TopCenter,
+    MiddleCenter,
+    BottomCenter,
+    TopRight,
+    MiddleRight,
+    BottomRight
+}
