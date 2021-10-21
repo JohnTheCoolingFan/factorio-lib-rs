@@ -540,3 +540,23 @@ pub struct TechnologySlotStyleSpecification {
     progress_bar_height: u32,
     progress_bar_color: Color
 }
+
+/// <https://wiki.factorio.com/Types/CheckBoxStyleSpecification>
+#[derive(Debug)]
+pub struct CheckBoxStyleSpecification {
+    base: StyleSpecificationBase,
+    default_graphical_set: Option<ElementImageSet>,
+    hovered_graphical_set: Option<ElementImageSet>,
+    clicked_graphical_set: Option<ElementImageSet>,
+    disabled_graphical_set: Option<ElementImageSet>,
+    selected_graphical_set: Option<ElementImageSet>,
+    selected_hovered_graphical_set: Option<ElementImageSet>,
+    selected_clicked_graphical_set: Option<ElementImageSet>,
+    left_click_sound: Option<Sound>,
+    font: Option<String>, // Nmae of Font prototype
+    font_color: Color,
+    checkmark: Option<Sprite>,
+    disabled_checkmark: Option<Sprite>,
+    intermediate_mark: Option<Sprite>,
+    text_padding: u32
+}
