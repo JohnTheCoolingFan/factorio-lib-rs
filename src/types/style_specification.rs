@@ -10,7 +10,7 @@ use strum_macros::{EnumString, AsRefStr};
 // For now, I'll leave some properties that I think do have a default value or are mandatory
 // without Option<> wrap.
 
-/// https://wiki.factorio.com/Types/StyleSpecification
+/// <https://wiki.factorio.com/Types/StyleSpecification>
 #[derive(Debug)]
 pub enum StyleSpecification {
     ActivityBar(ActivityBarStyleSpecification),
