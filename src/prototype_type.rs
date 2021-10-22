@@ -5,23 +5,28 @@ use strum_macros::{EnumString, AsRefStr};
 #[strum(serialize_all = "kebab-case")]
 pub enum PrototypeType {
     // All prototypes
-    AmbientSound,
-    Animation,
+    #[strum(serialize = "ambient-sound")]
+    AmbientSoundPrototype,
+    #[strum(serialize = "animation")]
+    AnimationPrototype,
     EditorController,
     Font,
     GodController,
     MapGenPresets,
     MapSettings,
     MouseCursor,
-    Sound,
+    #[strum(serialize = "sound")]
+    SoundPrototype,
     SpectatorController,
-    Sprite,
+    #[strum(serialize = "sprite")]
+    SpritePrototype,
     TileEffect,
     TipsAndTricksItemCategory,
     TriggerTargetType,
     WindSound,
     Achievement,
     BuildEntityAchievement,
+    #[strum(serialize = "combat-robot-count")]
     CombatRobotCountAchievement,
     ConstructWithRobotsAchievement,
     DeconstructWithRobotsAchievement,
@@ -41,6 +46,7 @@ pub enum PrototypeType {
     AutoplaceControl,
     CustomInput,
     DamageType,
+    #[strum(serialize = "optimized-decorative")]
     Decorative,
     Arrow,
     ArtilleryFlare,
@@ -48,7 +54,8 @@ pub enum PrototypeType {
     Beam,
     CharacterCorpse,
     Cliff,
-    Corpse,
+    #[strum(serialize = "corpse")]
+    CorpsePrototype,
     RailRemnants,
     DeconstructibleTileProxy,
     EntityGhost,
@@ -108,12 +115,15 @@ pub enum PrototypeType {
     StorageTank,
     TrainStop,
     LinkedBelt,
+    #[strum(serialize = "loader-1x1")]
     Loader1x1,
+    #[strum(serialize = "loader")]
     Loader1x2,
     Splitter,
     TransportBelt,
     UndergroundBelt,
     Tree,
+    #[strum(serialize = "turret")]
     Turret,
     AmmoTurret,
     ElectricTurret,
@@ -129,13 +139,16 @@ pub enum PrototypeType {
     Explosion,
     FlameThrowerExplosion,
     FireFlame,
+    #[strum(serialize = "stream")]
     FluidStream,
     FlyingText,
+    #[strum(serialize = "highlight-box")]
     HighlightBoxEntity,
     ItemEntity,
     ItemRequestProxy,
     ParticleSource,
     Projectile,
+    #[strum(serialize = "resource")]
     ResourceEntity,
     RocketSiloRocket,
     RocketSiloRocketShadow,
@@ -157,7 +170,9 @@ pub enum PrototypeType {
     Fluid,
     FuelCategory,
     GuiStyle,
-    Item,
+    #[strum(serialize = "item")]
+    ItemPrototype,
+    #[strum(serialize = "ammo")]
     AmmoItem,
     Capsule,
     Gun,
@@ -166,7 +181,8 @@ pub enum PrototypeType {
     ItemWithInventory,
     BlueprintBook,
     ItemWithTags,
-    SelectionTool,
+    #[strum(serialize = "selection-tool")]
+    SelectionToolPrototype,
     BlueprintItem,
     CopyPasteTool,
     DeconstructionItem,
@@ -178,10 +194,13 @@ pub enum PrototypeType {
     Armor,
     RepairTool,
     ItemGroup,
+    #[strum(serialize = "item-subgroup")]
     ItemSubGroup,
     ModuleCategory,
+    #[strum(serialize = "noise-expression")]
     NamedNoiseExpression,
     NoiseLayer,
+    #[strum(serialize = "optimized-particle")]
     Particle,
     Recipe,
     RecipeCategory,
