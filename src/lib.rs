@@ -297,4 +297,3 @@ pub trait DataTableAccessable: Prototype {
     /// Extend [Data table](DataTable) with this prototype
     fn extend(self, data_table: &DataTable) -> Result<(), PrototypesErr>;
 }
-
