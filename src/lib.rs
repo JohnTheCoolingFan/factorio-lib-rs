@@ -248,6 +248,11 @@ impl DataTable {
         Ok(())
     }
 
+    /// Create new resource record
+    pub fn new_resource_record(&mut self, resource_record: ResourceRecord) -> () {
+        self.resource_records.push(resource_record);
+    }
+
     // Probably should be done at prototype definition load
     /// Validate resources
     /// callback is a function that should find the file and perform necessary checks, returning
