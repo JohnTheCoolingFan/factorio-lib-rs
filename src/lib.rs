@@ -176,7 +176,7 @@ pub struct DataTable {
     capsule: PrototypeCategory<Capsule>,
     gun: PrototypeCategory<Gun>,
     item_with_entity_data: PrototypeCategory<ItemWithEntityData>,
-    entity_with_label: PrototypeCategory<ItemWithLabel>,
+    item_with_label: PrototypeCategory<ItemWithLabel>,
     item_with_inventory: PrototypeCategory<ItemWithInventory>,
     blueprint_book: PrototypeCategory<BlueprintBook>,
     item_with_tags: PrototypeCategory<ItemWithTags>,
