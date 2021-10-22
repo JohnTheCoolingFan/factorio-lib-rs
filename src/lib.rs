@@ -9,7 +9,9 @@ use std::rc::{Rc, Weak};
 use std::fmt;
 use std::marker::PhantomData;
 use mlua::{Value, Lua, prelude::LuaResult};
+use thiserror::Error;
 use prototypes::*;
+use crate::types::SpriteSizeType;
 
 /// Shorthand for prototype category/type, used in [DataTable]
 pub type PrototypeCategory<T> = HashMap<String, T>;
@@ -18,6 +20,7 @@ pub type PrototypeCategory<T> = HashMap<String, T>;
 #[derive(Debug)]
 pub struct DataTable {
     references: Vec<Weak<dyn PrototypeReferenceValidate>>,
+    resource_records: Vec<ResourceRecord>,
     // Prototypes
     ambient_sound: PrototypeCategory<AmbientSoundPrototype>,
     animation: PrototypeCategory<AnimationPrototype>,
@@ -244,6 +247,17 @@ impl DataTable {
         }
         Ok(())
     }
+
+    // Probably should be done at prototype definition load
+    /// Validate resources
+    /// callback is a function that should find the file and perform necessary checks, returning
+    /// the Result of the check.
+    pub fn validate_resources<F: Fn(&ResourceRecord) -> Result<(), ResourceError>>(&self, callback: F) -> Result<(), ResourceError> {
+        for resource_record in &self.resource_records {
+            callback(&resource_record)?;
+        }
+        Ok(())
+    }
 }
 
 /// [mlua::FromLua] alternative with [DataTable] reference being passed
@@ -296,4 +310,26 @@ pub trait DataTableAccessable: Prototype {
     fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr> where Self: Sized;
     /// Extend [Data table](DataTable) with this prototype
     fn extend(self, data_table: &DataTable) -> Result<(), PrototypesErr>;
+}
+
+/// Struct for recording resources (images, sound files)
+#[derive(Debug)]
+pub struct ResourceRecord {
+    path: String,
+    resource_type: ResourceType
+}
+
+/// Respirce type with additional info if neded
+#[derive(Debug)]
+pub enum ResourceType {
+    Image(SpriteSizeType, SpriteSizeType), // x and y dimensions of an image
+    Sound
+}
+
+#[derive(Debug, Error)]
+pub enum ResourceError {
+    #[error("File not found: \"{0}\"")]
+    FileNotFound(String),
+    #[error("Image size incorrect: Expected at least {0}x{1}, got {2}x{3}")]
+    ImageSizeIncorrect(SpriteSizeType, SpriteSizeType, SpriteSizeType, SpriteSizeType)
 }
