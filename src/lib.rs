@@ -320,8 +320,8 @@ pub trait DataTableAccessable: Prototype {
 /// Struct for recording resources (images, sound files)
 #[derive(Debug)]
 pub struct ResourceRecord {
-    path: String,
-    resource_type: ResourceType
+    pub path: String,
+    pub resource_type: ResourceType
 }
 
 /// Respirce type with additional info if neded
