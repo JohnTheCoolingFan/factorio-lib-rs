@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use std::rc::{Rc, Weak};
 use std::fmt;
 use std::marker::PhantomData;
-use mlua::{Value, Lua, prelude::LuaResult};
+use mlua::{Value, Lua, prelude::LuaResult, Integer, Table};
 use thiserror::Error;
 use prototypes::*;
 use crate::types::SpriteSizeType;
@@ -337,4 +337,25 @@ pub enum ResourceError {
     FileNotFound(String),
     #[error("Image size incorrect: Expected at least {0}x{1}, got {2}x{3}")]
     ImageSizeIncorrect(SpriteSizeType, SpriteSizeType, SpriteSizeType, SpriteSizeType)
+}
+
+// TODO: add more features
+/// Unfinished wrapper around [mlua::Lua::new] that sets some global variables
+/// Adds `table_size` global function into environment
+pub fn new_lua_instance() -> Lua {
+    let lua = Lua::new();
+
+    {
+        let globals = lua.globals();
+
+        fn tablesize<'lua>(_lua: &'lua Lua, table: Table) -> LuaResult<Integer> {
+            Ok(table.table_size(true))
+        }
+
+        let tablesize_luaf = lua.create_function(tablesize).unwrap();
+
+        globals.set("table_size", tablesize_luaf).unwrap();
+    }
+
+    lua
 }
