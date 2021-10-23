@@ -342,7 +342,7 @@ pub enum ResourceError {
 // TODO: add more features
 /// Unfinished wrapper around [mlua::Lua::new] that sets some global variables
 /// Adds `table_size` global function into environment
-pub fn new_lua_instance() -> Lua {
+pub fn new_lua_instance() -> LuaResult<Lua> {
     let lua = Lua::new();
 
     {
@@ -352,10 +352,10 @@ pub fn new_lua_instance() -> Lua {
             Ok(table.table_size(true))
         }
 
-        let tablesize_luaf = lua.create_function(tablesize).unwrap();
+        let tablesize_luaf = lua.create_function(tablesize)?;
 
-        globals.set("table_size", tablesize_luaf).unwrap();
+        globals.set("table_size", tablesize_luaf)?;
     }
 
-    lua
+    Ok(lua)
 }
