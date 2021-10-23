@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 factorio-lib-rs-derive = { path = "./factorio-lib-rs-derive" }
-mlua = { git = "https://github.com/JohnTheCoolingFan/factorio-mlua", branch = "factorio-lua", features = ["serialize"] }
+mlua = { git = "https://github.com/JohnTheCoolingFan/factorio-mlua", features = ["serialize"] }
 lexical-sort = "0.3.1"
 zip = "0.5"
 thiserror = "1.0.25"
