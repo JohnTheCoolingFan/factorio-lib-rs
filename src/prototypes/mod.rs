@@ -23,6 +23,7 @@ use factorio_lib_rs_derive::{
     Item,
     SelectionTool
 };
+use crate::{PrototypeFromLua, DataTableAccessable, DataTable};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
@@ -217,6 +218,17 @@ pub struct BoolModSetting {
     setting_type: ModSettingType,
     default_value: bool,
     forced_value: Option<bool>,
+}
+
+impl DataTableAccessable for BoolModSetting {
+    fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr> where Self: Sized {
+        data_table.bool_setting.get(name).ok_or_else(|| PrototypesErr::PrototypeNotFound(name.into()))
+    }
+
+    fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr> {
+        data_table.bool_setting.insert(self.name, self);
+        Ok(())
+    }
 }
 
 impl BoolModSetting {
