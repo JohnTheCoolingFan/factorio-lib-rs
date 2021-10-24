@@ -314,7 +314,7 @@ pub trait DataTableAccessable: Prototype {
     /// Find prototype in [Data table](DataTable) by it's name
     fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr> where Self: Sized;
     /// Extend [Data table](DataTable) with this prototype
-    fn extend(self, data_table: &DataTable) -> Result<(), PrototypesErr>;
+    fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr>;
 }
 
 /// Struct for recording resources (images, sound files)
