@@ -226,7 +226,7 @@ impl DataTable {
     }
 
     /// Shorthand for [DataTableAccessable::extend]
-    pub fn extend<T: DataTableAccessable>(&self, prototype: T) -> Result<(), PrototypesErr> {
+    pub fn extend<T: DataTableAccessable>(&mut self, prototype: T) -> Result<(), PrototypesErr> {
         prototype.extend(self)
     }
 
