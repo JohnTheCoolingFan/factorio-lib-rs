@@ -312,7 +312,7 @@ impl<T: DataTableAccessable> PrototypeReferenceValidate for PrototypeReference<T
 /// Primarily used for [`PrototypeReference`]
 pub trait DataTableAccessable: Prototype {
     /// Find prototype in [Data table](DataTable) by it's name
-    fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr> where Self: Sized;
+    fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr>;
     /// Extend [Data table](DataTable) with this prototype
     fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr>;
 }

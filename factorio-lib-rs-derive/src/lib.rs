@@ -582,7 +582,7 @@ fn impl_data_table_accessable_macro(ast: &syn::DeriveInput) -> TokenStream {
     let attr = attrs.next().unwrap();
     let gen = quote! {
         impl DataTableAccessable for #name {
-            fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr> where Self: Sized {
+            fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr> {
                 data_table.#attr.get(name).ok_or_else(|| PrototypesErr::PrototypeNotFound(name.into()))
             }
 
