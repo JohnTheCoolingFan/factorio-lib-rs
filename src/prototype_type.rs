@@ -138,6 +138,7 @@ pub enum PrototypeType {
     Wall,
     Explosion,
     FlameThrowerExplosion,
+    #[strum(to_string = "fire")]
     FireFlame,
     #[strum(to_string = "stream")]
     FluidStream,
