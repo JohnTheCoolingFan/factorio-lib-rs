@@ -1,10 +1,13 @@
 use std::collections::HashMap;
-use crate::prototypes::{PrototypeBaseSpec, Prototype, PrototypeBase};
+use factorio_lib_rs_derive::DataTableAccessable;
+use crate::{DataTableAccessable, DataTable};
+use crate::prototypes::{PrototypeBaseSpec, Prototype, PrototypeBase, PrototypesErr};
 use crate::types::{Color, Sound, DaytimeColorLookupTable, Factorio2DVector, TriggerTargetMask, FileName, SimulationDefinition, BoxSpecification, Animation, Sprite};
 use crate::concepts::LocalisedString;
 
 /// <https://wiki.factorio.com/Prototype/UtilityConstants>
-#[derive(Debug, Prototype, PrototypeBase)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[data_table(utility_constants)]
 pub struct UtilityConstants {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -203,7 +206,8 @@ pub struct UtilityConstantsEntityRendererSerahcBoxLimits {
 }
 
 /// <https://wiki.factorio.com/Prototype/UtilitySounds>
-#[derive(Debug, Prototype, PrototypeBase)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[data_table(utility_sounds)]
 pub struct UtilitySounds {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -271,7 +275,8 @@ pub struct UtilitySounds {
 }
 
 /// <https://wiki.factorio.com/Prototype/UtilitySprites>
-#[derive(Debug, Prototype, PrototypeBase)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[data_table(utility_sprites)]
 pub struct UtilitySprites {
     // Only one instance allowed
     name: String,
