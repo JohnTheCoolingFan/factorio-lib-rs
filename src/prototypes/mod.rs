@@ -226,7 +226,7 @@ impl DataTableAccessable for BoolModSetting {
     }
 
     fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr> {
-        data_table.bool_setting.insert(self.name, self);
+        data_table.bool_setting.insert(self.name.clone(), self);
         Ok(())
     }
 }
