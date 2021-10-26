@@ -2,7 +2,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn;
+use syn::{self, Attribute, Ident, Result};
 
 #[proc_macro_derive(Prototype)]
 pub fn prototype_macro_derive(input: TokenStream) -> TokenStream {
@@ -148,6 +148,12 @@ pub fn item_macro_derive(input: TokenStream) -> TokenStream {
 pub fn selection_tool_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_selection_tool_macro(&ast)
+}
+
+#[proc_macro_derive(DataTableAccessable, attributes(data_table))]
+pub fn data_table_accessable_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_data_table_accessable_macro(&ast)
 }
 
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
@@ -563,4 +569,34 @@ fn impl_selection_tool_macro(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
     gen.into()
+}
+
+fn impl_data_table_accessable_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let attrs = &ast.attrs;
+
+    let mut attrs = attrs
+        .iter()
+        .filter(|attr| attr.path.is_ident("data_table"))
+        .map(|attr| parse_data_table_attribute(&attr).expect("failed to parse data_table attribute"));
+    let attr = attrs.next().unwrap();
+    let gen = quote! {
+        impl DataTableAccessable for #name {
+            fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr> where Self: Sized {
+                data_table.#attr.get(name).ok_or_else(|| PrototypesErr::PrototypeNotFound(name.into()))
+            }
+
+            fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr> {
+                data_table.#attr.insert(self.name.clone(), self);
+                Ok(())
+            }
+        }
+    };
+    gen.into()
+}
+
+fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
+    let field: syn::Path = attr.parse_args()?;
+    let ident = field.get_ident().expect("expected indentifier");
+    Ok(ident.clone())
 }

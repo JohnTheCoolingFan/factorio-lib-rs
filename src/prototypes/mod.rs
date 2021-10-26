@@ -21,7 +21,8 @@ use factorio_lib_rs_derive::{
     RollingStock,
     Equipment,
     Item,
-    SelectionTool
+    SelectionTool,
+    DataTableAccessable
 };
 use crate::{PrototypeFromLua, DataTableAccessable, DataTable};
 use crate::types::{
@@ -236,7 +237,8 @@ impl BoolModSetting {
     pub fn forced_value(&self) -> Option<bool> { self.forced_value }
 }
 
-#[derive(Debug, Prototype, ModSetting)]
+#[derive(Debug, Prototype, ModSetting, DataTableAccessable)]
+#[data_table(int_setting)]
 pub struct IntModSetting {
     name: String,
     localised_name: Option<LocalisedString>,
