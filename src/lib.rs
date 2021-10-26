@@ -148,7 +148,7 @@ pub struct DataTable {
     fire: PrototypeCategory<FireFlame>,
     stream: PrototypeCategory<FluidStream>,
     flying_text: PrototypeCategory<FlyingText>,
-    higlight_box: PrototypeCategory<HighlightBoxEntity>,
+    highlight_box: PrototypeCategory<HighlightBoxEntity>,
     item_entity: PrototypeCategory<ItemEntity>,
     item_request_proxy: PrototypeCategory<ItemRequestProxy>,
     particle_source: PrototypeCategory<ParticleSource>,
