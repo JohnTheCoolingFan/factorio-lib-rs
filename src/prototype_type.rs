@@ -184,6 +184,7 @@ pub enum PrototypeType {
     ItemWithTags,
     #[strum(to_string = "selection-tool")]
     SelectionToolPrototype,
+    #[strum(to_string = "blueprint")]
     BlueprintItem,
     CopyPasteTool,
     DeconstructionItem,
