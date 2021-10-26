@@ -124,7 +124,7 @@ pub enum PrototypeType {
     UndergroundBelt,
     Tree,
     #[strum(to_string = "turret")]
-    Turret,
+    TurretPrototype,
     AmmoTurret,
     ElectricTurret,
     FluidTurret,
