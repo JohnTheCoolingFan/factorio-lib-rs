@@ -27,7 +27,7 @@ pub struct DataTable {
     editor_controller: PrototypeCategory<EditorController>,
     font: PrototypeCategory<Font>,
     god_controller: PrototypeCategory<GodController>,
-    map_gen_settings: PrototypeCategory<MapGenPresets>,
+    map_gen_presets: PrototypeCategory<MapGenPresets>,
     map_settings: PrototypeCategory<MapSettings>,
     mouse_cursor: PrototypeCategory<MouseCursor>,
     sound: PrototypeCategory<SoundPrototype>,
