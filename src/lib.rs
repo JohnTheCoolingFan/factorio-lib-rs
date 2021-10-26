@@ -206,7 +206,7 @@ pub struct DataTable {
     shortcut: PrototypeCategory<Shortcut>,
     technology: PrototypeCategory<Technology>,
     tile: PrototypeCategory<Tile>,
-    tip_and_tricks_item: PrototypeCategory<TipsAndTricksItem>,
+    tips_and_tricks_item: PrototypeCategory<TipsAndTricksItem>,
     trivial_smoke: PrototypeCategory<TrivialSmoke>,
     tutorial: PrototypeCategory<Tutorial>,
     utility_constants: PrototypeCategory<UtilityConstants>,
