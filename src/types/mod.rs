@@ -609,6 +609,7 @@ impl<T: AsRef<str>> FromIterator<T> for CollisionMask {
                 "train-layer" => result |= Self::TRAIN_LAYER,
                 "rail-layer" => result |= Self::RAIL_LAYER,
                 "transport-belt-layer" => result |= Self::TRANSPORT_BELT_LAYER,
+                // These 3 are flags
                 "not-colliding-with-itself" => result |= Self::NOT_COLLIDING_WITH_ITSELF,
                 "consider-tile-transitions" => result |= Self::CONSIDER_TILE_TRANSITIONS,
                 "colliding-with-tiles-only" => result |= Self::COLLIDING_WITH_TILES_ONLY,
@@ -662,6 +663,12 @@ impl<T: AsRef<str>> FromIterator<T> for CollisionMask {
             }
         }
         result
+    }
+}
+
+impl CollisionMask {
+    pub fn without_flags(&self) -> Self {
+        Self(self.0 & (Self::NOT_COLLIDING_WITH_ITSELF.0 - 1))
     }
 }
 
