@@ -24,6 +24,7 @@ use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
 use crate::prototypes::PrototypesErr;
 use crate::concepts::LocalisedString;
+use mlua::{ToLua, Value, Lua, prelude::LuaResult};
 use strum_macros::{EnumString, AsRefStr};
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
@@ -669,6 +670,71 @@ impl<T: AsRef<str>> FromIterator<T> for CollisionMask {
 impl CollisionMask {
     pub fn without_flags(&self) -> Self {
         Self(self.0 & (Self::NOT_COLLIDING_WITH_ITSELF.0 - 1))
+    }
+}
+
+impl<'lua> ToLua<'lua> for CollisionMask {
+    fn to_lua(self, lua: &'lua Lua) -> LuaResult<Value<'lua>> {
+        let mut result: HashMap<String, bool> = HashMap::new();
+        if (self & Self::GROUND_TILE).0 > 0 { result.insert("ground-tile".into(), true); };
+        if (self & Self::WATER_TILE).0 > 0 { result.insert("water-tile".into(), true); };
+        if (self & Self::RESOURCE_LAYER).0 > 0 { result.insert("resource-layer".into(), true); };
+        if (self & Self::DOODAD_LAYER).0 > 0 { result.insert("doodad-layer".into(), true); };
+        if (self & Self::FLOOR_LAYER).0 > 0 { result.insert("floor-layer".into(), true); };
+        if (self & Self::ITEM_LAYER).0 > 0 { result.insert("item-layer".into(), true); };
+        if (self & Self::GHOST_LAYER).0 > 0 { result.insert("ghost-layer".into(), true); };
+        if (self & Self::OBJECT_LAYER).0 > 0 { result.insert("object-layer".into(), true); };
+        if (self & Self::PLAYER_LAYER).0 > 0 { result.insert("player-layer".into(), true); };
+        if (self & Self::TRAIN_LAYER).0 > 0 { result.insert("train-layer".into(), true); };
+        if (self & Self::RAIL_LAYER).0 > 0 { result.insert("rail-layer".into(), true); };
+        if (self & Self::TRANSPORT_BELT_LAYER).0 > 0 { result.insert("transport-belt-layer".into(), true); };
+        if (self & Self::NOT_COLLIDING_WITH_ITSELF).0 > 0 { result.insert("not-colliding-with-itself".into(), true); };
+        if (self & Self::CONSIDER_TILE_TRANSITIONS).0 > 0 { result.insert("consider-tile-transitions".into(), true); };
+        if (self & Self::COLLIDING_WITH_TILES_ONLY).0 > 0 { result.insert("colliding-with-tiles-only".into(), true); };
+        if (self & Self::LAYER_13).0 > 0 { result.insert("layer-13".into(), true); };
+        if (self & Self::LAYER_14).0 > 0 { result.insert("layer-14".into(), true); };
+        if (self & Self::LAYER_15).0 > 0 { result.insert("layer-15".into(), true); };
+        if (self & Self::LAYER_16).0 > 0 { result.insert("layer-16".into(), true); };
+        if (self & Self::LAYER_17).0 > 0 { result.insert("layer-17".into(), true); };
+        if (self & Self::LAYER_18).0 > 0 { result.insert("layer-18".into(), true); };
+        if (self & Self::LAYER_19).0 > 0 { result.insert("layer-19".into(), true); };
+        if (self & Self::LAYER_20).0 > 0 { result.insert("layer-20".into(), true); };
+        if (self & Self::LAYER_21).0 > 0 { result.insert("layer-21".into(), true); };
+        if (self & Self::LAYER_22).0 > 0 { result.insert("layer-22".into(), true); };
+        if (self & Self::LAYER_23).0 > 0 { result.insert("layer-23".into(), true); };
+        if (self & Self::LAYER_24).0 > 0 { result.insert("layer-24".into(), true); };
+        if (self & Self::LAYER_25).0 > 0 { result.insert("layer-25".into(), true); };
+        if (self & Self::LAYER_26).0 > 0 { result.insert("layer-26".into(), true); };
+        if (self & Self::LAYER_27).0 > 0 { result.insert("layer-27".into(), true); };
+        if (self & Self::LAYER_28).0 > 0 { result.insert("layer-28".into(), true); };
+        if (self & Self::LAYER_29).0 > 0 { result.insert("layer-29".into(), true); };
+        if (self & Self::LAYER_30).0 > 0 { result.insert("layer-30".into(), true); };
+        if (self & Self::LAYER_31).0 > 0 { result.insert("layer-31".into(), true); };
+        if (self & Self::LAYER_32).0 > 0 { result.insert("layer-32".into(), true); };
+        if (self & Self::LAYER_33).0 > 0 { result.insert("layer-33".into(), true); };
+        if (self & Self::LAYER_34).0 > 0 { result.insert("layer-34".into(), true); };
+        if (self & Self::LAYER_35).0 > 0 { result.insert("layer-35".into(), true); };
+        if (self & Self::LAYER_36).0 > 0 { result.insert("layer-36".into(), true); };
+        if (self & Self::LAYER_37).0 > 0 { result.insert("layer-37".into(), true); };
+        if (self & Self::LAYER_38).0 > 0 { result.insert("layer-38".into(), true); };
+        if (self & Self::LAYER_39).0 > 0 { result.insert("layer-39".into(), true); };
+        if (self & Self::LAYER_40).0 > 0 { result.insert("layer-40".into(), true); };
+        if (self & Self::LAYER_41).0 > 0 { result.insert("layer-41".into(), true); };
+        if (self & Self::LAYER_42).0 > 0 { result.insert("layer-42".into(), true); };
+        if (self & Self::LAYER_43).0 > 0 { result.insert("layer-43".into(), true); };
+        if (self & Self::LAYER_44).0 > 0 { result.insert("layer-44".into(), true); };
+        if (self & Self::LAYER_45).0 > 0 { result.insert("layer-45".into(), true); };
+        if (self & Self::LAYER_46).0 > 0 { result.insert("layer-46".into(), true); };
+        if (self & Self::LAYER_47).0 > 0 { result.insert("layer-47".into(), true); };
+        if (self & Self::LAYER_48).0 > 0 { result.insert("layer-48".into(), true); };
+        if (self & Self::LAYER_49).0 > 0 { result.insert("layer-49".into(), true); };
+        if (self & Self::LAYER_50).0 > 0 { result.insert("layer-50".into(), true); };
+        if (self & Self::LAYER_51).0 > 0 { result.insert("layer-51".into(), true); };
+        if (self & Self::LAYER_52).0 > 0 { result.insert("layer-52".into(), true); };
+        if (self & Self::LAYER_53).0 > 0 { result.insert("layer-53".into(), true); };
+        if (self & Self::LAYER_54).0 > 0 { result.insert("layer-54".into(), true); };
+        if (self & Self::LAYER_55).0 > 0 { result.insert("layer-55".into(), true); };
+        result.to_lua(lua)
     }
 }
 
