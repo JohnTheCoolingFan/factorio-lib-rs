@@ -12,10 +12,17 @@ use crate::concepts::LocalisedString;
 
 /// <https://lua-api.factorio.com/next/LuaAchievementPrototype.html>
 #[derive(Debug, Prototype, PrototypeBase)]
-pub struct AbstractAchievement {
+pub struct AbstractAchievementPrototype {
     name: String,
     prototype_base: PrototypeBaseSpec,
     allowed_without_fight: bool,
     hidden: bool,
     valid: bool,
+}
+
+/// <https://lua-api.factorio.com/next/LuaEntityPrototype.html>
+#[derive(Debug, Prototype, PrototypeBase)]
+pub struct AbstractEntityPrototype {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
 }

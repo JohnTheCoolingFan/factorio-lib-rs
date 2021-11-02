@@ -1,7 +1,7 @@
-mod abstract;
+mod abstract_prototypes;
 mod utility;
 
-pub use abstract::*;
+pub use abstract_prototypes::*;
 pub use utility::*;
 
 use std::collections::HashMap;
