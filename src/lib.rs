@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use std::rc::{Rc, Weak};
 use std::fmt;
 use std::marker::PhantomData;
-use mlua::{Value, Lua, prelude::LuaResult, Integer, Table};
+use mlua::{Value, Lua, FromLua, prelude::LuaResult, Integer, Table};
 use thiserror::Error;
 use prototypes::*;
 use crate::types::SpriteSizeType;
@@ -268,6 +268,12 @@ impl DataTable {
 /// [mlua::FromLua] alternative with [DataTable] reference being passed
 pub trait PrototypeFromLua<'lua>: Sized {
     fn prototype_from_lua(lua_value: Value<'lua>, lua: &'lua Lua, data_table: &DataTable) -> LuaResult<Self>;
+}
+
+impl<'lua, T: FromLua<'lua>> PrototypeFromLua<'lua> for T {
+    fn prototype_from_lua(lua_value: Value<'lua>, lua: &'lua Lua, _: &DataTable) -> LuaResult<Self> {
+        T::from_lua(lua_value, lua)
+    }
 }
 
 /// Validate PrototypeReference. Any type.
