@@ -1,3 +1,5 @@
+//! This crate is not intended for use outside of [factorio-lib-rs]!
+
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
