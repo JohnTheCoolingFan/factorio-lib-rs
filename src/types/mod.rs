@@ -71,10 +71,10 @@ impl Color {
     }
 
     pub fn new_rgba_opt(r: Option<f32>, g: Option<f32>, b: Option<f32>, a: Option<f32>) -> Self {
-        let r = r.or(Some(0.0 as f32)).unwrap();
-        let g = g.or(Some(0.0 as f32)).unwrap();
-        let b = b.or(Some(0.0 as f32)).unwrap();
-        let a = a.or(Some(0.0 as f32)).unwrap();
+        let r = r.or(Some(0.0_f32)).unwrap();
+        let g = g.or(Some(0.0_f32)).unwrap();
+        let b = b.or(Some(0.0_f32)).unwrap();
+        let a = a.or(Some(0.0_f32)).unwrap();
         Self(r, g, b, a)
     }
 
@@ -114,7 +114,7 @@ pub enum ModSettingType {
 pub enum MapGenPreset {
     // Decided by `default` field
     Default(MapGenPresetDefault),
-    NonDefault(MapGenPresetNonDefault)
+    NonDefault(Box<MapGenPresetNonDefault>)
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#default>
@@ -143,9 +143,9 @@ impl FromStr for MapGenSize {
         match s {
             "none" => Ok(Self(0.0)),
             "very-low" | "very-small" | "very-poor" => Ok(Self(0.5)),
-            "low" | "small" | "poor" => Ok(Self(1.0 / (2.0 as f64).sqrt())),
+            "low" | "small" | "poor" => Ok(Self(1.0 / (2.0_f64).sqrt())),
             "normal" | "medium" | "regular" => Ok(Self(1.0)),
-            "high" | "big" | "good" => Ok(Self((2.0 as f64).sqrt())),
+            "high" | "big" | "good" => Ok(Self((2.0_f64).sqrt())),
             "very-high" | "very-big" | "very-good" => Ok(Self(2.0)),
             _ => Err(PrototypesErr::InvalidTypeStr("MapGenSize".into(), s.into()))
         }
@@ -451,36 +451,36 @@ impl FromStr for Energy {
                     'k' | 'K' => Ok(1000.0),
                     'M' => Ok(1000000.0),
                     'G' => Ok(1000000000.0),
-                    'T' => Ok((10.0 as f64).powi(12)),
-                    'P' => Ok((10.0 as f64).powi(15)),
-                    'E' => Ok((10.0 as f64).powi(18)),
-                    'Z' => Ok((10.0 as f64).powi(21)),
-                    'Y' => Ok((10.0 as f64).powi(24)),
+                    'T' => Ok((10.0_f64).powi(12)),
+                    'P' => Ok((10.0_f64).powi(15)),
+                    'E' => Ok((10.0_f64).powi(18)),
+                    'Z' => Ok((10.0_f64).powi(21)),
+                    'Y' => Ok((10.0_f64).powi(24)),
                     _ => Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(original)))
             }
         }
 
         let len = s.len();
         let mut rev_s = s.chars().rev();
-        let last_char: char = rev_s.next().ok_or(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
+        let last_char: char = rev_s.next().ok_or_else(|| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
         if last_char == 'W' {
-            let next_char: char = rev_s.next().ok_or(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
+            let next_char: char = rev_s.next().ok_or_else(|| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
             if next_char.is_ascii_digit() {
-                return Ok(Self(parse_num(&s[0..len-1], s)?/60.0))
+                Ok(Self(parse_num(&s[0..len-1], s)?/60.0))
             } else {
                 let value = parse_num(&s[0..len-2], s)?;
-                return Ok(Self(value * get_multiplier(&next_char, &s)?/60.0))
+                Ok(Self(value * get_multiplier(&next_char, s)?/60.0))
             }
         } else if last_char == 'J' {
-            let next_char: char = rev_s.next().ok_or(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
+            let next_char: char = rev_s.next().ok_or_else(|| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
             if next_char.is_ascii_digit() {
-                return Ok(Self(parse_num(&s[0..len-1], s)?))
+                Ok(Self(parse_num(&s[0..len-1], s)?))
             } else {
                 let value = parse_num(&s[0..len-2], s)?;
-                return Ok(Self(value * get_multiplier(&next_char, &s)?))
+                Ok(Self(value * get_multiplier(&next_char, s)?))
             }
         } else {
-            return Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))
+            Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))
         } 
     }
 }
@@ -1227,9 +1227,9 @@ impl From<u32> for Direction {
     }
 }
 
-impl Into<u32> for Direction {
-    fn into(self) -> u32 {
-        self.0
+impl From<Direction> for u32 {
+    fn from(value: Direction) -> Self {
+        value.0
     }
 }
 

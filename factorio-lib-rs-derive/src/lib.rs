@@ -580,11 +580,11 @@ fn impl_data_table_accessable_macro(ast: &syn::DeriveInput) -> TokenStream {
     let mut attrs = attrs
         .iter()
         .filter(|attr| attr.path.is_ident("data_table"))
-        .map(|attr| parse_data_table_attribute(&attr).expect("failed to parse data_table attribute"));
+        .map(|attr| parse_data_table_attribute(attr).expect("failed to parse data_table attribute"));
     let attr = attrs.next().unwrap();
     let gen = quote! {
         impl DataTableAccessable for #name {
-            fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr> {
+            fn find<'a>(data_table: &'a DataTable, name: &str) -> Result<&'a Self, PrototypesErr> {
                 data_table.#attr.get(name).ok_or_else(|| PrototypesErr::PrototypeNotFound(name.into()))
             }
 

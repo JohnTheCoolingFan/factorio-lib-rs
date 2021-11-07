@@ -25,7 +25,7 @@ pub struct ModDependency {
 }
 
 impl ModDependency {
-    pub fn new(input: &String) -> Result<Self, ModDependencyErr> {
+    pub fn new(input: &str) -> Result<Self, ModDependencyErr> {
         static DEP_STRING_REGEX: OnceCell<Regex> = OnceCell::new();
         let captures = DEP_STRING_REGEX
             .get_or_init(|| {
@@ -34,7 +34,7 @@ impl ModDependency {
                 ).unwrap()
             })
             .captures(input)
-            .ok_or(ModDependencyErr::InvalidDependencyString(input.clone()))?;
+            .ok_or_else(|| ModDependencyErr::InvalidDependencyString(input.into()))?;
 
         Ok(Self {
             dep_type: match captures.name("type").map(|mtch| mtch.as_str()) {
@@ -47,7 +47,7 @@ impl ModDependency {
             },
             name: match captures.name("name") {
                 Some(mtch) => mtch.as_str().to_string(),
-                None => return Err(ModDependencyErr::NameIsUnparsable(input.clone())),
+                None => return Err(ModDependencyErr::NameIsUnparsable(input.into())),
             },
             version_req: match [captures.name("version_req"), captures.name("version")] {
                 [Some(req_match), Some(version_match)] => {
@@ -59,7 +59,7 @@ impl ModDependency {
                             Ok(sub
                                 .parse::<usize>()
                                 .map_err(|_| {
-                                    ModDependencyErr::InvalidDependencyString(input.clone())
+                                    ModDependencyErr::InvalidDependencyString(input.into())
                                 })?
                                 .to_string())
                         })
@@ -127,9 +127,9 @@ impl PartialOrd for Mod {
 impl Ord for Mod {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.has_dependency(&other.name) {
-            return Ordering::Greater;
+            Ordering::Greater
         } else {
-            return natural_only_alnum_cmp(&self.name, &other.name);
+            natural_only_alnum_cmp(&self.name, &other.name)
         }
     }
 }
@@ -144,15 +144,12 @@ impl Eq for Mod {}
 
 impl Mod {
     // Check if this mod has other mod as a dependency
-    fn has_dependency(&self, dep_name: &String) -> bool {
+    fn has_dependency(&self, dep_name: &str) -> bool {
         match &self.version {
             Some(version) => {
                 for dependency in &version.dependencies {
-                    if &dependency.name == dep_name {
-                        match &dependency.dep_type {
-                            ModDependencyType::Optional | ModDependencyType::Required | ModDependencyType::OptionalHidden => true,
-                            _ => false,
-                        };
+                    if dependency.name == dep_name {
+                        matches!(&dependency.dep_type, ModDependencyType::Optional | ModDependencyType::Required | ModDependencyType::OptionalHidden);
                     }
                 }
                 false
@@ -217,10 +214,10 @@ impl ModVersion {
                 let file_path = self.entry.path().join(filename);
                 if file_path.exists() {
                     let file = File::create(file_path).unwrap();
-                    return Ok(Box::new(file.bytes().map(|byte| byte.unwrap()).collect::<Vec<u8>>()))
+                    Ok(Box::new(file.bytes().map(|byte| byte.unwrap()).collect::<Vec<u8>>()))
                 }
                 else {
-                    return Err(ModDataErr::FileNotFound(file_path))
+                    Err(ModDataErr::FileNotFound(file_path))
                 }
             },
             ModStructure::Zip => {
