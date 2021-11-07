@@ -221,7 +221,7 @@ pub struct DataTable {
 
 impl DataTable {
     /// Shorthand for [DataTableAccessable::find]
-    pub fn find<T: DataTableAccessable>(&self, name: &String) -> Result<&T, PrototypesErr> {
+    pub fn find<T: DataTableAccessable>(&self, name: &str) -> Result<&T, PrototypesErr> {
         T::find(self, name)
     }
 
@@ -240,16 +240,15 @@ impl DataTable {
     /// Validates all tracked references.
     pub fn validate_references(&self) -> Result<(), PrototypesErr> {
         for prot_reference in &self.references {
-            match prot_reference.upgrade() {
-                Some(pref) => pref.validate(self)?,
-                None => {}
+            if let Some(pref) = prot_reference.upgrade() {
+                pref.validate(self)?
             }
         }
         Ok(())
     }
 
     /// Create new resource record
-    pub fn new_resource_record(&mut self, resource_record: ResourceRecord) -> () {
+    pub fn new_resource_record(&mut self, resource_record: ResourceRecord) {
         self.resource_records.push(resource_record);
     }
 
@@ -259,7 +258,7 @@ impl DataTable {
     /// the Result of the check.
     pub fn validate_resources<F: Fn(&ResourceRecord) -> Result<(), ResourceError>>(&self, callback: F) -> Result<(), ResourceError> {
         for resource_record in &self.resource_records {
-            callback(&resource_record)?;
+            callback(resource_record)?;
         }
         Ok(())
     }
@@ -300,10 +299,7 @@ impl<T: DataTableAccessable> PrototypeReference<T> {
 
     /// Checks if reference is valid.
     pub fn is_valid(&self, data_table: &DataTable) -> bool {
-        match self.find(data_table) as Result<&T, PrototypesErr> {
-            Ok(_) => true,
-            _ => false
-        }
+        matches!(self.find(data_table), Ok(_))
     }
 }
 
@@ -318,7 +314,7 @@ impl<T: DataTableAccessable> PrototypeReferenceValidate for PrototypeReference<T
 /// Primarily used for [`PrototypeReference`]
 pub trait DataTableAccessable: Prototype {
     /// Find prototype in [Data table](DataTable) by it's name
-    fn find<'a>(data_table: &'a DataTable, name: &String) -> Result<&'a Self, PrototypesErr>;
+    fn find<'a>(data_table: &'a DataTable, name: &str) -> Result<&'a Self, PrototypesErr>;
     /// Extend [Data table](DataTable) with this prototype
     fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr>;
 }
@@ -354,7 +350,7 @@ pub fn new_lua_instance() -> LuaResult<Lua> {
     {
         let globals = lua.globals();
 
-        fn tablesize<'lua>(_lua: &'lua Lua, table: Table) -> LuaResult<Integer> {
+        fn tablesize(_lua: &Lua, table: Table) -> LuaResult<Integer> {
             Ok(table.table_size(true))
         }
 

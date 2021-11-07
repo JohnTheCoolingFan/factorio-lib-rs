@@ -23,11 +23,13 @@ impl Index<String> for LocaleHandler {
     }
 }
 
-impl LocaleHandler {
-    pub fn new() -> Self {
+impl Default for LocaleHandler {
+    fn default() -> Self {
         Self{entries: HashMap::new()}
     }
+}
 
+impl LocaleHandler {
     pub fn append_from_reader<R: Read>(&mut self, reader: &mut R) -> Result<(), ini::Error> {
         let ini = Ini::read_from_noescape(reader)?;
         if !ini.is_empty() {
@@ -42,7 +44,7 @@ impl LocaleHandler {
         Ok(())
     }
 
-    pub fn get_by_key(&self, key: &String) -> Option<&String> {
+    pub fn get_by_key(&self, key: &str) -> Option<&String> {
         self.entries.get(key)
     }
 }
@@ -111,12 +113,9 @@ impl fmt::Display for LocalisedString {
                 Some(s) => { // Key is found
                     let mut temp_str = s.to_string();
                     for i in 1..self.parameters.len() { // Search for substituion spots
-                        if match temp_str.as_str().find(&format!("__{}__", i)) {
-                            Some(_) => true,
-                            _ => false
-                        } {
+                        if matches!(temp_str.as_str().find(&format!("__{}__", i)), Some(_)) {
                             temp_str = temp_str.as_str().replace(format!("__{}__", i).as_str(), match &self.parameters[i-1] {
-                                LocalisedStringEntry::String(st) => &st,
+                                LocalisedStringEntry::String(st) => st,
                                 _ => return Err(fmt::Error),
                             });
                         }
