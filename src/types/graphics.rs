@@ -300,7 +300,7 @@ impl Dice {
 #[derive(Debug)]
 pub enum Animation {
     Layers(Vec<Animation>),
-    Single(AnimationBase)
+    Single(Box<AnimationBase>)
 }
 
 /// <https://wiki.factorio.com/Types/Animation#hr_version>
@@ -403,7 +403,7 @@ pub type RotatedAnimationVariations = Vec<RotatedAnimationVariation>;
 #[derive(Debug)]
 pub enum RotatedAnimationVariation {
     Layers(Vec<RotatedAnimationVariation>),
-    Single(RotatedAnimation)
+    Single(Box<RotatedAnimation>)
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimation4Way>

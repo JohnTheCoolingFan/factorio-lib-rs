@@ -86,7 +86,7 @@ pub enum NoiseExpression {
     LiteralString(String), // literal_value
     LiteralObject(String), // FIXME // I'm not going to implement this properly.
     LiteralExpression(Box<NoiseExpression>), // literal_value // oh god no
-    ArrayConstruction(Vec<Box<NoiseExpression>>), // FIXME // Not implemented properly
+    ArrayConstruction(Vec<NoiseExpression>), // FIXME // Not implemented properly
     ProcedureDelimeter(Box<NoiseExpression>), // expression
     IfElseChain(String), // FIXME // no
 }
