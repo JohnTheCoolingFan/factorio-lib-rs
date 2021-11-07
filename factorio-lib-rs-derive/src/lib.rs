@@ -158,6 +158,15 @@ pub fn data_table_accessable_macro_derive(input: TokenStream) -> TokenStream {
     impl_data_table_accessable_macro(&ast)
 }
 
+// Attribute on field
+// #[optional(expr)] - expr is default value
+// #[mandatory_if(expr)] - expr is a condition for mandatority
+#[proc_macro_derive(PrototypeFromLua, attributes(optional, mandatory_if))]
+pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_prototype_from_lua_macro(&ast)
+}
+
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -602,3 +611,19 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
     let ident = field.get_ident().expect("expected indentifier");
     Ok(ident.clone())
 }
+
+// TODO
+fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let data = { match &ast.data {
+        syn::Data::Struct(d) => d,
+        _ => panic!("expected struct")
+    }};
+    let fields = { match &data.fields {
+        syn::Fields::Named(f) => f.named.iter(),
+        _ => panic!("expected named fields")
+    }};
+    let parsed_fields = fields.map(|f| prot_from_lua_field_attribute(&f))
+}
+
+fn prot_from_lua_field_attribute(field: &syn::Field) -> Result<()>
