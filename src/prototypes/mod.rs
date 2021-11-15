@@ -25,7 +25,8 @@ use factorio_lib_rs_derive::{
     Equipment,
     Item,
     SelectionTool,
-    DataTableAccessable
+    DataTableAccessable,
+    PrototypeFromLua
 };
 use crate::{PrototypeFromLua, DataTableAccessable, DataTable};
 use crate::types::{
@@ -214,51 +215,32 @@ pub trait ModSetting: Prototype {
     fn setting_type(&self) -> ModSettingType;
 }
 
-#[derive(Debug, Prototype, ModSetting, DataTableAccessable)]
+#[derive(Debug, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(bool_setting)]
 pub struct BoolModSetting {
     name: String,
     localised_name: Option<LocalisedString>,
     localised_description: Option<LocalisedString>,
     order: Option<String>,
+    #[default(false)]
     hidden: bool,
+    #[from_str]
     setting_type: ModSettingType,
     default_value: bool,
+    #[mandatory_if(default_value)]
     forced_value: Option<bool>,
 }
 
-impl<'lua> PrototypeFromLua<'lua> for BoolModSetting {
-    fn prototype_from_lua(value: Value<'lua>, _: &'lua Lua, _: &DataTable) -> LuaResult<Self> {
-        if let Value::Table(prot_table) = value {
-            let name: String = prot_table.get("name")?;
-            let localised_name: Option<LocalisedString> = prot_table.get("localised_name")?;
-            let localised_description: Option<LocalisedString> = prot_table.get("localised_description")?;
-            let order: Option<String> = prot_table.get("order")?;
-            let hidden: bool = prot_table.get::<_, Option<bool>>("hidden")?.unwrap_or(false);
-            let setting_type: ModSettingType = prot_table.get::<_, String>("type")?
-                .parse::<ModSettingType>().map_err(mlua::Error::external)?;
-            let default_value: bool = prot_table.get("default_value")?;
-            let forced_value: Option<bool> = if default_value {
-                Some(prot_table.get("forced_value")?)
-            } else {
-                None
-            };
-            Ok(Self{name, localised_name, localised_description, order, hidden, setting_type, default_value, forced_value})
-        } else {
-            Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: "BoolModSetting",
-                message: Some("Expected Table".into())})
-        }
-    }
-}
-
-#[derive(Debug, Prototype, ModSetting, DataTableAccessable)]
+#[derive(Debug, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(int_setting)]
 pub struct IntModSetting {
     name: String,
     localised_name: Option<LocalisedString>,
     localised_description: Option<LocalisedString>,
     order: Option<String>,
+    #[default(false)]
     hidden: bool,
+    #[from_str]
     setting_type: ModSettingType,
     default_value: i64,
     minimum_value: Option<i64>,
