@@ -650,7 +650,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
 // #[prototype] - use prototype_from_lua instead of get
 fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let ident = &field.ident;
-    let str_ident = ident.as_ref().unwrap().to_string();
+    let str_field = ident.as_ref().unwrap().to_string();
     let field_type = &field.ty;
     let mut gen = quote! {
         let #ident: #field_type =
@@ -661,39 +661,39 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
         if !use_from_str {
             if let Some(default_value) = default_value {
                 get_expr = quote! {
-                    prot_table.get::<_, Option<#field_type>>(#str_ident)?.unwrap_or(#default_value)
+                    prot_table.get::<_, Option<#field_type>>(#str_field)?.unwrap_or(#default_value)
                 }
             } else {
                 get_expr = quote! {
-                    prot_table.get(#str_ident)?
+                    prot_table.get(#str_field)?
                 }
             }
         } else if let Some(default_value) = default_value {
             get_expr = quote! {
-                prot_table.get::<_, Option<String>>(#str_ident)?.unwrap_or(#default_value.into())
+                prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or(#default_value.into())
             }
         } else {
             get_expr = quote! {
-                prot_table.get::<_, String>(#str_ident)?
+                prot_table.get::<_, String>(#str_field)?
             }
         }
     } else if !use_from_str {
         if let Some(default_value) = default_value {
             get_expr = quote! {
-                #field_type::prototype_from_lua(prot_table.get::<_, Option<#field_type>>(#str_ident)?.unwrap_or(#default_value), lua, data_table)?
+                #field_type::prototype_from_lua(prot_table.get::<_, Option<#field_type>>(#str_field)?.unwrap_or(#default_value), lua, data_table)?
             }
         } else {
             get_expr = quote! {
-                #field_type::prototype_from_lua(prot_table.get(#str_ident)?, lua, data_table)?
+                #field_type::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
             }
         }
     } else if let Some(default_value) = default_value {
         get_expr = quote! {
-            #field_type::prototype_from_lua(prot_table.get::<_, Option<String>>(#str_ident)?.unwrap_or(#default_value.into()), lua, data_table)?
+            #field_type::prototype_from_lua(prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or(#default_value.into()), lua, data_table)?
         }
     } else {
         get_expr = quote! {
-            #field_type::prototype_from_lua(prot_table.get(#str_ident)?, lua, data_table)?
+            #field_type::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
         }
     }
     if use_from_str {
@@ -707,7 +707,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
             if #mandatory_expr {
                 Some(#get_expr)
             } else {
-                None
+                #get_expr
             }
         };
         gen.extend(if_gen);
