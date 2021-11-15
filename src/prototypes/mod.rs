@@ -248,14 +248,16 @@ pub struct IntModSetting {
     allowed_values: Option<Vec<i64>>,
 }
 
-#[derive(Debug, Prototype, ModSetting, DataTableAccessable)]
+#[derive(Debug, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(double_setting)]
 pub struct DoubleModSetting {
     name: String,
     localised_name: Option<LocalisedString>,
     localised_description: Option<LocalisedString>,
     order: Option<String>,
+    #[default(false)]
     hidden: bool,
+    #[from_str]
     setting_type: ModSettingType,
     default_value: f64,
     minimum_value: Option<f64>,
@@ -263,18 +265,22 @@ pub struct DoubleModSetting {
     allowed_values: Option<Vec<f64>>,
 }
 
-#[derive(Debug, Prototype, ModSetting, DataTableAccessable)]
+#[derive(Debug, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(string_setting)]
 pub struct StringModSetting {
     name: String,
     localised_name: Option<LocalisedString>,
     localised_description: Option<LocalisedString>,
     order: Option<String>,
+    #[default(false)]
     hidden: bool,
+    #[from_str]
     setting_type: ModSettingType,
     default_value: String,
-    allow_blank: Option<bool>,
-    auto_trim: Option<bool>,
+    #[default(false)]
+    allow_blank: bool,
+    #[default(false)]
+    auto_trim: bool,
     allowed_values: Option<Vec<String>>
 }
 
@@ -4306,5 +4312,7 @@ pub enum PrototypesErr {
     #[error("Invalid string for type {0}: {1}")]
     InvalidTypeStr(String, String),
     #[error("Prototype \"{0}\" not found")]
-    PrototypeNotFound(String)
+    PrototypeNotFound(String),
+    #[error("Field {0} is required")]
+    FieldRequired(String)
 }
