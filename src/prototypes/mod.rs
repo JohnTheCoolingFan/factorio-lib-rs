@@ -176,6 +176,8 @@ use crate::types::{
     TipStatus
 };
 
+// TODO: Make fields not acessible through traits pub
+
 // TODO
 // Current prototype definitions are based off Factorio wiki, which describe prototypes
 // *definitions*, meaning how they are defined in lua code and how they are parsed.
@@ -249,11 +251,6 @@ impl<'lua> PrototypeFromLua<'lua> for BoolModSetting {
     }
 }
 
-impl BoolModSetting {
-    pub fn default_value(&self) -> bool { self.default_value }
-    pub fn forced_value(&self) -> Option<bool> { self.forced_value }
-}
-
 #[derive(Debug, Prototype, ModSetting, DataTableAccessable)]
 #[data_table(int_setting)]
 pub struct IntModSetting {
@@ -267,13 +264,6 @@ pub struct IntModSetting {
     minimum_value: Option<i64>,
     maximum_value: Option<i64>,
     allowed_values: Option<Vec<i64>>,
-}
-
-impl IntModSetting {
-    pub fn default_value(&self) -> i64 { self.default_value }
-    pub fn minimum_value(&self) -> Option<i64> { self.minimum_value }
-    pub fn maximum_value(&self) -> Option<i64> { self.maximum_value }
-    pub fn allowed_values(&self) -> Option<Vec<i64>> { self.allowed_values.clone() }
 }
 
 #[derive(Debug, Prototype, ModSetting, DataTableAccessable)]
@@ -291,13 +281,6 @@ pub struct DoubleModSetting {
     allowed_values: Option<Vec<f64>>,
 }
 
-impl DoubleModSetting {
-    pub fn default_value(&self) -> f64 { self.default_value }
-    pub fn minimum_value(&self) -> Option<f64> { self.minimum_value }
-    pub fn maximum_value(&self) -> Option<f64> { self.maximum_value }
-    pub fn allowed_values(&self) -> Option<Vec<f64>> { self.allowed_values.clone() }
-}
-
 #[derive(Debug, Prototype, ModSetting, DataTableAccessable)]
 #[data_table(string_setting)]
 pub struct StringModSetting {
@@ -313,13 +296,6 @@ pub struct StringModSetting {
     allowed_values: Option<Vec<String>>
 }
 
-impl StringModSetting {
-    pub fn default_value(&self) -> String { self.default_value.clone() }
-    pub fn allow_blank(&self) -> Option<bool> { self.allow_blank }
-    pub fn auto_trim(&self) -> Option<bool> {self.auto_trim }
-    pub fn allowed_values(&self) -> Option<Vec<String>> { self.allowed_values.clone() }
-}
-
 /// <https://wiki.factorio.com/Prototype/AmbientSound>
 #[derive(Debug, Prototype, DataTableAccessable)]
 #[data_table(ambient_sound)]
@@ -328,12 +304,6 @@ pub struct AmbientSoundPrototype {
     sound: Sound,
     track_type: String,
     weight: Option<f64>
-}
-
-impl AmbientSoundPrototype {
-    pub fn sound(&self) -> &Sound { &self.sound }
-    pub fn track_type(&self) -> String { self.track_type.clone() }
-    pub fn weight(&self) -> Option<f64> { self.weight }
 }
 
 /// <https://wiki.factorio.com/Prototype/Animation>
