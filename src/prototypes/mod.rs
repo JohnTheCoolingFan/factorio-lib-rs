@@ -5,6 +5,7 @@ pub use abstract_prototypes::*;
 pub use utility::*;
 
 use std::collections::HashMap;
+use mlua::{Lua, Value, prelude::LuaResult};
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::fmt;
@@ -222,6 +223,30 @@ pub struct BoolModSetting {
     setting_type: ModSettingType,
     default_value: bool,
     forced_value: Option<bool>,
+}
+
+impl<'lua> PrototypeFromLua<'lua> for BoolModSetting {
+    fn prototype_from_lua(value: Value<'lua>, _: &'lua Lua, _: &DataTable) -> LuaResult<Self> {
+        if let Value::Table(prot_table) = value {
+            let name: String = prot_table.get("name")?;
+            let localised_name: Option<LocalisedString> = prot_table.get("localised_name")?;
+            let localised_description: Option<LocalisedString> = prot_table.get("localised_description")?;
+            let order: Option<String> = prot_table.get("order")?;
+            let hidden: bool = prot_table.get::<_, Option<bool>>("hidden")?.unwrap_or(false);
+            let setting_type: ModSettingType = prot_table.get::<_, String>("type")?
+                .parse::<ModSettingType>().map_err(mlua::Error::external)?;
+            let default_value: bool = prot_table.get("default_value")?;
+            let forced_value: Option<bool> = if default_value {
+                Some(prot_table.get("forced_value")?)
+            } else {
+                None
+            };
+            Ok(Self{name, localised_name, localised_description, order, hidden, setting_type, default_value, forced_value})
+        } else {
+            Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: "BoolModSetting",
+                message: Some("Expected Table".into())})
+        }
+    }
 }
 
 impl BoolModSetting {
