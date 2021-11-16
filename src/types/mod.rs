@@ -2157,3 +2157,13 @@ pub enum BoxSpecificationDimensionSpec {
     WholeBox(f64, f64), // `is_whole_box` = true; `side_length` and `side_height`
     NotWholeBox(f64), // `is_whole_box` = false (Default); `max_side_length`
 }
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
+pub enum TrackType {
+    EarlyGame,
+    MainTrack,
+    Interlude,
+    LateGame,
+    MenuTrack
+}

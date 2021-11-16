@@ -174,7 +174,8 @@ use crate::types::{
     TileBuildSound,
     SimulationDefinition,
     TipTrigger,
-    TipStatus
+    TipStatus,
+    TrackType
 };
 
 // TODO: Make fields not acessible through traits pub
@@ -290,8 +291,8 @@ pub struct StringModSetting {
 pub struct AmbientSoundPrototype {
     name: String,
     sound: Sound,
-    track_type: String,
-    weight: Option<f64>
+    track_type: TrackType,
+    weight: f64
 }
 
 /// <https://wiki.factorio.com/Prototype/Animation>
