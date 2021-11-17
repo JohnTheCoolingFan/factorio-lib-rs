@@ -30,6 +30,13 @@ use strum_macros::{EnumString, AsRefStr};
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
 #[derive(Debug)]
 pub struct FileName(String);
+
+impl From<String> for FileName {
+    fn from(s: String) -> Self {
+        Self(s)
+    }
+}
+
 /// <https://wiki.factorio.com/Types/ItemStackIndex>
 pub type ItemStackIndex = u16;
 /// <https://wiki.factorio.com/Types/ItemCountType>
