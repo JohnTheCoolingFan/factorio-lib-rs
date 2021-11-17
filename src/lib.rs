@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use std::rc::{Rc, Weak};
 use std::fmt;
 use std::marker::PhantomData;
-use mlua::{Value, Lua, FromLua, prelude::LuaResult, Integer, Table};
+use mlua::{Value, Lua, prelude::LuaResult, Integer, Table};
 use thiserror::Error;
 use prototypes::*;
 use crate::types::SpriteSizeType;
@@ -266,12 +266,37 @@ impl DataTable {
 
 /// [mlua::FromLua] alternative with [DataTable] reference being passed
 pub trait PrototypeFromLua<'lua>: Sized {
-    fn prototype_from_lua(lua_value: Value<'lua>, lua: &'lua Lua, data_table: &DataTable) -> LuaResult<Self>;
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self>;
 }
 
-impl<'lua, T: FromLua<'lua>> PrototypeFromLua<'lua> for T {
-    fn prototype_from_lua(lua_value: Value<'lua>, lua: &'lua Lua, _: &DataTable) -> LuaResult<Self> {
-        T::from_lua(lua_value, lua)
+impl<'lua, T: PrototypeFromLua<'lua>> PrototypeFromLua<'lua> for Vec<T> {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(value) = value {
+            value.sequence_values::<Value>().collect::<LuaResult<Vec<Value>>>()?.into_iter().map(|v| T::prototype_from_lua(v, lua, data_table)).collect()
+        } else {
+            Err(mlua::Error::FromLuaConversionError{
+                from: value.type_name(),
+                to: "Vec",
+                message: Some("expected table".into())
+            })
+        }
+    }
+}
+
+impl<'lua, T: PrototypeFromLua<'lua>> PrototypeFromLua<'lua> for Option<T> {
+    #[inline]
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        match value {
+            Value::Nil => Ok(None),
+            value => Ok(Some(T::prototype_from_lua(value, lua, data_table)?))
+        }
+    }
+}
+
+impl<'lua> PrototypeFromLua<'lua> for Value<'lua> {
+    #[inline]
+    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+        Ok(value)
     }
 }
 
@@ -326,11 +351,11 @@ pub struct ResourceRecord {
     pub resource_type: ResourceType
 }
 
-/// Respirce type with additional info if neded
+/// Resource type with additional info if needed
 #[derive(Debug)]
 pub enum ResourceType {
     Image(SpriteSizeType, SpriteSizeType), // x and y dimensions of an image
-    Sound
+    Sound // Only .ogg, .wav and .voc are accepted
 }
 
 #[derive(Debug, Error)]
