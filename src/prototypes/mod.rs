@@ -1,6 +1,7 @@
 mod abstract_prototypes;
 mod utility;
 
+use mlua::FromLua;
 pub use abstract_prototypes::*;
 pub use utility::*;
 
@@ -286,12 +287,15 @@ pub struct StringModSetting {
 }
 
 /// <https://wiki.factorio.com/Prototype/AmbientSound>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(ambient_sound)]
 pub struct AmbientSoundPrototype {
     name: String,
+    #[prototype]
     sound: Sound,
+    #[from_str]
     track_type: TrackType,
+    #[default(1.0)]
     weight: f64
 }
 
