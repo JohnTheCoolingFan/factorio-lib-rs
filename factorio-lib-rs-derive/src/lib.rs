@@ -163,7 +163,9 @@ pub fn data_table_accessable_macro_derive(input: TokenStream) -> TokenStream {
 // #[mandatory_if(expr)] - expr is a condition for mandatority
 // #[from_str] - convert value to string, then parse from str
 // #[prototype] - use prototype_from_lua instead of get
-#[proc_macro_derive(PrototypeFromLua, attributes(default, mandatory_if, from_str, prototype))]
+// #[use_self_if_not_found] - use self-Value for property if corresponding field does not exist
+// #[resource] - this field is a resource record
+#[proc_macro_derive(PrototypeFromLua, attributes(default, mandatory_if, from_str, prototype, use_self_if_not_found, resource))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
@@ -614,7 +616,6 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
     Ok(ident.clone())
 }
 
-// TODO
 fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let str_name = name.to_string();
@@ -626,12 +627,15 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
         syn::Fields::Named(f) => f.named.iter(),
         _ => panic!("expected named fields")
     }};
+    let requires_data_table = fields.clone().fold(false, check_for_data_table);
     let parsed_fields = fields.clone().map(|f| prot_from_lua_field(f).unwrap());
     let field_names = fields.map(|f| &f.ident);
-    let gen = quote! {
+    let parsed_fields_clone = parsed_fields.clone();
+    let field_names_clone = field_names.clone();
+    let mut gen = quote! {
         impl<'lua> PrototypeFromLua<'lua> for #name {
-            fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &DataTable) -> LuaResult<Self> {
-                if let Value::Table(prot_table) = value {
+            fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+                if let Value::Table(ref prot_table) = value {
                     #(#parsed_fields)*
                     Ok(Self{#(#field_names),*})
                 } else {
@@ -641,13 +645,25 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
     };
+    if !requires_data_table {
+        let extra_gen = quote! {
+            impl<'lua> FromLua<'lua> for #name {
+                fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+                    if let Value::Table(ref prot_table) = value {
+                        #(#parsed_fields_clone)*
+                        Ok(Self{#(#field_names_clone),*})
+                    } else {
+                        Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: #str_name,
+                        message: Some("Expected Table".into())})
+                    }
+                }
+            }
+        };
+        gen.extend(extra_gen);
+    }
     gen.into()
 }
 
-// #[default(expr)] - expr is default value
-// #[mandatory_if(expr)] - expr is a condition for mandatority
-// #[from_str] - convert value to string, then parse from str
-// #[prototype] - use prototype_from_lua instead of get
 fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let ident = &field.ident;
     let str_field = ident.as_ref().unwrap().to_string();
@@ -655,17 +671,41 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let mut gen = quote! {
         let #ident: #field_type =
     };
-    let (default_value, mandatory_expr, use_from_str, use_prototype) = prot_from_lua_field_attributes(&field.attrs)?;
+    let (default_value, mandatory_expr, use_from_str, use_prototype, use_self, is_resource) = prot_from_lua_field_attributes(&field.attrs)?;
     let mut get_expr: proc_macro2::TokenStream;
-    if !use_prototype {
+    if is_resource {
+        if let Some(default_value) = default_value {
+            get_expr = quote! {
+                { 
+                    let name = prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or_else(|| #default_value.into());
+                    data_table.new_resource_record(ResourceRecord{path: name.clone, resource_type: ResourceType::Sound});
+                    name.into()
+                }
+            }
+        } else {
+            get_expr = quote! {
+                {
+                    let name = prot_table.get::<_, String>(#str_field)?;
+                    data_table.new_resource_record(ResourceRecord{path: name.clone(), resource_type: ResourceType::Sound});
+                    name.into()
+                }
+            }
+        }
+    } else if !use_prototype { 
         if !use_from_str {
-            if let Some(default_value) = default_value {
-                get_expr = quote! {
-                    prot_table.get::<_, Option<#field_type>>(#str_field)?.unwrap_or(#default_value)
+            if !use_self {
+                if let Some(default_value) = default_value {
+                    get_expr = quote! {
+                        prot_table.get::<_, Option<#field_type>>(#str_field)?.unwrap_or(#default_value)
+                    }
+                } else {
+                    get_expr = quote! {
+                        prot_table.get(#str_field)?
+                    }
                 }
             } else {
                 get_expr = quote! {
-                    prot_table.get(#str_field)?
+                    prot_table.get::<_, Option<#field_type>>(#str_field)?.unwrap_or_else(|| Vec::from([lua.unpack(prot_table.clone().to_lua()?)?]))
                 }
             }
         } else if let Some(default_value) = default_value {
@@ -678,22 +718,29 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
             }
         }
     } else if !use_from_str {
-        if let Some(default_value) = default_value {
-            get_expr = quote! {
-                #field_type::prototype_from_lua(prot_table.get::<_, Option<#field_type>>(#str_field)?.unwrap_or(#default_value), lua, data_table)?
+        if !use_self {
+            if let Some(default_value) = default_value {
+                get_expr = quote! {
+                    PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<Vec<Value>>>(#str_field)?.unwrap_or(#default_value), lua, data_table)?
+                }
+            } else {
+                get_expr = quote! {
+                    PrototypeFromLua::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
+                }
             }
         } else {
             get_expr = quote! {
-                #field_type::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
+                PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<Value>>(#str_field)?
+                    .unwrap_or_else(|| value.clone()), lua, data_table)?
             }
         }
     } else if let Some(default_value) = default_value {
         get_expr = quote! {
-            #field_type::prototype_from_lua(prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or(#default_value.into()), lua, data_table)?
+            PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or(#default_value.into()), lua, data_table)?
         }
     } else {
         get_expr = quote! {
-            #field_type::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
+            PrototypeFromLua::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
         }
     }
     if use_from_str {
@@ -719,8 +766,8 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     Ok(gen)
 }
 
-fn prot_from_lua_field_attributes(attrs: &[Attribute]) -> Result<(Option<syn::Lit>, Option<proc_macro2::TokenStream>, bool, bool)> {
-    let mut result = (None, None, false, false);
+fn prot_from_lua_field_attributes(attrs: &[Attribute]) -> Result<(Option<syn::Lit>, Option<proc_macro2::TokenStream>, bool, bool, bool, bool)> {
+    let mut result = (None, None, false, false, false, false);
     for attr in attrs {
         if attr.path.is_ident("from_str") {
             result.2 = true
@@ -730,7 +777,24 @@ fn prot_from_lua_field_attributes(attrs: &[Attribute]) -> Result<(Option<syn::Li
             result.0 = Some(attr.parse_args::<syn::Lit>()?)
         } else if attr.path.is_ident("mandatory_if") {
             result.1 = Some(attr.parse_args::<proc_macro2::TokenStream>()?)
+        } else if attr.path.is_ident("use_self_if_not_found") {
+            result.4 = true
+        } else if attr.path.is_ident("resource") {
+            result.5 = true
         }
     }
     Ok(result)
+}
+
+fn check_for_data_table(state: bool, field: &syn::Field) -> bool {
+    if state {
+        state
+    } else {
+        for attr in &field.attrs {
+            if attr.path.is_ident("prototype") || attr.path.is_ident("resource") {
+                return true
+            }
+        }
+        false
+    }
 }
