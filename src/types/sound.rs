@@ -48,22 +48,37 @@ pub struct SoundVariation {
 }
 
 /// <https://wiki.factorio.com/Types/WorkingSound>
-#[derive(Debug)]
+#[derive(Debug, PrototypeFromLua)]
 pub struct WorkingSound {
+    #[use_self_if_not_found]
+    #[prototype]
     sound: Sound, // If property not present, Sound is constructed from WorkingSound fields
+    #[default(1.0)]
     apparent_volume: f32, // Default: 1
     max_sounds_per_type: Option<u8>,
+    #[default(false)]
     match_progress_to_activity: bool, // Default: false
+    #[default(false)]
     match_volume_to_activity: bool, // Default: false
+    #[default(false)]
     match_speed_to_activity: bool, // Default: false
+    #[default(false)]
     persistent: bool, // Default: false
+    #[default(true)]
     use_doppler_shift: bool, // Default: true
-    audible_distance_modifier: bool, // Default: 1
+    #[default(1.0)]
+    audible_distance_modifier: f64, // Default: 1
+    #[default(1.0)]
     probability: f64, // Default: 1
+    #[default(0)]
     fade_in_ticks: u32, // Default: 0
+    #[default(0)]
     fade_out_ticks: u32, // Default: 0
+    #[prototype]
     idle_sound: Option<Sound>,
+    #[prototype]
     activate_sound: Option<Sound>,
+    #[prototype]
     deactivate_sound: Option<Sound>,
 }
 
