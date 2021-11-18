@@ -83,24 +83,33 @@ pub struct WorkingSound {
 }
 
 /// <https://wiki.factorio.com/Types/InterruptibleSound>
-#[derive(Debug)]
+#[derive(Debug, PrototypeFromLua)]
 pub struct InterruptibleSound {
+    #[prototype]
     sound: Sound,
+    #[default(0)]
     fade_ticks: u32 // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/CyclicSound>
-#[derive(Debug)]
+#[derive(Debug, PrototypeFromLua)]
 pub struct CyclicSound {
+    #[prototype]
     begin_sound: Option<Sound>,
+    #[prototype]
     middle_sound: Option<Sound>,
+    #[prototype]
     end_sound: Option<Sound>
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#build_sound>
-#[derive(Debug)]
+#[derive(Debug, PrototypeFromLua)]
 pub struct TileBuildSound {
+    #[use_self_if_not_found]
+    #[prototype]
     small: Sound,
+    #[prototype]
     medium: Option<Sound>,
+    #[prototype]
     large: Option<Sound>
 }
