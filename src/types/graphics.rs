@@ -1,7 +1,10 @@
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
 use std::iter::FromIterator;
 use crate::types::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
+use factorio_lib_rs_derive::PrototypeFromLua;
 use strum_macros::{EnumString, AsRefStr};
+use mlua::{Value, prelude::LuaResult, Lua, FromLua};
+use crate::{DataTable, PrototypeFromLua};
 
 // ============ // Simple types // ============ //
 
@@ -178,11 +181,15 @@ pub enum RunMode {
         // Structs
 
 /// <https://wiki.factorio.com/Types/FluidBox#secondary_draw_orders>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, PrototypeFromLua)]
 pub struct SecondaryDrawOrders {
+    #[default(1)]
     north: i8,
+    #[default(1)]
     east: i8,
+    #[default(1)]
     south: i8,
+    #[default(1)]
     west: i8
 }
 
