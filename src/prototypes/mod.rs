@@ -1808,7 +1808,8 @@ pub struct Generator {
     scale_fluid_usage: bool, // Default: false
     min_perceived_performance: f64, // Default: 0.25
     performance_to_sound_speedup: f64, // Default: 0.5
-    max_power_output: Option<Energy>
+    max_power_output: Option<Energy>,
+    destroy_non_fuel_fluid: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Prototype/HeatInterface>

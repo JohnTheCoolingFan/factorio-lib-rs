@@ -1151,6 +1151,7 @@ pub struct FluidEnergySource {
     scale_fluid_usage: bool, // Default: false
     fluid_usage_per_tick: f64, // Default: 0
     maximum_temperature: f64, // Default: f64::INFINITY
+    destroy_non_fuel_fluid: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Types/ElectricUsagePriority>
