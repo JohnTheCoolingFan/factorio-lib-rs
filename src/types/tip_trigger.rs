@@ -9,7 +9,7 @@ pub enum TipTrigger {
     DependenciesMet(DependenciesMetTipTrigger),
     TimeElapsed(TimeElapsedTipTrigger),
     Research(ResearchTechnologyTipTrigger),
-    UnlockedRecipe(UnlockedRecipeTipTrigger),
+    UnlockRecipe(UnlockRecipeTipTrigger),
     CraftItem(CraftItemTipTrigger),
     BuildEntity(BuildEntityTipTrigger),
     ManualTransfer(ManualTransferTipTrigger),
@@ -61,8 +61,9 @@ pub struct ResearchTechnologyTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#UnlockedRecipeTipTrigger>
+/// <https://wiki.factorio.com/Types/TipTrigger#UnlockRecipeTipTrigger>
 #[derive(Debug)]
-pub struct UnlockedRecipeTipTrigger {
+pub struct UnlockRecipeTipTrigger {
     recipe: String // Name of recipe
 }
 
