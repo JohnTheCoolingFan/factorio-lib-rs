@@ -81,7 +81,7 @@ impl Color {
         let r = r.or(Some(0.0_f32)).unwrap();
         let g = g.or(Some(0.0_f32)).unwrap();
         let b = b.or(Some(0.0_f32)).unwrap();
-        let a = a.or(Some(0.0_f32)).unwrap();
+        let a = a.or(Some(1.0_f32)).unwrap();
         Self(r, g, b, a)
     }
 
