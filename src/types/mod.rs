@@ -24,7 +24,7 @@ use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
 use crate::prototypes::PrototypesErr;
 use crate::concepts::LocalisedString;
-use mlua::{ToLua, Value, Lua, prelude::LuaResult};
+use mlua::{ToLua, Value, Lua, prelude::LuaResult, FromLua};
 use strum_macros::{EnumString, AsRefStr};
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
@@ -87,6 +87,37 @@ impl Color {
 
     pub fn new_rgb(r: f32, g: f32, b: f32) -> Self { // r, g, b default is 0
         Self(r, g, b, 1.0)
+    }
+}
+
+impl<'lua> FromLua<'lua> for Color {
+    fn from_lua(value: Value<'lua>, _: &'lua Lua) -> LuaResult<Self> {
+        if let Value::Table(table) = value {
+            let r: Option<f32> = table.get("r")?;
+            let g: Option<f32> = table.get("g")?;
+            let b: Option<f32> = table.get("b")?;
+            let a: Option<f32> = table.get("a")?;
+            if r.is_none() && g.is_none() && b.is_none() && a.is_none() {
+                let mut seq = table.sequence_values::<f32>();
+                let r = seq.next().transpose()?;
+                let g = seq.next().transpose()?;
+                let b = seq.next().transpose()?;
+                let a = seq.next().transpose()?;
+                if let (Some(red), Some(grn), Some(blu)) = (r, g, b) {
+                    if let Some(alp) = a {
+                        Ok(Self::new_rgba(red, grn, blu, alp))
+                    } else {
+                        Ok(Self::new_rgb(red, grn, blu))
+                    }
+                } else {
+                    Err(mlua::Error::FromLuaConversionError{from: "table", to: "Color", message: Some("Expected 3 or 4 items in array".into())})
+                }
+            } else {
+                Ok(Self::new_rgba_opt(r, g, b, a))
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: "Color", message: Some("Expected table".into())})
+        }
     }
 }
 
