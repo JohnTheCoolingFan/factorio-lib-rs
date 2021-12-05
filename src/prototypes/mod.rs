@@ -1,12 +1,10 @@
 mod abstract_prototypes;
 mod utility;
 
-use mlua::FromLua;
 pub use abstract_prototypes::*;
 pub use utility::*;
 
 use std::collections::HashMap;
-use mlua::{Lua, Value, prelude::LuaResult};
 use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::fmt;
@@ -29,7 +27,7 @@ use factorio_lib_rs_derive::{
     DataTableAccessable,
     PrototypeFromLua
 };
-use crate::{PrototypeFromLua, DataTableAccessable, DataTable};
+use crate::{DataTableAccessable, DataTable};
 use crate::types::{
     ModSettingType,
     MapDifficultySettings,
