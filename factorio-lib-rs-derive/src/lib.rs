@@ -678,7 +678,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
             get_expr = quote! {
                 { 
                     let name = prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or_else(|| #default_value.into());
-                    data_table.new_resource_record(ResourceRecord{path: name.clone, resource_type: ResourceType::Sound});
+                    data_table.new_resource_record(ResourceRecord{path: name.clone, resource_type: crate::ResourceType::Sound});
                     name.into()
                 }
             }
@@ -686,7 +686,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
             get_expr = quote! {
                 {
                     let name = prot_table.get::<_, String>(#str_field)?;
-                    data_table.new_resource_record(ResourceRecord{path: name.clone(), resource_type: ResourceType::Sound});
+                    data_table.new_resource_record(ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
                     name.into()
                 }
             }
@@ -721,26 +721,26 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
         if !use_self {
             if let Some(default_value) = default_value {
                 get_expr = quote! {
-                    PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<Vec<Value>>>(#str_field)?.unwrap_or(#default_value), lua, data_table)?
+                    crate::PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<Vec<mlua::Value>>>(#str_field)?.unwrap_or(#default_value), lua, data_table)?
                 }
             } else {
                 get_expr = quote! {
-                    PrototypeFromLua::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
+                    crate::PrototypeFromLua::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
                 }
             }
         } else {
             get_expr = quote! {
-                PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<Value>>(#str_field)?
+                crate::PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<mlua::Value>>(#str_field)?
                     .unwrap_or_else(|| value.clone()), lua, data_table)?
             }
         }
     } else if let Some(default_value) = default_value {
         get_expr = quote! {
-            PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or(#default_value.into()), lua, data_table)?
+            crate::PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or(#default_value.into()), lua, data_table)?
         }
     } else {
         get_expr = quote! {
-            PrototypeFromLua::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
+            crate::PrototypeFromLua::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
         }
     }
     if use_from_str {
