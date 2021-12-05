@@ -1,8 +1,9 @@
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
-use std::iter::FromIterator;
+use std::iter::{Iterator, FromIterator};
 use crate::types::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
 use factorio_lib_rs_derive::PrototypeFromLua;
 use strum_macros::{EnumString, AsRefStr};
+use mlua::ToLua;
 
 // ============ // Simple types // ============ //
 
@@ -308,11 +309,44 @@ pub enum Animation {
     Single(Box<AnimationBase>)
 }
 
+impl<'lua> crate::PrototypeFromLua<'lua> for Animation {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
+        if let mlua::Value::Table(p_table) = value {
+            let layers = p_table.get::<_, Option<Vec<mlua::Value>>>("layers")?;
+            if let Some(actual_layers) = layers {
+                let result_layers: mlua::Result<Vec<Self>> = actual_layers.into_iter().map(|v| Self::prototype_from_lua(v, lua, data_table)).collect();
+                Ok(Self::Layers(result_layers?))
+            } else {
+                Ok(Self::Single(Box::new(AnimationBase::prototype_from_lua(p_table.to_lua(lua)?, lua, data_table)?)))
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError{from:value.type_name(), to: "Animation", message: Some("Expected table".into())})
+        }
+    }
+}
+
 /// <https://wiki.factorio.com/Types/Animation#hr_version>
 #[derive(Debug, Clone)]
 pub struct AnimationBase {
     regular: AnimationVariant,
     hr_version: Option<AnimationVariant>,
+}
+
+impl<'lua> crate::PrototypeFromLua<'lua> for AnimationBase {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
+        if let mlua::Value::Table(p_table) = value {
+            let hr_version_opt = p_table.get::<_, Option<mlua::Value>>("hr_version")?;
+            let regular = AnimationVariant::prototype_from_lua(p_table.clone().to_lua(lua)?)?;
+            if let Some(hr_version_value) = hr_version_opt {
+                let hr_version = AnimationVariant::prototype_from_lua(hr_version_value, lua, data_table)?;
+                Ok(Self{regular, hr_version: Some(hr_version)})
+            } else {
+                Ok(Self{regular, hr_version: None})
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError{from:value.type_name(), to: "AnimationBse", message: Some("Expected table".into())})
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Types/Animation#stripes>
