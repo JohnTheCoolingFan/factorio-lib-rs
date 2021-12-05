@@ -215,7 +215,7 @@ pub trait ModSetting: Prototype {
     fn setting_type(&self) -> ModSettingType;
 }
 
-#[derive(Debug, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(bool_setting)]
 pub struct BoolModSetting {
     name: String,
@@ -226,12 +226,12 @@ pub struct BoolModSetting {
     hidden: bool,
     #[from_str]
     setting_type: ModSettingType,
-    default_value: bool,
+    pub default_value: bool,
     #[mandatory_if(default_value)]
-    forced_value: Option<bool>,
+    pub forced_value: Option<bool>,
 }
 
-#[derive(Debug, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(int_setting)]
 pub struct IntModSetting {
     name: String,
@@ -242,13 +242,13 @@ pub struct IntModSetting {
     hidden: bool,
     #[from_str]
     setting_type: ModSettingType,
-    default_value: i64,
-    minimum_value: Option<i64>,
-    maximum_value: Option<i64>,
-    allowed_values: Option<Vec<i64>>,
+    pub default_value: i64,
+    pub minimum_value: Option<i64>,
+    pub maximum_value: Option<i64>,
+    pub allowed_values: Option<Vec<i64>>,
 }
 
-#[derive(Debug, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(double_setting)]
 pub struct DoubleModSetting {
     name: String,
@@ -259,13 +259,13 @@ pub struct DoubleModSetting {
     hidden: bool,
     #[from_str]
     setting_type: ModSettingType,
-    default_value: f64,
-    minimum_value: Option<f64>,
-    maximum_value: Option<f64>,
-    allowed_values: Option<Vec<f64>>,
+    pub default_value: f64,
+    pub minimum_value: Option<f64>,
+    pub maximum_value: Option<f64>,
+    pub allowed_values: Option<Vec<f64>>,
 }
 
-#[derive(Debug, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(string_setting)]
 pub struct StringModSetting {
     name: String,
@@ -276,33 +276,35 @@ pub struct StringModSetting {
     hidden: bool,
     #[from_str]
     setting_type: ModSettingType,
-    default_value: String,
+    pub default_value: String,
     #[default(false)]
-    allow_blank: bool,
+    pub allow_blank: bool,
     #[default(false)]
-    auto_trim: bool,
-    allowed_values: Option<Vec<String>>
+    pub auto_trim: bool,
+    pub allowed_values: Option<Vec<String>>
 }
 
 /// <https://wiki.factorio.com/Prototype/AmbientSound>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(ambient_sound)]
 pub struct AmbientSoundPrototype {
     name: String,
     #[prototype]
-    sound: Sound,
+    pub sound: Sound,
     #[from_str]
-    track_type: TrackType,
+    pub track_type: TrackType,
     #[default(1.0)]
-    weight: f64
+    pub weight: f64
 }
 
 /// <https://wiki.factorio.com/Prototype/Animation>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(animation)]
 pub struct AnimationPrototype {
     name: String,
-    layers: Vec<Animation> // If lua table doesn't have layers, use same table for constructing just one
+    #[use_self_if_not_found]
+    #[prototype]
+    pub layers: Vec<Animation> // If lua table doesn't have layers, use same table for constructing just one
 }
 
 /// <https://wiki.factorio.com/Prototype/EditorController>
