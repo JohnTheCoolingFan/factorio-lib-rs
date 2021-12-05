@@ -648,7 +648,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     if !requires_data_table {
         let extra_gen = quote! {
             impl<'lua> mlua::FromLua<'lua> for #name {
-                fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> LuaResult<Self> {
+                fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::prelude::LuaResult<Self> {
                     if let mlua::Value::Table(ref prot_table) = value {
                         #(#parsed_fields_clone)*
                         Ok(Self{#(#field_names_clone),*})
@@ -678,7 +678,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
             get_expr = quote! {
                 { 
                     let name = prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or_else(|| #default_value.into());
-                    data_table.new_resource_record(ResourceRecord{path: name.clone, resource_type: crate::ResourceType::Sound});
+                    data_table.new_resource_record(crate::ResourceRecord{path: name.clone, resource_type: crate::ResourceType::Sound});
                     name.into()
                 }
             }
@@ -686,7 +686,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
             get_expr = quote! {
                 {
                     let name = prot_table.get::<_, String>(#str_field)?;
-                    data_table.new_resource_record(ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
+                    data_table.new_resource_record(crate::ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
                     name.into()
                 }
             }
