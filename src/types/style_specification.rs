@@ -11,7 +11,7 @@ use strum_macros::{EnumString, AsRefStr};
 // without Option<> wrap.
 
 /// <https://wiki.factorio.com/Types/StyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum StyleSpecification {
     ActivityBar(ActivityBarStyleSpecification),
     Camera(CameraStyleSpecification),
@@ -46,7 +46,7 @@ pub enum StyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/StyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StyleSpecificationBase {
     parent: String, // Name of StyleSpecification
     horizontal_align: HorizontalAlignment, // Default: "left"
@@ -96,7 +96,7 @@ pub enum StretchRule {
 }
 
 /// <https://wiki.factorio.com/Types/ActivityBarStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ActivityBarStyleSpecification {
     base: StyleSpecificationBase,
     speed: f32,
@@ -108,7 +108,7 @@ pub struct ActivityBarStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/EmptyWidgetStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum EmptyWidgetStyleSpecification {
     Camera(CameraStyleSpecification),
     Minimap(MinimapStyleSpecification)
@@ -116,7 +116,7 @@ pub enum EmptyWidgetStyleSpecification {
 
 /// <https://wiki.factorio.com/Types/EmptyWidgetStyleSpecification>
 /// <https://wiki.factorio.com/Types/CameraStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CameraStyleSpecification {
     base: StyleSpecificationBase,
     graphical_set: ElementImageSet
@@ -124,14 +124,14 @@ pub struct CameraStyleSpecification {
 
 /// <https://wiki.factorio.com/Types/EmptyWidgetStyleSpecification>
 /// <https://wiki.factorio.com/Types/MinimapStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MinimapStyleSpecification {
     base: StyleSpecificationBase,
     graphical_set: ElementImageSet
 }
 
 /// <https://wiki.factorio.com/Types/ElementImageSet>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ElementImageSet {
     base: ElementImageSetLayer,
     shadow: Option<ElementImageSetLayer>,
@@ -139,7 +139,7 @@ pub struct ElementImageSet {
 }
 
 /// <https://wiki.factorio.com/Types/ElementImageSetLayer>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ElementImageSetLayer {
     draw_type: DrawType, // Default: "inner"
     eisl_type: ElementImageSetLayerType, // Default: "none" if there are no other properties, "composition" otherwise
@@ -209,7 +209,7 @@ pub enum ElementImageSetLayerType {
 }
 
 /// <https://wiki.factorio.com/Types/DropDownStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DropDownStyleSpecification {
     base: StyleSpecificationBase,
     button_style: Option<ButtonStyleSpecification>,
@@ -220,7 +220,7 @@ pub struct DropDownStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/FlowStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FlowStyleSpecification {
     base: StyleSpecificationBase,
     // Default 0 (unconfirmed)
@@ -230,7 +230,7 @@ pub struct FlowStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/FrameStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FrameStyleSpecification {
     base: StyleSpecificationBase,
     graphical_set: Option<ElementImageSet>,
@@ -248,7 +248,7 @@ pub struct FrameStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/BorderImageSet>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BorderImageSet {
     scale: f64, // Default: 1
     border_width: u32, // Default: 0
@@ -270,14 +270,14 @@ pub struct BorderImageSet {
 }
 
 /// <https://wiki.factorio.com/Types/GlowStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GlowStyleSpecification {
     base: StyleSpecificationBase,
     image_set: Option<ElementImageSet>
 }
 
 /// <https://wiki.factorio.com/Types/GraphStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphStyleSpecification {
     base: StyleSpecificationBase,
     background_color: Color,
@@ -297,21 +297,21 @@ pub struct GraphStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/HorizontalFlowStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HorizontalFlowStyleSpecification {
     base: StyleSpecificationBase,
     horizontal_spacing: i32
 }
 
 /// <https://wiki.factorio.com/Types/VerticalFlowStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VerticalFlowStyleSpecification {
     base: StyleSpecificationBase,
     vertical_spacing: i32
 }
 
 /// <https://wiki.factorio.com/Types/ImageStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ImageStyleSpecification {
     base: StyleSpecificationBase,
     graphical_set: Option<ElementImageSet>,
@@ -319,7 +319,7 @@ pub struct ImageStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/LabelStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LabelStyleSpecification {
     base: StyleSpecificationBase,
     font: Option<String>, // Name of Font prototype
@@ -345,14 +345,14 @@ pub enum RichTextSetting {
 }
 
 /// <https://wiki.factorio.com/Types/LineStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LineStyleSpecification {
     base: StyleSpecificationBase,
     border: Option<BorderImageSet>
 }
 
 /// <https://wiki.factorio.com/Types/ListBoxStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ListBoxStyleSpecification {
     base: StyleSpecificationBase,
     item_style: Option<ButtonStyleSpecification>,
@@ -360,7 +360,7 @@ pub struct ListBoxStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/ProgressBarStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ProgressBarStyleSpecification {
     base: StyleSpecificationBase,
     bar_width: u32,
@@ -375,7 +375,7 @@ pub struct ProgressBarStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/ProgressBarStyleSpecification#other_colors>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OtherColor {
     less_than: f64,
     color: Option<Color>,
@@ -383,7 +383,7 @@ pub struct OtherColor {
 }
 
 /// <https://wiki.factorio.com/Types/HorizontalScrollBarStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HorizontalScrollBarStyleSpecification {
     base: StyleSpecificationBase,
     background_graphical_set: Option<ElementImageSet>,
@@ -391,7 +391,7 @@ pub struct HorizontalScrollBarStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/VerticalScrollBarStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VerticalScrollBarStyleSpecification {
     base: StyleSpecificationBase,
     background_graphical_set: Option<ElementImageSet>,
@@ -399,7 +399,7 @@ pub struct VerticalScrollBarStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/ScrollPaneStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ScrollPaneStyleSpecification {
     base: StyleSpecificationBase,
     vertical_flow_style: Option<VerticalFlowStyleSpecification>,
@@ -413,7 +413,7 @@ pub struct ScrollPaneStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/SliderStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SliderStyleSpecification {
     base: StyleSpecificationBase,
     full_bar: Option<ElementImageSet>,
@@ -427,7 +427,7 @@ pub struct SliderStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/DoubleSliderStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DoubleSliderStyleSpecification {
     base: StyleSpecificationBase,
     full_bar: Option<ElementImageSet>,
@@ -441,7 +441,7 @@ pub struct DoubleSliderStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/SpeechBubbleStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpeechBubbleStyleSpecification {
     base: StyleSpecificationBase,
     frame_style: Option<FrameStyleSpecification>,
@@ -453,7 +453,7 @@ pub struct SpeechBubbleStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/ButtonStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ButtonStyleSpecification {
     base: StyleSpecificationBase,
     default_graphical_set: Option<ElementImageSet>,
@@ -481,7 +481,7 @@ pub struct ButtonStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/TechnologySlotStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TechnologySlotStyleSpecification {
     base: StyleSpecificationBase,
     default_graphical_set: Option<ElementImageSet>,
@@ -542,7 +542,7 @@ pub struct TechnologySlotStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/CheckBoxStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CheckBoxStyleSpecification {
     base: StyleSpecificationBase,
     default_graphical_set: Option<ElementImageSet>,
@@ -562,7 +562,7 @@ pub struct CheckBoxStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/RadioButtonStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RadioButtonStyleSpecification {
     base: StyleSpecificationBase,
     default_graphical_set: Option<ElementImageSet>,
@@ -579,7 +579,7 @@ pub struct RadioButtonStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/SwitchStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SwitchStyleSpecification {
     base: StyleSpecificationBase,
     left_button_position: u32,
@@ -594,7 +594,7 @@ pub struct SwitchStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/TabbedPaneStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TabbedPaneStyleSpecification {
     base: StyleSpecificationBase,
     vertical_spacing: u32,
@@ -603,7 +603,7 @@ pub struct TabbedPaneStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/TableStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TableStyleSpecification {
     base: StyleSpecificationBase,
     horizontal_spacing: i32,
@@ -634,14 +634,14 @@ pub struct TableStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/TableStyleSpecification#column_alignments>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ColumnAlignment {
     column: u32,
     alignment: ColumnAlignmentStr
 }
 
 /// <https://wiki.factorio.com/Types/TableStyleSpecification#column_widths>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ColumnWidth {
     column: u32,
     width: [i32; 2], // `minimal_width` and `maximal_width` // Default: 0
@@ -665,7 +665,7 @@ pub enum ColumnAlignmentStr {
 }
 
 /// <https://wiki.factorio.com/Types/TabStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TabStyleSpecification {
     base: StyleSpecificationBase,
     font: Option<String>, // Name of Font prototype
@@ -695,7 +695,7 @@ pub struct TabStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/TextBoxStyleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TextBoxStyleSpecification {
     base: StyleSpecificationBase,
     font: Option<String>, // Name of Font prototype

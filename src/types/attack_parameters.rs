@@ -1,12 +1,12 @@
 use crate::types::{Factorio2DVector, RangeMode, AmmoType, CircularParticleCreationSpecification};
-use super::graphics::{RotatedAnimation};
+use super::graphics::RotatedAnimation;
 use super::sound::{LayeredSound, CyclicSound};
 use strum_macros::{EnumString, AsRefStr};
 
 // ========== // AttackParameters // ========== //
 
 /// <https://wiki.factorio.com/Types/AttackParameters>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AttackParameters {
     // Depends on `type` key
     Projectile(ProjectileAttackParameters), // "projectile"
@@ -15,7 +15,7 @@ pub enum AttackParameters {
 }
 
 /// <https://wiki.factorio.com/Types/ProjectileAttackParameters>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ProjectileAttackParameters {
     range: f32,
     cooldown: f32,
@@ -48,7 +48,7 @@ pub struct ProjectileAttackParameters {
 }
 
 /// <https://wiki.factorio.com/Types/BeamAttackParameters>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeamAttackParameters {
     range: f32,
     cooldown: f32,
@@ -78,7 +78,7 @@ pub struct BeamAttackParameters {
 }
 
 /// <https://wiki.factorio.com/Types/StreamAttackParameters>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StreamAttackParameters {
     range: f32,
     cooldown: f32,
@@ -123,7 +123,7 @@ pub enum ActivationType {
 }
 
 /// <https://wiki.factorio.com/Types/StreamAttackParameters#gun_center_shift>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GunCenterShift {
     north: Factorio2DVector,
     east: Factorio2DVector,
@@ -132,7 +132,7 @@ pub struct GunCenterShift {
 }
 
 /// <https://wiki.factorio.com/Types/StreamAttackParameters#fluids>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StreamAttackFluid {
     r#type: String, // Name of Fluid
     damage_modifier: f64, // Default: 1

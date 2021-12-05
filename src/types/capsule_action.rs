@@ -1,7 +1,7 @@
-use crate::types::{AttackParameters};
+use crate::types::AttackParameters;
 
 /// <https://wiki.factorio.com/Types/CapsuleAction>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CapsuleAction {
     Throw(ThrowCapsuleAction),
     EquipmentRemote(ActivateEquipmentCapsuleAction),
@@ -11,34 +11,34 @@ pub enum CapsuleAction {
 }
 
 /// <https://wiki.factorio.com/Types/ThrowCapsuleAction>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ThrowCapsuleAction {
     attack_parameters: AttackParameters,
     uses_stack: bool // Default: true
 }
 
 /// <https://wiki.factorio.com/Types/ActivateEquipmentCapsuleAction>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ActivateEquipmentCapsuleAction {
     equipment: String, // Name of Equipment prototype
 }
 
 /// <https://wiki.factorio.com/Types/UseOnSelfCapsuleAction>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UseOnSelfCapsuleAction {
     attack_parameters: AttackParameters,
     uses_stack: bool // Default: true
 }
 
 /// <https://wiki.factorio.com/Types/ArtilleryRemoteCapsuleAction>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ArtilleryRemoteCapsuleAction {
     flare: String, // Name of ArtilleryFlare prototype
     play_sound_on_failure: bool // Default: true
 }
 
 /// <https://wiki.factorio.com/Types/DestroyCliffsCapsuleAction>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DestroyCliffsCapsuleAction {
     attack_parameters: AttackParameters,
     radius: f32,

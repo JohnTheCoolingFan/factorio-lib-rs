@@ -28,7 +28,7 @@ use mlua::{ToLua, Value, Lua, prelude::LuaResult, FromLua};
 use strum_macros::{EnumString, AsRefStr};
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FileName(String);
 
 impl From<String> for FileName {
@@ -48,7 +48,7 @@ pub type Factorio2DVector = (f32, f32);
 pub type Factorio3DVector = (f32, f32, f32);
 // Parser and checker maybe?
 /// Keyboard keys sequence <https://wiki.factorio.com/Prototype/CustomInput#key_sequence>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct KeySequence(String);
 // Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox? It's kinda undocumented
 /// <https://wiki.factorio.com/Types/BoundingBox>
@@ -148,7 +148,7 @@ pub enum ModSettingType {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum MapGenPreset {
     // Decided by `default` field
     Default(MapGenPresetDefault),
@@ -156,13 +156,13 @@ pub enum MapGenPreset {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#default>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapGenPresetDefault {
     order: String
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#default>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapGenPresetNonDefault {
     order: String,
     // Should these be optional or just have defaults? TODO
@@ -197,7 +197,7 @@ impl MapGenSize {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapGenAutoplaceControl {
     frequency: Option<MapGenSize>,
     size: Option<MapGenSize>,
@@ -205,7 +205,7 @@ pub struct MapGenAutoplaceControl {
 }
 
 /// <https://lua-api.factorio.com/latest/Concepts.html#CliffPlacementSettings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CliffPlacementSettings {
     name: String, // Name of the cliff prototype
     cliff_elevation_0: f32, // Default 10.0
@@ -214,7 +214,7 @@ pub struct CliffPlacementSettings {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapGenPresetBasicSettings {
     // Defaults are not documented for some f'ing reason
     terain_segmentation: MapGenSize, // Default is... Unknown
@@ -233,7 +233,7 @@ pub struct MapGenPresetBasicSettings {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapGenPresetAdvancedSettings {
     // Defaults are not documented too
     pollution: MapGenPollution,
@@ -243,7 +243,7 @@ pub struct MapGenPresetAdvancedSettings {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapGenPollution {
     enabled: bool,
     diffusion_ratio: f64, // Must be <= 0.25
@@ -254,7 +254,7 @@ pub struct MapGenPollution {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapGenEnemyEvolution {
     enabled: bool,
     time_factor: f64,
@@ -263,7 +263,7 @@ pub struct MapGenEnemyEvolution {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapGenEnemyExpansion {
     enabled: bool,
     // Oddly satisfying how lines strings line up
@@ -275,7 +275,7 @@ pub struct MapGenEnemyExpansion {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapGenDifficultySettings {
     recipe_difficulty: DifficultySetting,
     technology_difficulty: DifficultySetting,
@@ -284,7 +284,7 @@ pub struct MapGenDifficultySettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#pollution>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapPollutionSettings {
     enabled: bool,
     diffusion_ratio: f64,
@@ -301,14 +301,14 @@ pub struct MapPollutionSettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#steering>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapSteering {
     default: MapSteeringSettings,
     moving: MapSteeringSettings
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#steering>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapSteeringSettings {
     radius: f64,
     separation_factor: f64,
@@ -317,7 +317,7 @@ pub struct MapSteeringSettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#enemy_evolution>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapEnemyEvolution {
     enabled: bool,
     time_factor: f64,
@@ -326,7 +326,7 @@ pub struct MapEnemyEvolution {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#unit_group>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapUnitGroup {
     min_group_gathering_time: u32,
     max_group_gathering_time: u32,
@@ -344,7 +344,7 @@ pub struct MapUnitGroup {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#enemy_expansion>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapEnemyExpansion {
     enabled: bool,
     max_expansion_distance: u32,
@@ -362,7 +362,7 @@ pub struct MapEnemyExpansion {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#path_finder>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapPathFinder {
     fwd2bwd_ratio: i32,
     goal_pressure_ratio: f64,
@@ -398,7 +398,7 @@ pub struct MapPathFinder {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#difficulty_settings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MapDifficultySettings {
     recipe_difficulty: DifficultySetting,
     technology_difficulty: DifficultySetting,
@@ -407,7 +407,7 @@ pub struct MapDifficultySettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum MouseCursorType {
     SystemCursor(SystemCursor),
     CustomCursor(CustomCursor)
@@ -427,7 +427,7 @@ pub enum SystemCursor {
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CustomCursor {
     filename: FileName,
     hot_pixel_x: i16,
@@ -436,14 +436,14 @@ pub struct CustomCursor {
 
 // Make different constructors for variants with different field names, like `icon_tintable` in https://wiki.factorio.com/Prototype/ItemWithEntityData
 /// <https://wiki.factorio.com/Types/IconSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum IconSpecification {
     Icon(IconSpec),
     Icons(IconsSpec)
 }
 
 /// <https://wiki.factorio.com/Types/IconSpecification#Prototype_properties:_Option_2>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IconSpec {
     icon: FileName,
     icon_size: i16,
@@ -451,7 +451,7 @@ pub struct IconSpec {
 }
 
 /// <https://wiki.factorio.com/Types/IconSpecification#Prototype_properties:_Option_1>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IconsSpec {
     icons: Vec<IconData>,
     // icon_size omitted here, it will be copied to each IconData
@@ -459,7 +459,7 @@ pub struct IconsSpec {
 }
 
 /// <https://wiki.factorio.com/Types/IconData>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IconData {
     icon: FileName,
     icon_size: i16, // Copied from `icon_size` from prototype
@@ -524,14 +524,14 @@ impl FromStr for Energy {
 }
 
 /// <https://wiki.factorio.com/Types/ProductPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ProductType {
     Item(String),
     Fluid(String)
 }
 
 /// <https://wiki.factorio.com/Prototype/ResearchAchievement>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ResearchTarget {
     All,
     Technology(String)
@@ -931,14 +931,14 @@ impl BitXorAssign for EntityPrototypeFlags {
 }
 
 /// <https://wiki.factorio.com/Types/DamagePrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DamagePrototype {
     amount: f32,
     r#type: String // Damage type
 }
 
 /// <https://wiki.factorio.com/Types/DamageTypeFilters>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DamageTypeFilters {
     types: Vec<String>, // If String, converted to Vec<String> with one element // Name of DamageType prototype
     whitelist: bool // Default: false
@@ -966,7 +966,7 @@ pub enum CollisionMode {
 }
 
 /// <https://wiki.factorio.com/Types/MinableProperties>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MinableProperties {
     mining_type: f64,
     results: Vec<ProductPrototype>,
@@ -981,7 +981,7 @@ pub struct MinableProperties {
 }
 
 /// <https://wiki.factorio.com/Types/ProductPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ProductPrototype {
     /// type = "item" // Default
     Item(ItemProductPrototype),
@@ -991,7 +991,7 @@ pub enum ProductPrototype {
 
 /// Either a sequence or a table, first item stands for name and second for amount
 /// <https://wiki.factorio.com/Types/ItemProductPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ItemProductPrototype {
     name: String, // Name of Prototype/Item
     show_details_in_recipe_tooltip: bool, // Default: true
@@ -1003,7 +1003,7 @@ pub struct ItemProductPrototype {
 }
 
 /// <https://wiki.factorio.com/Types/FluidProductPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FluidProductPrototype {
     name: String, // Name of Prototype/Fluid
     show_details_in_recipe_tooltip: bool, // Default: true
@@ -1017,7 +1017,7 @@ pub struct FluidProductPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity#remove_decoratives>
-#[derive(Debug, Clone, Copy, Eq, PartialEq, EnumString, AsRefStr)]
+#[derive(Debug,  Clone, Copy, Eq, PartialEq, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum RemoveDecoratives {
     Automatic,
@@ -1026,14 +1026,14 @@ pub enum RemoveDecoratives {
 }
 
 /// <https://wiki.factorio.com/Types/ItemToPlace>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ItemToPlace {
     item: String, // Name of Item
     count: u32 // Can't be larger than the stack size of the item
 }
 
 /// <https://wiki.factorio.com/Prototype/Cliff#orientations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OrientedCliffPrototypes {
     west_to_east: OrientedCliffPrototype,
     north_to_south: OrientedCliffPrototype,
@@ -1058,7 +1058,7 @@ pub struct OrientedCliffPrototypes {
 }
 
 /// <https://wiki.factorio.com/Types/OrientedCliffPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OrientedCliffPrototype {
     collision_bounding_box: BoundingBox,
     pictures: Vec<SpriteVariation>,
@@ -1074,14 +1074,14 @@ pub enum BendingType {
 }
 
 /// <https://wiki.factorio.com/Types/ExplosionDefinition>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExplosionDefinition {
     name: String, // Name of Prototype/Entity
     offset: Option<Factorio2DVector>
 }
 
 /// <https://wiki.factorio.com/Types/Resistances>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Resistance {
     r#type: String, // Name of Prototype/DamageType
     decrease: f32, // Default: 0
@@ -1089,7 +1089,7 @@ pub struct Resistance {
 }
 
 /// <https://wiki.factorio.com/Types/Loot>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Loot {
     item: String, // Name of Prototype/Item
     probability: f64, // Default: 1
@@ -1098,7 +1098,7 @@ pub struct Loot {
 }
 
 /// <https://wiki.factorio.com/Types/AttackReactionItem>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AttackReactionItem {
     range: f32,
     action: Option<Trigger>,
@@ -1107,7 +1107,7 @@ pub struct AttackReactionItem {
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EnergySourceBase {
     emissions_per_minute: f64, // Default: 0
     render_no_power_icon: bool, // Default: true
@@ -1115,7 +1115,7 @@ pub struct EnergySourceBase {
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum EnergySource {
     /// <https://wiki.factorio.com/Types/EnergySource#Electric_energy_source>
     Electric(ElectricEnergySource),
@@ -1130,7 +1130,7 @@ pub enum EnergySource {
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource#Electric_energy_source>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ElectricEnergySource {
     base: EnergySourceBase,
     buffer_capacity: Option<Energy>,
@@ -1141,7 +1141,7 @@ pub struct ElectricEnergySource {
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource#Burner>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BurnerEnergySource {
     base: EnergySourceBase,
     fuel_inventory_size: ItemStackIndex,
@@ -1153,7 +1153,7 @@ pub struct BurnerEnergySource {
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource#Heat_energy_source>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HeatEnergySource {
     base: EnergySourceBase,
     max_temperature: f64, // Must be >= default_temperature
@@ -1171,7 +1171,7 @@ pub struct HeatEnergySource {
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource#Fluid_energy_source>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FluidEnergySource {
     base: EnergySourceBase,
     fluid_box: FluidBox,
@@ -1201,7 +1201,7 @@ pub enum ElectricUsagePriority {
 }
 
 /// <https://wiki.factorio.com/Types/SmokeSource>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SmokeSource {
     name: String, // Name of Prototype/TrivialSmoke
     frequency: f64, // Can't be negative, NaN or infinite
@@ -1225,14 +1225,14 @@ pub struct SmokeSource {
 }
 
 /// <https://wiki.factorio.com/Types/HeatConnection>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HeatConnection {
     position: Position,
     direction: Direction
 }
 
 /// <https://wiki.factorio.com/Types/FluidBox>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FluidBox {
     pipe_connections: Vec<PipeConnectionDefinition>, // Max: 256
     base_area: f64, // Default: 1 // Must be > 0
@@ -1249,7 +1249,7 @@ pub struct FluidBox {
 }
 
 /// <https://wiki.factorio.com/Types/PipeConnectionDefinition>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PipeConnectionDefinition {
     positions: Vec<Factorio2DVector>, // `position` takes priority and gets converted to this
     max_underground_distance: u32, // Default: 0
@@ -1282,14 +1282,14 @@ pub enum ProductionType {
 }
 
 /// <https://wiki.factorio.com/Types/WireConnectionPoint>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WireConnectionPoint {
     wire: WirePosition,
     shadow: WirePosition
 }
 
 /// <https://wiki.factorio.com/Types/WirePosition>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WirePosition {
     copper: Option<Factorio2DVector>,
     red: Option<Factorio2DVector>,
@@ -1297,14 +1297,14 @@ pub struct WirePosition {
 }
 
 /// <https://wiki.factorio.com/Types/SignalIDConnector>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SignalIDConnector {
     r#type: SignalType,
     name: String, // Name of a circuit network signal
 }
 
 /// <https://wiki.factorio.com/Types/ModuleSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ModuleSpecification {
     module_slots: u16, // Default: 0
     module_info_max_icons_per_row: u8, // Default: width of selection box / 0,75
@@ -1389,7 +1389,7 @@ pub enum BoilerMode {
 }
 
 /// <https://wiki.factorio.com/Types/FootprintParticle>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FootprintParticle {
     tiles: Vec<String>, // (Names) Name of a tile
     particle_name: Option<String>, // Name of a particle
@@ -1419,7 +1419,7 @@ pub enum GuiMode {
 
 // Can also be converted from array
 /// <https://wiki.factorio.com/Types/UnitSpawnDefinition>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UnitSpawnDefinition {
     unit: String, // Name of Entity
     spawn_points: Vec<SpawnPoint> // `evolution_factor` must be ascending from entry to entry
@@ -1427,14 +1427,14 @@ pub struct UnitSpawnDefinition {
 
 // Can also be converted from array
 /// <https://wiki.factorio.com/Types/SpawnPoint>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpawnPoint {
     evolution_factor: f64,
     spawn_height: f64, // Must be >= 0
 }
 
 /// <https://wiki.factorio.com/Types/AmmoType>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AmmoType {
     category: String, // Name of AmmoCategory
     action: Option<Trigger>,
@@ -1459,7 +1459,7 @@ pub enum TargetType {
 pub type CircularParticleCreationSpecification = Vec<(RealOrientation, Factorio2DVector)>;
 
 /// <https://wiki.factorio.com/Types/HeatBuffer>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HeatBuffer {
     max_temperature: f64, // Must be >= `default_temperature`
     specific_heat: Energy,
@@ -1476,7 +1476,7 @@ pub struct HeatBuffer {
 }
 
 /// <https://wiki.factorio.com/Types/SignalColorMapping>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SignalColorMapping {
     r#type: SignalType,
     name: String, // Name of a signal
@@ -1493,21 +1493,21 @@ pub enum SignalType {
 }
 
 /// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker#instruments>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Instrument {
     name: String,
     notes: Vec<Note>
 }
 
 /// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker#instruments>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Note {
     name: String,
     sound: Sound
 }
 
 /// <https://wiki.factorio.com/Types/AnimatedVector>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AnimatedVector {
     rotations: Vec<AnimatedVectorRotation>,
     //render_layer: Option<RenderLayer>, // Just copied over to all rotations
@@ -1515,14 +1515,14 @@ pub struct AnimatedVector {
 }
 
 /// <https://wiki.factorio.com/Types/AnimatedVector#rotations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AnimatedVectorRotation {
     frames: Vec<Factorio2DVector>, // Sizes of all arrays must be the same
     render_layer: RenderLayer
 }
 
 /// <https://wiki.factorio.com/Types/AnimatedVector#direction_shift>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AnimatedVectorDirectionShift {
     north: Option<Factorio2DVector>,
     east: Option<Factorio2DVector>,
@@ -1531,7 +1531,7 @@ pub struct AnimatedVectorDirectionShift {
 }
 
 /// <https://wiki.factorio.com/Types/UnitAISettings>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UnitAISettings {
     destroy_when_commands_fail: bool, // Default: false
     allow_try_return_to_spawner: bool, // Default: false
@@ -1540,7 +1540,7 @@ pub struct UnitAISettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/Unit#alternative_attacking_frame_sequence>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UnitAlternativeAttackingFrameSequence {
     warmup_frame_sequence: Vec<u16>,
     warmup2_frame_sequence: Vec<u16>,
@@ -1556,14 +1556,14 @@ pub struct UnitAlternativeAttackingFrameSequence {
 }
 
 /// <https://wiki.factorio.com/Types/SpiderEnginePrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpiderEnginePrototype {
     military_target: String, // Name of simple entity with force prototype
     legs: Vec<SpiderLegSpecification> // Single leg is converted to Vec with one leg
 }
 
 /// <https://wiki.factorio.com/Types/SpiderLegSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpiderLegSpecification {
     leg: String, // Name of SpiderLeg
     mount_position: Factorio2DVector,
@@ -1573,7 +1573,7 @@ pub struct SpiderLegSpecification {
 }
 
 /// <https://wiki.factorio.com/Prototype/FireFlame#burnt_patch_alpha_variations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FireFlameBurntPatchAlphaVariation {
     tile: String, // Name of a tile
     alpha: f32
@@ -1603,7 +1603,7 @@ pub enum CursorBoxType {
 }
 
 /// <https://wiki.factorio.com/Types/EquipmentShape>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EquipmentShape {
     width: u32,
     height: u32,
@@ -1621,22 +1621,22 @@ pub enum EquipmentShapeType {
 
 // Constructor should accept width and height, as points can't exceed them.
 /// <https://wiki.factorio.com/Types/EquipmentShape#points>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EquipmentShapePoints(Vec<Vec<u32>>);
 
 /// <https://wiki.factorio.com/Prototype/NightVisionEquipment>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DaytimeColorLookupTable(Vec<(f64, ColorLookupTable)>);
 
 /// <https://wiki.factorio.com/Types/DaytimeColorLookupTable#Second_member>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ColorLookupTable {
     Identity,
     Filename(FileName)
 }
 
 /// <https://wiki.factorio.com/Types/PlaceAsTile>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PlaceAsTile {
     result: String, // Name of Tile
     condition: CollisionMask,
@@ -1724,7 +1724,7 @@ impl BitXorAssign for ItemPrototypeFlags {
 }
 
 /// <https://wiki.factorio.com/Prototype/AmmoItem#ammo_type>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AmmoItemAmmoType {
     ammo_type: AmmoType,
     source_type: AmmoSourceType
@@ -1858,7 +1858,7 @@ impl BitXorAssign for SelectionMode {
 }
 
 /// <https://wiki.factorio.com/Types/Effect>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Effect {
     consumption: EffectSpec,
     speed: EffectSpec,
@@ -1867,15 +1867,15 @@ pub struct Effect {
 }
 
 /// <https://wiki.factorio.com/Types/Effect#consumption>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EffectSpec(f64); // `bonus` key // Pecision is ignored beyond two decimals: 17.567 -> 17.56
 
 /// <https://wiki.factorio.com/Types/Resistances>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Resistances(Vec<Resistance>);
 
 /// <https://wiki.factorio.com/Prototype/Recipe#Recipe_data>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RecipeData {
     ingredients: Vec<IngredientPrototype>, // Max amount is 65535 // can be empty // Duplicates are not allowed
     results: Vec<ProductPrototype>, // `result` and `result_count` are converted to this // Duplicate entries not allowed
@@ -1900,14 +1900,14 @@ pub struct RecipeData {
 }
 
 /// <https://wiki.factorio.com/Types/IngredientPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum IngredientPrototype { // Determined by type
     Item(ItemIngredientPrototype),
     Fluid(FluidIngredientPrototype)
 }
 
 /// <https://wiki.factorio.com/Types/ItemIngredientPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ItemIngredientPrototype {
     name: String, // Name of Item // Also index 1
     amount: u16, // Also index 2
@@ -1915,7 +1915,7 @@ pub struct ItemIngredientPrototype {
 }
 
 /// <https://wiki.factorio.com/Types/FluidIngredientPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FluidIngredientPrototype {
     name: String, // Name of Fluid
     amount: f64,
@@ -1953,7 +1953,7 @@ pub enum ShortcutStyle {
 }
 
 /// <https://wiki.factorio.com/Prototype/Technology#Technology_data>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TechnologyData {
     upgrade: bool, // Default: false
     enabled: bool, // Default: true
@@ -1967,7 +1967,7 @@ pub struct TechnologyData {
 }
 
 /// <https://wiki.factorio.com/Prototype/Technology#unit>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TechnologyUnit {
     // One of these 2 or both can be defined
     count: Option<u64>, // Must be > 0
@@ -1977,14 +1977,14 @@ pub struct TechnologyUnit {
 }
 
 /// <https://wiki.factorio.com/Prototype/Technology#max_level>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TechnologyMaxLevel {
     Level(u32),
     Infinite // "infinite"
 }
 
 /// <https://wiki.factorio.com/Types/ModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ModifierPrototype {
     mp_type: ModifierPrototypeType,
     body: ModifierPrototypeBody,
@@ -1994,7 +1994,7 @@ pub struct ModifierPrototype {
 }
 
 /// <https://wiki.factorio.com/Types/ModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ModifierPrototypeBody {
     /// Variant for the types:
     /// "inserter-stack-size-bonus"
@@ -2056,53 +2056,53 @@ pub enum ModifierPrototypeBody {
 }
 
 /// <https://wiki.factorio.com/Types/SimpleModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SimpleModifierPrototype {
     modifier: f64
 }
 
 /// <https://wiki.factorio.com/Types/TurretAttackModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TurretAttackModifierPrototype {
     turret_id: String, // Name of Entity
     modifier: f64
 }
 
 /// <https://wiki.factorio.com/Types/AmmoDamageModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AmmoDamageModifierPrototype {
     ammo_category: String, // Name of AmmoCategory
     modifier: f64
 }
 
 /// <https://wiki.factorio.com/Types/GiveItemModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GiveItemModifierPrototype {
     item: String, // Name of Item
     count: ItemCountType // Default: 1 // Must be > 0
 }
 
 /// <https://wiki.factorio.com/Types/GunSpeedModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GunSpeedModifierPrototype {
     ammo_category: String, // Name of AmmoCategory
     modifier: f64
 }
 
 /// <https://wiki.factorio.com/Types/UnlockRecipeModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UnlockRecipeModifierPrototype {
     recipe: String // Name of the recipe
 }
 
 /// <https://wiki.factorio.com/Types/BoolModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BoolModifierPrototype {
     modifier: bool
 }
 
 /// <https://wiki.factorio.com/Types/NothingModifierPrototype>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NothingModifierPrototype {
     effect_description: LocalisedString
 }
@@ -2155,7 +2155,7 @@ pub enum ModifierPrototypeType {
 }
 
 /// <https://wiki.factorio.com/Types/SimulationDefinition>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SimulationDefinition {
     save: Option<FileName>,
     init_file: Option<FileName>,
@@ -2185,13 +2185,13 @@ pub enum TipStatus {
 }
 
 /// <https://wiki.factorio.com/Types/BoxSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BoxSpecification {
     sprite: Sprite,
     dimension_spec: BoxSpecificationDimensionSpec
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BoxSpecificationDimensionSpec {
     WholeBox(f64, f64), // `is_whole_box` = true; `side_length` and `side_height`
     NotWholeBox(f64), // `is_whole_box` = false (Default); `max_side_length`

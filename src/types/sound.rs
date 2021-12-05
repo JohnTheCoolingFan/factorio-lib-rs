@@ -10,7 +10,7 @@ use crate::types::FileName;
 pub type LayeredSound = Vec<Sound>; // `layers`
 
 /// <https://wiki.factorio.com/Types/Sound>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct Sound {
     aggregation: Option<SoundAggregation>,
     #[default(false)]
@@ -23,7 +23,7 @@ pub struct Sound {
 }
 
 /// <https://wiki.factorio.com/Types/Sound#aggregation>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SoundAggregation {
     max_count: u32,
     #[default(1.0)]
@@ -34,7 +34,7 @@ pub struct SoundAggregation {
 }
 
 /// <https://wiki.factorio.com/Types/Sound#variations>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SoundVariation {
     #[resource]
     filename: FileName,
@@ -48,7 +48,7 @@ pub struct SoundVariation {
 }
 
 /// <https://wiki.factorio.com/Types/WorkingSound>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct WorkingSound {
     #[use_self_if_not_found]
     #[prototype]
@@ -83,7 +83,7 @@ pub struct WorkingSound {
 }
 
 /// <https://wiki.factorio.com/Types/InterruptibleSound>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct InterruptibleSound {
     #[prototype]
     sound: Sound,
@@ -92,7 +92,7 @@ pub struct InterruptibleSound {
 }
 
 /// <https://wiki.factorio.com/Types/CyclicSound>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CyclicSound {
     #[prototype]
     begin_sound: Option<Sound>,
@@ -103,7 +103,7 @@ pub struct CyclicSound {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#build_sound>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct TileBuildSound {
     #[use_self_if_not_found]
     #[prototype]

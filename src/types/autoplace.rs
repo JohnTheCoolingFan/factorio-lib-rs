@@ -1,5 +1,5 @@
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AutoplaceSpecification {
     control: String, // Default: "" // id of autoplace control
     default_enabled: bool, // Default: true
@@ -11,7 +11,7 @@ pub struct AutoplaceSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#General_properties>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AutoplaceSpecificationBase {
     /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
     Expression(ExpressionBasedAutoplaceSpecification),
@@ -20,14 +20,14 @@ pub enum AutoplaceSpecificationBase {
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExpressionBasedAutoplaceSpecification {
     probability_expression: NoiseExpression,
     richness_expression: NoiseExpression
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PeakBasedAutoplaceSpecification {
     sharpness: f64, // Default: 0
     max_probability: f64, // Default: 1
@@ -42,7 +42,7 @@ pub struct PeakBasedAutoplaceSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Autoplace_peaks>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AutoplacePeak {
     influence: f64, // Default: 1
     min_influence: f64, // Default: f64::MIN
@@ -56,7 +56,7 @@ pub struct AutoplacePeak {
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Dimensions>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Dimension {
     StartingAreaWeight(DimensionSpec),
     Elevation(DimensionSpec),
@@ -68,7 +68,7 @@ pub enum Dimension {
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Dimensions>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DimensionSpec {
     optimal: f64,
     range: f64, // Default: 0
@@ -77,7 +77,7 @@ pub struct DimensionSpec {
 }
 
 /// <https://wiki.factorio.com/Types/NoiseExpression>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum NoiseExpression {
     Variable(String), // variable_name
     FunctionApplication(String, String), // function_name and arguments //  FIXME // This does not actually satisfy the api, because arguments make my brain explode

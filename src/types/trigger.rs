@@ -6,7 +6,7 @@ use factorio_lib_rs_derive::{TriggerItemBase, TriggerEffectItemBase, CreateEntit
 // ============== // Trigger // =============== //
 
 /// <https://wiki.factorio.com/Types/Trigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Trigger {
     Direct(DirectTriggerItem),
     Area(AreaTriggerItem),
@@ -15,7 +15,7 @@ pub enum Trigger {
 }
 
 /// <https://wiki.factorio.com/Types/TriggerItem>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TriggerItem {
     entity_flags: EntityPrototypeFlags, // Default: all flags
     ignore_collision_condition: bool, // Default: false
@@ -40,14 +40,14 @@ pub trait TriggerItemBase {
 }
 
 /// <https://wiki.factorio.com/Types/DirectTriggerItem>
-#[derive(Debug, TriggerItemBase)]
+#[derive(Debug, Clone, TriggerItemBase)]
 pub struct DirectTriggerItem {
     base: TriggerItem,
     filter_enabled: bool // Default: false
 }
 
 /// <https://wiki.factorio.com/Types/AreaTriggerItem>
-#[derive(Debug, TriggerItemBase)]
+#[derive(Debug, Clone, TriggerItemBase)]
 pub struct AreaTriggerItem {
     base: TriggerItem,
     radius: f64,
@@ -58,7 +58,7 @@ pub struct AreaTriggerItem {
 }
 
 /// <https://wiki.factorio.com/Types/LineTriggerItem>
-#[derive(Debug, TriggerItemBase)]
+#[derive(Debug, Clone, TriggerItemBase)]
 pub struct LineTriggerItem {
     base: TriggerItem,
     range: f64,
@@ -67,7 +67,7 @@ pub struct LineTriggerItem {
 }
 
 /// <https://wiki.factorio.com/Types/ClusterTriggerItem>
-#[derive(Debug, TriggerItemBase)]
+#[derive(Debug, Clone, TriggerItemBase)]
 pub struct ClusterTriggerItem {
     base: TriggerItem,
     cluster_count: f64, // Must be at least 2
@@ -78,7 +78,7 @@ pub struct ClusterTriggerItem {
 // ========== // TriggerDelivery // =========== //
 
 /// <https://wiki.factorio.com/Types/TriggerDelivery>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TriggerDelivery {
     Instant(InstantTriggerDelivery),
     Projectile(ProjectileTriggerDelivery),
@@ -89,14 +89,14 @@ pub enum TriggerDelivery {
 }
 
 /// <https://wiki.factorio.com/Types/InstantTriggerDelivery>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InstantTriggerDelivery {
     source_effects: Option<TriggerEffect>,
     target_effects: Option<TriggerEffect>
 }
 
 /// <https://wiki.factorio.com/Types/ProjectileTriggerDelivery>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ProjectileTriggerDelivery {
     source_effects: Option<TriggerEffect>,
     target_effects: Option<TriggerEffect>,
@@ -110,7 +110,7 @@ pub struct ProjectileTriggerDelivery {
 }
 
 /// <https://wiki.factorio.com/Types/FlameThrowerExplosionTriggerDelivery>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FlameThrowerExplosionTriggerDelivery {
     source_effects: Option<TriggerEffect>,
     target_effects: Option<TriggerEffect>,
@@ -123,7 +123,7 @@ pub struct FlameThrowerExplosionTriggerDelivery {
 }
 
 /// <https://wiki.factorio.com/Types/BeamTriggerDelivery>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeamTriggerDelivery {
     source_effects: Option<TriggerEffect>,
     target_effects: Option<TriggerEffect>,
@@ -135,7 +135,7 @@ pub struct BeamTriggerDelivery {
 }
 
 /// <https://wiki.factorio.com/Types/StreamTriggerDelivery>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StreamTriggerDelivery {
     source_effects: Option<TriggerEffect>,
     target_effects: Option<TriggerEffect>,
@@ -144,7 +144,7 @@ pub struct StreamTriggerDelivery {
 }
 
 /// <https://wiki.factorio.com/Types/ArtilleryTriggerDelivery>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ArtilleryTriggerDelivery {
     source_effects: Option<TriggerEffect>,
     target_effects: Option<TriggerEffect>,
@@ -159,7 +159,7 @@ pub struct ArtilleryTriggerDelivery {
 // ============ // TriggerEffect // =========== //
 
 /// <https://wiki.factorio.com/Types/TriggerEffect>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TriggerEffect {
     Damage(DamageTriggerEffectItem),
     CreateEntity(CreateEntityTriggerEffectItem),
@@ -184,7 +184,7 @@ pub enum TriggerEffect {
 }
 
 /// <https://wiki.factorio.com/Types/TriggerEffectItem>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TriggerEffectItem {
     repeat_count: u16, // Default: 1
     repeat_count_deviation: u16, // Default: 0
@@ -205,7 +205,7 @@ pub trait TriggerEffectItemBase {
 }
 
 /// <https://wiki.factorio.com/Types/DamageTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct DamageTriggerEffectItem {
     base: TriggerEffectItem,
     damage: DamagePrototype,
@@ -218,7 +218,7 @@ pub struct DamageTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateEntityTriggerEffectItem>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CreateEntityTriggerEffect {
     entity_name: String, // Entity name
     offset_deviation: Option<BoundingBox>,
@@ -242,14 +242,14 @@ pub trait CreateEntityTriggerEffectItemBase {
 }
 
 /// <https://wiki.factorio.com/Types/CreateEntityTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
 pub struct CreateEntityTriggerEffectItem {
     base: TriggerEffectItem,
     create_entity_base: CreateEntityTriggerEffect
 }
 
 /// <https://wiki.factorio.com/Types/CreateExplosionTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
 pub struct CreateExplosionTriggerEffectItem {
     base: TriggerEffectItem,
     create_entity_base: CreateEntityTriggerEffect,
@@ -260,7 +260,7 @@ pub struct CreateExplosionTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateFireTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
 pub struct CreateFireTriggerEffectItem {
     base: TriggerEffectItem,
     create_entity_base: CreateEntityTriggerEffect,
@@ -268,7 +268,7 @@ pub struct CreateFireTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateSmokeTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase)]
 pub struct CreateSmokeTriggerEffectItem {
     base: TriggerEffectItem,
     create_entity_base: CreateEntityTriggerEffect,
@@ -285,7 +285,7 @@ pub struct CreateSmokeTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateTrivialSmokeEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct CreateTrivialSmokeEffectItem {
     base: TriggerEffectItem,
     smoke_name: String, // Name of TrivialSmoke prototype
@@ -305,7 +305,7 @@ pub struct CreateTrivialSmokeEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateParticleTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct CreateParticleTriggerEffectItem {
     base: TriggerEffectItem,
     particle_name: String, // Name of Particle prototype
@@ -328,7 +328,7 @@ pub struct CreateParticleTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateStickerTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct CreateStickerTriggerEffectItem {
     base: TriggerEffectItem,
     stricker: String, // Name of Sticker prototype
@@ -337,7 +337,7 @@ pub struct CreateStickerTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateDecorativesTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct CreateDecorativesTriggerEffectItem {
     base: TriggerEffectItem,
     decorative: String, // name of Decorative prototype
@@ -351,14 +351,14 @@ pub struct CreateDecorativesTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/NestedTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct NestedTriggerEffectItem {
     base: TriggerEffectItem,
     action: Trigger
 }
 
 /// <https://wiki.factorio.com/Types/PlaySoundTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct PlaySoundTriggerEffectItem {
     base: TriggerEffectItem,
     sound: Sound,
@@ -371,14 +371,14 @@ pub struct PlaySoundTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/PushBackTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct PushBackTriggerEffectItem {
     base: TriggerEffectItem,
     distance: f32
 }
 
 /// <https://wiki.factorio.com/Types/DestroyCliffsTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct DestroyCliffsTriggerEffectItem {
     base: TriggerEffectItem,
     radius: f32,
@@ -386,14 +386,14 @@ pub struct DestroyCliffsTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/ShowExplosionOnChartTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct ShowExplosionOnChartTriggerEffectItem {
     base: TriggerEffectItem,
     scale: f32
 }
 
 /// <https://wiki.factorio.com/Types/InsertItemTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct InsertItemTriggerEffectItem {
     base: TriggerEffectItem,
     item: String, // Name of an item
@@ -401,14 +401,14 @@ pub struct InsertItemTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/ScriptTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct ScriptTriggerEffectItem {
     base: TriggerEffectItem,
     effect_id: String
 }
 
 /// <https://wiki.factorio.com/Types/SetTileTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct SetTileTriggerEffectItem {
     base: TriggerEffectItem,
     tile_name: String, // Name of a prototype
@@ -418,14 +418,14 @@ pub struct SetTileTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/InvokeTileEffectTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct InvokeTileEffectTriggerEffectItem {
     base: TriggerEffectItem,
     tile_collision_mask: Option<CollisionMask>
 }
 
 /// <https://wiki.factorio.com/Types/DestroyDecorativesTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct DestroyDecorativesTriggerEffectItem {
     base: TriggerEffectItem,
     radius: f32,
@@ -438,7 +438,7 @@ pub struct DestroyDecorativesTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CameraEffectTriggerEffectItem>
-#[derive(Debug, TriggerEffectItemBase)]
+#[derive(Debug, Clone, TriggerEffectItemBase)]
 pub struct CameraEffectTriggerEffectItem {
     base: TriggerEffectItem,
     effect: String,
@@ -457,7 +457,7 @@ pub struct CameraEffectTriggerEffectItem {
 pub type FootstepTriggerEffectList = Vec<FootstepTriggerEffect>;
 
 /// <https://wiki.factorio.com/Types/FootstepTriggerEffectList>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FootstepTriggerEffect {
     actions: Vec<CreateParticleTriggerEffectItem>,
     use_as_default: bool, // Default: false
@@ -465,7 +465,7 @@ pub struct FootstepTriggerEffect {
 }
 
 /// <https://wiki.factorio.com/Types/TriggerTargetMask>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TriggerTargetMask {
     Everything,
     Specific(Vec<String>)

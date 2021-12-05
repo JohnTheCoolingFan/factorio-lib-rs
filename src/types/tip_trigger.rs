@@ -1,7 +1,7 @@
 use strum_macros::{EnumString, AsRefStr};
 
 /// <https://wiki.factorio.com/Types/TipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TipTrigger {
     Or(OrTipTrigger),
     And(AndTipTrigger),
@@ -27,48 +27,48 @@ pub enum TipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#OrTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OrTipTrigger {
     triggers: Vec<TipTrigger>
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#AndTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AndTipTrigger {
     triggers: Vec<TipTrigger>
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#SequenceTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SequenceTipTrigger {
     triggers: Vec<TipTrigger>
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#DependenciesMetTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DependenciesMetTipTrigger;
 
 /// <https://wiki.factorio.com/Types/TipTrigger#TimeElapsedTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TimeElapsedTipTrigger {
     ticks: u32
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#ResearchTechnologyTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResearchTechnologyTipTrigger {
     technology: String // Name of technology
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#UnlockedRecipeTipTrigger>
 /// <https://wiki.factorio.com/Types/TipTrigger#UnlockRecipeTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UnlockRecipeTipTrigger {
     recipe: String // Name of recipe
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#CraftItemTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CraftItemTipTrigger {
     count: u32, // Default: 0
     item: Option<String>, // Name of Item
@@ -86,7 +86,7 @@ pub enum CraftItemTipTriggerEventType {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#BuildEntityTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BuildEntityTipTrigger {
     count: u32, // Default: 1
     entity: Option<String>, // Name of Entity
@@ -95,13 +95,13 @@ pub struct BuildEntityTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#ManualTransferTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ManualTransferTipTrigger {
     count: u32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#StackTransferTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StackTransferTipTrigger {
     count: u32, // Default: 0
     transfer: Option<StackTransferType>
@@ -117,7 +117,7 @@ pub enum StackTransferType {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#EntityTransferTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EntityTransferTipTrigger {
     count: u32, // Default: 0
     transfer: Option<EntityTransferType>
@@ -132,7 +132,7 @@ pub enum EntityTransferType {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#SetRecipeTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SetRecipeTipTrigger {
     count: u32, // Default: 0
     recipe: Option<String>, // Name of Recipe
@@ -142,38 +142,38 @@ pub struct SetRecipeTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#LimitChestTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LimitChestTipTrigger {
     count: u32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#UsePipetteTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UsePipetteTipTrigger {
     count: u32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#SetLogisticRequestTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SetLogisticRequestTipTrigger {
     count: u32, // Default: 0
     logistic_chest_only: bool, // default: false
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#UseConfirmTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UseConfirmTipTrigger {
     count: u32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#LowPowerTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LowPowerTipTrigger {
     count: u32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#PasteEntitySettingsTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PasteEntitySettingsTipTrigger {
     count: u32, // Default: 0
     source: Option<String>, // Name of Entity
@@ -182,7 +182,7 @@ pub struct PasteEntitySettingsTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#FastReplaceTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FastReplaceTipTrigger {
     count: u32, // Default: 0
     source: Option<String>, // Name of Entity
@@ -191,7 +191,7 @@ pub struct FastReplaceTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#GroupAttackTipTrigger>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GroupAttackTipTrigger {
     count: u32, // Default: 0
 }

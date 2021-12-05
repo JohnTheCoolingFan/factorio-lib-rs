@@ -2,7 +2,7 @@ use crate::types::{Sprite, Animation, FileName, SpriteSizeType};
 use strum_macros::{EnumString, AsRefStr};
 
 /// <https://wiki.factorio.com/Types/TileTransitions>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TileTransitionsBase {
     // 3 properties need to be specified if `empty_transitions` is false
     // They also correspond to *_mask names
@@ -51,14 +51,14 @@ pub enum LayerGroup {
 }
 
 /// <https://wiki.factorio.com/Types/TileTransitionSprite>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TileTransitionSprite {
     regular: TileTransitionSpriteSpec,
     hr_version: Option<TileTransitionSpriteSpec>
 }
 
 /// <https://wiki.factorio.com/Types/TileTransitionSprite>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TileTransitionSpriteSpec {
     count: u32,
     picture: FileName,
@@ -69,7 +69,7 @@ pub struct TileTransitionSpriteSpec {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#variants>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MainTileTransitions {
     base: TileTransitionsBase,
     main: Vec<MainTileSprite>,
@@ -77,14 +77,14 @@ pub struct MainTileTransitions {
 }
 
 /// <https://wiki.factorio.com/Types/TileSprite>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TileSprite {
     regular: TileSpriteSpec,
     hr_version: Option<TileSpriteSpec>
 }
 
 /// <https://wiki.factorio.com/Types/TileSprite>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TileSpriteSpec {
     count: u32,
     picture: FileName,
@@ -95,14 +95,14 @@ pub struct TileSpriteSpec {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#variants>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MainTileSprite {
     regular: MainTileSpriteSpec,
     hr_version: Option<MainTileSpriteSpec>
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#variants>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MainTileSpriteSpec {
     base: TileSpriteSpec,
     size: u32, // Only power of 2 from 1 to 128 are accepted // So whitelist: [1, 2, 4, 8, 16, 32, 64, 128]
@@ -111,7 +111,7 @@ pub struct MainTileSpriteSpec {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#transitions>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExtraTileTransitions {
     base: TileTransitionsBase,
     to_tiles: String, // Name of a Tile
@@ -119,7 +119,7 @@ pub struct ExtraTileTransitions {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#transitions_between_transitions>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BetweenTileTransitions {
     base: TileTransitionsBase,
     transition_group1: u8,

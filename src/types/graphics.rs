@@ -194,7 +194,7 @@ pub struct SecondaryDrawOrders {
 }
 
 /// <https://wiki.factorio.com/Types/LightDefinition>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LightDefinition {
     r#type: LightDefinitionType,
     // Next 2 are not optional if type is "oriented"
@@ -210,7 +210,7 @@ pub struct LightDefinition {
 }
 
 /// <https://wiki.factorio.com/Types/LightFlickeringDefinition>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LightFlickeringDefinition {
     minimum_intensity: f32, // Default: 0.2
     maximum_intensity: f32, // Default: 0.8
@@ -223,7 +223,7 @@ pub struct LightFlickeringDefinition {
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#default_recipe_tint>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RecipeTint {
     // All default to (1, 1, 1, 1), except special cases
     primary: Color,
@@ -233,7 +233,7 @@ pub struct RecipeTint {
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#shift_animation_waypoints>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ShiftAnimationWaypoints {
     north: Option<Vec<Factorio2DVector>>,
     east: Option<Vec<Factorio2DVector>>,
@@ -242,7 +242,7 @@ pub struct ShiftAnimationWaypoints {
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#status_colors>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StatusColors {
     idle: Color, // Default: White (1, 1, 1)
     no_minable_resources: Color, // Default: `idle`
@@ -255,7 +255,7 @@ pub struct StatusColors {
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_secondary_draw_order>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CircuitConnectorSecondaryDrawOrder {
     north: i8,
     east: i8,
@@ -270,7 +270,7 @@ impl CircuitConnectorSecondaryDrawOrder {
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity#radius_visualisation_specification>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RadiusVisualizationSpecification {
     sprite: Option<Sprite>,
     distance: f64, // Default: 0 // Must be > 0
@@ -280,7 +280,7 @@ pub struct RadiusVisualizationSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/WaterReflectionDefinition>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WaterReflectionDefinition {
     pictures: Option<Vec<SpriteVariation>>,
     orientation_to_variation: bool, // default: false
@@ -304,28 +304,28 @@ impl Dice {
 // ============= // Animations // ============= //
 
 /// <https://wiki.factorio.com/Types/Animation#layers>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Animation {
     Layers(Vec<Animation>),
     Single(Box<AnimationBase>)
 }
 
 /// <https://wiki.factorio.com/Types/Animation#hr_version>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AnimationBase {
     regular: AnimationVariant,
     hr_version: Option<AnimationVariant>,
 }
 
 /// <https://wiki.factorio.com/Types/Animation#stripes>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AnimationVariant {
     Regular(AnimationSpec),
     Stripes(Vec<Stripe>)
 }
 
 /// <https://wiki.factorio.com/Types/Animation>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AnimationSpec {
     // These types share same fields/values, so I decided to "combine" them
     sprite: SpriteSpec,
@@ -339,7 +339,7 @@ pub struct AnimationSpec {
 }
 
 /// <https://wiki.factorio.com/Types/Stripe>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Stripe {
     width_in_frames: u32,
     height_in_frames: u32,
@@ -352,7 +352,7 @@ pub struct Stripe {
 pub type AnimationVariations = Vec<AnimationVariation>;
 
 /// <https://wiki.factorio.com/Types/AnimationVariations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AnimationVariation {
     animation: AnimationBase, // Filename is mandatory
     variation_count: u32,
@@ -361,7 +361,7 @@ pub struct AnimationVariation {
 }
 
 /// <https://wiki.factorio.com/Types/Animation4Way>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Animation4Way {
     // All fancy shenanigans are omitted, this program/library behaves like a game
     north: Animation,
@@ -371,7 +371,7 @@ pub struct Animation4Way {
 }
 
 /// <https://wiki.factorio.com/Types/AnimationElement>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AnimationElement {
     render_layer: RenderLayer, // Default: "object"
     secondary_draw_order: Option<i8>,
@@ -383,7 +383,7 @@ pub struct AnimationElement {
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimation>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RotatedAnimation {
     regular: RotatedAnimationSpec,
     hr_version: Option<RotatedAnimationSpec>
@@ -391,7 +391,7 @@ pub struct RotatedAnimation {
 
 // A: "Are you sure this will work?"; Me: "I have no idea!"
 /// <https://wiki.factorio.com/Types/RotatedAnimation>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RotatedAnimationSpec {
     direction_count: u32,
     still_frame: u32, // Default: 0
@@ -407,14 +407,14 @@ pub struct RotatedAnimationSpec {
 pub type RotatedAnimationVariations = Vec<RotatedAnimationVariation>;
 
 /// <https://wiki.factorio.com/Types/RotatedAnimationVariations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum RotatedAnimationVariation {
     Layers(Vec<RotatedAnimationVariation>),
     Single(Box<RotatedAnimation>)
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimation4Way>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RotatedAnimation4Way {
     north: RotatedAnimation,
     east: RotatedAnimation,
@@ -424,7 +424,7 @@ pub struct RotatedAnimation4Way {
 }
 
 /// <https://wiki.factorio.com/Prototype/Beam#light_animations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LightAnimations {
     start: Option<Animation>,
     ending: Option<Animation>,
@@ -436,20 +436,20 @@ pub struct LightAnimations {
 // ============== // Sprites // ==============  //
 
 /// <https://wiki.factorio.com/Types/Sprite>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Sprite {
     layers: Vec<SpriteLayer>
 }
 
 /// <https://wiki.factorio.com/Types/Sprite>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpriteLayer {
     regular: SpriteSpec,
     hr_version: Option<SpriteSpec>
 }
 
 /// <https://wiki.factorio.com/Types/Sprite>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpriteSpec {
     filename: FileName,
     dice: Option<Dice>, // AKA slice // _y and _x are converted into this
@@ -476,41 +476,41 @@ pub struct SpriteSpec {
 }
 
 /// <https://wiki.factorio.com/Types/SpriteNWaySheet>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpriteNWaySheet {
     sprite: SpriteSpec,
     frames: u32, // 4 or 8
 }
 
 /// <https://wiki.factorio.com/Types/Sprite4Way>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Sprite4Way {
     // Priority list (most priority first): sheets, sheet, other properties
     sheets: Vec<SpriteNWaySheet>
 }
 
 /// <https://wiki.factorio.com/Types/Sprite8Way>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Sprite8Way {
     // Priority list (most priority first): sheets, sheet, other properties
     sheets: Vec<SpriteNWaySheet>
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite#layers>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RotatedSprite {
     layers: Vec<RotatedSpriteLayer>
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RotatedSpriteLayer {
     regular: RotatedSpriteSpec,
     hr_version: Option<RotatedSpriteSpec>
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RotatedSpriteSpec {
     sprites: Vec<SpriteSpec>, // If `filenames` is set, copy all properties to each object for each filename
     direction_count: u16
@@ -520,13 +520,13 @@ pub struct RotatedSpriteSpec {
 pub type SpriteVariations = Vec<SpriteVariation>;
 
 /// <https://wiki.factorio.com/Types/SpriteVariations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpriteVariation {
     layers: Vec<SpriteVariationLayer>
 }
 
 /// <https://wiki.factorio.com/Types/SpriteVariations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpriteVariationLayer {
     regular: SpriteVariationSpec,
     hr_version: Option<SpriteVariationSpec>
@@ -534,7 +534,7 @@ pub struct SpriteVariationLayer {
 
 /// Extension of SpriteSpec, ignores dice and slice
 /// <https://wiki.factorio.com/Types/SpriteVariations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpriteVariationSpec {
     sprite: SpriteSpec,
     variation_count: u32, // Default: 1
@@ -725,7 +725,7 @@ pub enum SpritePriority {
 // ===== // Graphics Sets and Pictures // ===== //
 
 /// <https://wiki.factorio.com/Prototype/Rail#pictures>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RailPictures {
     straight_rail_horizontal: RailPieceLayers,
     straight_rail_vertical: RailPieceLayers,
@@ -745,7 +745,7 @@ pub struct RailPictures {
 }
 
 /// <https://wiki.factorio.com/Types/RailPieceLayers>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RailPieceLayers {
     metals: Vec<SpriteVariation>,
     backplayes: Vec<SpriteVariation>, // Must have same number of variations as `metals`
@@ -760,7 +760,7 @@ pub struct RailPieceLayers {
 }
 
 /// <https://wiki.factorio.com/Types/CircuitConnectorSprites>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CircuitConnectorSprites {
     led_red: Sprite,
     led_green: Sprite,
@@ -776,7 +776,7 @@ pub struct CircuitConnectorSprites {
 }
 
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeaconGraphicsSet {
     draw_animation_when_idle: bool, //Default: true
     draw_light_when_idle: bool, // Default: false
@@ -798,7 +798,7 @@ pub struct BeaconGraphicsSet {
 }
 
 /// <https://wiki.factorio.com/Types/BeaconModuleVisualizations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeaconModuleVisualizations {
     art_style: String,
     use_for_empty_slots: bool, // Default: false
@@ -807,7 +807,7 @@ pub struct BeaconModuleVisualizations {
 }
 
 /// <https://wiki.factorio.com/Types/BeaconModuleVisualization>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeaconModuleVisualization {
     has_empty_slot: bool, // Default: false
     draw_as_light: bool, // Default: false
@@ -819,7 +819,7 @@ pub struct BeaconModuleVisualization {
 }
 
 /// <https://wiki.factorio.com/Types/CharacterArmorAnimation>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CharacterArmorAnimation {
     idle: RotatedAnimation,
     idle_with_gun: RotatedAnimation,
@@ -831,7 +831,7 @@ pub struct CharacterArmorAnimation {
 }
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WorkingVisualisation {
     render_layer: RenderLayer, // Default: "object"
     fadeout: bool, // Default: false
@@ -868,7 +868,7 @@ pub enum WorkingVisualisationEffect {
 }
 
 /// <https://wiki.factorio.com/Types/ConnectableEntityGraphics>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ConnectableEntityGraphics {
     single: Vec<SpriteVariation>,
     straight_vertical: Vec<SpriteVariation>,
@@ -889,7 +889,7 @@ pub struct ConnectableEntityGraphics {
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MiningDrillGraphicsSet {
     animation: Option<Animation4Way>,
     idle_animation: Option<Animation4Way>,
@@ -910,7 +910,7 @@ pub struct MiningDrillGraphicsSet {
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_layer>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CircuitConnectorRenderLayers {
     north: RenderLayer,
     east: RenderLayer,
@@ -925,7 +925,7 @@ impl CircuitConnectorRenderLayers {
 }
 
 /// <https://wiki.factorio.com/Prototype/OffshorePump#graphics_set>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OffshorePumpGraphicsSet {
     animation: Animation4Way,
     base_render_layer: RenderLayer, // Default: "ground-patch"
@@ -937,7 +937,7 @@ pub struct OffshorePumpGraphicsSet {
 }
 
 /// <https://wiki.factorio.com/Prototype/Pipe#pictures>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PipePictures {
     straight_vertical_single: Sprite,
     straight_vertical: Sprite,
@@ -968,7 +968,7 @@ pub struct PipePictures {
 }
 
 /// <https://wiki.factorio.com/Prototype/PipeToGround#pictures>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PipeToGroundPictures {
     down: Sprite,
     up: Sprite,
@@ -977,14 +977,14 @@ pub struct PipeToGroundPictures {
 }
 
 /// <https://wiki.factorio.com/Prototype/Pump#fluid_wagon_connector_graphics>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PumpConnectorGraphicsFluidWagon {
     load_animations: PumpConnectorGraphics,
     unload_animations: PumpConnectorGraphics
 }
 
 /// <https://wiki.factorio.com/Types/PumpConnectorGraphics>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PumpConnectorGraphics {
     north: Vec<PumpConnectorGraphicsMapping>,
     east: Vec<PumpConnectorGraphicsMapping>,
@@ -993,7 +993,7 @@ pub struct PumpConnectorGraphics {
 }
 
 /// <https://wiki.factorio.com/Types/PumpConnectorGraphics>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PumpConnectorGraphicsMapping {
     standup_base: Option<Animation>,
     standup_top: Option<Animation>,
@@ -1003,7 +1003,7 @@ pub struct PumpConnectorGraphicsMapping {
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntity#pictures>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SimpleEntityVisuals {
     Pictures(SpriteVariations),
     Picture(Sprite),
@@ -1011,7 +1011,7 @@ pub enum SimpleEntityVisuals {
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntityWithOwner#pictures>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SimpleEntityWithOwnerVisuals {
     Pictires(SpriteVariations),
     Pictire(Sprite4Way),
@@ -1019,7 +1019,7 @@ pub enum SimpleEntityWithOwnerVisuals {
 }
 
 /// <https://wiki.factorio.com/Types/SpiderLegGraphicsSet>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpiderLegGraphicsSet {
     joint_turn_offset: f32, // Default: 0
     joint: Option<Sprite>,
@@ -1033,7 +1033,7 @@ pub struct SpiderLegGraphicsSet {
 }
 
 /// <https://wiki.factorio.com/Types/SpiderLegPart>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpiderLegPart {
     top_end: Option<Sprite>,
     middle: Option<Sprite>,
@@ -1045,7 +1045,7 @@ pub struct SpiderLegPart {
 }
 
 /// <https://wiki.factorio.com/Prototype/StorageTank#pictures>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StorageTankPictures {
     picture: Sprite4Way,
     window_background: Sprite,
@@ -1055,7 +1055,7 @@ pub struct StorageTankPictures {
 }
 
 /// <https://wiki.factorio.com/Prototype/TrainStop#light1>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TrainStopLight {
     sprite: Sprite4Way,
     red_picture: Sprite4Way,
@@ -1063,7 +1063,7 @@ pub struct TrainStopLight {
 }
 
 /// <https://wiki.factorio.com/Prototype/TrainStop#drawing_boxes>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TrainStopDrawingBoxes {
     north: BoundingBox,
     east: BoundingBox,
@@ -1072,7 +1072,7 @@ pub struct TrainStopDrawingBoxes {
 }
 
 /// <https://wiki.factorio.com/Prototype/TransportBeltConnectable#belt_animation_set>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeltAnimationSet {
     animation_set: RotatedAnimation,
     east_index: u8, // Default: 1
@@ -1092,7 +1092,7 @@ pub struct BeltAnimationSet {
 }
 
 /// <https://wiki.factorio.com/Prototype/TransportBeltConnectable#belt_horizontal>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeltGraphicsSet {
     belt_horizontal: Animation,
     belt_vertical: Animation,
@@ -1107,7 +1107,7 @@ pub struct BeltGraphicsSet {
 }
 
 /// <https://wiki.factorio.com/Prototype/Loader1x1#structure>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeltStructure {
     direction_in: Sprite4Way,
     direction_out: Sprite4Way,
@@ -1116,7 +1116,7 @@ pub struct BeltStructure {
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedBelt#structure>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeltStructureWithSideLoading {
     base_structure: BeltStructure,
     direction_in_side_loading: Option<Sprite4Way>,
@@ -1124,7 +1124,7 @@ pub struct BeltStructureWithSideLoading {
 }
 
 /// <https://wiki.factorio.com/Types/TransportBeltConnectorFrame>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TransportBeltConnectorFrame {
     frame_main: AnimationVariations,
     frame_shadow: AnimationVariations,
@@ -1153,7 +1153,7 @@ pub struct TransportBeltConnectorFrame {
 }
 
 /// <https://wiki.factorio.com/Prototype/TransportBelt#belt_animation_set>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BeltAnimationSetIndexes {
     east_to_north_index: u8, // Default: 5
     north_to_east_index: u8, // Default: 6
@@ -1166,21 +1166,21 @@ pub struct BeltAnimationSetIndexes {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tree#pictures>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TreeVisuals {
     Pictures(TreePictures),
     Variations(Vec<TreePrototypeVariation>) // Non-empty array
 }
 
 /// <https://wiki.factorio.com/Prototype/Tree#pictures>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TreePictures {
     pictures: SpriteVariations,
     color: Vec<Color>
 }
 
 /// <https://wiki.factorio.com/Prototype/Tree#variations>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TreePrototypeVariation {
     trunk: Animation,
     leaves: Animation,
@@ -1193,7 +1193,7 @@ pub struct TreePrototypeVariation {
 }
 
 /// <https://wiki.factorio.com/Types/SpiderVehicleGraphicsSet>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SpiderVehicleGraphicsSet {
     base_animation: Option<RotatedAnimation>,
     shadow_base_animation: Option<RotatedAnimation>,
@@ -1214,7 +1214,7 @@ pub struct SpiderVehicleGraphicsSet {
 }
 
 /// <https://wiki.factorio.com/Prototype/Wall#pictures>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WallPictures {
     single: SpriteVariations,
     straight_vertical: SpriteVariations,
