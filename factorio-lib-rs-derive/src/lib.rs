@@ -633,9 +633,9 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     let parsed_fields_clone = parsed_fields.clone();
     let field_names_clone = field_names.clone();
     let mut gen = quote! {
-        impl<'lua> PrototypeFromLua<'lua> for #name {
-            fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-                if let Value::Table(ref prot_table) = value {
+        impl<'lua> crate::PrototypeFromLua<'lua> for #name {
+            fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::prelude::LuaResult<Self> {
+                if let mlua::Value::Table(ref prot_table) = value {
                     #(#parsed_fields)*
                     Ok(Self{#(#field_names),*})
                 } else {
@@ -647,9 +647,9 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     };
     if !requires_data_table {
         let extra_gen = quote! {
-            impl<'lua> FromLua<'lua> for #name {
-                fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
-                    if let Value::Table(ref prot_table) = value {
+            impl<'lua> mlua::FromLua<'lua> for #name {
+                fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> LuaResult<Self> {
+                    if let mlua::Value::Table(ref prot_table) = value {
                         #(#parsed_fields_clone)*
                         Ok(Self{#(#field_names_clone),*})
                     } else {
