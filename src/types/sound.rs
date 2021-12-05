@@ -1,8 +1,4 @@
-use crate::PrototypeFromLua;
 use factorio_lib_rs_derive::PrototypeFromLua;
-use mlua::{prelude::LuaResult, Lua, Value};
-use crate::{DataTable, ResourceRecord, ResourceType};
-use mlua::FromLua;
 
 use crate::types::FileName;
 
