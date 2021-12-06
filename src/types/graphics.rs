@@ -344,7 +344,7 @@ impl<'lua> crate::PrototypeFromLua<'lua> for AnimationBase {
                 Ok(Self{regular, hr_version: None})
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError{from:value.type_name(), to: "AnimationBse", message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError{from:value.type_name(), to: "AnimationBase", message: Some("Expected table".into())})
         }
     }
 }
