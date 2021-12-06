@@ -328,17 +328,17 @@ impl<'lua> crate::PrototypeFromLua<'lua> for Animation {
 /// <https://wiki.factorio.com/Types/Animation#hr_version>
 #[derive(Debug, Clone)]
 pub struct AnimationBase {
-    regular: AnimationVariant,
-    hr_version: Option<AnimationVariant>,
+    regular: AnimationSpec,
+    hr_version: Option<AnimationSpec>,
 }
 
 impl<'lua> crate::PrototypeFromLua<'lua> for AnimationBase {
     fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
             let hr_version_opt = p_table.get::<_, Option<mlua::Value>>("hr_version")?;
-            let regular = AnimationVariant::prototype_from_lua(p_table.clone().to_lua(lua)?)?;
+            let regular = AnimationSpec::prototype_from_lua(p_table.clone().to_lua(lua)?)?;
             if let Some(hr_version_value) = hr_version_opt {
-                let hr_version = AnimationVariant::prototype_from_lua(hr_version_value, lua, data_table)?;
+                let hr_version = AnimationSpec::prototype_from_lua(hr_version_value, lua, data_table)?;
                 Ok(Self{regular, hr_version: Some(hr_version)})
             } else {
                 Ok(Self{regular, hr_version: None})
@@ -349,18 +349,11 @@ impl<'lua> crate::PrototypeFromLua<'lua> for AnimationBase {
     }
 }
 
-/// <https://wiki.factorio.com/Types/Animation#stripes>
-#[derive(Debug, Clone)]
-pub enum AnimationVariant {
-    Regular(AnimationSpec),
-    Stripes(Vec<Stripe>)
-}
-
 /// <https://wiki.factorio.com/Types/Animation>
 #[derive(Debug, Clone)]
 pub struct AnimationSpec {
     // These types share same fields/values, so I decided to "combine" them
-    sprite: SpriteSpec,
+    sprite: SpriteSpec, // Filename is mandatory unless `stripes` is specified
     run_mode: RunMode, // Default: "forward"
     frame_count: u32, // Default: 1, can't be 0
     line_length: u32, // Default: 0
@@ -368,6 +361,7 @@ pub struct AnimationSpec {
     max_advance: f32, // Default: MAX_FLOAT
     repeat_count: u8, // Default: 1, can't be 0
     frame_sequence: Option<AnimationFrameSequence>,
+    stripes: Option<Vec<Stripe>>
 }
 
 /// <https://wiki.factorio.com/Types/Stripe>
@@ -483,7 +477,7 @@ pub struct SpriteLayer {
 /// <https://wiki.factorio.com/Types/Sprite>
 #[derive(Debug, Clone)]
 pub struct SpriteSpec {
-    filename: FileName,
+    filename: Option<FileName>, // Mandatory in some cases
     dice: Option<Dice>, // AKA slice // _y and _x are converted into this
     priority: SpritePriority, // Default: "medium"
     flags: Option<SpriteFlags>,
