@@ -49,28 +49,22 @@ pub type Factorio3DVector = (f32, f32, f32);
 // Parser and checker maybe?
 /// Keyboard keys sequence <https://wiki.factorio.com/Prototype/CustomInput#key_sequence>
 #[derive(Debug, Clone)]
-pub struct KeySequence(String);
+pub struct KeySequence(pub String);
 // Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox? It's kinda undocumented
 /// <https://wiki.factorio.com/Types/BoundingBox>
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
-pub struct BoundingBox(Position, Position);
+pub struct BoundingBox(pub Position, pub Position);
 /// Value range: [0.0; 1.0) <https://wiki.factorio.com/Types/RealOrientation>
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct RealOrientation(f32);
+pub struct RealOrientation(pub f32);
 
 /// Can be constructed from an array or table with x and y values <https://wiki.factorio.com/Types/Position>
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
-pub struct Position(i32, i32);
-
-impl Position {
-    pub fn new(x: i32, y: i32) -> Self {
-        Self(x, y)
-    }
-}
+pub struct Position(pub i32, pub i32);
 
 /// Any of the color components are optional <https://wiki.factorio.com/Types/Color>
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub struct Color(f32, f32, f32, f32);
+pub struct Color(pub f32, pub f32, pub f32, pub f32);
 
 impl Color {
     pub fn new_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
@@ -172,7 +166,7 @@ pub struct MapGenPresetNonDefault {
 
 /// <https://wiki.factorio.com/Types/MapGenSize>
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
-pub struct MapGenSize(f64); // Exact type is unknown, so slap an f64
+pub struct MapGenSize(pub f64); // Exact type is unknown, so slap an f64
 
 impl FromStr for MapGenSize {
     type Err = PrototypesErr;
@@ -190,56 +184,50 @@ impl FromStr for MapGenSize {
     }
 }
 
-impl MapGenSize {
-    pub fn new(size: f64) -> Self {
-        Self(size)
-    }
-}
-
 /// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
 #[derive(Debug, Clone)]
 pub struct MapGenAutoplaceControl {
-    frequency: Option<MapGenSize>,
-    size: Option<MapGenSize>,
-    rechness: Option<MapGenSize>,
+    pub frequency: Option<MapGenSize>,
+    pub size: Option<MapGenSize>,
+    pub richness: Option<MapGenSize>,
 }
 
 /// <https://lua-api.factorio.com/latest/Concepts.html#CliffPlacementSettings>
 #[derive(Debug, Clone)]
 pub struct CliffPlacementSettings {
-    name: String, // Name of the cliff prototype
-    cliff_elevation_0: f32, // Default 10.0
-    cliff_elevation_interval: f32,
-    richness: MapGenSize
+    pub name: String, // Name of the cliff prototype
+    pub cliff_elevation_0: f32, // Default 10.0
+    pub cliff_elevation_interval: f32,
+    pub richness: MapGenSize
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
 #[derive(Debug, Clone)]
 pub struct MapGenPresetBasicSettings {
     // Defaults are not documented for some f'ing reason
-    terain_segmentation: MapGenSize, // Default is... Unknown
-    water: MapGenSize, // Same here
-    default_enable_all_autoplace_controls: bool, // Default: true
-    autoplace_controls: HashMap<String, MapGenAutoplaceControl>, // key is AutoplaceControl name
+    pub terain_segmentation: MapGenSize, // Default is... Unknown
+    pub water: MapGenSize, // Same here
+    pub default_enable_all_autoplace_controls: bool, // Default: true
+    pub autoplace_controls: HashMap<String, MapGenAutoplaceControl>, // key is AutoplaceControl name
     // autoplace_settings // TODO: UNDOCUMENTED // "Types/table", refuses to elaborate further
-    property_expression_names: HashMap<String, String>, // Map property name to noise expression name
-    starting_points: Position,
-    seed: u32,
-    width: u32,
-    height: u32,
-    starting_area: MapGenSize,
-    peaceful_mode: bool,
-    cliff_settings: CliffPlacementSettings
+    pub property_expression_names: HashMap<String, String>, // Map property name to noise expression name
+    pub starting_points: Position,
+    pub seed: u32,
+    pub width: u32,
+    pub height: u32,
+    pub starting_area: MapGenSize,
+    pub peaceful_mode: bool,
+    pub cliff_settings: CliffPlacementSettings
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
 #[derive(Debug, Clone)]
 pub struct MapGenPresetAdvancedSettings {
     // Defaults are not documented too
-    pollution: MapGenPollution,
-    enemy_evolution: MapGenEnemyEvolution,
-    enemy_expansion: MapGenEnemyExpansion,
-    difficulty_settings: MapGenDifficultySettings
+    pub pollution: MapGenPollution,
+    pub enemy_evolution: MapGenEnemyEvolution,
+    pub enemy_expansion: MapGenEnemyExpansion,
+    pub difficulty_settings: MapGenDifficultySettings
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
