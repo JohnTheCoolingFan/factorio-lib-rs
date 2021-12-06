@@ -1,5 +1,6 @@
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
 use std::iter::{Iterator, FromIterator};
+use crate::{ResourceRecord, ResourceType};
 use crate::types::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
 use factorio_lib_rs_derive::PrototypeFromLua;
 use strum_macros::{EnumString, AsRefStr};
@@ -353,7 +354,8 @@ impl<'lua> crate::PrototypeFromLua<'lua> for AnimationBase {
 #[derive(Debug, Clone)]
 pub struct AnimationSpec {
     // These types share same fields/values, so I decided to "combine" them
-    sprite: SpriteSpec, // Filename is mandatory unless `stripes` is specified
+    filename: Option<FileName>,
+    sprite: SpriteSpecWithoutFilename, // Filename is mandatory unless `stripes` is specified
     run_mode: RunMode, // Default: "forward"
     frame_count: u32, // Default: 1, can't be 0
     line_length: u32, // Default: 0
@@ -364,14 +366,41 @@ pub struct AnimationSpec {
     stripes: Option<Vec<Stripe>>
 }
 
+impl<'lua> crate::PrototypeFromLua<'lua> for AnimationSpec {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
+        if let mlua::Value::Table(p_table) = value {
+            // TODO: register resource
+            let stripes: Option<Vec<Stripe>> = crate::PrototypeFromLua::prototype_from_lua(p_table.get::<_, mlua::Value>("stripes")?, lua, data_table)?;
+            let mut filename = None;
+            if stripes.is_none() {
+                filename = Some(FileName(p_table.get("filename")?));
+            }
+            let sprite = SpriteSpecWithoutFilename::prototype_from_lua(p_table.clone().to_lua(lua)?, lua, data_table)?;
+            let run_mode: RunMode = p_table.get::<_, Option<String>>("run_mode")?.unwrap_or_else(|| "forward".into()).parse().map_err(|_| mlua::Error::FromLuaConversionError{from:"String", to: "RunMode", message: Some("Invalid string".into())})?;
+            let frame_count: u32 = p_table.get::<_, Option<u32>>("frame_count")?.unwrap_or(1); // TODO: data check
+            let line_length: u32 = p_table.get::<_, Option<u32>>("line_length")?.unwrap_or(0);
+            let animation_speed: f32 = p_table.get::<_, Option<f32>>("animation_speed")?.unwrap_or(1.0_f32);
+            let max_advance: f32 = p_table.get::<_, Option<f32>>("max_advance")?.unwrap_or(f32::MAX);
+            let repeat_count: u8 = p_table.get::<_, Option<u8>>("repeat_count")?.unwrap_or(1); // TODO: data check
+            let frame_sequence: Option<AnimationFrameSequence> = p_table.get("frame_sequence")?;
+            Ok(Self{filename, sprite, run_mode, frame_count, line_length, animation_speed, max_advance, repeat_count, frame_sequence, stripes})
+        } else {
+            Err(mlua::Error::FromLuaConversionError{from:value.type_name(), to: "AnimationSpec", message: Some("Expected table".into())})
+        }
+    }
+}
+
 /// <https://wiki.factorio.com/Types/Stripe>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct Stripe {
     width_in_frames: u32,
     height_in_frames: u32,
+    #[prototype]
     filename: FileName,
-    x: Option<u32>,
-    y: Option<u32>
+    #[default(0)]
+    x: u32, // Default: 0
+    #[default(0)]
+    y: u32 // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/AnimationVariations>
@@ -477,7 +506,12 @@ pub struct SpriteLayer {
 /// <https://wiki.factorio.com/Types/Sprite>
 #[derive(Debug, Clone)]
 pub struct SpriteSpec {
-    filename: Option<FileName>, // Mandatory in some cases
+    filename: FileName, // Mandatory in some cases
+    body: SpriteSpecWithoutFilename,
+}
+
+#[derive(Debug, Clone)]
+pub struct SpriteSpecWithoutFilename {
     dice: Option<Dice>, // AKA slice // _y and _x are converted into this
     priority: SpritePriority, // Default: "medium"
     flags: Option<SpriteFlags>,

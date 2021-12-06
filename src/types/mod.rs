@@ -37,6 +37,13 @@ impl From<String> for FileName {
     }
 }
 
+impl<'lua> crate::PrototypeFromLua<'lua> for FileName {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut crate::DataTable) -> LuaResult<Self> {
+        let string = String::from_lua(value, lua)?;
+        Ok(Self(string))
+    }
+}
+
 /// <https://wiki.factorio.com/Types/ItemStackIndex>
 pub type ItemStackIndex = u16;
 /// <https://wiki.factorio.com/Types/ItemCountType>
