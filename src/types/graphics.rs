@@ -337,7 +337,7 @@ impl<'lua> crate::PrototypeFromLua<'lua> for AnimationBase {
     fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
             let hr_version_opt = p_table.get::<_, Option<mlua::Value>>("hr_version")?;
-            let regular = AnimationSpec::prototype_from_lua(p_table.clone().to_lua(lua)?)?;
+            let regular = AnimationSpec::prototype_from_lua(p_table.clone().to_lua(lua)?, lua, data_table)?;
             if let Some(hr_version_value) = hr_version_opt {
                 let hr_version = AnimationSpec::prototype_from_lua(hr_version_value, lua, data_table)?;
                 Ok(Self{regular, hr_version: Some(hr_version)})
