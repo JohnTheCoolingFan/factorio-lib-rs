@@ -366,6 +366,13 @@ pub struct AnimationSpec {
     stripes: Option<Vec<Stripe>>
 }
 
+impl AnimationSpec {
+    // TODO: clarify the required image sizes for stripes
+    fn register_resources(&self, data_table: &mut crate::DataTable) {
+        todo!()
+    }
+}
+
 impl<'lua> crate::PrototypeFromLua<'lua> for AnimationSpec {
     fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
