@@ -678,7 +678,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
             get_expr = quote! {
                 { 
                     let name = prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or_else(|| #default_value.into());
-                    data_table.new_resource_record(crate::ResourceRecord{path: name.clone, resource_type: crate::ResourceType::Sound});
+                    data_table.register_resource(crate::ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
                     name.into()
                 }
             }
@@ -686,7 +686,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
             get_expr = quote! {
                 {
                     let name = prot_table.get::<_, String>(#str_field)?;
-                    data_table.new_resource_record(crate::ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
+                    data_table.register_resource(crate::ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
                     name.into()
                 }
             }

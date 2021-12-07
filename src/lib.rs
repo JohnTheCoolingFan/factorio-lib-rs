@@ -248,7 +248,7 @@ impl DataTable {
     }
 
     /// Create new resource record
-    pub fn new_resource_record(&mut self, resource_record: ResourceRecord) {
+    pub fn register_resource(&mut self, resource_record: ResourceRecord) {
         self.resource_records.push(resource_record);
     }
 
