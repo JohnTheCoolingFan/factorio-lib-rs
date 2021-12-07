@@ -539,7 +539,7 @@ pub struct SpriteSpecWithoutFilename {
     blend_mode: BlendMode, // Default: "normal"
     load_in_minimal_mode: bool, //Default: false
     premul_alpha: bool, // Default: true
-    generate_sfd: bool // Default: false // Unused (Then why it is documented?)
+    generate_sfd: bool // Default: false // Only used by sprites in UtilitySprites with "icon" flag
 }
 
 /// <https://wiki.factorio.com/Types/SpriteNWaySheet>
