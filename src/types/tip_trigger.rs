@@ -23,7 +23,14 @@ pub enum TipTrigger {
     LowPower(LowPowerTipTrigger),
     PasteEntitySettings(PasteEntitySettingsTipTrigger),
     FastReplace(FastReplaceTipTrigger),
-    GroupAttack(GroupAttackTipTrigger)
+    GroupAttack(GroupAttackTipTrigger),
+    FastBeltBend(FastBeltBendTipTrigger),
+    BeltTraverse(BeltTraverseTipTrigger),
+    PlaceEquipment(PlaceEquipmentTipTrigger),
+    ClearCursor(ClearCursorTipTrigger),
+    ShiftBuild(ShiftBuildTipTrigger),
+    GateOverRailBuild(GateOverRailBuildTipTrigger),
+    ManualWireDrag(ManualWireDragTipTrigger),
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#OrTipTrigger>
@@ -194,4 +201,47 @@ pub struct FastReplaceTipTrigger {
 #[derive(Debug, Clone)]
 pub struct GroupAttackTipTrigger {
     count: u32, // Default: 0
+}
+
+/// <https://wiki.factorio.com/Types/TipTrigger#FastBeltBendTipTrigger>
+#[derive(Debug, Clone)]
+pub struct FastBeltBendTipTrigger {
+    count: u32, // Default: 1
+}
+
+/// <https://wiki.factorio.com/Types/TipTrigger#BeltTraverseTipTrigger>
+#[derive(Debug, Clone)]
+pub struct BeltTraverseTipTrigger {
+    count: u32, // Default: 1
+}
+
+/// <https://wiki.factorio.com/Types/TipTrigger#PlaceEquipmentTipTrigger>
+#[derive(Debug, Clone)]
+pub struct PlaceEquipmentTipTrigger {
+    count: u32, // Default: 1
+    equipment: Option<String>, // Name of Equipment prototype
+}
+
+/// <https://wiki.factorio.com/Types/TipTrigger#ClearCursorTipTrigger>
+#[derive(Debug, Clone)]
+pub struct ClearCursorTipTrigger {
+    count: u32, // Default: 1
+}
+
+/// <https://wiki.factorio.com/Types/TipTrigger#ShiftBuildTipTrigger>
+#[derive(Debug, Clone)]
+pub struct ShiftBuildTipTrigger {
+    count: u32, // Default: 1
+}
+
+/// <https://wiki.factorio.com/Types/TipTrigger#GateOverRailBuildTipTrigger>
+#[derive(Debug, Clone)]
+pub struct GateOverRailBuildTipTrigger {
+    count: u32, // Default: 1
+}
+
+/// <https://wiki.factorio.com/Types/TipTrigger#ManualWireDragTipTrigger>
+#[derive(Debug, Clone)]
+pub struct ManualWireDragTipTrigger {
+    count: u32, // Default: 1
 }
