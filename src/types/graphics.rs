@@ -542,6 +542,35 @@ pub struct SpriteSpecWithoutFilename {
     generate_sfd: bool // Default: false // Only used by sprites in UtilitySprites with "icon" flag
 }
 
+impl<'lua> crate::PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
+        if let mlua::Value::Table(p_table) = value {
+            let mut dice: Option<Dice> = None;
+            let dice_gen_opt: Option<i16> = p_table.get::<_, Option<i16>>("dice")?.or_else(|| p_table.get("slice")?);
+            if let Some(dice_gen) = dice_gen_opt {
+                dice = Some(Dice::new(dice_gen));
+            } else {
+                let x: Option<i16> = p_table.get::<_, Option<i16>>("dice_x")?.or_else(|| p_table.get("slice_x")?);
+                let y: Option<i16> = p_table.get::<_, Option<i16>>("dice_y")?.or_else(|| p_table.get("slice_y")?);
+                if let (Some(ax), Some(ay)) = (x, y) {
+                    dice = Some(Dice(x, y));
+                }
+            };
+            let priority: SpritePriority = p_table.get::<_, Option<String>>("priority")?.unwrap_or_else(|| "medium".into()).parse().map_err(
+                |_| mlua::Error::FromLuaConversionError{from: "String", to: "SpritePriority", message: Some("invalid value".into())}
+                )?;
+            let sprite_flags_raw: Option<Vec<String>> = p_table.get("flags")?;
+            let sprite_flags: Option<SpriteFlags> = None;
+            if let Some(sprite_flags_raw) = sprite_flags_raw {
+                sprite_flags = Some(SpriteFlags::from_iter(sprite_flags_raw))
+            };
+            todo!()
+        } else {
+            Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: "SpriteSpec", message: Some("Expected table".into())})
+        }
+    }
+}
+
 /// <https://wiki.factorio.com/Types/SpriteNWaySheet>
 #[derive(Debug, Clone)]
 pub struct SpriteNWaySheet {
@@ -1256,6 +1285,7 @@ pub struct TreePrototypeVariation {
     shadow: Option<Animation>,
     disable_shadow_distortion_beginning_at_frame: u32, // Default: shadow.frame_count - 1
     normal: Option<Animation>,
+    overlay: Option<Animation>,
     water_reflection: Option<WaterReflectionDefinition>
 }
 
