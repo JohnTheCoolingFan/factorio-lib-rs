@@ -359,7 +359,7 @@ pub struct MapEnemyExpansion {
 /// <https://wiki.factorio.com/Prototype/MapSettings#path_finder>
 #[derive(Debug, Clone)]
 pub struct MapPathFinder {
-    fwd2bwd_ratio: i32,
+    fwd2bwd_ratio: u32,
     goal_pressure_ratio: f64,
     use_path_cache: bool,
     max_steps_worked_per_tick: f64,
