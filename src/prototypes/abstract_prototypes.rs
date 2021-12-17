@@ -1,7 +1,5 @@
 //! This module contains abstract prototypes used for [PrototypeReference](crate::PrototypeReference).
-//! Instead of Data stage, these structs correspond to the scripting stage of Factorio modding.
 //! Not all properties are implemented
-//! If prototype does not have any extensions, data-stage struct is used instead.
 
 use crate::prototypes::{Prototype, PrototypeBase, PrototypeBaseSpec};
 use crate::concepts::LocalisedString;
