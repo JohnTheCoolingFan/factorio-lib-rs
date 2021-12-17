@@ -5,10 +5,16 @@ use crate::prototypes::Prototype;
 
 // TODO: Finish other abstract prototypes
 // TODO: impl DataTableAccessable
+// TODO (not important): type property
 
 /// <https://wiki.factorio.com/PrototypeBase>
 #[derive(Debug, Clone, Prototype)]
 pub struct AbstractPrototypeBase {
     name: String,
-    // TODO (not important): type property
+}
+
+/// <https://wiki.factorio.com/Prototype/Achievement>
+#[derive(Debug, Clone, Prototype)]
+pub struct AbstractAchievement {
+    name: String
 }
