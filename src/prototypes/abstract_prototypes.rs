@@ -6,7 +6,6 @@ use crate::concepts::LocalisedString;
 
 // TODO: Finish other abstract prototypes
 // TODO: impl DataTableAccessable
-// TODO: impl From<>
 
 /// <https://lua-api.factorio.com/next/LuaAchievementPrototype.html>
 #[derive(Debug, Prototype, PrototypeBase)]
