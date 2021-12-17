@@ -462,7 +462,7 @@ pub struct RotatedAnimationSpec {
     middle_orientation: f32, // Default: 0.5
     orientation_range: f32, // Default: 1
     apply_projection: bool, // Default: true
-    animation: AnimationVariant
+    animation: AnimationVariation
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimationVariations>
