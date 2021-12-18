@@ -10,7 +10,7 @@ use ini::Ini;
 
 // Unfinished
 /// Handles the locale file parsing, aggregation and unified access
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct LocaleHandler {
     entries: HashMap<String, String>
 }
@@ -20,12 +20,6 @@ impl Index<String> for LocaleHandler {
 
     fn index(&self, key: String) -> &Self::Output {
         self.entries.get(&key).unwrap() // Improve to not use unwrap
-    }
-}
-
-impl Default for LocaleHandler {
-    fn default() -> Self {
-        Self{entries: HashMap::new()}
     }
 }
 
