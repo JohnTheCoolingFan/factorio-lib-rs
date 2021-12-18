@@ -54,15 +54,15 @@ pub type ItemCountType = u32;
 pub struct Factorio2DVector(pub f32, pub f32);
 
 impl<'lua> FromLua<'lua> for Factorio2DVector {
-    fn from_lua(lua_value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+    fn from_lua(lua_value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
         if let mlua::Value::Table(v_table) = lua_value {
             if let (Ok(x), Ok(y)) = (v_table.get::<_, f32>(1), v_table.get::<_, f32>(2)) {
                 Ok(Self(x, y))
             } else {
-                Err(mlua::Error::FromLuaConversionError{from: "table".into(), to: "Factorio2DVector".into(), message: Some("Expected table".into())})
+                Err(mlua::Error::FromLuaConversionError{from: "table", to: "Factorio2DVector", message: Some("Expected table".into())})
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio2DVector".into(), message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio2DVector", message: Some("Expected table".into())})
         }
     }
 }
@@ -72,15 +72,15 @@ impl<'lua> FromLua<'lua> for Factorio2DVector {
 pub struct Factorio3DVector(pub f32, pub f32, pub f32);
 
 impl<'lua> FromLua<'lua> for Factorio3DVector {
-    fn from_lua(lua_value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+    fn from_lua(lua_value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
         if let mlua::Value::Table(v_table) = lua_value {
             if let (Ok(x), Ok(y), Ok(z)) = (v_table.get::<_, f32>(1), v_table.get::<_, f32>(2), v_table.get::<_, f32>(3)) {
                 Ok(Self(x, y, z))
             } else {
-                Err(mlua::Error::FromLuaConversionError{from: "table".into(), to: "Factorio3DVector".into(), message: Some("Expected table".into())})
+                Err(mlua::Error::FromLuaConversionError{from: "table", to: "Factorio3DVector", message: Some("Expected table".into())})
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio3DVector".into(), message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio3DVector", message: Some("Expected table".into())})
         }
     }
 }
