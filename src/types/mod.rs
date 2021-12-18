@@ -50,9 +50,39 @@ pub type ItemStackIndex = u16;
 pub type ItemCountType = u32;
 // Type derived from Factorio3DVector definition (https://wiki.factorio.com/Types/Vector3D)
 /// 2D Vector defined by Factorio <https://wiki.factorio.com/Types/vector>
-pub type Factorio2DVector = (f32, f32);
+pub struct Factorio2DVector(f32, f32);
+
+impl<'lua> FromLua<'lua> for Factorio2DVector {
+    fn from_lua(lua_value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+        if let mlua::Value::Table(v_table) = lua_value {
+            if let (Ok(x), Ok(y)) = (v_table.get::<_, f32>(1), v_table.get::<_, f32>(2)) {
+                Ok(Self(x, y))
+            } else {
+                Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio2DVector".into(), message: Some("Expected table".into())})
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio2DVector".into(), message: Some("Expected table".into())})
+        }
+    }
+}
+
 /// 3D Vector defined by Factorio <https://wiki.factorio.com/Types/Vector3D>
-pub type Factorio3DVector = (f32, f32, f32);
+pub struct Factorio3DVector(f32, f32, f32);
+
+impl<'lua> FromLua<'lua> for Factorio3DVector {
+    fn from_lua(lua_value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+        if let mlua::Value::Table(v_table) = lua_value {
+            if let (Ok(x), Ok(y), Ok(z)) = (v_table.get::<_, f32>(1), v_table.get::<_, f32>(2), v_table.get::<_, f32>(3)) {
+                Ok(Self(x, y, z))
+            } else {
+                Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio3DVector".into(), message: Some("Expected table".into())})
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio3DVector".into(), message: Some("Expected table".into())})
+        }
+    }
+}
+
 // Parser and checker maybe?
 /// Keyboard keys sequence <https://wiki.factorio.com/Prototype/CustomInput#key_sequence>
 #[derive(Debug, Clone)]
