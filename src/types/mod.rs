@@ -51,7 +51,7 @@ pub type ItemCountType = u32;
 // Type derived from Factorio3DVector definition (https://wiki.factorio.com/Types/Vector3D)
 /// 2D Vector defined by Factorio <https://wiki.factorio.com/Types/vector>
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Factorio2DVector(f32, f32);
+pub struct Factorio2DVector(pub f32, pub f32);
 
 impl<'lua> FromLua<'lua> for Factorio2DVector {
     fn from_lua(lua_value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
@@ -69,7 +69,7 @@ impl<'lua> FromLua<'lua> for Factorio2DVector {
 
 /// 3D Vector defined by Factorio <https://wiki.factorio.com/Types/Vector3D>
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Factorio3DVector(f32, f32, f32);
+pub struct Factorio3DVector(pub f32, pub f32, pub f32);
 
 impl<'lua> FromLua<'lua> for Factorio3DVector {
     fn from_lua(lua_value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
