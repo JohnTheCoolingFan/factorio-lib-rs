@@ -522,7 +522,7 @@ pub struct SpriteSpecWithoutFilename {
     dice: Option<Dice>, // AKA slice // _y and _x are converted into this
     priority: SpritePriority, // Default: "medium"
     flags: Option<SpriteFlags>,
-    size: Option<SpriteSize>,
+    size: SpriteSize,
     // Automatically converted to size
     // width
     // height
