@@ -59,7 +59,7 @@ impl<'lua> FromLua<'lua> for Factorio2DVector {
             if let (Ok(x), Ok(y)) = (v_table.get::<_, f32>(1), v_table.get::<_, f32>(2)) {
                 Ok(Self(x, y))
             } else {
-                Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio2DVector".into(), message: Some("Expected table".into())})
+                Err(mlua::Error::FromLuaConversionError{from: "table".into(), to: "Factorio2DVector".into(), message: Some("Expected table".into())})
             }
         } else {
             Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio2DVector".into(), message: Some("Expected table".into())})
@@ -77,7 +77,7 @@ impl<'lua> FromLua<'lua> for Factorio3DVector {
             if let (Ok(x), Ok(y), Ok(z)) = (v_table.get::<_, f32>(1), v_table.get::<_, f32>(2), v_table.get::<_, f32>(3)) {
                 Ok(Self(x, y, z))
             } else {
-                Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio3DVector".into(), message: Some("Expected table".into())})
+                Err(mlua::Error::FromLuaConversionError{from: "table".into(), to: "Factorio3DVector".into(), message: Some("Expected table".into())})
             }
         } else {
             Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio3DVector".into(), message: Some("Expected table".into())})
