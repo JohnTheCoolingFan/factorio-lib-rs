@@ -14,7 +14,7 @@ pub type AnimationFrameSequence = Vec<u16>;
 pub type SpritePosition = (i16, i16);
 /// Width and Height <https://wiki.factorio.com/Types/Sprite#width>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SpriteSize(i16, i16);
+pub struct SpriteSize(pub i16, pub i16);
 /// <https://wiki.factorio.com/Types/SpriteSizeType>
 pub type SpriteSizeType = i16;
 
