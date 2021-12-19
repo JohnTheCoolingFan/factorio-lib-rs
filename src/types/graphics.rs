@@ -544,7 +544,7 @@ pub struct SpriteSpecWithoutFilename {
 }
 
 impl<'lua> crate::PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut crate::DataTable) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
             let dice: Option<Dice> = {
                 let dice_gen_opt: Option<i16> = p_table.get::<_, Option<i16>>("dice")?.or_else(|| p_table.get("slice").ok());
