@@ -370,7 +370,7 @@ pub struct AnimationSpec {
 impl AnimationSpec {
     // TODO: clarify the required image sizes for stripes
     fn register_resources(&self, data_table: &mut crate::DataTable) {
-        todo!()
+        todo!() // TODO
     }
 }
 
