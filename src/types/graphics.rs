@@ -11,7 +11,8 @@ use mlua::ToLua;
 /// <https://wiki.factorio.com/Types/AnimationFrameSequence>
 pub type AnimationFrameSequence = Vec<u16>;
 /// <https://wiki.factorio.com/Types/Sprite#position>
-pub type SpritePosition = (i16, i16);
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SpritePosition(pub i16, pub i16);
 /// Width and Height <https://wiki.factorio.com/Types/Sprite#width>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SpriteSize(pub i16, pub i16);
