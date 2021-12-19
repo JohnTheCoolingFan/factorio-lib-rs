@@ -546,26 +546,96 @@ pub struct SpriteSpecWithoutFilename {
 impl<'lua> crate::PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
     fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
-            let mut dice: Option<Dice> = None;
-            let dice_gen_opt: Option<i16> = p_table.get::<_, Option<i16>>("dice")?.or_else(|| p_table.get("slice")?);
-            if let Some(dice_gen) = dice_gen_opt {
-                dice = Some(Dice::new(dice_gen));
-            } else {
-                let x: Option<i16> = p_table.get::<_, Option<i16>>("dice_x")?.or_else(|| p_table.get("slice_x")?);
-                let y: Option<i16> = p_table.get::<_, Option<i16>>("dice_y")?.or_else(|| p_table.get("slice_y")?);
-                if let (Some(ax), Some(ay)) = (x, y) {
-                    dice = Some(Dice(x, y));
+            let dice: Option<Dice> = {
+                let dice_gen_opt: Option<i16> = p_table.get::<_, Option<i16>>("dice")?.or_else(|| p_table.get("slice").ok());
+                if let Some(dice_gen) = dice_gen_opt {
+                    Some(Dice::new(dice_gen))
+                } else {
+                    let x: Option<i16> = p_table.get::<_, Option<i16>>("dice_x")?.or_else(|| p_table.get("slice_x").ok());
+                    let y: Option<i16> = p_table.get::<_, Option<i16>>("dice_y")?.or_else(|| p_table.get("slice_y").ok());
+                    if let (Some(ax), Some(ay)) = (x, y) {
+                        Some(Dice(ax, ay))
+                    } else {
+                        None
+                    }
                 }
             };
             let priority: SpritePriority = p_table.get::<_, Option<String>>("priority")?.unwrap_or_else(|| "medium".into()).parse().map_err(
                 |_| mlua::Error::FromLuaConversionError{from: "String", to: "SpritePriority", message: Some("invalid value".into())}
                 )?;
-            let sprite_flags_raw: Option<Vec<String>> = p_table.get("flags")?;
-            let sprite_flags: Option<SpriteFlags> = None;
-            if let Some(sprite_flags_raw) = sprite_flags_raw {
-                sprite_flags = Some(SpriteFlags::from_iter(sprite_flags_raw))
+            let flags = p_table.get::<_, Option<Vec<String>>>("flags")?.map(SpriteFlags::from_iter);
+            let size = {
+                let error = Err(mlua::Error::FromLuaConversionError{from: "integer", to: "SpriteSizeType", message: Some("value must be in range 0-8192".into())});
+                if let Some(s_value) = p_table.get::<_, Option<mlua::Value>>("size")? {
+                    match lua.unpack::<i16>(s_value.clone()) {
+                        Ok(size) => {
+                            if (0..=8192_i16).contains(&size) {
+                                SpriteSize(size, size)
+                            } else {
+                                return error
+                            }
+                        },
+                        _ => {
+                            let size = lua.unpack::<[i16; 2]>(s_value)?;
+                            if (0..=8192_i16).contains(&size[0]) && (0..=8192_i16).contains(&size[1]) {
+                                SpriteSize(size[0], size[1])
+                            } else {
+                                return error
+                            }
+                        }
+                    }
+                } else {
+                    let width: SpriteSizeType = p_table.get("width")?;
+                    let height: SpriteSizeType = p_table.get("height")?;
+                    if (0..=8192_i16).contains(&width) && (0..=8192_i16).contains(&height) {
+                        SpriteSize(width, height)
+                    } else {
+                        return error
+                    }
+                }
             };
-            todo!()
+            let position = {
+                let x = p_table.get::<_, Option<SpriteSizeType>>("x")?.unwrap_or(0);
+                let y = p_table.get::<_, Option<SpriteSizeType>>("y")?.unwrap_or(0);
+                if x != 0 || y != 0 {
+                    Some(SpritePosition(x, y))
+                } else {
+                    p_table.get::<_, Option<[SpriteSizeType; 2]>>("position")?.map(|pos| SpritePosition(pos[0], pos[1]))
+                }
+            };
+            let shift = p_table.get::<_, Option<Factorio2DVector>>("shift")?.unwrap_or(Factorio2DVector(0.0, 0.0));
+            let scale = p_table.get::<_, Option<f64>>("scale")?.unwrap_or(1.0);
+            let draw_as = {
+                let draw_as_shadow = p_table.get::<_, Option<bool>>("draw_as_shadow")?.unwrap_or(false);
+                let draw_as_glow = p_table.get::<_, Option<bool>>("draw_as_glow")?.unwrap_or(false);
+                let draw_as_light = p_table.get::<_, Option<bool>>("draw_as_light")?.unwrap_or(false);
+                DrawAs::new(draw_as_shadow, draw_as_glow, draw_as_light)
+            };
+            let mipmap_count = p_table.get::<_, Option<u8>>("mipmap_count")?.unwrap_or(0);
+            let apply_runtime_tint = p_table.get::<_, Option<bool>>("apply_runtime_tint")?.unwrap_or(false);
+            let tint = p_table.get::<_, Option<Color>>("tint")?.unwrap_or(Color(1.0, 1.0, 1.0, 1.0));
+            let blend_mode: BlendMode = p_table.get::<_, Option<String>>("blend_mode")?.unwrap_or_else(|| "normal".into()).parse()
+                .map_err(|_| mlua::Error::FromLuaConversionError{from: "string", to: "BlendMode", message: Some("Invalid variant".into())})?;
+            let load_in_minimal_mode = p_table.get::<_, Option<bool>>("load_in_minimal_mode")?.unwrap_or(false);
+            let premul_alpha = p_table.get::<_, Option<bool>>("premul_alpha")?.unwrap_or(true);
+            let generate_sfd = p_table.get::<_, Option<bool>>("generate_sfd")?.unwrap_or(false);
+            Ok(Self{
+                dice,
+                priority,
+                flags,
+                size,
+                position,
+                shift,
+                scale,
+                draw_as,
+                mipmap_count,
+                apply_runtime_tint,
+                tint,
+                blend_mode,
+                load_in_minimal_mode,
+                premul_alpha,
+                generate_sfd
+            })
         } else {
             Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: "SpriteSpec", message: Some("Expected table".into())})
         }
