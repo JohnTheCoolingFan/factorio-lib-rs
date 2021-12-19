@@ -391,7 +391,9 @@ impl<'lua> crate::PrototypeFromLua<'lua> for AnimationSpec {
             let max_advance: f32 = p_table.get::<_, Option<f32>>("max_advance")?.unwrap_or(f32::MAX);
             let repeat_count: u8 = p_table.get::<_, Option<u8>>("repeat_count")?.unwrap_or(1); // TODO: data check
             let frame_sequence: Option<AnimationFrameSequence> = p_table.get("frame_sequence")?;
-            Ok(Self{filename, sprite, run_mode, frame_count, line_length, animation_speed, max_advance, repeat_count, frame_sequence, stripes})
+            let result = Self{filename, sprite, run_mode, frame_count, line_length, animation_speed, max_advance, repeat_count, frame_sequence, stripes};
+            result.register_resources(data_table);
+            Ok(result)
         } else {
             Err(mlua::Error::FromLuaConversionError{from:value.type_name(), to: "AnimationSpec", message: Some("Expected table".into())})
         }
