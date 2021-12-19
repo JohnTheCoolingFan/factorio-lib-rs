@@ -312,29 +312,29 @@ pub struct AnimationPrototype {
 #[data_table(editor_controller)]
 pub struct EditorController {
     name: String, // Must be "default"
-    inventory_size: ItemStackIndex,
-    gun_inventory_size: ItemStackIndex,
-    movement_speed: f64, // Must be >= 0.34375
-    item_pickup_distance: f64,
-    loot_pickup_distance: f64,
-    mining_speed: f64,
-    enable_flash_light: bool,
-    adjust_speed_based_off_zoom: bool,
-    render_as_day: bool,
-    instant_blueprint_building: bool,
-    instant_deconstruction: bool,
-    instant_upgrading: bool,
-    instant_rail_planner: bool,
-    show_status_icons: bool,
-    show_hidden_entities: bool,
-    show_entity_tags: bool,
-    show_entity_health_bars: bool,
-    show_additional_entity_info_gui: bool,
-    generate_neighbour_chunks: bool,
-    fill_built_entity_energy_buffers: bool,
-    show_character_tab_in_controller_gui: bool,
-    show_infinity_filter_in_controller_gui: bool,
-    placed_corpses_never_expire: bool
+    pub inventory_size: ItemStackIndex,
+    pub gun_inventory_size: ItemStackIndex,
+    pub movement_speed: f64, // Must be >= 0.34375
+    pub item_pickup_distance: f64,
+    pub loot_pickup_distance: f64,
+    pub mining_speed: f64,
+    pub enable_flash_light: bool,
+    pub adjust_speed_based_off_zoom: bool,
+    pub render_as_day: bool,
+    pub instant_blueprint_building: bool,
+    pub instant_deconstruction: bool,
+    pub instant_upgrading: bool,
+    pub instant_rail_planner: bool,
+    pub show_status_icons: bool,
+    pub show_hidden_entities: bool,
+    pub show_entity_tags: bool,
+    pub show_entity_health_bars: bool,
+    pub show_additional_entity_info_gui: bool,
+    pub generate_neighbour_chunks: bool,
+    pub fill_built_entity_energy_buffers: bool,
+    pub show_character_tab_in_controller_gui: bool,
+    pub show_infinity_filter_in_controller_gui: bool,
+    pub placed_corpses_never_expire: bool
 }
 
 /// <https://wiki.factorio.com/Prototype/Font>

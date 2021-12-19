@@ -11,17 +11,17 @@ use crate::prototypes::Prototype;
 /// <https://wiki.factorio.com/PrototypeBase>
 #[derive(Debug, Clone, Prototype)]
 pub struct AbstractPrototypeBase {
-    name: String,
+    pub name: String,
 }
 
 /// <https://wiki.factorio.com/Prototype/Achievement>
 #[derive(Debug, Clone, Prototype)]
 pub struct AbstractAchievement {
-    name: String
+    pub name: String
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity>
 #[derive(Debug, Clone, Prototype)]
 pub struct AbstractEntity {
-    name: String
+    pub name: String
 }
