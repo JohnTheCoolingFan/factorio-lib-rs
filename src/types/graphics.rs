@@ -520,27 +520,27 @@ pub struct SpriteSpec {
 
 #[derive(Debug, Clone)]
 pub struct SpriteSpecWithoutFilename {
-    dice: Option<Dice>, // AKA slice // _y and _x are converted into this
-    priority: SpritePriority, // Default: "medium"
-    flags: Option<SpriteFlags>,
-    size: SpriteSize,
+    pub dice: Option<Dice>, // AKA slice // _y and _x are converted into this
+    pub priority: SpritePriority, // Default: "medium"
+    pub flags: Option<SpriteFlags>,
+    pub size: SpriteSize,
     // Automatically converted to size
     // width
     // height
-    position: Option<SpritePosition>,
+    pub position: Option<SpritePosition>,
     // Automatically converted to position
     // x
     // y
-    shift: Factorio2DVector, // (0, 0) by default
-    scale: f64, // 1 by default,
-    draw_as: DrawAs, // all false by default
-    mipmap_count: u8, // Default: 0
-    apply_runtime_tint: bool, // Default: false
-    tint: Color, // Default: (1, 1, 1, 1) (white)
-    blend_mode: BlendMode, // Default: "normal"
-    load_in_minimal_mode: bool, //Default: false
-    premul_alpha: bool, // Default: true
-    generate_sfd: bool // Default: false // Only used by sprites in UtilitySprites with "icon" flag
+    pub shift: Factorio2DVector, // (0, 0) by default
+    pub scale: f64, // 1 by default,
+    pub draw_as: DrawAs, // all false by default
+    pub mipmap_count: u8, // Default: 0
+    pub apply_runtime_tint: bool, // Default: false
+    pub tint: Color, // Default: (1, 1, 1, 1) (white)
+    pub blend_mode: BlendMode, // Default: "normal"
+    pub load_in_minimal_mode: bool, //Default: false
+    pub premul_alpha: bool, // Default: true
+    pub generate_sfd: bool // Default: false // Only used by sprites in UtilitySprites with "icon" flag
 }
 
 impl<'lua> crate::PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
