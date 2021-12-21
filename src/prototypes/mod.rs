@@ -2283,7 +2283,6 @@ pub struct Reactor {
     light: Option<LightDefinition>,
     meltdown_action: Option<Trigger>,
     neighbour_bonus: f64, // Default: 1
-    neighbour_collision_increase: f64, // Default: 0.25 // Can't be negative
     scale_energy_usage: bool, // Default: false
     use_fuel_glow_color: bool, // Default: false
     default_fuel_glow_color: Color, // Default: (1, 1, 1, 1)
@@ -4244,7 +4243,8 @@ pub struct Tile {
     transitions: Option<Vec<ExtraTileTransitions>>,
     transitions_between_transitions: Option<Vec<BetweenTileTransitions>>,
     autoplace: Option<AutoplaceSpecification>,
-    placeable_by: Option<Vec<ItemToPlace>>
+    placeable_by: Option<Vec<ItemToPlace>>,
+    check_collision_with_entities: bool, // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/TipsAndTricksItem>
