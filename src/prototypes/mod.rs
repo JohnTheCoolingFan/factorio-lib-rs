@@ -3501,7 +3501,8 @@ pub struct EnergyShieldEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/GeneratorEquipment>
-#[derive(Debug, Prototype, Equipment)]
+#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[data_table(generator_equipment)]
 pub struct GeneratorEquipment {
     name: String,
     prototype_base: PrototypeBaseSpec,
@@ -3522,7 +3523,8 @@ pub struct MovementBonusEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/NightVisionEquipment>
-#[derive(Debug, Prototype, Equipment)]
+#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[data_table(night_vision_equipment)]
 pub struct NightVisionEquipment {
     name: String,
     prototype_base: PrototypeBaseSpec,
