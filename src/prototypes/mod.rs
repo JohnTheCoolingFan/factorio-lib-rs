@@ -784,7 +784,8 @@ pub struct EntityBase {
     map_color: Option<Color>,
     friendly_map_color: Option<Color>,
     enemy_map_color: Option<Color>,
-    water_reflection: Option<WaterReflectionDefinition>
+    water_reflection: Option<WaterReflectionDefinition>,
+    protected_from_tile_building: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity>
@@ -833,6 +834,7 @@ pub trait Entity: PrototypeBase {
     fn friendly_map_color(&self) -> Option<Color>;
     fn enemy_map_color(&self) -> Option<Color>;
     fn water_reflection(&self) -> &Option<WaterReflectionDefinition>;
+    fn protected_from_tile_building(&self) -> bool;
 }
 
 /// <https://wiki.factorio.com/Prototype/Arrow>
@@ -1943,7 +1945,8 @@ pub struct LandMine {
     action: Option<Trigger>,
     ammo_category: Option<String>, // Name of AmmoCategory
     force_die_on_attack: bool, // Default: true
-    trigger_force: ForceCondition // Default: "enemy"
+    trigger_force: ForceCondition, // Default: "enemy"
+    trigger_collision_mask: Option<CollisionMask>
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedContainer>

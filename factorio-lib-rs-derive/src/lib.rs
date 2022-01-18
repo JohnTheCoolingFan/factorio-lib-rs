@@ -303,6 +303,7 @@ fn impl_entity_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn friendly_map_color(&self) -> Option<Color> { self.entity_base.friendly_map_color }
             fn enemy_map_color(&self) -> Option<Color> { self.entity_base.enemy_map_color }
             fn water_reflection(&self) -> &Option<WaterReflectionDefinition> { &self.entity_base.water_reflection }
+            fn protected_from_tile_building(&self) -> bool { self.entity_base.protected_from_tile_building }
         }
     };
     gen.into()
