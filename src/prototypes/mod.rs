@@ -2802,7 +2802,7 @@ pub struct FluidTurret {
 }
 
 /// <https://wiki.factorio.com/Prototype/Unit>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(unit)]
 pub struct Unit {
     name: String,
