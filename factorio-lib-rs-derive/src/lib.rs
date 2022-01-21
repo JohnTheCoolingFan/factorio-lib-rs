@@ -82,6 +82,7 @@ pub fn entity_with_owner_macro_derive(input: TokenStream) -> TokenStream {
 pub fn combinator_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     let mut ts = impl_combinator_macro(&ast);
+    ts.extend(impl_entity_with_owner_macro(&ast));
     ts.extend(impl_entity_with_health_macro(&ast));
     ts.extend(impl_entity_macro(&ast));
     ts.extend(impl_prototype_base_macro(&ast));
