@@ -1585,7 +1585,7 @@ pub struct UnitAlternativeAttackingFrameSequence {
 /// <https://wiki.factorio.com/Types/SpiderEnginePrototype>
 #[derive(Debug, Clone)]
 pub struct SpiderEnginePrototype {
-    military_target: String, // Name of simple entity with force prototype
+    military_target: bool, // Converted from Option<String>. if Some(_), set to true. If None, set to false
     legs: Vec<SpiderLegSpecification> // Single leg is converted to Vec with one leg
 }
 
