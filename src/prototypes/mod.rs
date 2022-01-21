@@ -1946,7 +1946,7 @@ pub struct LandMine {
     ammo_category: Option<String>, // Name of AmmoCategory
     force_die_on_attack: bool, // Default: true
     trigger_force: ForceCondition, // Default: "enemy"
-    trigger_collision_mask: Option<CollisionMask>
+    trigger_collision_mask: CollisionMask, // Default: ["item-layer", "object-layer", "player-layer", "water-tile"]
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedContainer>
