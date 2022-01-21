@@ -20,6 +20,7 @@ use factorio_lib_rs_derive::{
     CraftingMachine,
     FlyingRobot,
     TransportBeltConnectable,
+    Turret,
     Vehicle,
     RollingStock,
     Equipment,
@@ -1111,166 +1112,172 @@ pub trait EntityWithOwner {
 }
 
 /// <https://wiki.factorio.com/Prototype/Accumulator>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(accumulator)]
 pub struct Accumulator {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_source: EnergySource,
-    picture: Sprite,
-    charge_cooldown: u16,
-    discharge_cooldown: u16,
-    charge_animation: Option<Animation>,
-    charge_light: Option<LightDefinition>,
-    discharge_animation: Option<Animation>,
-    discharge_light: Option<LightDefinition>,
-    circuit_wire_connection_point: Option<WireConnectionPoint>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_connector_sprites: Option<CircuitConnectorSprites>,
-    default_output_signal: Option<SignalIDConnector>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource,
+    pub picture: Sprite,
+    pub charge_cooldown: u16,
+    pub discharge_cooldown: u16,
+    pub charge_animation: Option<Animation>,
+    pub charge_light: Option<LightDefinition>,
+    pub discharge_animation: Option<Animation>,
+    pub discharge_light: Option<LightDefinition>,
+    pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    pub default_output_signal: Option<SignalIDConnector>
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryTurret>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(artillery_turret)]
 pub struct ArtilleryTurret {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    gun: String, // Name of a gun item
-    inventory_size: u16, // Must be > 0
-    ammo_stack_limit: u32, // Must be > 0
-    automated_ammo_count: u32,
-    turret_rotation_speed: f64,
-    manual_range_modifier: f64, // Must be positive
-    alert_when_attacking: bool, // Default: true
-    disable_automatic_firing: bool, // Default: false
-    base_picture_secondary_draw_order: u8, // Default: 0
-    base_picture_render_layer: RenderLayer, // Default: "lower-object"
-    base_shift: Option<Factorio2DVector>,
-    base_picture: Option<Animation4Way>,
-    cannon_base_pictures: Option<RotatedSprite>,
-    cannon_barrel_pictures: Option<RotatedSprite>,
-    rotating_sound: Option<InterruptibleSound>,
-    rotating_stopped_sound: Option<Sound>,
-    turn_after_shooting_cooldown: u16, // Default: 0
-    cannon_parking_frame_count: u16, // Default: 0
-    cannon_parking_speed: u16, // Default: 1
-    cannon_barrel_recoil_shiftings: Option<Vec<Factorio3DVector>>,
-    cannon_barrel_recoil_shiftings_load_correction_matrix: Option<Vec<Factorio3DVector>>, // Only loaded if cannon_barrel_recoil_shiftings is loaded
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub gun: String, // Name of a gun item
+    pub inventory_size: u16, // Must be > 0
+    pub ammo_stack_limit: u32, // Must be > 0
+    pub automated_ammo_count: u32,
+    pub turret_rotation_speed: f64,
+    pub manual_range_modifier: f64, // Must be positive
+    pub alert_when_attacking: bool, // Default: true
+    pub disable_automatic_firing: bool, // Default: false
+    pub base_picture_secondary_draw_order: u8, // Default: 0
+    pub base_picture_render_layer: RenderLayer, // Default: "lower-object"
+    pub base_shift: Option<Factorio2DVector>,
+    pub base_picture: Option<Animation4Way>,
+    pub cannon_base_pictures: Option<RotatedSprite>,
+    pub cannon_barrel_pictures: Option<RotatedSprite>,
+    pub rotating_sound: Option<InterruptibleSound>,
+    pub rotating_stopped_sound: Option<Sound>,
+    pub turn_after_shooting_cooldown: u16, // Default: 0
+    pub cannon_parking_frame_count: u16, // Default: 0
+    pub cannon_parking_speed: u16, // Default: 1
+    pub cannon_barrel_recoil_shiftings: Option<Vec<Factorio3DVector>>,
+    pub cannon_barrel_recoil_shiftings_load_correction_matrix: Option<Vec<Factorio3DVector>>, // Only loaded if cannon_barrel_recoil_shiftings is loaded
     cannon_barrel_light_direction: Option<Factorio3DVector> // Only loaded if cannon_barrel_recoil_shiftings is loaded
 }
 
 /// <https://wiki.factorio.com/Prototype/Beacon>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(beacon)]
 pub struct Beacon {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_usage: Energy,
-    energy_source: EnergySource,
-    supply_area_distance: f64,
-    distribution_effectivity: f64,
-    module_specification: ModuleSpecification,
-    graphics_set: Option<BeaconGraphicsSet>,
-    animation: Option<Animation>, // Loaded only if `graphics_set` is not present
-    base_picture: Option<Sprite>, // Loaded only if `graphics_set` is not present
-    radius_visualization_picture: Option<Sprite>,
-    allowed_effects: Option<EffectTypeLimitation>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_usage: Energy,
+    pub energy_source: EnergySource,
+    pub supply_area_distance: f64,
+    pub distribution_effectivity: f64,
+    pub module_specification: ModuleSpecification,
+    pub graphics_set: Option<BeaconGraphicsSet>,
+    pub animation: Option<Animation>, // Loaded only if `graphics_set` is not present
+    pub base_picture: Option<Sprite>, // Loaded only if `graphics_set` is not present
+    pub radius_visualization_picture: Option<Sprite>,
+    pub allowed_effects: Option<EffectTypeLimitation>
 }
 
 /// <https://wiki.factorio.com/Prototype/Boiler>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(boiler)]
 pub struct Boiler {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_source: EnergySource,
-    fluid_box: FluidBox,
-    output_fluid_box: FluidBox,
-    energy_consumption: Energy,
-    burning_cooldown: u32,
-    target_temperature: f64,
-    structure: Animation4Way,
-    fire: Animation4Way, // Can be empty
-    fire_glow: Animation4Way, // Can be empty
-    fire_glow_flicker_enabled: bool, // Default: false
-    fire_flicker_enabled: bool, // Default: false
-    mode: BoilerMode, // Default: "heat-water-inside"
-    patch: Option<Sprite4Way>,
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource,
+    pub fluid_box: FluidBox,
+    pub output_fluid_box: FluidBox,
+    pub energy_consumption: Energy,
+    pub burning_cooldown: u32,
+    pub target_temperature: f64,
+    pub structure: Animation4Way,
+    pub fire: Animation4Way, // Can be empty
+    pub fire_glow: Animation4Way, // Can be empty
+    pub fire_glow_flicker_enabled: bool, // Default: false
+    pub fire_flicker_enabled: bool, // Default: false
+    pub mode: BoilerMode, // Default: "heat-water-inside"
+    pub patch: Option<Sprite4Way>,
 }
 
 /// <https://wiki.factorio.com/Prototype/BurnerGenerator>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(burner_generator)]
 pub struct BurnerGenerator {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_source: EnergySource, // Emissions are ignored
-    burner: EnergySource, // Must be a burner energy source
-    animation: Animation4Way,
-    max_power_output: Energy,
-    idle_animation: Option<Animation4Way>,
-    always_draw_idle_animation: bool, // Default: false
-    min_perceived_performance: f64, // Default: 0.25
-    performance_to_sound_speedup: f64, // Default: 0.5
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource, // Emissions are ignored
+    pub burner: EnergySource, // Must be a burner energy source
+    pub animation: Animation4Way,
+    pub max_power_output: Energy,
+    pub idle_animation: Option<Animation4Way>,
+    pub always_draw_idle_animation: bool, // Default: false
+    pub min_perceived_performance: f64, // Default: 0.25
+    pub performance_to_sound_speedup: f64, // Default: 0.5
 }
 
 /// <https://wiki.factorio.com/Prototype/Character>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(character)]
 pub struct Character {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    mining_speed: f64,
-    running_speed: f64,
-    distance_per_frame: f64,
-    maximum_corner_sliding_distance: f64,
-    heartbeat: Sound,
-    eat: Sound,
-    inventory_size: ItemStackIndex,
-    build_distance: u32,
-    drop_item_distance: u32,
-    reach_distance: u32,
-    reach_resource_distance: f64,
-    item_pickup_distance: f64,
-    loot_pickup_distance: f64,
-    ticks_to_keep_gun: u32,
-    ticks_to_keep_aiming_direction: u32,
-    ticks_to_stay_in_combat: u32,
-    damage_hit_tint: Color,
-    running_sound_animation_positions: Vec<f32>,
-    mining_with_tool_particles_animation_positions: Vec<f32>,
-    animations: Vec<CharacterArmorAnimation>,
-    crafting_categories: Option<Vec<String>>, // (Names) Name of crafting category
-    mining_categories: Option<Vec<String>>, // (Names) Name of mining category
-    light: Option<LightDefinition>,
-    enter_vehicle_distance: f64, // Default: 3.0
-    tool_attack_distance: f64, // Default: 1.5
-    respawn_time: u32, // Default: 10
-    has_belt_immunity: bool, // Default: false
-    character_corpse: Option<String>,
-    footstep_particle_triggers: Option<FootstepTriggerEffectList>,
-    synced_footstep_particle_triggers: Option<FootstepTriggerEffectList>,
-    footprint_particles: Option<Vec<FootprintParticle>>,
-    left_footprint_offset: Option<Factorio2DVector>,
-    right_footprint_offset: Option<Factorio2DVector>,
-    right_footprint_frames: Option<Factorio2DVector>,
-    left_footprint_frames: Option<Factorio2DVector>,
-    tool_attack_result: Option<Trigger>,
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub mining_speed: f64,
+    pub running_speed: f64,
+    pub distance_per_frame: f64,
+    pub maximum_corner_sliding_distance: f64,
+    pub heartbeat: Sound,
+    pub eat: Sound,
+    pub inventory_size: ItemStackIndex,
+    pub build_distance: u32,
+    pub drop_item_distance: u32,
+    pub reach_distance: u32,
+    pub reach_resource_distance: f64,
+    pub item_pickup_distance: f64,
+    pub loot_pickup_distance: f64,
+    pub ticks_to_keep_gun: u32,
+    pub ticks_to_keep_aiming_direction: u32,
+    pub ticks_to_stay_in_combat: u32,
+    pub damage_hit_tint: Color,
+    pub running_sound_animation_positions: Vec<f32>,
+    pub mining_with_tool_particles_animation_positions: Vec<f32>,
+    pub animations: Vec<CharacterArmorAnimation>,
+    pub crafting_categories: Option<Vec<String>>, // (Names) Name of crafting category
+    pub mining_categories: Option<Vec<String>>, // (Names) Name of mining category
+    pub light: Option<LightDefinition>,
+    pub enter_vehicle_distance: f64, // Default: 3.0
+    pub tool_attack_distance: f64, // Default: 1.5
+    pub respawn_time: u32, // Default: 10
+    pub has_belt_immunity: bool, // Default: false
+    pub character_corpse: Option<String>,
+    pub footstep_particle_triggers: Option<FootstepTriggerEffectList>,
+    pub synced_footstep_particle_triggers: Option<FootstepTriggerEffectList>,
+    pub footprint_particles: Option<Vec<FootprintParticle>>,
+    pub left_footprint_offset: Option<Factorio2DVector>,
+    pub right_footprint_offset: Option<Factorio2DVector>,
+    pub right_footprint_frames: Option<Factorio2DVector>,
+    pub left_footprint_frames: Option<Factorio2DVector>,
+    pub tool_attack_result: Option<Trigger>,
 }
 
 /// <https://wiki.factorio.com/Prototype/Combinator>
@@ -1322,18 +1329,19 @@ pub struct ArithmeticCombinator {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     combinator_base: CombinatorBase,
-    plus_symbol_sprites: Sprite4Way,
-    minus_symbol_sprites: Sprite4Way,
-    multiply_symbol_sprites: Sprite4Way,
-    divide_symbol_sprites: Sprite4Way,
-    modulo_symbol_sprites: Sprite4Way,
-    power_symbol_sprites: Sprite4Way,
-    left_shift_symbol_sprites: Sprite4Way,
-    right_shift_symbol_sprites: Sprite4Way,
-    and_symbol_sprites: Sprite4Way,
-    or_symbol_sprites: Sprite4Way,
-    xor_symbol_sprites: Sprite4Way,
+    pub plus_symbol_sprites: Sprite4Way,
+    pub minus_symbol_sprites: Sprite4Way,
+    pub multiply_symbol_sprites: Sprite4Way,
+    pub divide_symbol_sprites: Sprite4Way,
+    pub modulo_symbol_sprites: Sprite4Way,
+    pub power_symbol_sprites: Sprite4Way,
+    pub left_shift_symbol_sprites: Sprite4Way,
+    pub right_shift_symbol_sprites: Sprite4Way,
+    pub and_symbol_sprites: Sprite4Way,
+    pub or_symbol_sprites: Sprite4Way,
+    pub xor_symbol_sprites: Sprite4Way,
 }
 
 /// <https://wiki.factorio.com/Prototype/DeciderCombinator>
@@ -1344,105 +1352,110 @@ pub struct DeciderCombinator {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     combinator_base: CombinatorBase,
-    equal_symbol_sprites: Sprite4Way,
-    greater_symbol_sprites: Sprite4Way,
-    less_symbol_sprites: Sprite4Way,
-    not_equal_symbol_sprites: Sprite4Way,
-    greater_or_equal_symbol_sprites: Sprite4Way,
-    less_or_equal_symbol_sprites: Sprite4Way,
+    pub equal_symbol_sprites: Sprite4Way,
+    pub greater_symbol_sprites: Sprite4Way,
+    pub less_symbol_sprites: Sprite4Way,
+    pub not_equal_symbol_sprites: Sprite4Way,
+    pub greater_or_equal_symbol_sprites: Sprite4Way,
+    pub less_or_equal_symbol_sprites: Sprite4Way,
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstantCombinator>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(constant_combinator)]
 pub struct ConstantCombinator {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    item_slot_count: u32,
-    sprites: Sprite4Way,
-    activity_led_sprites: Sprite4Way,
-    activity_led_light_offsets: [Factorio2DVector; 4],
-    circuit_wire_connection_points: [WireConnectionPoint; 4],
-    activity_led_light: Option<LightDefinition>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub item_slot_count: u32,
+    pub sprites: Sprite4Way,
+    pub activity_led_sprites: Sprite4Way,
+    pub activity_led_light_offsets: [Factorio2DVector; 4],
+    pub circuit_wire_connection_points: [WireConnectionPoint; 4],
+    pub activity_led_light: Option<LightDefinition>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Prototype/Container>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(container)]
 pub struct Container {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    inventory_size: u16,
-    picture: Sprite,
-    enable_inventory_bar: bool, // Default: true
-    scale_info_icons: bool, // Default: false
-    circuit_wire_connection_point: Option<WireConnectionPoint>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_connector_sprites: Option<CircuitConnectorSprites>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub inventory_size: u16,
+    pub picture: Sprite,
+    pub enable_inventory_bar: bool, // Default: true
+    pub scale_info_icons: bool, // Default: false
+    pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_connector_sprites: Option<CircuitConnectorSprites>
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticContainer>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(logistic_container)]
 pub struct LogisticContainer {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    inventory_size: u16,
-    picture: Option<Sprite>,
-    logistic_mode: LogisticMode,
-    enable_inventory_bar: bool, // Default: true
-    scale_info_icons: bool, // Default: false
-    circuit_wire_connection_point: Option<WireConnectionPoint>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_connector_sprites: Option<CircuitConnectorSprites>,
-    max_logistic_slots: Option<u16>, // requester-type must have > 0 and <= 1000 // Storage type must have <= 1
-    render_not_in_network_icon: bool, // Default: true
-    opened_duration: u8, // Default: 0
-    animation: Option<Animation>,
-    landing_location_offset: Option<Factorio2DVector>,
-    animation_sound: Option<Sound>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub inventory_size: u16,
+    pub picture: Option<Sprite>,
+    pub logistic_mode: LogisticMode,
+    pub enable_inventory_bar: bool, // Default: true
+    pub scale_info_icons: bool, // Default: false
+    pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    pub max_logistic_slots: Option<u16>, // requester-type must have > 0 and <= 1000 // Storage type must have <= 1
+    pub render_not_in_network_icon: bool, // Default: true
+    pub opened_duration: u8, // Default: 0
+    pub animation: Option<Animation>,
+    pub landing_location_offset: Option<Factorio2DVector>,
+    pub animation_sound: Option<Sound>
 }
 
 /// <https://wiki.factorio.com/Prototype/InfinityContainer>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(infinity_container)]
 pub struct InfinityContainer {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    inventory_size: u16, // Can't be 0
-    picture: Option<Sprite>,
-    logistic_mode: Option<LogisticMode>,
-    erase_contents_when_mined: bool,
-    enable_inventory_bar: bool, // Default: true
-    scale_info_icons: bool, // Default: false
-    circuit_wire_connection_point: Option<WireConnectionPoint>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_connector_sprites: Option<CircuitConnectorSprites>,
-    max_logistic_slots: Option<u16>, // requester-type must have > 0 and <= 1000 // Storage type must have <= 1
-    render_not_in_network_icon: bool, // Default: false
-    opened_duration: u8, // Default: 0
-    animation: Option<Animation>,
-    landing_location_offset: Option<Factorio2DVector>,
-    animation_sound: Option<Sound>,
-    gui_mode: GuiMode // Default: "none"
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub inventory_size: u16, // Can't be 0
+    pub picture: Option<Sprite>,
+    pub logistic_mode: Option<LogisticMode>,
+    pub erase_contents_when_mined: bool,
+    pub enable_inventory_bar: bool, // Default: true
+    pub scale_info_icons: bool, // Default: false
+    pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    pub max_logistic_slots: Option<u16>, // requester-type must have > 0 and <= 1000 // Storage type must have <= 1
+    pub render_not_in_network_icon: bool, // Default: false
+    pub opened_duration: u8, // Default: 0
+    pub animation: Option<Animation>,
+    pub landing_location_offset: Option<Factorio2DVector>,
+    pub animation_sound: Option<Sound>,
+    pub gui_mode: GuiMode // Default: "none"
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine>
@@ -1512,10 +1525,11 @@ pub struct AssemblingMachine {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     crafting_machine_base: CraftingMachineBase,
-    fixed_recipe: String, // Default: "" // Name of Recipe
-    gui_title_key: String, // Default: ""
-    ingredient_count: u8, // Default: 255
+    pub fixed_recipe: String, // Default: "" // Name of Recipe
+    pub gui_title_key: String, // Default: ""
+    pub ingredient_count: u8, // Default: 255
 }
 
 /// <https://wiki.factorio.com/Prototype/RocketSilo>
@@ -1526,54 +1540,55 @@ pub struct RocketSilo {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     crafting_machine_base: CraftingMachineBase,
-    fixed_recipe: String, // Default: "" // Name of Recipe
-    gui_title_key: String, // Default: ""
-    ingredient_count: u8, // Default: 255
-    active_energy_usage: Energy,
-    idle_energy_usage: Energy,
-    lamp_energy_usage: Energy,
-    rocket_entity: String, // Name of RocketSiloRocket
-    satellite_animation: Animation,
-    satellite_shadow_animation: Animation,
-    arm_01_back_animation: Animation,
-    arm_02_right_animation: Animation,
-    arm_03_front_animation: Animation,
-    shadow_sprite: Sprite,
-    hole_sprite: Sprite,
-    hole_light_sprite: Sprite,
-    rocket_shadow_overlay_sprite: Sprite,
-    rocket_glow_overlay_sprite: Sprite,
-    door_back_sprite: Sprite,
-    door_front_sprite: Sprite,
-    base_day_sprite: Sprite,
-    base_front_sprite: Sprite,
-    red_lights_back_sprites: Sprite,
-    red_lights_front_sprites: Sprite,
-    hole_clipping_box: BoundingBox,
-    door_back_open_offset: Factorio2DVector,
-    door_front_open_offset: Factorio2DVector,
-    silo_fade_out_start_distance: f64,
-    silo_fade_out_end_distance: f64,
-    times_to_blink: u8,
-    light_blinking_speed: f64,
-    door_opening_speed: f64,
-    rocket_parts_required: u32,
-    base_night_sprite: Option<Sprite>,
-    base_light: Option<LightDefinition>,
-    base_engine_light: Option<LightDefinition>,
-    alarm_trigger: Option<TriggerEffect>,
-    clamps_on_trigger: Option<TriggerEffect>,
-    clamps_off_trigger: Option<TriggerEffect>,
-    doors_trigger: Option<TriggerEffect>,
-    raise_rocket_trigger: Option<TriggerEffect>,
-    alarm_sound: Option<Sound>,
-    clamps_on_sound: Option<Sound>,
-    clamps_off_sound: Option<Sound>,
-    doors_sound: Option<Sound>,
-    raise_rocket_sound: Option<Sound>,
-    flying_sound: Option<Sound>,
-    rocket_result_inventory_size: u16 // Default: 0
+    pub fixed_recipe: String, // Default: "" // Name of Recipe
+    pub gui_title_key: String, // Default: ""
+    pub ingredient_count: u8, // Default: 255
+    pub active_energy_usage: Energy,
+    pub idle_energy_usage: Energy,
+    pub lamp_energy_usage: Energy,
+    pub rocket_entity: String, // Name of RocketSiloRocket
+    pub satellite_animation: Animation,
+    pub satellite_shadow_animation: Animation,
+    pub arm_01_back_animation: Animation,
+    pub arm_02_right_animation: Animation,
+    pub arm_03_front_animation: Animation,
+    pub shadow_sprite: Sprite,
+    pub hole_sprite: Sprite,
+    pub hole_light_sprite: Sprite,
+    pub rocket_shadow_overlay_sprite: Sprite,
+    pub rocket_glow_overlay_sprite: Sprite,
+    pub door_back_sprite: Sprite,
+    pub door_front_sprite: Sprite,
+    pub base_day_sprite: Sprite,
+    pub base_front_sprite: Sprite,
+    pub red_lights_back_sprites: Sprite,
+    pub red_lights_front_sprites: Sprite,
+    pub hole_clipping_box: BoundingBox,
+    pub door_back_open_offset: Factorio2DVector,
+    pub door_front_open_offset: Factorio2DVector,
+    pub silo_fade_out_start_distance: f64,
+    pub silo_fade_out_end_distance: f64,
+    pub times_to_blink: u8,
+    pub light_blinking_speed: f64,
+    pub door_opening_speed: f64,
+    pub rocket_parts_required: u32,
+    pub base_night_sprite: Option<Sprite>,
+    pub base_light: Option<LightDefinition>,
+    pub base_engine_light: Option<LightDefinition>,
+    pub alarm_trigger: Option<TriggerEffect>,
+    pub clamps_on_trigger: Option<TriggerEffect>,
+    pub clamps_off_trigger: Option<TriggerEffect>,
+    pub doors_trigger: Option<TriggerEffect>,
+    pub raise_rocket_trigger: Option<TriggerEffect>,
+    pub alarm_sound: Option<Sound>,
+    pub clamps_on_sound: Option<Sound>,
+    pub clamps_off_sound: Option<Sound>,
+    pub doors_sound: Option<Sound>,
+    pub raise_rocket_sound: Option<Sound>,
+    pub flying_sound: Option<Sound>,
+    pub rocket_result_inventory_size: u16 // Default: 0
 }
 
 /// <https://wiki.factorio.com/Prototype/Furnace>
@@ -1584,27 +1599,29 @@ pub struct Furnace {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     crafting_machine_base: CraftingMachineBase,
-    result_inventory_size: u16,
-    source_inventory_size: u16 // Not more than 1
+    pub result_inventory_size: u16,
+    pub source_inventory_size: u16 // Not more than 1
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(electric_energy_interface)]
 pub struct ElectricEnergyInterface {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_source: EnergySource, // Must be electric
-    energy_production: Energy, // Default: 0
-    energy_usage: Energy, // Default: 0
-    gui_mode: GuiMode, // Default: "none"
-    continuous_animation: bool, // Default: false
-    render_layer: RenderLayer, // Default: "object"
-    light: Option<LightDefinition>,
-    visuals: ElectricEnergyInterfaceVisuals
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource, // Must be electric
+    pub energy_production: Energy, // Default: 0
+    pub energy_usage: Energy, // Default: 0
+    pub gui_mode: GuiMode, // Default: "none"
+    pub continuous_animation: bool, // Default: false
+    pub render_layer: RenderLayer, // Default: "object"
+    pub light: Option<LightDefinition>,
+    pub visuals: ElectricEnergyInterfaceVisuals
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface#picture>
@@ -1617,63 +1634,54 @@ pub enum ElectricEnergyInterfaceVisuals {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricPole>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(electric_pole)]
 pub struct ElectricPole {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    pictures: RotatedSprite,
-    supply_area_distance: f64, // Max value: 64
-    connection_points: Vec<WireConnectionPoint>,
-    radius_visualisation_picture: Option<Sprite>,
-    active_picture: Option<Sprite>,
-    maximum_wire_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    light: Option<LightDefinition>,
-    track_coverage_during_build_by_moving: bool // Default: false
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub pictures: RotatedSprite,
+    pub supply_area_distance: f64, // Max value: 64
+    pub connection_points: Vec<WireConnectionPoint>,
+    pub radius_visualisation_picture: Option<Sprite>,
+    pub active_picture: Option<Sprite>,
+    pub maximum_wire_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub light: Option<LightDefinition>,
+    pub track_coverage_during_build_by_moving: bool // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/EnemySpawner>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(unit_spawner)]
 pub struct EnemySpawner {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    animations: Vec<AnimationVariation>,
-    max_count_of_owned_units: u32,
-    max_friends_around_to_spawn: u32,
-    spawning_cooldown: [f64; 2],
-    spawning_radius: f64,
-    spawning_spacing: f64,
-    max_richness_for_spawn_shift: f64,
-    max_spawn_shift: f64,
-    pollution_absorption_absolute: f64,
-    pollution_absorption_proportional: f64,
-    call_for_help_radius: f64,
-    result_units: Vec<UnitSpawnDefinition>,
-    dying_sound: Option<Sound>,
-    integration: Vec<SpriteVariation>,
-    min_darkness_to_spawn: f32, // Default: 0.0
-    max_darkness_to_spawn: f32, // Default: 1.0
-    random_animation_offset: bool, // Default: true
-    spawn_decorations_on_expansion: bool, // Default: false
-    spawn_decoration: Vec<CreateDecorativesTriggerEffectItem>
-}
-
-/// <https://wiki.factorio.com/Prototype/Fish>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
-#[data_table(fish)]
-pub struct Fish {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    pictures: Vec<SpriteVariation>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub animations: Vec<AnimationVariation>,
+    pub max_count_of_owned_units: u32,
+    pub max_friends_around_to_spawn: u32,
+    pub spawning_cooldown: [f64; 2],
+    pub spawning_radius: f64,
+    pub spawning_spacing: f64,
+    pub max_richness_for_spawn_shift: f64,
+    pub max_spawn_shift: f64,
+    pub pollution_absorption_absolute: f64,
+    pub pollution_absorption_proportional: f64,
+    pub call_for_help_radius: f64,
+    pub result_units: Vec<UnitSpawnDefinition>,
+    pub dying_sound: Option<Sound>,
+    pub integration: Vec<SpriteVariation>,
+    pub min_darkness_to_spawn: f32, // Default: 0.0
+    pub max_darkness_to_spawn: f32, // Default: 1.0
+    pub random_animation_offset: bool, // Default: true
+    pub spawn_decorations_on_expansion: bool, // Default: false
+    pub spawn_decoration: Vec<CreateDecorativesTriggerEffectItem>
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingRobot>
@@ -1709,18 +1717,19 @@ pub struct CombatRobot {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     flying_robot_base: FlyingRobotBase,
-    time_to_live: u32,
-    attack_parameters: AttackParameters,
-    idle: RotatedAnimation,
-    shadow_idle: RotatedAnimation,
-    in_motion: RotatedAnimation,
-    shadow_in_motion: RotatedAnimation,
-    range_from_player: f64, // Default: 0
-    friction: f64, // Default: 0
-    destroy_action: Option<Trigger>,
-    follows_player: bool, // Default: false
-    light: Option<LightDefinition>
+    pub time_to_live: u32,
+    pub attack_parameters: AttackParameters,
+    pub idle: RotatedAnimation,
+    pub shadow_idle: RotatedAnimation,
+    pub in_motion: RotatedAnimation,
+    pub shadow_in_motion: RotatedAnimation,
+    pub range_from_player: f64, // Default: 0
+    pub friction: f64, // Default: 0
+    pub destroy_action: Option<Trigger>,
+    pub follows_player: bool, // Default: false
+    pub light: Option<LightDefinition>
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstructionRobot>
@@ -1732,24 +1741,25 @@ pub struct ConstructionRobot {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     flying_robot_base: FlyingRobotBase,
     // RobotWithLogisticInterface
-    max_payload_size: u32,
-    cargo_centered: Factorio2DVector,
-    idle: Option<RotatedAnimation>,
-    in_motion: Option<RotatedAnimation>,
-    shadow_idle: Option<RotatedAnimation>,
-    shadow_in_motion: Option<RotatedAnimation>,
-    destroy_action: Option<Trigger>,
-    draw_cargo: bool, // Default: true
+    pub max_payload_size: u32,
+    pub cargo_centered: Factorio2DVector,
+    pub idle: Option<RotatedAnimation>,
+    pub in_motion: Option<RotatedAnimation>,
+    pub shadow_idle: Option<RotatedAnimation>,
+    pub shadow_in_motion: Option<RotatedAnimation>,
+    pub destroy_action: Option<Trigger>,
+    pub draw_cargo: bool, // Default: true
     // ConstructionRobot
-    construction_vector: Factorio2DVector,
-    working: Option<RotatedAnimation>,
-    shadow_working: Option<RotatedAnimation>,
-    smoke: Option<Animation>,
-    sparks: Option<Vec<AnimationVariation>>,
-    repairing_sound: Option<Sound>,
-    working_light: Option<LightDefinition>
+    pub construction_vector: Factorio2DVector,
+    pub working: Option<RotatedAnimation>,
+    pub shadow_working: Option<RotatedAnimation>,
+    pub smoke: Option<Animation>,
+    pub sparks: Option<Vec<AnimationVariation>>,
+    pub repairing_sound: Option<Sound>,
+    pub working_light: Option<LightDefinition>
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticRobot>
@@ -1761,463 +1771,486 @@ pub struct LogisticRobot {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     flying_robot_base: FlyingRobotBase,
     // RobotWithLogisticInterface
-    max_payload_size: u32,
-    cargo_centered: Factorio2DVector,
-    idle: Option<RotatedAnimation>,
-    in_motion: Option<RotatedAnimation>,
-    shadow_idle: Option<RotatedAnimation>,
-    shadow_in_motion: Option<RotatedAnimation>,
-    destroy_action: Option<Trigger>,
-    draw_cargo: bool, // Default: true
+    pub max_payload_size: u32,
+    pub cargo_centered: Factorio2DVector,
+    pub idle: Option<RotatedAnimation>,
+    pub in_motion: Option<RotatedAnimation>,
+    pub shadow_idle: Option<RotatedAnimation>,
+    pub shadow_in_motion: Option<RotatedAnimation>,
+    pub destroy_action: Option<Trigger>,
+    pub draw_cargo: bool, // Default: true
     // LogisticRobot
-    idle_with_cargo: Option<RotatedAnimation>,
-    in_motion_with_cargo: Option<RotatedAnimation>,
-    shadow_idle_with_cargo: Option<RotatedAnimation>,
-    shadow_in_motion_with_cargo: Option<RotatedAnimation>
+    pub idle_with_cargo: Option<RotatedAnimation>,
+    pub in_motion_with_cargo: Option<RotatedAnimation>,
+    pub shadow_idle_with_cargo: Option<RotatedAnimation>,
+    pub shadow_in_motion_with_cargo: Option<RotatedAnimation>
 }
 
 /// <https://wiki.factorio.com/Prototype/Gate>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(gate)]
 pub struct Gate {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    vertical_animation: Animation,
-    horizontal_animation: Animation,
-    vertical_rail_animation_left: Animation,
-    vertical_rail_animation_right: Animation,
-    horizontal_rail_animation_left: Animation,
-    horizontal_rail_animation_right: Animation,
-    vertical_rail_base: Animation,
-    horizontal_rail_base: Animation,
-    wall_patch: Animation,
-    opening_speed: f32,
-    activation_distance: f64,
-    timeout_to_close: u32,
-    open_sound: Sound,
-    close_sound: Sound,
-    fadeout_interval: u32, // Default: 0
-    opened_collision_mask: CollisionMask // Default: ["object-layer", "item-layer", "floor-layer", "water-tile"]
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub vertical_animation: Animation,
+    pub horizontal_animation: Animation,
+    pub vertical_rail_animation_left: Animation,
+    pub vertical_rail_animation_right: Animation,
+    pub horizontal_rail_animation_left: Animation,
+    pub horizontal_rail_animation_right: Animation,
+    pub vertical_rail_base: Animation,
+    pub horizontal_rail_base: Animation,
+    pub wall_patch: Animation,
+    pub opening_speed: f32,
+    pub activation_distance: f64,
+    pub timeout_to_close: u32,
+    pub open_sound: Sound,
+    pub close_sound: Sound,
+    pub fadeout_interval: u32, // Default: 0
+    pub opened_collision_mask: CollisionMask // Default: ["object-layer", "item-layer", "floor-layer", "water-tile"]
 }
 
 /// <https://wiki.factorio.com/Prototype/Generator>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(generator)]
 pub struct Generator {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_source: EnergySource, // Must be electric
-    fluid_box: FluidBox,
-    horizontal_animation: Animation,
-    vertical_animation: Animation,
-    effectivity: f64,
-    fluid_usage_per_tick: f64,
-    maximum_temperature: f64,
-    smoke: Option<Vec<SmokeSource>>, // 1 or more, if specified
-    burns_fluid: bool, // Default: false
-    scale_fluid_usage: bool, // Default: false
-    min_perceived_performance: f64, // Default: 0.25
-    performance_to_sound_speedup: f64, // Default: 0.5
-    max_power_output: Option<Energy>,
-    destroy_non_fuel_fluid: bool, // Default: true
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource, // Must be electric
+    pub fluid_box: FluidBox,
+    pub horizontal_animation: Animation,
+    pub vertical_animation: Animation,
+    pub effectivity: f64,
+    pub fluid_usage_per_tick: f64,
+    pub maximum_temperature: f64,
+    pub smoke: Option<Vec<SmokeSource>>, // 1 or more, if specified
+    pub burns_fluid: bool, // Default: false
+    pub scale_fluid_usage: bool, // Default: false
+    pub min_perceived_performance: f64, // Default: 0.25
+    pub performance_to_sound_speedup: f64, // Default: 0.5
+    pub max_power_output: Option<Energy>,
+    pub destroy_non_fuel_fluid: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Prototype/HeatInterface>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(heat_interface)]
 pub struct HeatInterface {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    heat_buffer: HeatBuffer,
-    picture: Option<Sprite>,
-    guid_mode: GuiMode, // Default: "all"
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub heat_buffer: HeatBuffer,
+    pub picture: Option<Sprite>,
+    pub guid_mode: GuiMode, // Default: "all"
 }
 
 /// <https://wiki.factorio.com/Prototype/HeatPipe>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(heat_pipe)]
 pub struct HeatPipe {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    connection_sprites: ConnectableEntityGraphics,
-    heat_glow_sprites: ConnectableEntityGraphics,
-    heat_buffer: HeatBuffer
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub connection_sprites: ConnectableEntityGraphics,
+    pub heat_glow_sprites: ConnectableEntityGraphics,
+    pub heat_buffer: HeatBuffer
 }
 
 /// <https://wiki.factorio.com/Prototype/Inserter>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(inserter)]
 pub struct Inserter {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    extension_speed: f64,
-    rotation_speed: f64,
-    insert_position: Factorio2DVector,
-    pickup_position: Factorio2DVector,
-    platform_picture: Sprite4Way,
-    hand_base_picture: Sprite,
-    hand_open_picture: Sprite,
-    hand_closed_picture: Sprite,
-    energy_source: EnergySource, // Emissions are ignored
-    energy_per_movement: Energy, // Default: 0
-    energy_per_rotation: Energy, // Default: 0
-    stack: bool, // Default: false
-    allow_custom_vectors: bool, // Default: false
-    allow_burner_leech: bool, // Default: false
-    draw_held_item: bool, // Default: true
-    use_easter_egg: bool, // Default: true
-    filter_count: u8, // Default: 0
-    hand_base_shadow: Option<Sprite>,
-    hand_open_shadow: Option<Sprite>,
-    hand_closed_shadow: Option<Sprite>,
-    hand_size: f64, // Default: 0.75
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    default_stack_control_input_signal: Option<SignalIDConnector>,
-    draw_inserter_arrow: bool, // Default: true
-    chases_belt_items: bool, // Default: true
-    stack_size_bonus: u32, // Default: 0
-    circuit_wire_connection_points: Option<Vec<WireConnectionPoint>>,
-    circuit_connector_sprites: Option<Vec<CircuitConnectorSprites>>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub extension_speed: f64,
+    pub rotation_speed: f64,
+    pub insert_position: Factorio2DVector,
+    pub pickup_position: Factorio2DVector,
+    pub platform_picture: Sprite4Way,
+    pub hand_base_picture: Sprite,
+    pub hand_open_picture: Sprite,
+    pub hand_closed_picture: Sprite,
+    pub energy_source: EnergySource, // Emissions are ignored
+    pub energy_per_movement: Energy, // Default: 0
+    pub energy_per_rotation: Energy, // Default: 0
+    pub stack: bool, // Default: false
+    pub allow_custom_vectors: bool, // Default: false
+    pub allow_burner_leech: bool, // Default: false
+    pub draw_held_item: bool, // Default: true
+    pub use_easter_egg: bool, // Default: true
+    pub filter_count: u8, // Default: 0
+    pub hand_base_shadow: Option<Sprite>,
+    pub hand_open_shadow: Option<Sprite>,
+    pub hand_closed_shadow: Option<Sprite>,
+    pub hand_size: f64, // Default: 0.75
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub default_stack_control_input_signal: Option<SignalIDConnector>,
+    pub draw_inserter_arrow: bool, // Default: true
+    pub chases_belt_items: bool, // Default: true
+    pub stack_size_bonus: u32, // Default: 0
+    pub circuit_wire_connection_points: Option<Vec<WireConnectionPoint>>,
+    pub circuit_connector_sprites: Option<Vec<CircuitConnectorSprites>>
 }
 
 /// <https://wiki.factorio.com/Prototype/Lab>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(lab)]
 pub struct Lab {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_usage: Energy,
-    energy_source: EnergySource,
-    on_animation: Animation,
-    off_animation: Animation,
-    inputs: Vec<String>, // (Names) Name of science pack items
-    researching_speed: f64, // Default: 1
-    allowed_effects: EffectTypeLimitation, // Default: all allowed
-    light: Option<LightDefinition>,
-    base_productivity: f32, // Default: 0
-    entity_info_icon_shift: Factorio2DVector, // Default: (0, 0)
-    module_specification: Option<ModuleSpecification>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_usage: Energy,
+    pub energy_source: EnergySource,
+    pub on_animation: Animation,
+    pub off_animation: Animation,
+    pub inputs: Vec<String>, // (Names) Name of science pack items
+    pub researching_speed: f64, // Default: 1
+    pub allowed_effects: EffectTypeLimitation, // Default: all allowed
+    pub light: Option<LightDefinition>,
+    pub base_productivity: f32, // Default: 0
+    pub entity_info_icon_shift: Factorio2DVector, // Default: (0, 0)
+    pub module_specification: Option<ModuleSpecification>
 }
 
 /// <https://wiki.factorio.com/Prototype/Lamp>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(lamp)]
 pub struct Lamp {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    picture_on: Sprite,
-    picture_off: Sprite,
-    energy_usage_per_tick: Energy,
-    energy_source: EnergySource, // Must be electric or void, emissions are ignored
-    light: Option<LightDefinition>,
-    light_when_colored: Option<LightDefinition>,
-    circuit_wire_connection_point: Option<WireConnectionPoint>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_connector_sprites: Option<CircuitConnectorSprites>,
-    glow_size: f32, // Default: 0
-    glow_color_intensity: f32, // Default: 0
-    darkness_for_all_lamps_on: f32, // Default: 0.5
-    darkness_for_all_lamps_off: f32, // Default: 0.3
-    always_on: bool, // Default: false
-    signal_to_color_mapping: Option<Vec<SignalColorMapping>>,
-    glow_render_mode: GlowRenderMode // Default: "additive"
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub picture_on: Sprite,
+    pub picture_off: Sprite,
+    pub energy_usage_per_tick: Energy,
+    pub energy_source: EnergySource, // Must be electric or void, emissions are ignored
+    pub light: Option<LightDefinition>,
+    pub light_when_colored: Option<LightDefinition>,
+    pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    pub glow_size: f32, // Default: 0
+    pub glow_color_intensity: f32, // Default: 0
+    pub darkness_for_all_lamps_on: f32, // Default: 0.5
+    pub darkness_for_all_lamps_off: f32, // Default: 0.3
+    pub always_on: bool, // Default: false
+    pub signal_to_color_mapping: Option<Vec<SignalColorMapping>>,
+    pub glow_render_mode: GlowRenderMode // Default: "additive"
 }
 
 /// <https://wiki.factorio.com/Prototype/LandMine>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(land_mine)]
 pub struct LandMine {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    picture_safe: Sprite,
-    picture_set: Sprite,
-    trigger_radius: f64,
-    picture_set_enemy: Option<Sprite>,
-    timeout: u32, // Default: 120
-    action: Option<Trigger>,
-    ammo_category: Option<String>, // Name of AmmoCategory
-    force_die_on_attack: bool, // Default: true
-    trigger_force: ForceCondition, // Default: "enemy"
-    trigger_collision_mask: CollisionMask, // Default: ["item-layer", "object-layer", "player-layer", "water-tile"]
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub picture_safe: Sprite,
+    pub picture_set: Sprite,
+    pub trigger_radius: f64,
+    pub picture_set_enemy: Option<Sprite>,
+    pub timeout: u32, // Default: 120
+    pub action: Option<Trigger>,
+    pub ammo_category: Option<String>, // Name of AmmoCategory
+    pub force_die_on_attack: bool, // Default: true
+    pub trigger_force: ForceCondition, // Default: "enemy"
+    pub trigger_collision_mask: CollisionMask, // Default: ["item-layer", "object-layer", "player-layer", "water-tile"]
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedContainer>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(linked_container)]
 pub struct LinkedContainer {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    inventory_size: u16, // Must be >0
-    picture: Option<Sprite>,
-    gui_mode: GuiMode, // Default: "all"
-    scale_info_icons: bool // Default: false
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub inventory_size: u16, // Must be >0
+    pub picture: Option<Sprite>,
+    pub gui_mode: GuiMode, // Default: "all"
+    pub scale_info_icons: bool // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/Market>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(market)]
 pub struct Market {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    picture: Sprite,
-    allow_access_to_all_forces: bool, // Default: true
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub picture: Sprite,
+    pub allow_access_to_all_forces: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Prototype/MiningDrill>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(mining_drill)]
 pub struct MiningDrill {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    vector_to_place_result: Factorio2DVector,
-    resource_searching_radius: f64,
-    energy_usage: Energy,
-    mining_speed: f64,
-    energy_source: EnergySource,
-    resource_categories: Vec<String>, // (Names) Name of resourceCategory
-    output_fluid_box: Option<FluidBox>,
-    input_fluid_box: Option<FluidBox>,
-    animations: Option<Animation4Way>, // Loaded only if `graphics_set` is not present
-    graphics_set: Option<MiningDrillGraphicsSet>,
-    wet_mining_graphics_set: Option<MiningDrillGraphicsSet>,
-    base_picture: Option<Sprite4Way>,
-    allowed_effects: EffectTypeLimitation, // Default: all allowed
-    radius_visualisation_picture: Option<Sprite>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    base_render_layer: RenderLayer, // Default: "lower-object"
-    base_productivity: f32, // Default: 0
-    monitor_visualization_tint: Option<Color>,
-    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
-    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory iff `circuit_wire_max_distance` > 0
-    module_specification: Option<ModuleSpecification>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub vector_to_place_result: Factorio2DVector,
+    pub resource_searching_radius: f64,
+    pub energy_usage: Energy,
+    pub mining_speed: f64,
+    pub energy_source: EnergySource,
+    pub resource_categories: Vec<String>, // (Names) Name of resourceCategory
+    pub output_fluid_box: Option<FluidBox>,
+    pub input_fluid_box: Option<FluidBox>,
+    pub animations: Option<Animation4Way>, // Loaded only if `graphics_set` is not present
+    pub graphics_set: Option<MiningDrillGraphicsSet>,
+    pub wet_mining_graphics_set: Option<MiningDrillGraphicsSet>,
+    pub base_picture: Option<Sprite4Way>,
+    pub allowed_effects: EffectTypeLimitation, // Default: all allowed
+    pub radius_visualisation_picture: Option<Sprite>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub base_render_layer: RenderLayer, // Default: "lower-object"
+    pub base_productivity: f32, // Default: 0
+    pub monitor_visualization_tint: Option<Color>,
+    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    pub circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory iff `circuit_wire_max_distance` > 0
+    pub module_specification: Option<ModuleSpecification>
 }
 
 /// <https://wiki.factorio.com/Prototype/OffshorePump>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(offshore_pump)]
 pub struct OffshorePump {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    fluid_box: FluidBox,
-    pumping_speed: f32, // Must be > 0
-    fluid: String, // Name of Fluid
-    graphics_set: Option<OffshorePumpGraphicsSet>, // Mandatory if `picture` is not defined
-    picture: Option<Sprite4Way>, // Deprecated
-    min_perceived_performance: f32, // Default: 0.25
-    fluid_box_tile_collision_test: CollisionMask, // Default: "ground-tile"
-    adjacent_tile_collision_test: CollisionMask, // Defauylt: "water-tile"
-    adjacent_tile_collision_mask: CollisionMask, // Default: none
-    center_collision_mask: CollisionMask, // Default: none
-    adjacent_tile_collision_box: BoundingBox, // Default: ((-0.05, -0.8), (0.05, -0.7))
-    placeable_position_visualization: Option<Sprite>,
-    remove_on_tile_collision: bool, // Default: false
-    always_draw_fluid: bool, // Default: true
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
-    circuit_connector_sprites: Vec<CircuitConnectorSprites> // Mandatory if `circuit_wire_max_distance` > 0
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub fluid_box: FluidBox,
+    pub pumping_speed: f32, // Must be > 0
+    pub fluid: String, // Name of Fluid
+    pub graphics_set: Option<OffshorePumpGraphicsSet>, // Mandatory if `picture` is not defined
+    pub picture: Option<Sprite4Way>, // Deprecated
+    pub min_perceived_performance: f32, // Default: 0.25
+    pub fluid_box_tile_collision_test: CollisionMask, // Default: "ground-tile"
+    pub adjacent_tile_collision_test: CollisionMask, // Defauylt: "water-tile"
+    pub adjacent_tile_collision_mask: CollisionMask, // Default: none
+    pub center_collision_mask: CollisionMask, // Default: none
+    pub adjacent_tile_collision_box: BoundingBox, // Default: ((-0.05, -0.8), (0.05, -0.7))
+    pub placeable_position_visualization: Option<Sprite>,
+    pub remove_on_tile_collision: bool, // Default: false
+    pub always_draw_fluid: bool, // Default: true
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    pub circuit_connector_sprites: Vec<CircuitConnectorSprites> // Mandatory if `circuit_wire_max_distance` > 0
 }
 
 /// <https://wiki.factorio.com/Prototype/Pipe>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(pipe)]
 pub struct Pipe {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    fluid_box: FluidBox,
-    horizontal_window_bounding_box: BoundingBox,
-    vertical_window_bounding_box: BoundingBox,
-    pictures: PipePictures
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub fluid_box: FluidBox,
+    pub horizontal_window_bounding_box: BoundingBox,
+    pub vertical_window_bounding_box: BoundingBox,
+    pub pictures: PipePictures
 }
 
 /// <https://wiki.factorio.com/Prototype/InfinityPipe>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(infinity_pipe)]
 pub struct InfinityPipe {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    fluid_box: FluidBox,
-    horizontal_window_bounding_box: BoundingBox,
-    vertical_window_bounding_box: BoundingBox,
-    pictures: PipePictures,
-    gui_mode: GuiMode
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub fluid_box: FluidBox,
+    pub horizontal_window_bounding_box: BoundingBox,
+    pub vertical_window_bounding_box: BoundingBox,
+    pub pictures: PipePictures,
+    pub gui_mode: GuiMode
 }
 
 /// <https://wiki.factorio.com/Prototype/PipeToGround>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(pipe_to_ground)]
 pub struct PipeToGround {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    fluid_box: FluidBox,
-    pictures: PipeToGroundPictures,
-    draw_fluid_icon_override: bool // Default: false
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub fluid_box: FluidBox,
+    pub pictures: PipeToGroundPictures,
+    pub draw_fluid_icon_override: bool // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/PlayerPort>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(player_port)]
 pub struct PlayerPort {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    animation: Animation
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub animation: Animation
 }
 
 /// <https://wiki.factorio.com/Prototype/PowerSwitch>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(power_switch)]
 pub struct PowerSwitch {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    power_on_animation: Animation,
-    overlay_start: Animation,
-    overlay_loop: Animation,
-    led_on: Sprite,
-    led_off: Sprite,
-    overlay_start_delay: u8,
-    circuit_wire_connection_point: WireConnectionPoint,
-    left_wire_connection_point: WireConnectionPoint,
-    right_wire_connection_point: WireConnectionPoint,
-    wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub power_on_animation: Animation,
+    pub overlay_start: Animation,
+    pub overlay_loop: Animation,
+    pub led_on: Sprite,
+    pub led_off: Sprite,
+    pub overlay_start_delay: u8,
+    pub circuit_wire_connection_point: WireConnectionPoint,
+    pub left_wire_connection_point: WireConnectionPoint,
+    pub right_wire_connection_point: WireConnectionPoint,
+    pub wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(programmable_speaker)]
 pub struct ProgrammableSpeaker {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_source: EnergySource, // Must be electric
-    energy_usage_per_tick: Energy,
-    sprite: Sprite,
-    maximum_polyphony: u32,
-    instruments: Vec<Instrument>,
-    audible_distance_modifier: f32, // Default: 1
-    circuit_wire_connection_point: Option<WireConnectionPoint>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_connector_sprites: Option<CircuitConnectorSprites>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource, // Must be electric
+    pub energy_usage_per_tick: Energy,
+    pub sprite: Sprite,
+    pub maximum_polyphony: u32,
+    pub instruments: Vec<Instrument>,
+    pub audible_distance_modifier: f32, // Default: 1
+    pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_connector_sprites: Option<CircuitConnectorSprites>
 }
 
 /// <https://wiki.factorio.com/Prototype/Pump>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(pump)]
 pub struct Pump {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    fluid_box: FluidBox,
-    energy_source: EnergySource,
-    energy_usage: Energy,
-    pumping_speed: f64,
-    animations: Animation4Way,
-    fluid_wagon_connector_speed: f64, // Default: 1 / 64.0
-    fluid_wagon_connector_alignment_tolerance: f64, // Default: 2 / 32.0
-    fluid_wagon_connector_frame_count: u8, // Default: 1
-    fluid_animation: Option<Animation4Way>,
-    glass_pictures: Option<Sprite4Way>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
-    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
-    fluid_wagon_connector_graphics: PumpConnectorGraphicsFluidWagon
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub fluid_box: FluidBox,
+    pub energy_source: EnergySource,
+    pub energy_usage: Energy,
+    pub pumping_speed: f64,
+    pub animations: Animation4Way,
+    pub fluid_wagon_connector_speed: f64, // Default: 1 / 64.0
+    pub fluid_wagon_connector_alignment_tolerance: f64, // Default: 2 / 32.0
+    pub fluid_wagon_connector_frame_count: u8, // Default: 1
+    pub fluid_animation: Option<Animation4Way>,
+    pub glass_pictures: Option<Sprite4Way>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    pub circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
+    pub fluid_wagon_connector_graphics: PumpConnectorGraphicsFluidWagon
 }
 
 /// <https://wiki.factorio.com/Prototype/Radar>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(radar)]
 pub struct Radar {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_usage: Energy,
-    energy_per_sector: Energy,
-    energy_per_nearby_scan: Energy,
-    energy_source: EnergySource,
-    pictures: RotatedSprite,
-    max_distance_of_sector_revealed: u32,
-    max_distance_of_nearby_sector_revealed: u32,
-    radius_minimap_visualisation_color: Option<Color>,
-    rotation_speed: f64, // Default: 0.01
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_usage: Energy,
+    pub energy_per_sector: Energy,
+    pub energy_per_nearby_scan: Energy,
+    pub energy_source: EnergySource,
+    pub pictures: RotatedSprite,
+    pub max_distance_of_sector_revealed: u32,
+    pub max_distance_of_nearby_sector_revealed: u32,
+    pub radius_minimap_visualisation_color: Option<Color>,
+    pub rotation_speed: f64, // Default: 0.01
 }
 
 /// <https://wiki.factorio.com/Prototype/CurvedRail>
 /// <https://wiki.factorio.com/Prototype/Rail>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(curved_rail)]
 pub struct CurvedRail {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    pictures: RailPictures,
-    walking_sound: Option<Sound>,
-    bending_type: BendingType // Must be "turn"
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub pictures: RailPictures,
+    pub walking_sound: Option<Sound>,
+    pub bending_type: BendingType // Must be "turn"
 }
 
 /// <https://wiki.factorio.com/Prototype/StraightRail>
 /// <https://wiki.factorio.com/Prototype/Rail>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(straight_rail)]
 pub struct StraightRail {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    pictures: RailPictures,
-    walking_sound: Option<Sound>,
-    bending_type: BendingType // Must be "straight"
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub pictures: RailPictures,
+    pub walking_sound: Option<Sound>,
+    pub bending_type: BendingType // Must be "straight"
 }
 
 /// `collision_box` is hardcoded to ((-0.2, -0.2), (0.2, 0.2))
@@ -2225,29 +2258,30 @@ pub struct StraightRail {
 /// Rail signals must collide with each other
 /// <https://wiki.factorio.com/Prototype/RailChainSignal>
 /// <https://wiki.factorio.com/Prototype/RailSignalBase>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(rail_chain_signal)]
 pub struct RailChainSignal {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    animation: RotatedAnimation,
-    rail_piece: Option<Animation>,
-    green_light: Option<LightDefinition>,
-    orange_light: Option<LightDefinition>,
-    red_light: Option<LightDefinition>,
-    default_red_output_signal: Option<SignalIDConnector>,
-    default_orange_output_signal: Option<SignalIDConnector>,
-    default_green_output_signal: Option<SignalIDConnector>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
-    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
-    selection_box_offsets: [Factorio2DVector; 8],
-    blue_light: Option<LightDefinition>,
-    default_blue_output_signal: Option<SignalIDConnector>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub animation: RotatedAnimation,
+    pub rail_piece: Option<Animation>,
+    pub green_light: Option<LightDefinition>,
+    pub orange_light: Option<LightDefinition>,
+    pub red_light: Option<LightDefinition>,
+    pub default_red_output_signal: Option<SignalIDConnector>,
+    pub default_orange_output_signal: Option<SignalIDConnector>,
+    pub default_green_output_signal: Option<SignalIDConnector>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    pub circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
+    pub selection_box_offsets: [Factorio2DVector; 8],
+    pub blue_light: Option<LightDefinition>,
+    pub default_blue_output_signal: Option<SignalIDConnector>
 }
 
 /// `collision_box` is hardcoded to ((-0.2, -0.2), (0.2, 0.2))
@@ -2255,236 +2289,208 @@ pub struct RailChainSignal {
 /// Rail signals must collide with each other
 /// <https://wiki.factorio.com/Prototype/RailSignal>
 /// <https://wiki.factorio.com/Prototype/RailSignalBase>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(rail_signal)]
 pub struct RailSignal {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    animation: RotatedAnimation,
-    rail_piece: Option<Animation>,
-    green_light: Option<LightDefinition>,
-    orange_light: Option<LightDefinition>,
-    red_light: Option<LightDefinition>,
-    default_red_output_signal: Option<SignalIDConnector>,
-    default_orange_output_signal: Option<SignalIDConnector>,
-    default_green_output_signal: Option<SignalIDConnector>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
-    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub animation: RotatedAnimation,
+    pub rail_piece: Option<Animation>,
+    pub green_light: Option<LightDefinition>,
+    pub orange_light: Option<LightDefinition>,
+    pub red_light: Option<LightDefinition>,
+    pub default_red_output_signal: Option<SignalIDConnector>,
+    pub default_orange_output_signal: Option<SignalIDConnector>,
+    pub default_green_output_signal: Option<SignalIDConnector>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    pub circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
 }
 
 /// <https://wiki.factorio.com/Prototype/Reactor>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(reactor)]
 pub struct Reactor {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    working_light_picture: Sprite,
-    heat_buffer: HeatBuffer,
-    energy_source: EnergySource,
-    consumption: Energy,
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub working_light_picture: Sprite,
+    pub heat_buffer: HeatBuffer,
+    pub energy_source: EnergySource,
+    pub consumption: Energy,
     // If defined, Number of variations must be >= count of connections defined in `heat_buffer`
-    connection_patches_connected: Option<SpriteVariations>,
-    connection_patches_disconnected: Option<SpriteVariations>,
-    heat_connection_patches_connected: Option<SpriteVariations>,
-    heat_connection_patches_disconnected: Option<SpriteVariations>,
-    lower_layer_picture: Option<Sprite>,
-    heat_lower_layer_picture: Option<Sprite>,
-    picture: Option<Sprite>,
-    light: Option<LightDefinition>,
-    meltdown_action: Option<Trigger>,
-    neighbour_bonus: f64, // Default: 1
-    scale_energy_usage: bool, // Default: false
-    use_fuel_glow_color: bool, // Default: false
-    default_fuel_glow_color: Color, // Default: (1, 1, 1, 1)
+    pub connection_patches_connected: Option<SpriteVariations>,
+    pub connection_patches_disconnected: Option<SpriteVariations>,
+    pub heat_connection_patches_connected: Option<SpriteVariations>,
+    pub heat_connection_patches_disconnected: Option<SpriteVariations>,
+    pub lower_layer_picture: Option<Sprite>,
+    pub heat_lower_layer_picture: Option<Sprite>,
+    pub picture: Option<Sprite>,
+    pub light: Option<LightDefinition>,
+    pub meltdown_action: Option<Trigger>,
+    pub neighbour_bonus: f64, // Default: 1
+    pub scale_energy_usage: bool, // Default: false
+    pub use_fuel_glow_color: bool, // Default: false
+    pub default_fuel_glow_color: Color, // Default: (1, 1, 1, 1)
 }
 
 /// <https://wiki.factorio.com/Prototype/Roboport>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(roboport)]
 pub struct Roboport {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    energy_source: EnergySource, // Must be electric or void
-    energy_usage: Energy,
-    recharge_minimum: Energy,
-    robot_slots_count: ItemStackIndex,
-    material_slots_count: ItemStackIndex,
-    base: Sprite,
-    base_patch: Sprite,
-    base_animation: Animation,
-    door_animation_up: Animation,
-    door_animation_down: Animation,
-    request_to_open_door_timeout: u32,
-    recharging_animation: Animation,
-    spawn_and_station_height: f32,
-    charge_approach_distance: f32,
-    logistics_radius: f32, // Can't be negative
-    construction_radius: f32, // Can'be negative
-    charging_energy: Energy,
-    open_door_trigger_effect: Option<TriggerEffect>,
-    close_door_trigger_effect: Option<TriggerEffect>,
-    default_available_logistic_output_signal: Option<SignalIDConnector>,
-    default_total_logistic_output_signal: Option<SignalIDConnector>,
-    default_available_construction_output_signal: Option<SignalIDConnector>,
-    default_total_construction_output_signal: Option<SignalIDConnector>,
-    circuit_wire_connection_point: Option<WireConnectionPoint>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_connector_sprites: Option<CircuitConnectorSprites>,
-    spawn_and_station_shadow_height_offset: f32, // Default: 0
-    draw_logistic_radius_visualization: bool, // Default: true
-    draw_construction_radius_visualization: bool, // Default: true
-    recharging_light: Option<LightDefinition>,
-    charging_station_count: u32, // Default: 0
-    charging_distance: f32, // Default: 0
-    charging_station_shift: Option<Factorio2DVector>,
-    charging_threshold_distance: f32, // Default: 1
-    robot_vertical_acceleration: f32, // Default: 0.01
-    stationing_offset: Option<Factorio2DVector>,
-    robot_limit: ItemCountType, // Default: u32::MAX
-    robots_shrink_when_entering_and_exiting: bool, // Default: false
-    charging_offsets: Option<Vec<Factorio2DVector>>,
-    logistics_connection_distance: Option<f32> // Must be >= `logistics_radius`
-}
-
-/// <https://wiki.factorio.com/Prototype/SimpleEntity>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
-#[data_table(simple_entity)]
-pub struct SimpleEntity {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    count_as_rock_for_filtered_deconstruction: bool, // Default: false
-    render_layer: RenderLayer, // Default: "object"
-    secondary_draw_order: i8, // Default: 0
-    random_animation_offset: bool, // Default: false
-    random_variation_on_create: bool, // Default: true
-    visuals: SimpleEntityVisuals
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource, // Must be electric or void
+    pub energy_usage: Energy,
+    pub recharge_minimum: Energy,
+    pub robot_slots_count: ItemStackIndex,
+    pub material_slots_count: ItemStackIndex,
+    pub base: Sprite,
+    pub base_patch: Sprite,
+    pub base_animation: Animation,
+    pub door_animation_up: Animation,
+    pub door_animation_down: Animation,
+    pub request_to_open_door_timeout: u32,
+    pub recharging_animation: Animation,
+    pub spawn_and_station_height: f32,
+    pub charge_approach_distance: f32,
+    pub logistics_radius: f32, // Can't be negative
+    pub construction_radius: f32, // Can'be negative
+    pub charging_energy: Energy,
+    pub open_door_trigger_effect: Option<TriggerEffect>,
+    pub close_door_trigger_effect: Option<TriggerEffect>,
+    pub default_available_logistic_output_signal: Option<SignalIDConnector>,
+    pub default_total_logistic_output_signal: Option<SignalIDConnector>,
+    pub default_available_construction_output_signal: Option<SignalIDConnector>,
+    pub default_total_construction_output_signal: Option<SignalIDConnector>,
+    pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    pub spawn_and_station_shadow_height_offset: f32, // Default: 0
+    pub draw_logistic_radius_visualization: bool, // Default: true
+    pub draw_construction_radius_visualization: bool, // Default: true
+    pub recharging_light: Option<LightDefinition>,
+    pub charging_station_count: u32, // Default: 0
+    pub charging_distance: f32, // Default: 0
+    pub charging_station_shift: Option<Factorio2DVector>,
+    pub charging_threshold_distance: f32, // Default: 1
+    pub robot_vertical_acceleration: f32, // Default: 0.01
+    pub stationing_offset: Option<Factorio2DVector>,
+    pub robot_limit: ItemCountType, // Default: u32::MAX
+    pub robots_shrink_when_entering_and_exiting: bool, // Default: false
+    pub charging_offsets: Option<Vec<Factorio2DVector>>,
+    pub logistics_connection_distance: Option<f32> // Must be >= `logistics_radius`
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntityWithOwner>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(simple_entity_with_owner)]
 pub struct SimpleEntityWithOwner {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    render_layer: RenderLayer, // default: "object"
-    secondary_draw_order: i8, // Default: 0
-    random_animation_offset: bool, // Default: false
-    random_variation_on_create: bool, // Default: true
-    visuals: SimpleEntityWithOwnerVisuals,
-    force_visibility: ForceCondition, // Default: "all"
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub render_layer: RenderLayer, // default: "object"
+    pub secondary_draw_order: i8, // Default: 0
+    pub random_animation_offset: bool, // Default: false
+    pub random_variation_on_create: bool, // Default: true
+    pub visuals: SimpleEntityWithOwnerVisuals, // Either `picture`, `pictures` or `animations`
+    pub force_visibility: ForceCondition, // Default: "all"
 }
 
-// TODO: EntityWithOwner
 /// <https://wiki.factorio.com/Prototype/SimpleEntityWithForce>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(simple_entity_with_force)]
 pub struct SimpleEntityWithForce {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    render_layer: RenderLayer, // Default: "object"
-    secondary_draw_order: i8, // Default: 0
-    random_animation_offset: bool, // Default: false
-    random_variation_on_create: bool, // Default: true
-    visuals: SimpleEntityWithOwnerVisuals
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub render_layer: RenderLayer, // default: "object"
+    pub secondary_draw_order: i8, // Default: 0
+    pub random_animation_offset: bool, // Default: false
+    pub random_variation_on_create: bool, // Default: true
+    pub visuals: SimpleEntityWithOwnerVisuals, // Either `picture`, `pictures` or `animations`
+    pub force_visibility: ForceCondition, // Default: "all"
 }
 
 /// <https://wiki.factorio.com/Prototype/SolarPanel>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(solar_panel)]
 pub struct SolarPanel {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-
-    energy_source: EnergySource, // Must be electric
-    picture: SpriteVariations,
-    production: Energy,
-    overlay: Option<SpriteVariations>
-}
-
-/// <https://wiki.factorio.com/Prototype/SpiderLeg>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
-#[data_table(spider_leg)]
-pub struct SpiderLeg {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    part_length: f64, // Must be > 0
-    initial_movement_speed: f64,
-    movement_acceleration: f64,
-    target_position_randomisation_distance: f64,
-    minimal_step_size: f64,
-    movement_based_position_selection_distance: f64,
-    graphics_set: SpiderLegGraphicsSet,
-    walking_sound_volume_modifier: f64, // Default: 1
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource, // Must be electric
+    pub picture: SpriteVariations,
+    pub production: Energy,
+    pub overlay: Option<SpriteVariations>
 }
 
 /// <https://wiki.factorio.com/Prototype/StorageTank>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(storage_tank)]
 pub struct StorageTank {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    fluid_box: FluidBox,
-    window_bounding_box: BoundingBox,
-    pictures: StorageTankPictures,
-    flow_length_in_ticks: u32, // Must be positive
-    two_direction_only: bool, // Default: false
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
-    circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
-    scale_info_icons: bool, // Default: true
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub fluid_box: FluidBox,
+    pub window_bounding_box: BoundingBox,
+    pub pictures: StorageTankPictures,
+    pub flow_length_in_ticks: u32, // Must be positive
+    pub two_direction_only: bool, // Default: false
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
+    pub circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory if `circuit_wire_max_distance` > 0
+    pub scale_info_icons: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Prototype/TrainStop>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(train_stop)]
 pub struct TrainStop {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-
-    animation_ticks_per_frame: u32,
-    rail_overlay_animations: Option<Animation4Way>,
-    animations: Option<Animation4Way>,
-    top_animations: Option<Animation4Way>,
-    default_train_stopped_signal: Option<SignalIDConnector>,
-    default_trains_count_signal: Option<SignalIDConnector>,
-    default_trains_limit_signal: Option<SignalIDConnector>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    color: Option<Color>,
-    chart_name: bool, // Default: true
-    light1: Option<TrainStopLight>,
-    light2: Option<TrainStopLight>,
-    drawing_boxes: Option<TrainStopDrawingBoxes>,
-    circuit_wire_connection_points: Vec<WireConnectionPoint>,
-    circuit_connector_sprites: Vec<CircuitConnectorSprites>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub animation_ticks_per_frame: u32,
+    pub rail_overlay_animations: Option<Animation4Way>,
+    pub animations: Option<Animation4Way>,
+    pub top_animations: Option<Animation4Way>,
+    pub default_train_stopped_signal: Option<SignalIDConnector>,
+    pub default_trains_count_signal: Option<SignalIDConnector>,
+    pub default_trains_limit_signal: Option<SignalIDConnector>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub color: Option<Color>,
+    pub chart_name: bool, // Default: true
+    pub light1: Option<TrainStopLight>,
+    pub light2: Option<TrainStopLight>,
+    pub drawing_boxes: Option<TrainStopDrawingBoxes>,
+    pub circuit_wire_connection_points: Vec<WireConnectionPoint>,
+    pub circuit_connector_sprites: Vec<CircuitConnectorSprites>
 }
 
 // TODO: Clean up graphics properties
@@ -2499,8 +2505,8 @@ pub struct TransportBeltConnectableBase {
 
 #[derive(Debug)]
 pub enum TransportBeltConnectableGraphics {
-    AnimationSet(BeltAnimationSet),
-    GraphicsSet(BeltGraphicsSet)
+    AnimationSet(Box<BeltAnimationSet>),
+    GraphicsSet(Box<BeltGraphicsSet>)
 }
 
 /// <https://wiki.factorio.com/Prototype/TransportBeltConnectable>
@@ -2518,12 +2524,13 @@ pub struct LinkedBelt {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
-    structure: BeltStructureWithSideLoading,
-    structure_render_layer: RenderLayer, // Default: "object"
-    allow_clone_connection: bool, // Default: true
-    allow_blueprint_connection: bool, // Default: true
-    allow_side_loading: bool, // Default: false
+    pub structure: BeltStructureWithSideLoading,
+    pub structure_render_layer: RenderLayer, // Default: "object"
+    pub allow_clone_connection: bool, // Default: true
+    pub allow_blueprint_connection: bool, // Default: true
+    pub allow_side_loading: bool, // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/Loader1x1>
@@ -2534,12 +2541,13 @@ pub struct Loader1x1 {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
-    structure: BeltStructure,
-    filter_count: u8,
-    structure_render_layer: RenderLayer, // Default: "object"
-    container_distance: f64, // Default: 1.5
-    belt_length: f64, // Default: 0.5
+    pub structure: BeltStructure,
+    pub filter_count: u8,
+    pub structure_render_layer: RenderLayer, // Default: "object"
+    pub container_distance: f64, // Default: 1.5
+    pub belt_length: f64, // Default: 0.5
 }
 
 /// <https://wiki.factorio.com/Prototype/Loader1x2>
@@ -2550,12 +2558,13 @@ pub struct Loader1x2 {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
-    structure: BeltStructure,
-    filter_count: u8,
-    structure_render_layer: RenderLayer, // Default: "object"
-    container_distance: f64, // Default: 1.5
-    belt_length: f64, // Default: 0.5
+    pub structure: BeltStructure,
+    pub filter_count: u8,
+    pub structure_render_layer: RenderLayer, // Default: "object"
+    pub container_distance: f64, // Default: 1.5
+    pub belt_length: f64, // Default: 0.5
 }
 
 /// <https://wiki.factorio.com/Prototype/Splitter>
@@ -2566,11 +2575,12 @@ pub struct Splitter {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
-    structure: Animation4Way,
-    structure_patch: Option<Animation4Way>,
-    structure_animation_speed_coefficient: f64, // Default: 1
-    structure_animation_movement_cooldown: u32, // Default: 10
+    pub structure: Animation4Way,
+    pub structure_patch: Option<Animation4Way>,
+    pub structure_animation_speed_coefficient: f64, // Default: 1
+    pub structure_animation_movement_cooldown: u32, // Default: 10
 }
 
 /// <https://wiki.factorio.com/Prototype/TransportBelt>
@@ -2581,16 +2591,17 @@ pub struct TransportBelt {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
-    connector_frame_sprites: TransportBeltConnectorFrame,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_wire_connection_point: Option<Vec<WireConnectionPoint>>,
-    circuit_connector_sprites: Option<Vec<CircuitConnectorSprites>>,
-    belt_animation_set_indexes: Option<BeltAnimationSetIndexes>,
-    animations: Option<RotatedAnimation>, // Must have 12 animations
-    related_underground_belt: Option<String>, // Name of underground belt
+    pub connector_frame_sprites: TransportBeltConnectorFrame,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_wire_connection_point: Option<Vec<WireConnectionPoint>>,
+    pub circuit_connector_sprites: Option<Vec<CircuitConnectorSprites>>,
+    pub belt_animation_set_indexes: Option<BeltAnimationSetIndexes>,
+    pub animations: Option<RotatedAnimation>, // Must have 12 animations
+    pub related_underground_belt: Option<String>, // Name of underground belt
 }
 
 /// <https://wiki.factorio.com/Prototype/UndergroundBelt>
@@ -2601,28 +2612,14 @@ pub struct UndergroundBelt {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     transport_belt_connectable_base: TransportBeltConnectableBase,
-    max_distance: u8,
-    structure: BeltStructureWithSideLoading,
-    underground_sprite: Sprite,
-    underground_remove_belts_sprite: Option<Sprite>
+    pub max_distance: u8,
+    pub structure: BeltStructureWithSideLoading,
+    pub underground_sprite: Sprite,
+    pub underground_remove_belts_sprite: Option<Sprite>
 }
 
-/// <https://wiki.factorio.com/Prototype/Tree>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
-#[data_table(tree)]
-pub struct Tree {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    variation_weights: Option<Vec<f64>>,
-    darkness_of_burnt_tree: f32, // Default: 0.5
-    visuals: TreeVisuals,
-    // healing_per_tick: default 0.001666
-}
-
-// TODO: Accessors trait
 /// <https://wiki.factorio.com/Prototype/Turret>
 #[derive(Debug)]
 pub struct TurretBase {
@@ -2733,70 +2730,74 @@ pub trait Turret {
 }
 
 /// <https://wiki.factorio.com/Prototype/Turret>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, Turret, DataTableAccessable)]
 #[data_table(turret)]
 pub struct TurretPrototype {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     turret_base: TurretBase
 }
 
 /// <https://wiki.factorio.com/Prototype/AmmoTurret>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, Turret, DataTableAccessable)]
 #[data_table(ammo_turret)]
 pub struct AmmoTurret {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     turret_base: TurretBase,
-    inventory_size: ItemStackIndex,
-    animated_ammo_count: ItemCountType,
-    entity_info_icon_shift: Option<Factorio2DVector>
+    pub inventory_size: ItemStackIndex,
+    pub animated_ammo_count: ItemCountType,
+    pub entity_info_icon_shift: Option<Factorio2DVector>
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricTurret>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, Turret, DataTableAccessable)]
 #[data_table(electric_turret)]
 pub struct ElectricTurret {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     turret_base: TurretBase,
-    energy_source: EnergySource
+    pub energy_source: EnergySource
 }
 
 // `turret_base_has_direction` must = true
 /// <https://wiki.factorio.com/Prototype/FluidTurret>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, Turret, DataTableAccessable)]
 #[data_table(fluid_turret)]
 pub struct FluidTurret {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     turret_base: TurretBase,
-    fluid_buffer_size: f32,
-    fluid_buffer_input_flow: f32,
-    activation_buffer_ratio: f32,
-    fluid_box: FluidBox,
-    muzzle_light: Option<LightDefinition>,
-    enough_fuel_indicator_light: Option<LightDefinition>,
-    not_enough_fuel_indicator_light: Option<LightDefinition>,
-    muzzle_animation: Option<Animation>,
-    folded_muzzle_animation_shift: Option<AnimatedVector>,
-    preparing_muzzle_animation_shift: Option<AnimatedVector>,
-    prepared_muzzle_animation_shift: Option<AnimatedVector>,
-    starting_attack_muzzle_animation_shift: Option<AnimatedVector>,
-    attacking_muzzle_animation_shift: Option<AnimatedVector>,
-    ending_attack_muzzle_animation_shift: Option<AnimatedVector>,
-    folding_muzzle_animation_shift: Option<AnimatedVector>,
-    enough_fuel_indicator_picture: Option<Sprite4Way>,
-    not_enough_fuel_indicator_picture: Option<Sprite4Way>,
-    out_of_ammo_alert_icon: Option<Sprite>
+    pub fluid_buffer_size: f32,
+    pub fluid_buffer_input_flow: f32,
+    pub activation_buffer_ratio: f32,
+    pub fluid_box: FluidBox,
+    pub muzzle_light: Option<LightDefinition>,
+    pub enough_fuel_indicator_light: Option<LightDefinition>,
+    pub not_enough_fuel_indicator_light: Option<LightDefinition>,
+    pub muzzle_animation: Option<Animation>,
+    pub folded_muzzle_animation_shift: Option<AnimatedVector>,
+    pub preparing_muzzle_animation_shift: Option<AnimatedVector>,
+    pub prepared_muzzle_animation_shift: Option<AnimatedVector>,
+    pub starting_attack_muzzle_animation_shift: Option<AnimatedVector>,
+    pub attacking_muzzle_animation_shift: Option<AnimatedVector>,
+    pub ending_attack_muzzle_animation_shift: Option<AnimatedVector>,
+    pub folding_muzzle_animation_shift: Option<AnimatedVector>,
+    pub enough_fuel_indicator_picture: Option<Sprite4Way>,
+    pub not_enough_fuel_indicator_picture: Option<Sprite4Way>,
+    pub out_of_ammo_alert_icon: Option<Sprite>
 }
 
 /// <https://wiki.factorio.com/Prototype/Unit>
@@ -2807,29 +2808,30 @@ pub struct Unit {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    run_animation: RotatedAnimation,
-    attack_parameters: AttackParameters, // Requires animation in attack_paramaters. Requires ammo_type in attack_paramaters
-    movement_speed: f32, // Must be >= 0
-    distance_per_frame: f32,
-    pollution_to_join_attack: f32,
-    distraction_cooldown: u32,
-    vision_distance: f64, // 100 max
-    rotation_speed: f32, // Default: 0.025
-    dying_sound: Option<Sound>,
-    min_pursue_time: u32, // Default: 600
-    has_belt_immunity: bool, // Default: false
-    spawning_time_modifier: f64, // Default: 1
-    max_pursue_distance: f64, // Default: 50
-    radar_range: u32, // Default: 0
-    ai_settings: Option<UnitAISettings>,
-    move_while_shooting: bool, // Default: false
-    can_open_gates: bool, // Default: false
-    affected_by_tiles: bool, // Default: false
-    render_layer: RenderLayer, // Default: "object"
-    light: Option<LightDefinition>,
-    walking_sound: Option<Sound>,
-    alternative_attacking_frame_sequence: Option<UnitAlternativeAttackingFrameSequence>,
-    running_sound_animation_positions: Option<Vec<f32>>, // Ignored if `walking_sound` is not defined
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub run_animation: RotatedAnimation,
+    pub attack_parameters: AttackParameters, // Requires animation in attack_paramaters. Requires ammo_type in attack_paramaters
+    pub movement_speed: f32, // Must be >= 0
+    pub distance_per_frame: f32,
+    pub pollution_to_join_attack: f32,
+    pub distraction_cooldown: u32,
+    pub vision_distance: f64, // 100 max
+    pub rotation_speed: f32, // Default: 0.025
+    pub dying_sound: Option<Sound>,
+    pub min_pursue_time: u32, // Default: 600
+    pub has_belt_immunity: bool, // Default: false
+    pub spawning_time_modifier: f64, // Default: 1
+    pub max_pursue_distance: f64, // Default: 50
+    pub radar_range: u32, // Default: 0
+    pub ai_settings: Option<UnitAISettings>,
+    pub move_while_shooting: bool, // Default: false
+    pub can_open_gates: bool, // Default: false
+    pub affected_by_tiles: bool, // Default: false
+    pub render_layer: RenderLayer, // Default: "object"
+    pub light: Option<LightDefinition>,
+    pub walking_sound: Option<Sound>,
+    pub alternative_attacking_frame_sequence: Option<UnitAlternativeAttackingFrameSequence>,
+    pub running_sound_animation_positions: Option<Vec<f32>>, // Ignored if `walking_sound` is not defined
 }
 
 /// <https://wiki.factorio.com/Prototype/Vehicle>
@@ -2877,27 +2879,28 @@ pub struct Car {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     vehicle_base: VehicleBase,
-    animation: RotatedAnimation,
-    effectivity: f64,
-    consumption: Energy,
-    rotation_speed: f64,
-    energy_source: EnergySource, // If used from `burner`, must be a burner energy source // Otherwise can also be a void energy source
-    inventory_size: ItemStackIndex,
-    turret_animation: Option<RotatedAnimation>,
-    light_animation: Option<RotatedAnimation>, // Must have the same frame count as `animation`
-    render_layer: RenderLayer, // Default: "object"
-    tank_driving: bool, // Default: false
-    has_belt_immunity: bool, // Default: false
-    immune_to_tree_impacts: bool, // Default: false
-    immune_to_rock_impacts: bool, // Default: false
-    turret_rotation_speed: f64, // Default: 0.01
-    turret_return_timeout: u32, // Default: 60
-    light: Option<LightDefinition>,
-    sound_no_fuel: Option<Sound>,
-    darkness_to_render_light_animation: f32, // Default: 0.3
-    track_particle_triggers: Option<FootstepTriggerEffectList>,
-    guns: Vec<String>, // (Names) Name of gun prototypes
+    pub animation: RotatedAnimation,
+    pub effectivity: f64,
+    pub consumption: Energy,
+    pub rotation_speed: f64,
+    pub energy_source: EnergySource, // If used from `burner`, must be a burner energy source // Otherwise can also be a void energy source
+    pub inventory_size: ItemStackIndex,
+    pub turret_animation: Option<RotatedAnimation>,
+    pub light_animation: Option<RotatedAnimation>, // Must have the same frame count as `animation`
+    pub render_layer: RenderLayer, // Default: "object"
+    pub tank_driving: bool, // Default: false
+    pub has_belt_immunity: bool, // Default: false
+    pub immune_to_tree_impacts: bool, // Default: false
+    pub immune_to_rock_impacts: bool, // Default: false
+    pub turret_rotation_speed: f64, // Default: 0.01
+    pub turret_return_timeout: u32, // Default: 60
+    pub light: Option<LightDefinition>,
+    pub sound_no_fuel: Option<Sound>,
+    pub darkness_to_render_light_animation: f32, // Default: 0.3
+    pub track_particle_triggers: Option<FootstepTriggerEffectList>,
+    pub guns: Vec<String>, // (Names) Name of gun prototypes
 }
 
 /// <https://wiki.factorio.com/Prototype/RollingStock>
@@ -2949,25 +2952,26 @@ pub struct ArtilleryWagon {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     vehicle_base: VehicleBase,
     rolling_stock_base: RollingStockBase,
-    gun: String, // Name of Prototype/Gun
-    inventory_size: ItemStackIndex, // Must be > 0
-    ammo_stack_limit: ItemCountType, // Must be > 0
-    turret_rotation_speed: f64,
-    manual_range_modifier: f64, // Must be > 0
-    disable_automatic_firing: bool, // Default: false
-    cannon_base_pictures: Option<RotatedSprite>,
-    cannon_barrel_pictures: Option<RotatedSprite>,
-    rotating_sound: Option<InterruptibleSound>,
-    rotating_stopped_sound: Option<Sound>,
-    turn_after_shooting_cooldown: u16, // Default: 0
-    cannon_parking_frame_count: u16, // Default: 0
-    cannon_parking_speed: f32, // Default: 1
-    cannon_base_shiftings: Option<Vec<Factorio2DVector>>, // Must match `cannon_base_pictures` frame count
-    cannon_barrel_recoil_shiftings: Option<Vec<Factorio3DVector>>,
-    cannon_barrel_recoil_shiftings_load_correction_matrix: Option<Vec<Factorio3DVector>>, // Only loaded if `cannon_barrel_recoil_shiftings` is loaded
-    cannon_barrel_light_direction: Option<Factorio3DVector>, // Only loaded if `cannon_barrel_recoil_shiftings` is loaded
+    pub gun: String, // Name of Prototype/Gun
+    pub inventory_size: ItemStackIndex, // Must be > 0
+    pub ammo_stack_limit: ItemCountType, // Must be > 0
+    pub turret_rotation_speed: f64,
+    pub manual_range_modifier: f64, // Must be > 0
+    pub disable_automatic_firing: bool, // Default: false
+    pub cannon_base_pictures: Option<RotatedSprite>,
+    pub cannon_barrel_pictures: Option<RotatedSprite>,
+    pub rotating_sound: Option<InterruptibleSound>,
+    pub rotating_stopped_sound: Option<Sound>,
+    pub turn_after_shooting_cooldown: u16, // Default: 0
+    pub cannon_parking_frame_count: u16, // Default: 0
+    pub cannon_parking_speed: f32, // Default: 1
+    pub cannon_base_shiftings: Option<Vec<Factorio2DVector>>, // Must match `cannon_base_pictures` frame count
+    pub cannon_barrel_recoil_shiftings: Option<Vec<Factorio3DVector>>,
+    pub cannon_barrel_recoil_shiftings_load_correction_matrix: Option<Vec<Factorio3DVector>>, // Only loaded if `cannon_barrel_recoil_shiftings` is loaded
+    pub cannon_barrel_light_direction: Option<Factorio3DVector>, // Only loaded if `cannon_barrel_recoil_shiftings` is loaded
 }
 
 /// <https://wiki.factorio.com/Prototype/CargoWagon>
@@ -2978,9 +2982,10 @@ pub struct CargoWagon {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     vehicle_base: VehicleBase,
     rolling_stock_base: RollingStockBase,
-    inventory_size: ItemStackIndex
+    pub inventory_size: ItemStackIndex
 }
 
 /// <https://wiki.factorio.com/Prototype/FluidWagon>
@@ -2991,10 +2996,11 @@ pub struct FluidWagon {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     vehicle_base: VehicleBase,
     rolling_stock_base: RollingStockBase,
-    capacity: f64,
-    tank_count: u8, // Default: 3 // Must be one of: 1, 2, 3
+    pub capacity: f64,
+    pub tank_count: u8, // Default: 3 // Must be one of: 1, 2, 3
 }
 
 /// <https://wiki.factorio.com/Prototype/Locomotive>
@@ -3005,14 +3011,15 @@ pub struct Locomotive {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     vehicle_base: VehicleBase,
     rolling_stock_base: RollingStockBase,
-    max_power: Energy,
-    reversing_power_modifier: f64,
-    energy_source: EnergySource, // Must be burner if used through `burner`, otherwise can also be void
-    front_light: Option<LightDefinition>,
-    front_light_pictures: Option<RotatedSprite>,
-    darkness_to_render_light_animation: f32, // Default: 0.3
+    pub max_power: Energy,
+    pub reversing_power_modifier: f64,
+    pub energy_source: EnergySource, // Must be burner if used through `burner`, otherwise can also be void
+    pub front_light: Option<LightDefinition>,
+    pub front_light_pictures: Option<RotatedSprite>,
+    pub darkness_to_render_light_animation: f32, // Default: 0.3
 }
 
 /// <https://wiki.factorio.com/Prototype/SpiderVehicle>
@@ -3023,48 +3030,113 @@ pub struct SpiderVehicle {
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
+    entity_with_owner_base: EntityWithOwnerBase,
     vehicle_base: VehicleBase,
-    energy_source: EnergySource, // Must be burner if used through `burner`, otherwise can also be void
-    inventory_size: ItemStackIndex,
-    graphics_set: SpiderVehicleGraphicsSet,
-    spider_engine: SpiderEnginePrototype,
-    height: f32,
-    chunk_exploration_radius: u32,
-    movement_energy_consumption: Energy,
-    automatic_weapon_cycling: bool,
-    chain_shooting_cooldown_modifier: f32,
-    torso_rotation_speed: f32, // Default: 1
-    trash_inventory_size: ItemStackIndex, // Default: 0
-    guns: Vec<String>, // (Names) Name of gun
+    pub energy_source: EnergySource, // Must be burner if used through `burner`, otherwise can also be void
+    pub inventory_size: ItemStackIndex,
+    pub graphics_set: SpiderVehicleGraphicsSet,
+    pub spider_engine: SpiderEnginePrototype,
+    pub height: f32,
+    pub chunk_exploration_radius: u32,
+    pub movement_energy_consumption: Energy,
+    pub automatic_weapon_cycling: bool,
+    pub chain_shooting_cooldown_modifier: f32,
+    pub torso_rotation_speed: f32, // Default: 1
+    pub trash_inventory_size: ItemStackIndex, // Default: 0
+    pub guns: Vec<String>, // (Names) Name of gun
 }
 
 /// <https://wiki.factorio.com/Prototype/Wall>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(wall)]
 pub struct Wall {
     name: String,
     prototype_base: PrototypeBaseSpec,
     entity_base: EntityBase,
     entity_with_health_base: EntityWithHealthBase,
-    pictures: WallPictures,
-    visual_merge_group: u32, // Default: 0
-    circuit_wire_connection_point: Option<WireConnectionPoint>,
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
-    circuit_connector_sprites: Option<CircuitConnectorSprites>,
-    default_output_signal: Option<SignalIDConnector>,
-    wall_diode_green: Option<Sprite4Way>,
-    wall_diode_red: Option<Sprite4Way>,
-    wall_diode_green_light_top: Option<LightDefinition>,
-    wall_diode_green_light_right: Option<LightDefinition>,
-    wall_diode_green_light_bottom: Option<LightDefinition>,
-    wall_diode_green_light_left: Option<LightDefinition>,
-    wall_diode_red_light_top: Option<LightDefinition>,
-    wall_diode_red_light_right: Option<LightDefinition>,
-    wall_diode_red_light_bottom: Option<LightDefinition>,
-    wall_diode_red_light_left: Option<LightDefinition>,
-    connected_gate_visualization: Option<Sprite>
+    entity_with_owner_base: EntityWithOwnerBase,
+    pub pictures: WallPictures,
+    pub visual_merge_group: u32, // Default: 0
+    pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    pub circuit_wire_max_distance: f64, // Default: 0
+    pub draw_copper_wires: bool, // Default: true
+    pub draw_circuit_wires: bool, // Default: true
+    pub circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    pub default_output_signal: Option<SignalIDConnector>,
+    pub wall_diode_green: Option<Sprite4Way>,
+    pub wall_diode_red: Option<Sprite4Way>,
+    pub wall_diode_green_light_top: Option<LightDefinition>,
+    pub wall_diode_green_light_right: Option<LightDefinition>,
+    pub wall_diode_green_light_bottom: Option<LightDefinition>,
+    pub wall_diode_green_light_left: Option<LightDefinition>,
+    pub wall_diode_red_light_top: Option<LightDefinition>,
+    pub wall_diode_red_light_right: Option<LightDefinition>,
+    pub wall_diode_red_light_bottom: Option<LightDefinition>,
+    pub wall_diode_red_light_left: Option<LightDefinition>,
+    pub connected_gate_visualization: Option<Sprite>
+}
+
+//
+// STOP HERE
+//
+
+/// <https://wiki.factorio.com/Prototype/Fish>
+#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[data_table(fish)]
+pub struct Fish {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    entity_with_health_base: EntityWithHealthBase,
+    pub pictures: Vec<SpriteVariation>
+}
+
+/// <https://wiki.factorio.com/Prototype/SimpleEntity>
+#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[data_table(simple_entity)]
+pub struct SimpleEntity {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    entity_with_health_base: EntityWithHealthBase,
+    pub count_as_rock_for_filtered_deconstruction: bool, // Default: false
+    pub render_layer: RenderLayer, // Default: "object"
+    pub secondary_draw_order: i8, // Default: 0
+    pub random_animation_offset: bool, // Default: false
+    pub random_variation_on_create: bool, // Default: true
+    pub visuals: SimpleEntityVisuals
+}
+
+/// <https://wiki.factorio.com/Prototype/SpiderLeg>
+#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[data_table(spider_leg)]
+pub struct SpiderLeg {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    entity_with_health_base: EntityWithHealthBase,
+    pub part_length: f64, // Must be > 0
+    pub initial_movement_speed: f64,
+    pub movement_acceleration: f64,
+    pub target_position_randomisation_distance: f64,
+    pub minimal_step_size: f64,
+    pub movement_based_position_selection_distance: f64,
+    pub graphics_set: SpiderLegGraphicsSet,
+    pub walking_sound_volume_modifier: f64, // Default: 1
+}
+
+/// <https://wiki.factorio.com/Prototype/Tree>
+#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[data_table(tree)]
+pub struct Tree {
+    name: String,
+    prototype_base: PrototypeBaseSpec,
+    entity_base: EntityBase,
+    entity_with_health_base: EntityWithHealthBase,
+    pub variation_weights: Option<Vec<f64>>,
+    pub darkness_of_burnt_tree: f32, // Default: 0.5
+    pub visuals: TreeVisuals,
+    // healing_per_tick: default 0.001666
 }
 
 /// <https://wiki.factorio.com/Prototype/Explosion>
