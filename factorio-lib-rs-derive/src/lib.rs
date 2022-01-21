@@ -137,6 +137,7 @@ pub fn turret_macro_derive(input: TokenStream) -> TokenStream {
 pub fn vehicle_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     let mut ts = impl_vehicle_macro(&ast);
+    ts.extend(impl_entity_with_owner_macro(&ast));
     ts.extend(impl_entity_with_health_macro(&ast));
     ts.extend(impl_entity_macro(&ast));
     ts.extend(impl_prototype_base_macro(&ast));
