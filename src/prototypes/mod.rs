@@ -2375,6 +2375,7 @@ pub struct SimpleEntityWithOwner {
     force_visibility: ForceCondition, // Default: "all"
 }
 
+// TODO: EntityWithOwner
 /// <https://wiki.factorio.com/Prototype/SimpleEntityWithForce>
 #[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
 #[data_table(simple_entity_with_force)]
