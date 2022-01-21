@@ -2679,6 +2679,60 @@ pub struct TurretBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Turret>
+pub trait Turret {
+    fn attack_parameters(&self) -> &AttackParameters;
+    fn folded_animation(&self) -> &RotatedAnimation4Way;
+    fn call_for_help_radius(&self) -> f64;
+    fn corpse(&self) -> &Option<String>; 
+    fn attack_target_mask(&self) -> &Option<TriggerTargetMask>; 
+    fn ignore_target_mask(&self) -> &Option<TriggerTargetMask>; 
+    fn shoot_in_prepare_state(&self) -> bool; 
+    fn turret_base_has_direction(&self) -> bool; 
+    fn random_animation_offset(&self) -> bool; 
+    fn secondary_animation(&self) -> bool; 
+    fn attack_from_start_frame(&self) -> bool; 
+    fn allow_turning_when_starting_attack(&self) -> bool; 
+    fn base_picture_secondary_draw_order(&self) -> u8; 
+    fn gun_animation_secondary_draw_order(&self) -> u8; 
+    fn base_picture_render_layer(&self) -> RenderLayer; 
+    fn gun_animation_render_layer(&self) -> RenderLayer; 
+    fn base_picture(&self) -> &Option<Animation4Way>;
+    fn preparing_animation(&self) -> &Option<RotatedAnimation4Way>;
+    fn prepared_animation(&self) -> &Option<RotatedAnimation4Way>;
+    fn prepared_alternative_animation(&self) -> &Option<RotatedAnimation4Way>;
+    fn starting_attack_animation(&self) -> &Option<RotatedAnimation4Way>;
+    fn attacking_animation(&self) -> &Option<RotatedAnimation4Way>;
+    fn energy_glow_animation(&self) -> &Option<RotatedAnimation4Way>;
+    fn ending_attack_animation(&self) -> &Option<RotatedAnimation4Way>;
+    fn folding_animation(&self) -> &Option<RotatedAnimation4Way>;
+    fn integration(&self) -> &Option<Sprite>;
+    fn glow_light_intensity(&self) -> f32; 
+    fn starting_attack_sound(&self) -> &Option<Sound>;
+    fn dying_sound(&self) -> &Option<Sound>;
+    fn preparing_sound(&self) -> &Option<Sound>;
+    fn folding_sound(&self) -> &Option<Sound>;
+    fn prepared_sound(&self) -> &Option<Sound>;
+    fn prepared_alternative_sound(&self) -> &Option<Sound>;
+    fn rotation_speed(&self) -> f32; 
+    fn preparing_speed(&self) -> f32; 
+    fn folded_speed(&self) -> f32; 
+    fn folded_speed_secondary(&self) -> f32; 
+    fn prepared_speed(&self) -> f32; 
+    fn prepared_speed_secondary(&self) -> f32; 
+    fn prepared_alternative_speed(&self) -> f32; 
+    fn prepared_alternative_speed_secondary(&self) -> f32; 
+    fn prepared_alternative_chance(&self) -> f32; 
+    fn starting_attack_speed(&self) -> f32; 
+    fn attacking_speed(&self) -> f32; 
+    fn ending_attack_speed(&self) -> f32; 
+    fn folding_speed(&self) -> f32; 
+    fn prepare_range(&self) -> f64; 
+    fn alert_when_attacking(&self) -> bool; 
+    fn spawn_decorations_on_expansion(&self) -> bool; 
+    fn spawn_decoration(&self) -> &Option<Vec<CreateDecorativesTriggerEffectItem>>;
+}
+
+/// <https://wiki.factorio.com/Prototype/Turret>
 #[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
 #[data_table(turret)]
 pub struct TurretPrototype {

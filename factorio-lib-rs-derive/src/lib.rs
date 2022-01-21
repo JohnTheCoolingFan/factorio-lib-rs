@@ -122,6 +122,17 @@ pub fn transport_belt_connectable_macro_derive(input: TokenStream) -> TokenStrea
     ts
 }
 
+#[proc_macro_derive(Turret)]
+pub fn turret_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    let mut ts = impl_turret_macro(&ast);
+    ts.extend(impl_entity_with_owner_macro(&ast));
+    ts.extend(impl_entity_with_health_macro(&ast));
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
+}
+
 #[proc_macro_derive(Vehicle)]
 pub fn vehicle_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -475,6 +486,65 @@ fn impl_transport_belt_connectable_macro(ast: &syn::DeriveInput) -> TokenStream 
             fn speed(&self) -> f64 { self.transport_belt_connectable_base.speed }
             fn animation_speed_coefficient(&self) -> f64 { self.transport_belt_connectable_base.animation_speed_coefficient }
             fn belt_animation_set(&self) -> &TransportBeltConnectableGraphics { &self.transport_belt_connectable_base.belt_animation_set }
+        }
+    };
+    gen.into()
+}
+
+fn impl_turret_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl Turret for #name {
+            fn attack_parameters(&self) -> &AttackParameters { &self.turret_base.attack_parameters }
+            fn folded_animation(&self) -> &RotatedAnimation4Way { &self.turret_base.folded_animation }
+            fn call_for_help_radius(&self) -> f64 { self.turret_base.call_for_help_radius }
+            fn corpse(&self) -> &Option<String>  { &self.turret_base.corpse }
+            fn attack_target_mask(&self) -> &Option<TriggerTargetMask>  { &self.turret_base.attack_target_mask }
+            fn ignore_target_mask(&self) -> &Option<TriggerTargetMask>  { &self.turret_base.ignore_target_mask }
+            fn shoot_in_prepare_state(&self) -> bool  { self.turret_base.shoot_in_prepare_state }
+            fn turret_base_has_direction(&self) -> bool  { self.turret_base.turret_base_has_direction }
+            fn random_animation_offset(&self) -> bool  { self.turret_base.random_animation_offset }
+            fn secondary_animation(&self) -> bool  { self.turret_base.secondary_animation }
+            fn attack_from_start_frame(&self) -> bool  { self.turret_base.attack_from_start_frame }
+            fn allow_turning_when_starting_attack(&self) -> bool  { self.turret_base.allow_turning_when_starting_attack }
+            fn base_picture_secondary_draw_order(&self) -> u8  { self.turret_base.base_picture_secondary_draw_order }
+            fn gun_animation_secondary_draw_order(&self) -> u8  { self.turret_base.gun_animation_secondary_draw_order }
+            fn base_picture_render_layer(&self) -> RenderLayer  { self.turret_base.base_picture_render_layer }
+            fn gun_animation_render_layer(&self) -> RenderLayer  { self.turret_base.gun_animation_render_layer }
+            fn base_picture(&self) -> &Option<Animation4Way> { &self.turret_base.base_picture }
+            fn preparing_animation(&self) -> &Option<RotatedAnimation4Way> { &self.turret_base.preparing_animation }
+            fn prepared_animation(&self) -> &Option<RotatedAnimation4Way> { &self.turret_base.prepared_animation }
+            fn prepared_alternative_animation(&self) -> &Option<RotatedAnimation4Way> { &self.turret_base.prepared_alternative_animation }
+            fn starting_attack_animation(&self) -> &Option<RotatedAnimation4Way> { &self.turret_base.starting_attack_animation }
+            fn attacking_animation(&self) -> &Option<RotatedAnimation4Way> { &self.turret_base.attacking_animation }
+            fn energy_glow_animation(&self) -> &Option<RotatedAnimation4Way> { &self.turret_base.energy_glow_animation }
+            fn ending_attack_animation(&self) -> &Option<RotatedAnimation4Way> { &self.turret_base.ending_attack_animation }
+            fn folding_animation(&self) -> &Option<RotatedAnimation4Way> { &self.turret_base.folding_animation }
+            fn integration(&self) -> &Option<Sprite> { &self.turret_base.integration }
+            fn glow_light_intensity(&self) -> f32  { self.turret_base.glow_light_intensity }
+            fn starting_attack_sound(&self) -> &Option<Sound> { &self.turret_base.starting_attack_sound }
+            fn dying_sound(&self) -> &Option<Sound> { &self.turret_base.dying_sound }
+            fn preparing_sound(&self) -> &Option<Sound> { &self.turret_base.preparing_sound }
+            fn folding_sound(&self) -> &Option<Sound> { &self.turret_base.folding_sound }
+            fn prepared_sound(&self) -> &Option<Sound> { &self.turret_base.prepared_sound }
+            fn prepared_alternative_sound(&self) -> &Option<Sound> { &self.turret_base.prepared_alternative_sound }
+            fn rotation_speed(&self) -> f32  { self.turret_base.rotation_speed }
+            fn preparing_speed(&self) -> f32  { self.turret_base.preparing_speed }
+            fn folded_speed(&self) -> f32  { self.turret_base.folded_speed }
+            fn folded_speed_secondary(&self) -> f32  { self.turret_base.folded_speed_secondary }
+            fn prepared_speed(&self) -> f32  { self.turret_base.prepared_speed }
+            fn prepared_speed_secondary(&self) -> f32  { self.turret_base.prepared_speed_secondary }
+            fn prepared_alternative_speed(&self) -> f32  { self.turret_base.prepared_alternative_speed }
+            fn prepared_alternative_speed_secondary(&self) -> f32  { self.turret_base.prepared_alternative_speed_secondary }
+            fn prepared_alternative_chance(&self) -> f32  { self.turret_base.prepared_alternative_chance }
+            fn starting_attack_speed(&self) -> f32  { self.turret_base.starting_attack_speed }
+            fn attacking_speed(&self) -> f32  { self.turret_base.attacking_speed }
+            fn ending_attack_speed(&self) -> f32  { self.turret_base.ending_attack_speed }
+            fn folding_speed(&self) -> f32  { self.turret_base.folding_speed }
+            fn prepare_range(&self) -> f64  { self.turret_base.prepare_range }
+            fn alert_when_attacking(&self) -> bool  { self.turret_base.alert_when_attacking }
+            fn spawn_decorations_on_expansion(&self) -> bool  { self.turret_base.spawn_decorations_on_expansion }
+            fn spawn_decoration(&self) -> &Option<Vec<CreateDecorativesTriggerEffectItem>> { &self.turret_base.spawn_decoration }
         }
     };
     gen.into()
