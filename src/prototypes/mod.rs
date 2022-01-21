@@ -15,6 +15,7 @@ use factorio_lib_rs_derive::{
     Entity,
     Corpse,
     EntityWithHealth,
+    EntityWithOwner,
     Combinator,
     CraftingMachine,
     FlyingRobot,
@@ -1094,6 +1095,19 @@ pub trait EntityWithHealth: Entity {
     fn integration_patch_render_layer(&self) -> RenderLayer;
     fn corpse(&self) -> &Vec<String>;
     fn integration_patch(&self) -> &Sprite4Way;
+}
+
+/// <https://wiki.factorio.com/Prototype/EntityWithOwner>
+#[derive(Debug)]
+pub struct EntityWithOwnerBase {
+    is_military_target: bool, // Default: false
+    allow_run_time_change_of_is_military_target: bool, // Default: false
+}
+
+/// <https://wiki.factorio.com/Prototype/EntityWithOwner>
+pub trait EntityWithOwner {
+    fn is_military_target(&self) -> bool;
+    fn allow_run_time_change_of_is_military_target(&self) -> bool;
 }
 
 /// <https://wiki.factorio.com/Prototype/Accumulator>

@@ -68,6 +68,16 @@ pub fn entity_with_health_macro_derive(input: TokenStream) -> TokenStream {
     ts
 }
 
+#[proc_macro_derive(EntityWithOwner)]
+pub fn entity_with_owner_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    let mut ts = impl_entity_with_owner_macro(&ast);
+    ts.extend(impl_entity_with_health_macro(&ast));
+    ts.extend(impl_entity_macro(&ast));
+    ts.extend(impl_prototype_base_macro(&ast));
+    ts
+}
+
 #[proc_macro_derive(Combinator)]
 pub fn combinator_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -363,6 +373,17 @@ fn impl_entity_with_health_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn integration_patch_render_layer(&self) -> RenderLayer { self.entity_with_health_base.integration_patch_render_layer }
             fn corpse(&self) -> &Vec<String> { &self.entity_with_health_base.corpse }
             fn integration_patch(&self) -> &Sprite4Way { &self.entity_with_health_base.integration_patch }
+        }
+    };
+    gen.into()
+}
+
+fn impl_entity_with_owner_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl EntityWithOwner for #name {
+            fn is_military_target(&self) -> bool { self.entity_with_owner_base.is_military_target }
+            fn allow_run_time_change_of_is_military_target(&self) -> bool { self.entity_with_owner_base.allow_run_time_change_of_is_military_target }
         }
     };
     gen.into()
