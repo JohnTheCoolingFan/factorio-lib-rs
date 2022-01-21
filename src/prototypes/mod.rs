@@ -1681,7 +1681,8 @@ pub struct EnemySpawner {
     pub max_darkness_to_spawn: f32, // Default: 1.0
     pub random_animation_offset: bool, // Default: true
     pub spawn_decorations_on_expansion: bool, // Default: false
-    pub spawn_decoration: Vec<CreateDecorativesTriggerEffectItem>
+    pub spawn_decoration: Vec<CreateDecorativesTriggerEffectItem>,
+    // allow_run_time_change_of_is_military_target must be false
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingRobot>
@@ -2832,6 +2833,7 @@ pub struct Unit {
     pub walking_sound: Option<Sound>,
     pub alternative_attacking_frame_sequence: Option<UnitAlternativeAttackingFrameSequence>,
     pub running_sound_animation_positions: Option<Vec<f32>>, // Ignored if `walking_sound` is not defined
+    // allow_run_time_change_of_is_military_target must be false
 }
 
 /// <https://wiki.factorio.com/Prototype/Vehicle>
