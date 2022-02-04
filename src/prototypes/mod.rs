@@ -4185,10 +4185,11 @@ pub struct Tool {
     name: String,
     prototype_base: PrototypeBaseSpec,
     item_base: ItemBase,
-    durability: f64, // Must be positive // Mandatory if `infinite` is false
+    durability: f64, // Must be positive
     durability_description_key: String, // Default: "description.durability-key" // May not be longer than 200 characters
     durability_description_value: String, // Default: "description.durability-value" // May not be longer than 200 characters
-    infinite: bool, // Default: true
+    infinite: bool, // Default: false
+    // Either durability or infinite = true must be specified.
 }
 
 /// <https://wiki.factorio.com/Prototype/Armor>
