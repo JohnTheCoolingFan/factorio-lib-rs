@@ -704,12 +704,11 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 
 // Attribute on field
 // #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
-// #[mandatory_if(expr)] - expr is a condition for mandatority
 // #[from_str] - convert value to string, then parse from str
 // #[prototype] - use prototype_from_lua instead of get
 // #[use_self_if_not_found] - use self-Value for property if corresponding field does not exist
 // #[resource] - this field is a resource record
-#[proc_macro_derive(PrototypeFromLua, attributes(default, mandatory_if, from_str, prototype, use_self_if_not_found, resource))]
+#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, prototype, use_self_if_not_found, resource))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
@@ -770,7 +769,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let mut gen = quote! {
         let #ident: #field_type =
     };
-    let (default_value, mandatory_expr, use_from_str, use_prototype, use_self, is_resource) = prot_from_lua_field_attributes(&field.attrs)?;
+    let (default_value, use_from_str, use_prototype, use_self, is_resource) = prot_from_lua_field_attributes(&field.attrs)?;
     let mut get_expr: proc_macro2::TokenStream;
     if is_resource {
         if let Some(default_value) = default_value {
@@ -848,38 +847,25 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
         };
         get_expr.extend(parse_str);
     }
-    if let Some(mandatory_expr) = mandatory_expr {
-        let if_gen = quote! {
-            if #mandatory_expr {
-                Some(#get_expr)
-            } else {
-                #get_expr
-            }
-        };
-        gen.extend(if_gen);
-    } else {
-        gen.extend(get_expr);
-    }
+    gen.extend(get_expr);
     let semicolon = quote!(;);
     gen.extend(semicolon);
     Ok(gen)
 }
 
-fn prot_from_lua_field_attributes(attrs: &[Attribute]) -> Result<(Option<syn::Lit>, Option<proc_macro2::TokenStream>, bool, bool, bool, bool)> {
-    let mut result = (None, None, false, false, false, false);
+fn prot_from_lua_field_attributes(attrs: &[Attribute]) -> Result<(Option<syn::Lit>, bool, bool, bool, bool)> {
+    let mut result = (None, false, false, false, false);
     for attr in attrs {
         if attr.path.is_ident("from_str") {
-            result.2 = true
+            result.1 = true
         } else if attr.path.is_ident("prototype") {
-            result.3 = true
+            result.2 = true
         } else if attr.path.is_ident("default") {
             result.0 = Some(attr.parse_args::<syn::Lit>()?)
-        } else if attr.path.is_ident("mandatory_if") {
-            result.1 = Some(attr.parse_args::<proc_macro2::TokenStream>()?)
         } else if attr.path.is_ident("use_self_if_not_found") {
-            result.4 = true
+            result.3 = true
         } else if attr.path.is_ident("resource") {
-            result.5 = true
+            result.4 = true
         }
     }
     Ok(result)
