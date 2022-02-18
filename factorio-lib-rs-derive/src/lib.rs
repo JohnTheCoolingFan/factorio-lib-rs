@@ -187,7 +187,7 @@ pub fn data_table_accessable_macro_derive(input: TokenStream) -> TokenStream {
 }
 
 // Attribute on field
-// #[default(expr)] - expr is default value
+// #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
 // #[mandatory_if(expr)] - expr is a condition for mandatority
 // #[from_str] - convert value to string, then parse from str
 // #[prototype] - use prototype_from_lua instead of get
