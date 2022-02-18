@@ -186,19 +186,6 @@ pub fn data_table_accessable_macro_derive(input: TokenStream) -> TokenStream {
     impl_data_table_accessable_macro(&ast)
 }
 
-// Attribute on field
-// #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
-// #[mandatory_if(expr)] - expr is a condition for mandatority
-// #[from_str] - convert value to string, then parse from str
-// #[prototype] - use prototype_from_lua instead of get
-// #[use_self_if_not_found] - use self-Value for property if corresponding field does not exist
-// #[resource] - this field is a resource record
-#[proc_macro_derive(PrototypeFromLua, attributes(default, mandatory_if, from_str, prototype, use_self_if_not_found, resource))]
-pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_prototype_from_lua_macro(&ast)
-}
-
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
@@ -713,6 +700,19 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
     let field: syn::Path = attr.parse_args()?;
     let ident = field.get_ident().expect("expected indentifier");
     Ok(ident.clone())
+}
+
+// Attribute on field
+// #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
+// #[mandatory_if(expr)] - expr is a condition for mandatority
+// #[from_str] - convert value to string, then parse from str
+// #[prototype] - use prototype_from_lua instead of get
+// #[use_self_if_not_found] - use self-Value for property if corresponding field does not exist
+// #[resource] - this field is a resource record
+#[proc_macro_derive(PrototypeFromLua, attributes(default, mandatory_if, from_str, prototype, use_self_if_not_found, resource))]
+pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_prototype_from_lua_macro(&ast)
 }
 
 fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
