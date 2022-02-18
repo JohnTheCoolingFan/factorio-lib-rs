@@ -770,9 +770,34 @@ struct PrototypeFromLuaFieldAttrArgs {
     is_resource: bool
 }
 
+type ArgsTuple = (Option<syn::Lit>, bool, bool, bool, bool);
+
 impl PrototypeFromLuaFieldAttrArgs {
-    fn to_tuple(self) -> (Option<syn::Lit>, bool, bool, bool, bool) {
+
+    fn to_tuple(self) -> ArgsTuple {
         (self.default_value, self.use_from_str, self.use_prototype, self.use_self, self.is_resource)
+    }
+
+    fn from_attrs(attrs: &[Attribute]) -> Result<Self> {
+        let mut result = Self::default();
+        for attr in attrs {
+            if attr.path.is_ident("from_str") {
+                result.use_from_str = true
+            } else if attr.path.is_ident("prototype") {
+                result.use_prototype = true
+            } else if attr.path.is_ident("default") {
+                result.default_value = Some(attr.parse_args::<syn::Lit>()?)
+            } else if attr.path.is_ident("use_self_if_not_found") {
+                result.use_self = true
+            } else if attr.path.is_ident("resource") {
+                result.is_resource = true
+            }
+        }
+        Ok(result)
+    }
+
+    fn tuple_from_attrs(attrs: &[Attribute]) -> Result<ArgsTuple> {
+        Ok(Self::from_attrs(attrs)?.to_tuple())
     }
 }
 
@@ -795,7 +820,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let mut gen = quote! {
         let #ident: #field_type =
     };
-    let (default_value, use_from_str, use_prototype, use_self, is_resource) = prot_from_lua_field_attributes(&field.attrs)?.to_tuple();
+    let (default_value, use_from_str, use_prototype, use_self, is_resource) = PrototypeFromLuaFieldAttrArgs::tuple_from_attrs(&field.attrs)?;
     let mut get_expr: proc_macro2::TokenStream;
     if is_resource {
         if let Some(default_value) = default_value {
@@ -877,24 +902,6 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let semicolon = quote!(;);
     gen.extend(semicolon);
     Ok(gen)
-}
-
-fn prot_from_lua_field_attributes(attrs: &[Attribute]) -> Result<PrototypeFromLuaFieldAttrArgs> {
-    let mut result = PrototypeFromLuaFieldAttrArgs::default();
-    for attr in attrs {
-        if attr.path.is_ident("from_str") {
-            result.use_from_str = true
-        } else if attr.path.is_ident("prototype") {
-            result.use_prototype = true
-        } else if attr.path.is_ident("default") {
-            result.default_value = Some(attr.parse_args::<syn::Lit>()?)
-        } else if attr.path.is_ident("use_self_if_not_found") {
-            result.use_self = true
-        } else if attr.path.is_ident("resource") {
-            result.is_resource = true
-        }
-    }
-    Ok(result)
 }
 
 fn check_for_data_table(state: bool, field: &syn::Field) -> bool {
