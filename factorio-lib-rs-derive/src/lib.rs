@@ -762,6 +762,32 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+struct PrototypeFromLuaFieldAttrArgs {
+    default_value: Option<syn::Lit>,
+    use_from_str: bool,
+    use_prototype: bool,
+    use_self: bool,
+    is_resource: bool
+}
+
+impl PrototypeFromLuaFieldAttrArgs {
+    fn to_tuple(self) -> (Option<syn::Lit>, bool, bool, bool, bool) {
+        (self.default_value, self.use_from_str, self.use_prototype, self.use_self, self.is_resource)
+    }
+}
+
+impl Default for PrototypeFromLuaFieldAttrArgs {
+    fn default() -> Self {
+        Self{
+            default_value: None, 
+            use_from_str: false,
+            use_prototype: false,
+            use_self: false,
+            is_resource: false
+        }
+    }
+}
+
 fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let ident = &field.ident;
     let str_field = ident.as_ref().unwrap().to_string();
@@ -769,7 +795,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let mut gen = quote! {
         let #ident: #field_type =
     };
-    let (default_value, use_from_str, use_prototype, use_self, is_resource) = prot_from_lua_field_attributes(&field.attrs)?;
+    let (default_value, use_from_str, use_prototype, use_self, is_resource) = prot_from_lua_field_attributes(&field.attrs)?.to_tuple();
     let mut get_expr: proc_macro2::TokenStream;
     if is_resource {
         if let Some(default_value) = default_value {
@@ -853,19 +879,19 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     Ok(gen)
 }
 
-fn prot_from_lua_field_attributes(attrs: &[Attribute]) -> Result<(Option<syn::Lit>, bool, bool, bool, bool)> {
-    let mut result = (None, false, false, false, false);
+fn prot_from_lua_field_attributes(attrs: &[Attribute]) -> Result<PrototypeFromLuaFieldAttrArgs> {
+    let mut result = PrototypeFromLuaFieldAttrArgs::default();
     for attr in attrs {
         if attr.path.is_ident("from_str") {
-            result.1 = true
+            result.use_from_str = true
         } else if attr.path.is_ident("prototype") {
-            result.2 = true
+            result.use_prototype = true
         } else if attr.path.is_ident("default") {
-            result.0 = Some(attr.parse_args::<syn::Lit>()?)
+            result.default_value = Some(attr.parse_args::<syn::Lit>()?)
         } else if attr.path.is_ident("use_self_if_not_found") {
-            result.3 = true
+            result.use_self = true
         } else if attr.path.is_ident("resource") {
-            result.4 = true
+            result.is_resource = true
         }
     }
     Ok(result)
