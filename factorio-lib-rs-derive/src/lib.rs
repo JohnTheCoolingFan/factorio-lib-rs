@@ -2,9 +2,11 @@
 
 extern crate proc_macro;
 
+use core::fmt::Display;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{self, Attribute, Ident, Result};
+use syn::spanned::Spanned;
 
 #[proc_macro_derive(Prototype)]
 pub fn prototype_macro_derive(input: TokenStream) -> TokenStream {
@@ -792,18 +794,30 @@ impl PrototypeFromLuaFieldAttrArgs {
         let mut result = Self::default();
         for attr in attrs {
             if attr.path.is_ident("from_str") {
+                if result.is_resource { return Self::attr_error(attr, "`from_str` attribute is incompatible with `resource`") }
+                if result.use_prototype { return Self::attr_error(attr, "`from_str` attribute is incompatible with `prototype`") }
                 result.use_from_str = true
             } else if attr.path.is_ident("prototype") {
+                if result.use_from_str { return Self::attr_error(attr, "`prototype` is incompatible with `from_str`") }
                 result.use_prototype = true
             } else if attr.path.is_ident("default") {
+                if result.use_self { return Self::attr_error(attr, "`default()` is incompatible with `use_self_if_not_found`") }
                 result.default_value = Some(attr.parse_args::<syn::Lit>()?)
             } else if attr.path.is_ident("use_self_if_not_found") {
+                if result.default_value.is_some() { return Self::attr_error(attr, "`use_self_if_not_found` is incompatible with `default()`") }
                 result.use_self = true
             } else if attr.path.is_ident("resource") {
+                if result.use_from_str { return Self::attr_error(attr, "`resource` is incompatible with `from_str`") }
+                if result.use_prototype { return Self::attr_error(attr, "`resource` is incompatible with `prototype`") }
+                if result.use_self { return Self::attr_error(attr, "`resource` is incompatible with `use_self_if_not_found`") }
                 result.is_resource = true
             }
         }
         Ok(result)
+    }
+
+    fn attr_error<T: Display>(attr: &Attribute, message: T) -> Result<Self> {
+        Err(syn::Error::new(attr.span(), message))
     }
 
     fn tuple_from_attrs(attrs: &[Attribute]) -> Result<ArgsTuple> {
