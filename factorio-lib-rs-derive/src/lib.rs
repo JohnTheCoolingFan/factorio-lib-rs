@@ -703,11 +703,21 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 }
 
 // Attribute on field
+//
 // #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
+// Incompatible with: use_self_if_not_found
+//
 // #[from_str] - convert value to string, then parse from str
+// Incompatible with: resource, prototype
+//
 // #[prototype] - use prototype_from_lua instead of get
+// Incompatible with: from_str
+//
 // #[use_self_if_not_found] - use self-Value for property if corresponding field does not exist
+// Incompatible with: default
+//
 // #[resource] - this field is a resource record
+// Incompatible with: from_str, prototype, use_self_if_not_found
 #[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, prototype, use_self_if_not_found, resource))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
