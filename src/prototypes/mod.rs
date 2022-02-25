@@ -691,8 +691,9 @@ pub struct AmmoCategory {
 pub struct AutoplaceControl {
     name: String,
     prototype_base: PrototypeBaseSpec,
-    category: AutoplaceControlCategory,
-    rechness: bool // Default: false
+    pub category: AutoplaceControlCategory,
+    pub can_be_disabled: bool, // Default: true
+    pub richness: bool // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/CustomInput>
@@ -3022,6 +3023,7 @@ pub struct Locomotive {
     pub front_light: Option<LightDefinition>,
     pub front_light_pictures: Option<RotatedSprite>,
     pub darkness_to_render_light_animation: f32, // Default: 0.3
+    pub max_snap_to_train_stop_distance: f32, // Default: 3.0
 }
 
 /// <https://wiki.factorio.com/Prototype/SpiderVehicle>
