@@ -4302,9 +4302,9 @@ pub struct Recipe {
     subgroup: String, // Default: subgroup of product (if only 1) or main_product if multiple. Required either.
     icon: IconSpecification, // Mandatory for recipe with multiple products and no main_product. Defaults to icon of `main_product` or index 1
     crafting_machine_tint: RecipeTint, // Defaults to all zeros
-    // If one difficulty defined, and otehr set to false, it sets enabled = false in other and
-    // copies other protperties. If one difficulty is not defined (set to nil) it uses other
-    // difficulty's properties. If RecipeData defined directly in table body, set only `normal`
+    // If one of the difficulties is defined, and the other is set to false, `enabled = false` in other and
+    // copies over protperties from the first difficulty. If one difficulty is not defined (set to nil), it uses other
+    // difficulty's properties. If RecipeData defined directly in table body (if there are no `normal` and `expensive`), set only `normal
     normal: RecipeData,
     expensive: Option<RecipeData>
 }
