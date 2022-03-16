@@ -1905,7 +1905,7 @@ pub struct Resistances(Vec<Resistance>);
 #[derive(Debug, Clone)]
 pub struct RecipeData {
     ingredients: Vec<IngredientPrototype>, // Max amount is 65535 // can be empty // Duplicates are not allowed
-    results: Vec<ProductPrototype>, // `result` and `result_count` are converted to this // Duplicate entries not allowed
+    results: Vec<ProductPrototype>, // `result` and `result_count` are converted to this // Duplicate entries not allowed // Takes priority over `result`
     // result_count: u32 // Default: 1
     energy_required: f64, // Default: 0.5
     emissions_multiplier: f64, // Default: 1
