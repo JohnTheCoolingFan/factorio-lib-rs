@@ -4,4 +4,4 @@ This library uses [custom fork](https://github.com/JohnTheCoolingFan/factorio-ml
 
 This library is still WIP.
 
-Development status: Implementing PrototypeFromLua
+Development status: Implementing PrototypeFromLua (making derive macro). Stalled.
