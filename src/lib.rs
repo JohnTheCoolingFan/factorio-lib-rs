@@ -1,5 +1,8 @@
+#[cfg(feature = "concepts")]
 pub mod concepts;
+#[cfg(feature = "data-structs")]
 pub mod data_structs;
+#[cfg(feature = "prototypes")]
 pub mod prototypes;
 
 use mlua::{Lua, prelude::LuaResult, Integer, Table};
