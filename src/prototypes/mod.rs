@@ -6,12 +6,15 @@ pub mod prototype_type;
 pub use abstract_prototypes::*;
 pub use utility::*;
 
+#[cfg(feature = "concepts")]
+use crate::concepts::LocalisedString;
+#[cfg(not(feature = "concepts"))]
+type LocalisedString = String;
 use mlua::{Value, Lua, prelude::LuaResult};
 use additional_types::SpriteSizeType;
 use std::collections::HashMap;
 use std::rc::{Rc, Weak};
 use std::marker::PhantomData;
-use crate::concepts::LocalisedString;
 use thiserror::Error;
 use std::fmt;
 use factorio_lib_rs_derive::{

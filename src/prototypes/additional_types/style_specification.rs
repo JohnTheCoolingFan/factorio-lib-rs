@@ -1,4 +1,4 @@
-use crate::concepts::LocalisedString;
+use super::LocalisedString;
 use super::{Color, Sprite, FileName, Position, SpriteSizeType, Sound};
 use strum_macros::{EnumString, AsRefStr};
 

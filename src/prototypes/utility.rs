@@ -3,7 +3,7 @@ use factorio_lib_rs_derive::DataTableAccessable;
 use crate::{DataTableAccessable, DataTable};
 use crate::prototypes::{PrototypeBaseSpec, Prototype, PrototypeBase, PrototypesErr};
 use crate::additional_types::{Color, Sound, DaytimeColorLookupTable, Factorio2DVector, TriggerTargetMask, FileName, SimulationDefinition, BoxSpecification, Animation, Sprite};
-use crate::concepts::LocalisedString;
+use super::LocalisedString;
 
 /// <https://wiki.factorio.com/Prototype/UtilityConstants>
 #[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]

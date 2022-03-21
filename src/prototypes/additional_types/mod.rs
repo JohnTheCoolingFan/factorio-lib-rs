@@ -23,7 +23,7 @@ use std::collections::HashMap;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
 use crate::prototypes::PrototypesErr;
-use crate::concepts::LocalisedString;
+use super::LocalisedString;
 use mlua::{ToLua, Value, Lua, prelude::LuaResult, FromLua};
 use strum_macros::{EnumString, AsRefStr};
 
