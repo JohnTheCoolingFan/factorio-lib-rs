@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["prototypes", "webapi", "concepts", "data-structs"]
+default = ["prototypes", "concepts", "data-structs", "webapi"]
 prototypes = []
-webapi = []
 concepts = []
 data-structs = []
+webapi = []
 
 [dependencies]
 factorio-lib-rs-derive = { path = "./factorio-lib-rs-derive" }
