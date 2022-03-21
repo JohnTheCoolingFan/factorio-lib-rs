@@ -162,7 +162,6 @@ impl Mod {
 // Struct for Mod version (or file, terminology isn't perfect)
 #[derive(Debug)]
 pub struct ModVersion {
-    pub entry: DirEntry,
     pub dependencies: Vec<ModDependency>,
     pub structure: ModStructure,
     pub version: Version,
@@ -206,32 +205,6 @@ impl PartialEq for ModVersion {
 }
 
 impl Eq for ModVersion {}
-
-impl ModVersion {
-    pub fn find_file(&self, filename: String) -> Result<Box<dyn mlua::AsChunk>, ModDataErr> {
-        match self.structure {
-            ModStructure::Directory | ModStructure::Symlink => {
-                let file_path = self.entry.path().join(filename);
-                if file_path.exists() {
-                    let file = File::create(file_path).unwrap();
-                    Ok(Box::new(file.bytes().map(|byte| byte.unwrap()).collect::<Vec<u8>>()))
-                }
-                else {
-                    Err(ModDataErr::FileNotFound(file_path))
-                }
-            },
-            ModStructure::Zip => {
-                let entry_path = self.entry.path();
-                let file_path = entry_path.join(filename);
-                let mut zip_archive = ZipArchive::new(File::create(entry_path).unwrap()) .unwrap();
-                let zip_file = zip_archive.by_name(file_path.to_str().unwrap())
-                    .map_err(|_| ModDataErr::FileNotFound(file_path))?;
-                let bytes = zip_file.bytes().map(|byte| byte.unwrap()).collect::<Vec<u8>>();
-                Ok(Box::new(bytes))
-            }
-        }
-    }
-}
 
 #[derive(Debug)]
 pub enum ModStructure {
