@@ -1,5 +1,5 @@
 use crate::concepts::LocalisedString;
-use crate::types::{Color, Sprite, FileName, Position, SpriteSizeType, Sound};
+use super::{Color, Sprite, FileName, Position, SpriteSizeType, Sound};
 use strum_macros::{EnumString, AsRefStr};
 
 // FIXME?

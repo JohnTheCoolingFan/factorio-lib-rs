@@ -1,7 +1,6 @@
 pub mod concepts;
 pub mod data_structs;
 pub mod prototypes;
-pub mod types;
 
 use std::collections::HashMap;
 use std::rc::{Rc, Weak};
@@ -10,7 +9,7 @@ use std::marker::PhantomData;
 use mlua::{Value, Lua, prelude::LuaResult, Integer, Table};
 use thiserror::Error;
 use prototypes::*;
-use crate::types::SpriteSizeType;
+use prototypes::additional_types::SpriteSizeType;
 
 /// Shorthand for prototype category/type, used in [DataTable]
 pub type PrototypeCategory<T> = HashMap<String, T>;

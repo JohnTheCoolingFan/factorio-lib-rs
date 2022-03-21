@@ -1,4 +1,4 @@
-use crate::types::AttackParameters;
+use super::AttackParameters;
 
 /// <https://wiki.factorio.com/Types/CapsuleAction>
 #[derive(Debug, Clone)]

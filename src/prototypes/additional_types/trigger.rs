@@ -1,4 +1,4 @@
-use crate::types::{Factorio2DVector, CollisionMask, CollisionMode, EntityPrototypeFlags, ForceCondition, DamageTypeFilters, DamagePrototype, BoundingBox};
+use super::{Factorio2DVector, CollisionMask, CollisionMode, EntityPrototypeFlags, ForceCondition, DamageTypeFilters, DamagePrototype, BoundingBox};
 use super::sound::Sound;
 use super::graphics::RenderLayer;
 use factorio_lib_rs_derive::{TriggerItemBase, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase};

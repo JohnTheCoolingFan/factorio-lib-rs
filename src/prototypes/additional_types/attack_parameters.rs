@@ -1,4 +1,4 @@
-use crate::types::{Factorio2DVector, RangeMode, AmmoType, CircularParticleCreationSpecification};
+use super::{Factorio2DVector, RangeMode, AmmoType, CircularParticleCreationSpecification};
 use super::graphics::RotatedAnimation;
 use super::sound::{LayeredSound, CyclicSound};
 use strum_macros::{EnumString, AsRefStr};

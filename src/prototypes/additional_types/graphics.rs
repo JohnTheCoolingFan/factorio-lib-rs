@@ -1,6 +1,6 @@
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
 use std::iter::{Iterator, FromIterator};
-use crate::types::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
+use super::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
 use factorio_lib_rs_derive::PrototypeFromLua;
 use strum_macros::{EnumString, AsRefStr};
 use mlua::ToLua;

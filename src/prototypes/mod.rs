@@ -1,5 +1,6 @@
 mod abstract_prototypes;
 mod utility;
+pub mod additional_types;
 pub mod prototype_type;
 
 pub use abstract_prototypes::*;
@@ -31,7 +32,7 @@ use factorio_lib_rs_derive::{
     PrototypeFromLua
 };
 use crate::{DataTableAccessable, DataTable};
-use crate::types::{
+use additional_types::{
     ModSettingType,
     MapDifficultySettings,
     MapPathFinder,

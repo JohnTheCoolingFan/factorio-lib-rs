@@ -1,6 +1,6 @@
 use factorio_lib_rs_derive::PrototypeFromLua;
 
-use crate::types::FileName;
+use super::FileName;
 
 /// <https://wiki.factorio.com/Types/LayeredSound>
 pub type LayeredSound = Vec<Sound>; // `layers`
