@@ -1,5 +1,5 @@
 pub mod concepts;
-pub mod mod_structs;
+pub mod data_structs;
 pub mod prototypes;
 pub mod types;
 
