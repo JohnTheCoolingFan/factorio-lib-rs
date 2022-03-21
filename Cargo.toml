@@ -7,6 +7,7 @@ edition = "2021"
 prototypes = []
 webapi = []
 concepts = []
+data-structs = []
 
 [dependencies]
 factorio-lib-rs-derive = { path = "./factorio-lib-rs-derive" }
