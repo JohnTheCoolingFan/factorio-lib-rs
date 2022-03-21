@@ -163,38 +163,19 @@ impl Mod {
 #[derive(Debug)]
 pub struct ModVersion {
     pub dependencies: Vec<ModDependency>,
-    pub structure: ModStructure,
     pub version: Version,
 }
 
 // impls for comparing mod versions
 impl PartialOrd for ModVersion {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match self.version.partial_cmp(&other.version) {
-            Some(Ordering::Equal) => {
-                match (&self.structure, &other.structure) {
-                    (ModStructure::Zip, ModStructure::Directory) | (ModStructure::Zip, ModStructure::Symlink) => Some(Ordering::Less),
-                    _ => Some(Ordering::Equal),
-                }
-            }
-            Some(ord) => Some(ord),
-            _ => None,
-        }
+        self.version.partial_cmp(&other.version)
     }
 }
 
 impl Ord for ModVersion {
     fn cmp(&self, other: &Self) -> Ordering {
-        match self.version.cmp(&other.version) {
-            Ordering::Equal => {
-                match (&self.structure, &other.structure) {
-                    (ModStructure::Zip, ModStructure::Directory) | (ModStructure::Zip, ModStructure::Symlink) => Ordering::Less,
-                    _ => Ordering::Equal,
-                }
-            }
-            Ordering::Greater => Ordering::Greater,
-            Ordering::Less => Ordering::Less,
-        }
+        self.version.cmp(&other.version)
     }
 }
 
@@ -205,37 +186,6 @@ impl PartialEq for ModVersion {
 }
 
 impl Eq for ModVersion {}
-
-#[derive(Debug)]
-pub enum ModStructure {
-    Directory,
-    Symlink,
-    Zip,
-}
-
-impl ModStructure {
-    pub fn parse(entry: &DirEntry) -> Result<Self, ModDataErr> {
-        let path = entry.path();
-        let extension = path.extension();
-
-        if extension.is_some() && extension.unwrap() == OsStr::new("zip") {
-            return Ok(ModStructure::Zip);
-        } else {
-            let file_type = entry.file_type().map_err(|_| ModDataErr::FilesystemError)?;
-            if file_type.is_symlink() {
-                return Ok(ModStructure::Symlink);
-            } else {
-                let mut path = entry.path();
-                path.push("info.json");
-                if path.exists() {
-                    return Ok(ModStructure::Directory);
-                }
-            }
-        }
-
-        Err(ModDataErr::InvalidModStructure)
-    }
-}
 
 // Structs for deserializing json files
 #[derive(Deserialize, Debug)]
