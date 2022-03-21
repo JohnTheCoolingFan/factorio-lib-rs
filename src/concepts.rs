@@ -156,7 +156,7 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedString {
 }
 
 impl LocalisedString {
-    fn set_handler(&mut self, locale_handler: Rc<Option<LocaleHandler>>) {
+    pub fn set_handler(&mut self, locale_handler: Rc<Option<LocaleHandler>>) {
         self.locale_handler = Rc::clone(&locale_handler);
     }
 }
