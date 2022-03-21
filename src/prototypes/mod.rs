@@ -1,5 +1,6 @@
 mod abstract_prototypes;
 mod utility;
+pub mod prototype_type;
 
 pub use abstract_prototypes::*;
 pub use utility::*;

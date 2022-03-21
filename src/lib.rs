@@ -1,7 +1,6 @@
 pub mod concepts;
 pub mod mod_structs;
 pub mod prototypes;
-pub mod prototype_type;
 pub mod types;
 
 use std::collections::HashMap;
