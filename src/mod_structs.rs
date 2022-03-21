@@ -1,8 +1,4 @@
 use std::path::PathBuf;
-use std::ffi::OsStr;
-use zip::ZipArchive;
-use std::fs::File;
-use std::fs::DirEntry;
 use semver::Version;
 use std::cmp::Ordering;
 use lexical_sort::natural_only_alnum_cmp;
@@ -11,7 +7,6 @@ use once_cell::sync::OnceCell;
 use regex::Regex;
 use semver::VersionReq;
 use thiserror::Error;
-use std::io::Read;
 use serde::Deserialize;
 
 // Credit for the most part goes to raiguard's factorio_mod_manager
