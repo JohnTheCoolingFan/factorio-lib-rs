@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, str::FromStr, fmt::{self, Display, Formatter}};
 use semver::Version;
 use std::cmp::Ordering;
 use lexical_sort::natural_only_alnum_cmp;
@@ -211,6 +211,61 @@ pub enum ModDependencyErr {
     NameIsUnparsable(String),
     #[error("Unknown dependency modifier: `{0}`")]
     UnknownModifier(String),
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Debug)]
+pub enum FactorioVersion {
+    v0_13,
+    v0_14,
+    v0_15,
+    v0_16,
+    v0_17,
+    v0_18,
+    v1_0,
+    v1_1
+}
+
+impl FromStr for FactorioVersion {
+    type Err = FactorioVersionParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "0.13" => Ok(Self::v0_13),
+            "0.14" => Ok(Self::v0_14),
+            "0.15" => Ok(Self::v0_15),
+            "0.16" => Ok(Self::v0_16),
+            "0.17" => Ok(Self::v0_17),
+            "0.18" => Ok(Self::v0_18),
+            "1.0" => Ok(Self::v1_0),
+            "1.1" => Ok(Self::v1_1),
+            _ => Err(FactorioVersionParseError(s.into()))
+        }
+    }
+}
+
+impl Display for FactorioVersion {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            v0_13 => "0.13",
+            v0_14 => "0.14",
+            v0_15 => "0.15",
+            v0_16 => "0.16",
+            v0_17 => "0.17",
+            v0_18 => "0.18",
+            v1_0 => "1.0",
+            v1_1 => "1.1"
+        })
+    }
+}
+
+#[derive(Debug, Error)]
+pub struct FactorioVersionParseError(String);
+
+impl Display for FactorioVersionParseError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "Incorrect factorio version string: \"{}\"", self.0)
+    }
 }
 
 #[derive(Debug, Error)]
