@@ -5,6 +5,9 @@ pub mod concepts;
 pub mod data_structs;
 #[cfg(feature = "prototypes")]
 pub mod prototypes;
+#[cfg(feature = "webapi")]
+/// <https://wiki.factorio.com/Factorio_HTTP_API_usage_guidelines#APIs>
+pub mod webapi;
 
 use mlua::{Lua, prelude::LuaResult, Integer, Table};
 use prototypes::*;

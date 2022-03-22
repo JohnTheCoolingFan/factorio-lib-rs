@@ -7,7 +7,7 @@ use once_cell::sync::OnceCell;
 use regex::Regex;
 use semver::VersionReq;
 use thiserror::Error;
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 
 // Credit for the most part goes to raiguard's factorio_mod_manager
 // https://github.com/raiguard/factorio_mod_manager
@@ -214,15 +214,23 @@ pub enum ModDependencyErr {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum FactorioVersion {
+    #[serde(rename = "0.13")]
     v0_13,
+    #[serde(rename = "0.14")]
     v0_14,
+    #[serde(rename = "0.15")]
     v0_15,
+    #[serde(rename = "0.16")]
     v0_16,
+    #[serde(rename = "0.17")]
     v0_17,
+    #[serde(rename = "0.18")]
     v0_18,
+    #[serde(rename = "1.0")]
     v1_0,
+    #[serde(rename = "1.1")]
     v1_1
 }
 

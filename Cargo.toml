@@ -8,7 +8,7 @@ default = ["prototypes", "concepts", "data-structs", "webapi"]
 prototypes = []
 concepts = []
 data-structs = []
-webapi = []
+webapi = ["data-structs"]
 
 [dependencies]
 factorio-lib-rs-derive = { path = "./factorio-lib-rs-derive" }
@@ -25,3 +25,4 @@ once_cell = "1.8.0"
 rust-ini = "0.17"
 strum = { version = "0.22", features = ["derive"] }
 strum_macros = "0.22"
+const_format = "0.2"
