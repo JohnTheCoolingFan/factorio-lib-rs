@@ -12,7 +12,8 @@ use serde::{Serialize, Deserialize};
 // Credit for the most part goes to raiguard's factorio_mod_manager
 // https://github.com/raiguard/factorio_mod_manager
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Deserialize)]
+#[serde(try_from = "String")]
 pub struct ModDependency {
     pub dep_type: ModDependencyType,
     pub name: String,
@@ -77,6 +78,14 @@ impl ModDependency {
                 _ => None,
             }
         })
+    }
+}
+
+impl TryFrom<String> for ModDependency {
+    type Error = ModDependencyErr;
+
+    fn try_from(s: String) -> Result<Self, Self::Error> {
+        Self::new(&s)
     }
 }
 
@@ -185,9 +194,27 @@ impl Eq for ModVersion {}
 // Structs for deserializing json files
 #[derive(Deserialize, Debug)]
 pub struct InfoJson {
-    pub dependencies: Option<Vec<String>>,
     pub name: String,
     pub version: Version,
+    pub title: String,
+    pub author: ModAuthor,
+    pub contact: Option<String>,
+    pub homepage: Option<String>,
+    pub description: Option<String>,
+    pub factorio_version: FactorioVersion,
+    #[serde(default = "default_dependencies")]
+    pub dependencies: Vec<ModDependency>
+}
+
+fn default_dependencies() -> Vec<ModDependency> {
+    vec![ModDependency{dep_type: ModDependencyType::Required, name: "base".into(), version_req: None}]
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum ModAuthor {
+    Author(String),
+    Authors(Vec<String>)
 }
 
 #[derive(Deserialize)]
@@ -214,7 +241,7 @@ pub enum ModDependencyErr {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum FactorioVersion {
     #[serde(rename = "0.13")]
     v0_13,
