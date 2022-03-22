@@ -24,11 +24,29 @@ pub enum PageSize {
 
 #[derive(Debug, Serialize)]
 pub struct ModPortalModsApiRequestParameters {
+    pub hide_deprecated: bool,
+    pub sort: ModPortalRequestSort,
+    pub sort_order: ModPortalRequestSortOrder,
     pub page: u64,
     pub page_size: PageSize,
     pub namelist: Vec<String>,
-    pub hide_deprecated: bool,
     pub version: FactorioVersion
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ModPortalRequestSort {
+    Name,
+    CreatedAt,
+    UpdatedAt
+}
+
+#[derive(Debug, Serialize)]
+pub enum ModPortalRequestSortOrder {
+    #[serde(rename = "asc")]
+    Ascending,
+    #[serde(rename = "desc")]
+    Descending
 }
 
 #[derive(Debug, Deserialize)]
