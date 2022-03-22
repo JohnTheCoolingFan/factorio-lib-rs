@@ -27,10 +27,24 @@ pub struct ModPortalModsApiRequestParameters {
     pub hide_deprecated: bool,
     pub sort: ModPortalRequestSort,
     pub sort_order: ModPortalRequestSortOrder,
-    pub page: u64,
-    pub page_size: PageSize,
-    pub namelist: Vec<String>,
-    pub version: FactorioVersion
+    pub page: Option<u64>,
+    pub page_size: Option<PageSize>,
+    pub namelist: Option<Vec<String>>,
+    pub version: Option<FactorioVersion>
+}
+
+impl ModPortalModsApiRequestParameters {
+    pub fn new() -> Self {
+        Self{
+            hide_deprecated: false,
+            page: None,
+            page_size: None,
+            sort: ModPortalRequestSort::Name,
+            sort_order: ModPortalRequestSortOrder::Descending,
+            namelist: None,
+            version: None
+        }
+    }
 }
 
 #[derive(Debug, Serialize)]
