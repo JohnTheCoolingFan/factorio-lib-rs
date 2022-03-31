@@ -769,7 +769,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
 }
 
 struct PrototypeFromLuaFieldAttrArgs {
-    default_value: Option<syn::Lit>, // Incompatible with: use_self_if_not_found
+    default_value: Option<proc_macro2::TokenStream>, // Incompatible with: use_self_if_not_found
     // Only 1 can be used:
     use_from_str: bool,              // Incompatible with:
     use_self: bool,                  // Incompatible with: default
@@ -784,7 +784,7 @@ impl PrototypeFromLuaFieldAttrArgs {
             if attr.path.is_ident("default") {
                 if result.use_self { return Self::attr_error(attr, "`default()` is incompatible with `use_self`") }
                 if result.use_self_vec { return Self::attr_error(attr, "`default()` is incompatible with `use_self_vec`") }
-                result.default_value = Some(attr.parse_args::<syn::Lit>()?)
+                result.default_value = Some(attr.tokens.clone())
             } else if attr.path.is_ident("from_str") {
                 if result.is_resource { return Self::attr_error(attr, "`from_str` attribute is incompatible with `resource`") }
                 if result.use_self { return Self::attr_error(attr, "`from_str` is incompatible with `use_self`") }
