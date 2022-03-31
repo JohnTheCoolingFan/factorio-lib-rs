@@ -503,6 +503,24 @@ impl<'lua> PrototypeFromLua<'lua> for Value<'lua> {
     }
 }
 
+impl<'lua> PrototypeFromLua<'lua> for String {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+        lua.unpack(value)
+    }
+}
+
+/// Trait for getting a prototype from table
+trait GetPrototype {
+    fn get_prot<K: ToLua, V: PrototypeFromLua>(&self, key: K, lua: &Lua) -> LuaResult<V>;
+}
+
+impl GetPrototype for mlua::Table {
+    fn get_prot<K: ToLua, V: PrototypeFromLua>(&self, key: K, lua: &Lua, data_table: &mut DataTable) -> LuaResult<V> {
+        let value = self.get::<K, Value>(key)?;
+        V::prototype_from_lua(value, lua, data_table)
+    }
+}
+
 /// Validate PrototypeReference. Any type.
 trait PrototypeReferenceValidate: fmt::Debug {
     fn validate(&self, data_table: &DataTable) -> Result<(), PrototypesErr>;
