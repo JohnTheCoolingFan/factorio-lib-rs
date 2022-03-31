@@ -733,7 +733,7 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 //
 // #[resource] - this field is a resource record (sound, textures should be done in post-extraction)
 // Incompatible with: from_str, use_self, use_self_vec
-#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self_if_not_found, use_self_vec, resource))]
+#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, resource))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
