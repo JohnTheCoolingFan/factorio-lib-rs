@@ -1,3 +1,4 @@
+use crate::prototypes::GetPrototype;
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
 use std::iter::{Iterator, FromIterator};
 use super::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
@@ -405,11 +406,10 @@ impl<'lua> crate::PrototypeFromLua<'lua> for AnimationSpec {
 pub struct Stripe {
     width_in_frames: u32,
     height_in_frames: u32,
-    #[prototype]
     filename: FileName,
-    #[default(0)]
+    #[default(0_u32)]
     x: u32, // Default: 0
-    #[default(0)]
+    #[default(0_u32)]
     y: u32 // Default: 0
 }
 

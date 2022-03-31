@@ -472,7 +472,7 @@ pub struct BoolModSetting {
     #[from_str]
     setting_type: ModSettingType,
     pub default_value: bool,
-    #[mandatory_if(default_value)]
+    //#[mandatory_if(default_value)]
     pub forced_value: Option<bool>,
 }
 
@@ -546,7 +546,7 @@ pub struct AmbientSoundPrototype {
 #[data_table(animation)]
 pub struct AnimationPrototype {
     name: String,
-    #[use_self_if_not_found]
+    #[use_self_vec]
     pub layers: Vec<Animation> // If lua table doesn't have layers, use same table for constructing just one
 }
 

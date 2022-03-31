@@ -14,8 +14,7 @@ pub struct Sound {
     allow_random_repeat: bool,
     #[default(1.0)]
     audible_distance_modifier: f64,
-    #[use_self_if_not_found]
-    #[prototype]
+    #[use_self_vec]
     variations: Vec<SoundVariation> // If variations table not present, use the same table, but construct single variation.
 }
 
@@ -47,8 +46,7 @@ pub struct SoundVariation {
 /// <https://wiki.factorio.com/Types/WorkingSound>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct WorkingSound {
-    #[use_self_if_not_found]
-    #[prototype]
+    #[use_self]
     sound: Sound, // If property not present, Sound is constructed from WorkingSound fields
     #[default(1.0)]
     apparent_volume: f32, // Default: 1
@@ -67,46 +65,36 @@ pub struct WorkingSound {
     audible_distance_modifier: f64, // Default: 1
     #[default(1.0)]
     probability: f64, // Default: 1
-    #[default(0)]
+    #[default(0_u32)]
     fade_in_ticks: u32, // Default: 0
-    #[default(0)]
+    #[default(0_u32)]
     fade_out_ticks: u32, // Default: 0
-    #[prototype]
     idle_sound: Option<Sound>,
-    #[prototype]
     activate_sound: Option<Sound>,
-    #[prototype]
     deactivate_sound: Option<Sound>,
 }
 
 /// <https://wiki.factorio.com/Types/InterruptibleSound>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct InterruptibleSound {
-    #[prototype]
     sound: Sound,
-    #[default(0)]
+    #[default(0_u32)]
     fade_ticks: u32 // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/CyclicSound>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CyclicSound {
-    #[prototype]
     begin_sound: Option<Sound>,
-    #[prototype]
     middle_sound: Option<Sound>,
-    #[prototype]
     end_sound: Option<Sound>
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#build_sound>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct TileBuildSound {
-    #[use_self_if_not_found]
-    #[prototype]
+    #[use_self]
     small: Sound,
-    #[prototype]
     medium: Option<Sound>,
-    #[prototype]
     large: Option<Sound>
 }
