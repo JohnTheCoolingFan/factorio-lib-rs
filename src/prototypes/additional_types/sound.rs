@@ -1,3 +1,4 @@
+use crate::prototypes::GetPrototype;
 use factorio_lib_rs_derive::PrototypeFromLua;
 
 use super::FileName;
