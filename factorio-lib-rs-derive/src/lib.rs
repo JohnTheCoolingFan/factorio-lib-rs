@@ -720,17 +720,20 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 // Attribute on field
 //
 // #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
-// Incompatible with: use_self_if_not_found
+// Incompatible with: use_self, use_self_vec
 //
 // #[from_str] - convert value to string, then parse from str
-// Incompatible with: resource,
+// Incompatible with: resource, use_self, use_self_vec
 //
-// #[use_self_if_not_found] - use self-Value for property if corresponding field does not exist
-// Incompatible with: default
+// #[use_self] - use self-Value for property if corresponding field does not exist
+// Incompatible with: default, from_str, use_self_vec, resource
+//
+// #[use_self_vec] - same as use_self, but puts result in a Vec
+// Incompatible with: default, from_str, use_self, resource
 //
 // #[resource] - this field is a resource record (sound, textures should be done in post-extraction)
-// Incompatible with: from_str, use_self_if_not_found
-#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self_if_not_found, resource))]
+// Incompatible with: from_str, use_self, use_self_vec
+#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self_if_not_found, use_self_vec, resource))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
@@ -750,7 +753,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     let parsed_fields = fields.clone().map(|f| prot_from_lua_field(f).unwrap());
     let field_names = fields.map(|f| &f.ident);
     let gen = quote! {
-        impl<'lua> crate::PrototypeFromLua<'lua> for #name {
+        impl<'lua> crate::prototypes::PrototypeFromLua<'lua> for #name {
             fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::prelude::LuaResult<Self> {
                 if let mlua::Value::Table(ref prot_table) = value {
                     #(#parsed_fields)*
@@ -770,6 +773,7 @@ struct PrototypeFromLuaFieldAttrArgs {
     // Only 1 can be used:
     use_from_str: bool,              // Incompatible with:
     use_self: bool,                  // Incompatible with: default
+    use_self_vec: bool,              // Incompatible with: default
     is_resource: bool                // Incompatible with:
 }
 
@@ -777,20 +781,29 @@ impl PrototypeFromLuaFieldAttrArgs {
     fn from_attrs(attrs: &[Attribute]) -> Result<Self> {
         let mut result = Self::default();
         for attr in attrs {
-            // TODO: all conditions
-            if attr.path.is_ident("from_str") {
-                if result.is_resource { return Self::attr_error(attr, "`from_str` attribute is incompatible with `resource`") }
-                result.use_from_str = true
-            } else if attr.path.is_ident("default") {
-                if result.use_self { return Self::attr_error(attr, "`default()` is incompatible with `use_self_if_not_found`") }
+            if attr.path.is_ident("default") {
+                if result.use_self { return Self::attr_error(attr, "`default()` is incompatible with `use_self`") }
+                if result.use_self_vec { return Self::attr_error(attr, "`default()` is incompatible with `use_self_vec`") }
                 result.default_value = Some(attr.parse_args::<syn::Lit>()?)
-            } else if attr.path.is_ident("use_self_if_not_found") {
-                if result.default_value.is_some() { return Self::attr_error(attr, "`use_self_if_not_found` is incompatible with `default()`") }
-                if result.use_from_str { return Self::attr_error(attr, "`use_self_if_not_found` is incompatible with `from_str`") }
+            } else if attr.path.is_ident("from_str") {
+                if result.is_resource { return Self::attr_error(attr, "`from_str` attribute is incompatible with `resource`") }
+                if result.use_self { return Self::attr_error(attr, "`from_str` is incompatible with `use_self`") }
+                if result.use_self_vec { return Self::attr_error(attr, "`from_str` is incompatible with `use_self_vec`") }
+                result.use_from_str = true
+            } else if attr.path.is_ident("use_self") {
+                if result.default_value.is_some() { return Self::attr_error(attr, "`use_self` is incompatible with `default()`") }
+                if result.use_from_str { return Self::attr_error(attr, "`use_self` is incompatible with `from_str`") }
+                if result.use_self_vec { return Self::attr_error(attr, "`use_self` is incompatible with `use_self_vec`") }
+                result.use_self = true
+            } else if attr.path.is_ident("use_self_vec") {
+                if result.default_value.is_some() { return Self::attr_error(attr, "`use_self_vec` is incompatible with `default()`") }
+                if result.use_from_str { return Self::attr_error(attr, "`use_self_vec` is incompatible with `from_str`") }
+                if result.use_self { return Self::attr_error(attr, "`use_self_vec` is incompatible with `use_self`") }
                 result.use_self = true
             } else if attr.path.is_ident("resource") {
                 if result.use_from_str { return Self::attr_error(attr, "`resource` is incompatible with `from_str`") }
-                if result.use_self { return Self::attr_error(attr, "`resource` is incompatible with `use_self_if_not_found`") }
+                if result.use_self { return Self::attr_error(attr, "`resource` is incompatible with `use_self_vec`") }
+                if result.use_self_vec { return Self::attr_error(attr, "`resource` is incompatible with `use_self_vec`") }
                 result.is_resource = true
             }
         }
@@ -808,6 +821,7 @@ impl Default for PrototypeFromLuaFieldAttrArgs {
             default_value: None, 
             use_from_str: false,
             use_self: false,
+            use_self_vec: false,
             is_resource: false
         }
     }
@@ -834,17 +848,22 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let get_expr = if prototype_field_attrs.is_resource {
         quote! {
             {
-                #field_get_expr;
+                let name = #field_get_expr;
                 data_table.register_resource(crate::ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
                 name.into()
             };
         }
     } else if prototype_field_attrs.use_from_str {
         quote! { #field_get_expr.parse::<#field_type>().map_err(mlua::Error::external)?; }
-    } else if prototype_field_attrs.use_self {
+    } else if prototype_field_attrs.use_self_vec {
         quote! { 
             prot_table.get_prot::<_, Option<#field_extr_type>>(#str_field, lua, data_table).transpose()
-                .unwrap_or_else(|| Ok(Vec::from([PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table)?])))?;
+                .unwrap_or_else(|| Ok(Vec::from([crate::prototypes::PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table)?])))?;
+        }
+    } else if prototype_field_attrs.use_self {
+        quote! {
+            prot_table.get_prot::<_, Option<#field_extr_type>>(#str_field, lua, data_table).transpose()
+                .unwrap_or_else(|| crate::prototypes::PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table))?;
         }
     } else {
         quote! { #field_get_expr; }
