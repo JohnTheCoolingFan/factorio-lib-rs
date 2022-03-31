@@ -674,6 +674,19 @@ fn impl_selection_tool_macro(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+#[proc_macro]
+pub fn prot_from_lua_blanket(input: TokenStream) -> TokenStream {
+    let target_type = syn::parse::<syn::Type>(input).unwrap();
+    let gen = quote! {
+        impl<'lua> PrototypeFromLua<'lua> for #target_type {
+            fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::prototypes::DataTable) -> mlua::prelude::LuaResult<Self> {
+                lua.unpack(value)
+            }
+        }
+    };
+    gen.into()
+}
+
 fn impl_data_table_accessable_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let attrs = &ast.attrs;
@@ -710,17 +723,14 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 // Incompatible with: use_self_if_not_found
 //
 // #[from_str] - convert value to string, then parse from str
-// Incompatible with: resource, prototype
-//
-// #[prototype] - use prototype_from_lua instead of get
-// Incompatible with: from_str
+// Incompatible with: resource,
 //
 // #[use_self_if_not_found] - use self-Value for property if corresponding field does not exist
 // Incompatible with: default
 //
-// #[resource] - this field is a resource record
-// Incompatible with: from_str, prototype, use_self_if_not_found
-#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, prototype, use_self_if_not_found, resource))]
+// #[resource] - this field is a resource record (sound, textures should be done in post-extraction)
+// Incompatible with: from_str, use_self_if_not_found
+#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self_if_not_found, resource))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
@@ -737,12 +747,9 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
         syn::Fields::Named(f) => f.named.iter(),
         _ => panic!("expected named fields")
     }};
-    let requires_data_table = fields.clone().fold(false, check_for_data_table);
     let parsed_fields = fields.clone().map(|f| prot_from_lua_field(f).unwrap());
     let field_names = fields.map(|f| &f.ident);
-    let parsed_fields_clone = parsed_fields.clone();
-    let field_names_clone = field_names.clone();
-    let mut gen = quote! {
+    let gen = quote! {
         impl<'lua> crate::PrototypeFromLua<'lua> for #name {
             fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::prelude::LuaResult<Self> {
                 if let mlua::Value::Table(ref prot_table) = value {
@@ -755,60 +762,34 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
     };
-    if !requires_data_table {
-        let extra_gen = quote! {
-            impl<'lua> mlua::FromLua<'lua> for #name {
-                fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::prelude::LuaResult<Self> {
-                    if let mlua::Value::Table(ref prot_table) = value {
-                        #(#parsed_fields_clone)*
-                        Ok(Self{#(#field_names_clone),*})
-                    } else {
-                        Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: #str_name,
-                        message: Some("Expected Table".into())})
-                    }
-                }
-            }
-        };
-        gen.extend(extra_gen);
-    }
     gen.into()
 }
 
 struct PrototypeFromLuaFieldAttrArgs {
-    default_value: Option<syn::Lit>,
-    use_from_str: bool,
-    use_prototype: bool,
-    use_self: bool,
-    is_resource: bool
+    default_value: Option<syn::Lit>, // Incompatible with: use_self_if_not_found
+    // Only 1 can be used:
+    use_from_str: bool,              // Incompatible with:
+    use_self: bool,                  // Incompatible with: default
+    is_resource: bool                // Incompatible with:
 }
 
-type ArgsTuple = (Option<syn::Lit>, bool, bool, bool, bool);
-
 impl PrototypeFromLuaFieldAttrArgs {
-
-    fn to_tuple(self) -> ArgsTuple {
-        (self.default_value, self.use_from_str, self.use_prototype, self.use_self, self.is_resource)
-    }
-
     fn from_attrs(attrs: &[Attribute]) -> Result<Self> {
         let mut result = Self::default();
         for attr in attrs {
+            // TODO: all conditions
             if attr.path.is_ident("from_str") {
                 if result.is_resource { return Self::attr_error(attr, "`from_str` attribute is incompatible with `resource`") }
-                if result.use_prototype { return Self::attr_error(attr, "`from_str` attribute is incompatible with `prototype`") }
                 result.use_from_str = true
-            } else if attr.path.is_ident("prototype") {
-                if result.use_from_str { return Self::attr_error(attr, "`prototype` is incompatible with `from_str`") }
-                result.use_prototype = true
             } else if attr.path.is_ident("default") {
                 if result.use_self { return Self::attr_error(attr, "`default()` is incompatible with `use_self_if_not_found`") }
                 result.default_value = Some(attr.parse_args::<syn::Lit>()?)
             } else if attr.path.is_ident("use_self_if_not_found") {
                 if result.default_value.is_some() { return Self::attr_error(attr, "`use_self_if_not_found` is incompatible with `default()`") }
+                if result.use_from_str { return Self::attr_error(attr, "`use_self_if_not_found` is incompatible with `from_str`") }
                 result.use_self = true
             } else if attr.path.is_ident("resource") {
                 if result.use_from_str { return Self::attr_error(attr, "`resource` is incompatible with `from_str`") }
-                if result.use_prototype { return Self::attr_error(attr, "`resource` is incompatible with `prototype`") }
                 if result.use_self { return Self::attr_error(attr, "`resource` is incompatible with `use_self_if_not_found`") }
                 result.is_resource = true
             }
@@ -819,10 +800,6 @@ impl PrototypeFromLuaFieldAttrArgs {
     fn attr_error<T: Display>(attr: &Attribute, message: T) -> Result<Self> {
         Err(syn::Error::new(attr.span(), message))
     }
-
-    fn tuple_from_attrs(attrs: &[Attribute]) -> Result<ArgsTuple> {
-        Ok(Self::from_attrs(attrs)?.to_tuple())
-    }
 }
 
 impl Default for PrototypeFromLuaFieldAttrArgs {
@@ -830,7 +807,6 @@ impl Default for PrototypeFromLuaFieldAttrArgs {
         Self{
             default_value: None, 
             use_from_str: false,
-            use_prototype: false,
             use_self: false,
             is_resource: false
         }
@@ -841,102 +817,40 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     let ident = &field.ident;
     let str_field = ident.as_ref().unwrap().to_string();
     let field_type = &field.ty;
-    let mut gen = quote! {
-        let #ident: #field_type =
+    let prototype_field_attrs = PrototypeFromLuaFieldAttrArgs::from_attrs(&field.attrs)?;
+    let mut field_extr_type = if prototype_field_attrs.use_from_str || prototype_field_attrs.is_resource {
+        quote! { String }
+    } else {
+        quote! { #field_type }
     };
-    let (default_value, use_from_str, use_prototype, use_self, is_resource) = PrototypeFromLuaFieldAttrArgs::tuple_from_attrs(&field.attrs)?;
-    let mut get_expr: proc_macro2::TokenStream;
-    if is_resource {
-        if let Some(default_value) = default_value {
-            get_expr = quote! {
-                { 
-                    let name = prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or_else(|| #default_value.into());
-                    data_table.register_resource(crate::ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
-                    name.into()
-                }
-            }
-        } else {
-            get_expr = quote! {
-                {
-                    let name = prot_table.get::<_, String>(#str_field)?;
-                    data_table.register_resource(crate::ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
-                    name.into()
-                }
-            }
+    if prototype_field_attrs.default_value.is_some() {
+        field_extr_type = quote! { Option<#field_extr_type> };
+    }
+    let field_get_expr = if let Some(def_val) = prototype_field_attrs.default_value {
+        quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)?.unwrap_or_else(|| #def_val.into()) }
+    } else {
+        quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? }
+    };
+    let get_expr = if prototype_field_attrs.is_resource {
+        quote! {
+            {
+                #field_get_expr;
+                data_table.register_resource(crate::ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
+                name.into()
+            };
         }
-    } else if !use_prototype { 
-        if !use_from_str {
-            if !use_self {
-                if let Some(default_value) = default_value {
-                    get_expr = quote! {
-                        prot_table.get::<_, Option<#field_type>>(#str_field)?.unwrap_or(#default_value)
-                    }
-                } else {
-                    get_expr = quote! {
-                        prot_table.get(#str_field)?
-                    }
-                }
-            } else {
-                get_expr = quote! {
-                    prot_table.get::<_, Option<#field_type>>(#str_field)?.unwrap_or_else(|| Vec::from([lua.unpack(prot_table.clone().to_lua()?)?]))
-                }
-            }
-        } else if let Some(default_value) = default_value {
-            get_expr = quote! {
-                prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or(#default_value.into())
-            }
-        } else {
-            get_expr = quote! {
-                prot_table.get::<_, String>(#str_field)?
-            }
-        }
-    } else if !use_from_str {
-        if !use_self {
-            if let Some(default_value) = default_value {
-                get_expr = quote! {
-                    crate::PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<Vec<mlua::Value>>>(#str_field)?.unwrap_or(#default_value), lua, data_table)?
-                }
-            } else {
-                get_expr = quote! {
-                    crate::PrototypeFromLua::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
-                }
-            }
-        } else {
-            get_expr = quote! {
-                crate::PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<mlua::Value>>(#str_field)?
-                    .unwrap_or_else(|| value.clone()), lua, data_table)?
-            }
-        }
-    } else if let Some(default_value) = default_value {
-        get_expr = quote! {
-            crate::PrototypeFromLua::prototype_from_lua(prot_table.get::<_, Option<String>>(#str_field)?.unwrap_or(#default_value.into()), lua, data_table)?
+    } else if prototype_field_attrs.use_from_str {
+        quote! { #field_get_expr.parse::<#field_type>().map_err(mlua::Error::external)?; }
+    } else if prototype_field_attrs.use_self {
+        quote! { 
+            prot_table.get_prot::<_, Option<#field_extr_type>>(#str_field, lua, data_table).transpose()
+                .unwrap_or_else(|| Ok(Vec::from([PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table)?])))?;
         }
     } else {
-        get_expr = quote! {
-            crate::PrototypeFromLua::prototype_from_lua(prot_table.get(#str_field)?, lua, data_table)?
-        }
-    }
-    if use_from_str {
-        let parse_str = quote! {
-            .parse::<#field_type>().map_err(mlua::Error::external)?
-        };
-        get_expr.extend(parse_str);
-    }
-    gen.extend(get_expr);
-    let semicolon = quote!(;);
-    gen.extend(semicolon);
+        quote! { #field_get_expr; }
+    };
+    let gen = quote! {
+        let #ident: #field_type = #get_expr
+    };
     Ok(gen)
-}
-
-fn check_for_data_table(state: bool, field: &syn::Field) -> bool {
-    if state {
-        state
-    } else {
-        for attr in &field.attrs {
-            if attr.path.is_ident("prototype") || attr.path.is_ident("resource") {
-                return true
-            }
-        }
-        false
-    }
 }

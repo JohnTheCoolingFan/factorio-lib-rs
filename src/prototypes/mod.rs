@@ -36,7 +36,8 @@ use factorio_lib_rs_derive::{
     Item,
     SelectionTool,
     DataTableAccessable,
-    PrototypeFromLua
+    PrototypeFromLua,
+    prot_from_lua_blanket,
 };
 use additional_types::*;
 
@@ -356,11 +357,22 @@ impl<'lua> PrototypeFromLua<'lua> for Value<'lua> {
     }
 }
 
-impl<'lua> PrototypeFromLua<'lua> for String {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
-        lua.unpack(value)
-    }
-}
+// "Manual" PrototypeFromLua implementations for types that implement FromLua
+// The reason I can't do impl<T> PrototypeFromLua for T is because I need special handling for Vec
+// and Option to allow to pass through DataTable reference
+prot_from_lua_blanket!(String);
+prot_from_lua_blanket!(f64);
+prot_from_lua_blanket!(f32);
+prot_from_lua_blanket!(bool);
+prot_from_lua_blanket!(u64);
+prot_from_lua_blanket!(u32);
+prot_from_lua_blanket!(u16);
+prot_from_lua_blanket!(u8);
+prot_from_lua_blanket!(i64);
+prot_from_lua_blanket!(i32);
+prot_from_lua_blanket!(i16);
+prot_from_lua_blanket!(i8);
+prot_from_lua_blanket!(LocalisedString);
 
 /// Trait for getting a prototype from table
 trait GetPrototype<'lua> {
@@ -522,7 +534,6 @@ pub struct StringModSetting {
 #[data_table(ambient_sound)]
 pub struct AmbientSoundPrototype {
     name: String,
-    #[prototype]
     pub sound: Sound,
     #[from_str]
     pub track_type: TrackType,
@@ -536,7 +547,6 @@ pub struct AmbientSoundPrototype {
 pub struct AnimationPrototype {
     name: String,
     #[use_self_if_not_found]
-    #[prototype]
     pub layers: Vec<Animation> // If lua table doesn't have layers, use same table for constructing just one
 }
 
