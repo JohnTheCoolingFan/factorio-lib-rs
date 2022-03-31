@@ -33,8 +33,8 @@ pub struct ModPortalModsApiRequestParameters {
     pub version: Option<FactorioVersion>
 }
 
-impl ModPortalModsApiRequestParameters {
-    pub fn new() -> Self {
+impl Default for ModPortalModsApiRequestParameters {
+    fn default() -> Self {
         Self{
             hide_deprecated: false,
             page: None,
