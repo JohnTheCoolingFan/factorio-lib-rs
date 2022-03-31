@@ -12,6 +12,9 @@ use serde::{Serialize, Deserialize};
 // Credit for the most part goes to raiguard's factorio_mod_manager
 // https://github.com/raiguard/factorio_mod_manager
 
+const MOD_DEPENDENCY_REGEX: &str = r"^(?:(?P<type>[!?~]|\(\?\)) *)?(?P<name>(?: *[a-zA-Z0-9_-]+)+(?: *$)?)(?: *(?P<version_req>[<>=]=?) *(?P<version>(?:\d+\.){1,2}\d+))?$";
+
+
 #[derive(Debug, PartialEq, Deserialize)]
 #[serde(try_from = "String")]
 pub struct ModDependency {
@@ -25,9 +28,7 @@ impl ModDependency {
         static DEP_STRING_REGEX: OnceCell<Regex> = OnceCell::new();
         let captures = DEP_STRING_REGEX
             .get_or_init(|| {
-                Regex::new(
-                    r"^(?:(?P<type>[!?~]|\(\?\)) *)?(?P<name>(?: *[a-zA-Z0-9_-]+)+(?: *$)?)(?: *(?P<version_req>[<>=]=?) *(?P<version>(?:\d+\.){1,2}\d+))?$",
-                ).unwrap()
+                Regex::new(MOD_DEPENDENCY_REGEX).unwrap()
             })
             .captures(input)
             .ok_or_else(|| ModDependencyErr::InvalidDependencyString(input.into()))?;
