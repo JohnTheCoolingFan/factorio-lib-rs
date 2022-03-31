@@ -10,7 +10,7 @@ pub use utility::*;
 use crate::concepts::LocalisedString;
 #[cfg(not(feature = "concepts"))]
 type LocalisedString = String;
-use mlua::{Value, Lua, prelude::LuaResult};
+use mlua::{Value, Lua, prelude::LuaResult, ToLua};
 use additional_types::SpriteSizeType;
 use std::collections::HashMap;
 use std::rc::{Rc, Weak};
@@ -510,12 +510,12 @@ impl<'lua> PrototypeFromLua<'lua> for String {
 }
 
 /// Trait for getting a prototype from table
-trait GetPrototype {
-    fn get_prot<K: ToLua, V: PrototypeFromLua>(&self, key: K, lua: &Lua) -> LuaResult<V>;
+trait GetPrototype<'lua> {
+    fn get_prot<K: ToLua<'lua>, V: PrototypeFromLua<'lua>>(&self, key: K, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<V>;
 }
 
-impl GetPrototype for mlua::Table {
-    fn get_prot<K: ToLua, V: PrototypeFromLua>(&self, key: K, lua: &Lua, data_table: &mut DataTable) -> LuaResult<V> {
+impl<'lua> GetPrototype<'lua> for mlua::Table<'lua> {
+    fn get_prot<K: ToLua<'lua>, V: PrototypeFromLua<'lua>>(&self, key: K, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<V> {
         let value = self.get::<K, Value>(key)?;
         V::prototype_from_lua(value, lua, data_table)
     }
