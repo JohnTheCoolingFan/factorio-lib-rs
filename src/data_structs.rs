@@ -282,14 +282,14 @@ impl FromStr for FactorioVersion {
 impl Display for FactorioVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.write_str(match self {
-            v0_13 => "0.13",
-            v0_14 => "0.14",
-            v0_15 => "0.15",
-            v0_16 => "0.16",
-            v0_17 => "0.17",
-            v0_18 => "0.18",
-            v1_0 => "1.0",
-            v1_1 => "1.1"
+            Self::v0_13 => "0.13",
+            Self::v0_14 => "0.14",
+            Self::v0_15 => "0.15",
+            Self::v0_16 => "0.16",
+            Self::v0_17 => "0.17",
+            Self::v0_18 => "0.18",
+            Self::v1_0 => "1.0",
+            Self::v1_1 => "1.1"
         })
     }
 }
