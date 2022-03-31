@@ -717,6 +717,8 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
     Ok(ident.clone())
 }
 
+// TODO: mandatory_if, post-load functions (before returning, but after all fields have been loaded)
+
 // Attribute on field
 //
 // #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
