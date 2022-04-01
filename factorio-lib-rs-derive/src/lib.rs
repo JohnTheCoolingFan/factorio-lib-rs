@@ -697,12 +697,12 @@ fn impl_data_table_accessable_macro(ast: &syn::DeriveInput) -> TokenStream {
         .map(|attr| parse_data_table_attribute(attr).expect("failed to parse data_table attribute"));
     let attr = attrs.next().unwrap();
     let gen = quote! {
-        impl DataTableAccessable for #name {
-            fn find<'a>(data_table: &'a DataTable, name: &str) -> Result<&'a Self, PrototypesErr> {
-                data_table.#attr.get(name).ok_or_else(|| PrototypesErr::PrototypeNotFound(name.into()))
+        impl crate::prototypes::DataTableAccessable for #name {
+            fn find<'a>(data_table: &'a crate::prototypes::DataTable, name: &str) -> Result<&'a Self, crate::prototypes::PrototypesErr> {
+                data_table.#attr.get(name).ok_or_else(|| crate::prototypes::PrototypesErr::PrototypeNotFound(name.into()))
             }
 
-            fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr> {
+            fn extend(self, data_table: &mut crate::prototypes::DataTable) -> Result<(), crate::prototypes::PrototypesErr> {
                 data_table.#attr.insert(self.name.clone(), self);
                 Ok(())
             }
@@ -756,7 +756,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     let field_names = fields.map(|f| &f.ident);
     let gen = quote! {
         impl<'lua> crate::prototypes::PrototypeFromLua<'lua> for #name {
-            fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::prelude::LuaResult<Self> {
+            fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::prototypes::DataTable) -> mlua::prelude::LuaResult<Self> {
                 if let mlua::Value::Table(ref prot_table) = value {
                     #(#parsed_fields)*
                     Ok(Self{#(#field_names),*})
@@ -851,7 +851,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
         quote! {
             {
                 let name = #field_get_expr;
-                data_table.register_resource(crate::ResourceRecord{path: name.clone(), resource_type: crate::ResourceType::Sound});
+                data_table.register_resource(crate::prototypes::ResourceRecord{path: name.clone(), resource_type: crate::prototypes::ResourceType::Sound});
                 name.into()
             };
         }
