@@ -23,7 +23,7 @@ use std::collections::HashMap;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
 use crate::prototypes::PrototypesErr;
-use super::LocalisedString;
+use super::{GetPrototype, LocalisedString, PrototypeFromLua, DataTable};
 use mlua::{ToLua, Value, Lua, prelude::LuaResult, FromLua};
 use strum_macros::{EnumString, AsRefStr};
 
@@ -37,8 +37,8 @@ impl From<String> for FileName {
     }
 }
 
-impl<'lua> crate::PrototypeFromLua<'lua> for FileName {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut crate::DataTable) -> LuaResult<Self> {
+impl<'lua> PrototypeFromLua<'lua> for FileName {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
         let string = String::from_lua(value, lua)?;
         Ok(Self(string))
     }

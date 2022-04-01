@@ -1,8 +1,7 @@
-use crate::prototypes::GetPrototype;
+use super::{GetPrototype, PrototypeFromLua, DataTable};
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
 use std::iter::{Iterator, FromIterator};
 use super::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
-use factorio_lib_rs_derive::PrototypeFromLua;
 use strum_macros::{EnumString, AsRefStr};
 use mlua::ToLua;
 
@@ -312,8 +311,8 @@ pub enum Animation {
     Single(Box<AnimationBase>)
 }
 
-impl<'lua> crate::PrototypeFromLua<'lua> for Animation {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
+impl<'lua> PrototypeFromLua<'lua> for Animation {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
             let layers = p_table.get::<_, Option<Vec<mlua::Value>>>("layers")?;
             if let Some(actual_layers) = layers {
@@ -335,8 +334,8 @@ pub struct AnimationBase {
     hr_version: Option<AnimationSpec>,
 }
 
-impl<'lua> crate::PrototypeFromLua<'lua> for AnimationBase {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
+impl<'lua> PrototypeFromLua<'lua> for AnimationBase {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
             let hr_version_opt = p_table.get::<_, Option<mlua::Value>>("hr_version")?;
             let regular = AnimationSpec::prototype_from_lua(p_table.clone().to_lua(lua)?, lua, data_table)?;
@@ -370,16 +369,17 @@ pub struct AnimationSpec {
 
 impl AnimationSpec {
     // TODO: clarify the required image sizes for stripes
-    fn register_resources(&self, data_table: &mut crate::DataTable) {
+    fn register_resources(&self, data_table: &mut DataTable) {
         todo!() // TODO
     }
 }
 
-impl<'lua> crate::PrototypeFromLua<'lua> for AnimationSpec {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::DataTable) -> mlua::Result<Self> {
+// TODO
+impl<'lua> PrototypeFromLua<'lua> for AnimationSpec {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
             // TODO: register resource
-            let stripes: Option<Vec<Stripe>> = crate::PrototypeFromLua::prototype_from_lua(p_table.get::<_, mlua::Value>("stripes")?, lua, data_table)?;
+            let stripes: Option<Vec<Stripe>> = PrototypeFromLua::prototype_from_lua(p_table.get::<_, mlua::Value>("stripes")?, lua, data_table)?;
             let mut filename = None;
             if stripes.is_none() {
                 filename = Some(FileName(p_table.get("filename")?));
@@ -545,8 +545,8 @@ pub struct SpriteSpecWithoutFilename {
     pub generate_sfd: bool // Default: false // Only used by sprites in UtilitySprites with "icon" flag
 }
 
-impl<'lua> crate::PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut crate::DataTable) -> mlua::Result<Self> {
+impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut DataTable) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
             let dice: Option<Dice> = {
                 let dice_gen_opt: Option<i16> = p_table.get::<_, Option<i16>>("dice")?.or_else(|| p_table.get("slice").ok());

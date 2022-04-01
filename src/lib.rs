@@ -10,7 +10,6 @@ pub mod prototypes;
 pub mod webapi;
 
 use mlua::{Lua, prelude::LuaResult, Integer, Table};
-use prototypes::*;
 
 // TODO: add more features
 /// Unfinished wrapper around [mlua::Lua::new] that sets some global variables

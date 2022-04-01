@@ -372,6 +372,7 @@ prot_from_lua_blanket!(i64);
 prot_from_lua_blanket!(i32);
 prot_from_lua_blanket!(i16);
 prot_from_lua_blanket!(i8);
+#[cfg(feature = "concepts")]
 prot_from_lua_blanket!(LocalisedString);
 
 /// Trait for getting a prototype from table
