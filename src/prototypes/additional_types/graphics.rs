@@ -352,16 +352,25 @@ impl<'lua> PrototypeFromLua<'lua> for AnimationBase {
 }
 
 /// <https://wiki.factorio.com/Types/Animation>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::register_resources)]
 pub struct AnimationSpec {
     // These types share same fields/values, so I decided to "combine" them
+    #[mandatory_if(stripes.is_none())]
     filename: Option<FileName>,
+    #[use_self_forced]
     sprite: SpriteSpecWithoutFilename, // Filename is mandatory unless `stripes` is specified
+    #[from_str]
     run_mode: RunMode, // Default: "forward"
+    #[default(1_u32)]
     frame_count: u32, // Default: 1, can't be 0
+    #[default(0_u32)]
     line_length: u32, // Default: 0
+    #[default(1.0_f32)]
     animation_speed: f32, // Default: 1.0
+    #[default(f32::MAX)]
     max_advance: f32, // Default: MAX_FLOAT
+    #[default(1_u8)]
     repeat_count: u8, // Default: 1, can't be 0
     frame_sequence: Option<AnimationFrameSequence>,
     stripes: Option<Vec<Stripe>>
@@ -369,11 +378,12 @@ pub struct AnimationSpec {
 
 impl AnimationSpec {
     // TODO: clarify the required image sizes for stripes
-    fn register_resources(&self, data_table: &mut DataTable) {
+    fn register_resources(&self, lua: &mlua::Lua, data_table: &mut DataTable) -> mlua::prelude::LuaResult<()> {
         todo!() // TODO
     }
 }
 
+/*
 // TODO
 impl<'lua> PrototypeFromLua<'lua> for AnimationSpec {
     fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
@@ -400,6 +410,7 @@ impl<'lua> PrototypeFromLua<'lua> for AnimationSpec {
         }
     }
 }
+*/
 
 /// <https://wiki.factorio.com/Types/Stripe>
 #[derive(Debug, Clone, PrototypeFromLua)]
