@@ -9,6 +9,7 @@ pub mod prototypes;
 #[cfg(feature = "webapi")]
 pub mod webapi;
 
+#[cfg(feature = "lua")]
 use mlua::{Lua, prelude::LuaResult, Integer, Table};
 
 // TODO: add more features
