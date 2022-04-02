@@ -5,14 +5,15 @@ edition = "2021"
 
 [features]
 default = ["prototypes", "concepts", "data-structs", "webapi"]
-prototypes = ["factorio-lib-rs-derive", "strum", "strum_macros"]
+prototypes = ["factorio-lib-rs-derive", "strum", "strum_macros", "lua"]
 concepts = ["rust-ini"]
 data-structs = ["lexical-sort", "serde", "semver", "itertools", "regex", "once_cell"]
 webapi = ["data-structs", "const_format"]
+lua = ["mlua"]
 
 [dependencies]
 # Non-optional
-mlua = { git = "https://github.com/JohnTheCoolingFan/factorio-mlua", features = ["serialize", "lua-factorio"]}
+mlua = { git = "https://github.com/JohnTheCoolingFan/factorio-mlua", features = ["serialize", "lua-factorio"], optional = true }
 thiserror = "1.0"
 # Optional
 factorio-lib-rs-derive = { path = "./factorio-lib-rs-derive", optional = true }

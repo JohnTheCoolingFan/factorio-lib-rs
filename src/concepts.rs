@@ -1,11 +1,12 @@
 use std::rc::Rc;
 use std::ops::Index;
 use std::io::Read;
-use std::collections::HashMap;
-use mlua::prelude::LuaResult;
 use std::fmt;
+use std::collections::HashMap;
 use thiserror::Error;
 use ini::Ini;
+#[cfg(feature = "lua")]
+use mlua::prelude::LuaResult;
 
 
 // Unfinished
@@ -63,6 +64,7 @@ impl fmt::Display for LocalisedStringEntry {
     }
 }
 
+#[cfg(feature = "lua")]
 impl<'lua> mlua::FromLua<'lua> for LocalisedStringEntry {
     fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::Result<Self> {
         match value {
@@ -123,6 +125,7 @@ impl fmt::Display for LocalisedString {
     }
 }
 
+#[cfg(feature = "lua")]
 impl<'lua> mlua::FromLua<'lua> for LocalisedString {
     fn from_lua(value: mlua::Value<'lua>, _: &'lua mlua::Lua) -> LuaResult<Self> {
         match &value {
