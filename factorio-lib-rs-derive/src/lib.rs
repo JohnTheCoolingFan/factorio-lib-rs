@@ -802,11 +802,13 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
 struct PrototypeFromLuaFieldAttrArgs {
     default_value: Option<proc_macro2::TokenStream>, // Incompatible with: use_self, use_self_vec
     mandatory_if: Option<proc_macro2::TokenStream>,  // Incompatible with: default, use_self, use_self_vec
+    // use_self* is incompatible with default and mandatory_if
     // Only 1 can be used:
-    use_from_str: bool,              // Incompatible with:
-    use_self: bool,                  // Incompatible with: default
-    use_self_vec: bool,              // Incompatible with: default
-    is_resource: bool                // Incompatible with:
+    use_from_str: bool,
+    use_self: bool,
+    use_self_vec: bool,
+    use_self_forced: bool,
+    is_resource: bool
 }
 
 impl PrototypeFromLuaFieldAttrArgs {
@@ -816,34 +818,47 @@ impl PrototypeFromLuaFieldAttrArgs {
             if attr.path.is_ident("default") {
                 if result.use_self { return Self::attr_error(attr, "`default()` is incompatible with `use_self`") }
                 if result.use_self_vec { return Self::attr_error(attr, "`default()` is incompatible with `use_self_vec`") }
+                if result.use_self_forced { return Self::attr_error(attr, "`default()` is incompatible with `use_self_forced`") }
                 if result.mandatory_if.is_some() { return Self::attr_error(attr, "`default()` is incompatible with `mandatory_if()`") }
                 result.default_value = Some(attr.tokens.clone())
             } else if attr.path.is_ident("mandatory_if") {
                 if result.default_value.is_some() { return Self::attr_error(attr, "`mandatory_if()` attribute is incompatible with `default()`") }
                 if result.use_self { return Self::attr_error(attr, "`mandatory_if()` is incompatible with `use_self`") }
                 if result.use_self_vec { return Self::attr_error(attr, "`mandatory_if()` is incompatible with `use_self_vec`") }
+                if result.use_self_forced { return Self::attr_error(attr, "`mandatory_if()` is incompatible with `use_self_forced`") }
                 result.mandatory_if = Some(attr.tokens.clone())
             } else if attr.path.is_ident("from_str") {
                 if result.is_resource { return Self::attr_error(attr, "`from_str` attribute is incompatible with `resource`") }
                 if result.use_self { return Self::attr_error(attr, "`from_str` is incompatible with `use_self`") }
                 if result.use_self_vec { return Self::attr_error(attr, "`from_str` is incompatible with `use_self_vec`") }
+                if result.use_self_forced { return Self::attr_error(attr, "`from_str` is incompatible with `use_self_forced`") }
                 result.use_from_str = true
             } else if attr.path.is_ident("use_self") {
                 if result.default_value.is_some() { return Self::attr_error(attr, "`use_self` is incompatible with `default()`") }
                 if result.use_from_str { return Self::attr_error(attr, "`use_self` is incompatible with `from_str`") }
                 if result.use_self_vec { return Self::attr_error(attr, "`use_self` is incompatible with `use_self_vec`") }
+                if result.use_self_forced { return Self::attr_error(attr, "`use_self` is incompatible with `use_self_forced`") }
                 if result.mandatory_if.is_some() { return Self::attr_error(attr, "`use_self` is incompatible with `mandatory_if()`") }
                 result.use_self = true
             } else if attr.path.is_ident("use_self_vec") {
                 if result.default_value.is_some() { return Self::attr_error(attr, "`use_self_vec` is incompatible with `default()`") }
                 if result.use_from_str { return Self::attr_error(attr, "`use_self_vec` is incompatible with `from_str`") }
                 if result.use_self { return Self::attr_error(attr, "`use_self_vec` is incompatible with `use_self`") }
+                if result.use_self_forced { return Self::attr_error(attr, "`use_self_vec` is incompatible with `use_self_forced`") }
                 if result.mandatory_if.is_some() { return Self::attr_error(attr, "`use_self_vec` is incompatible with `mandatory_if()`") }
                 result.use_self = true
+            } else if attr.path.is_ident("use_self_forced") {
+                if result.default_value.is_some() { return Self::attr_error(attr, "`use_self_forced` is incompatible with `default()`") }
+                if result.use_from_str { return Self::attr_error(attr, "`use_self_forced` is incompatible with `from_str`") }
+                if result.use_self { return Self::attr_error(attr, "`use_self_forced` is incompatible with `use_self`") }
+                if result.use_self_vec { return Self::attr_error(attr, "`use_self_forced` is incompatible with `use_self_vec`") }
+                if result.mandatory_if.is_some() { return Self::attr_error(attr, "`use_self_forced` is incompatible with `mandatory_if()`") }
+                result.use_self_forced = true
             } else if attr.path.is_ident("resource") {
                 if result.use_from_str { return Self::attr_error(attr, "`resource` is incompatible with `from_str`") }
                 if result.use_self { return Self::attr_error(attr, "`resource` is incompatible with `use_self_vec`") }
                 if result.use_self_vec { return Self::attr_error(attr, "`resource` is incompatible with `use_self_vec`") }
+                if result.use_self_forced { return Self::attr_error(attr, "`resource` is incompatible with `use_self_forced`") }
                 result.is_resource = true
             }
         }
@@ -863,6 +878,7 @@ impl Default for PrototypeFromLuaFieldAttrArgs {
             use_from_str: false,
             use_self: false,
             use_self_vec: false,
+            use_self_forced: false,
             is_resource: false
         }
     }
