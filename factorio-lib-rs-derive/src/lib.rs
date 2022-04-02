@@ -735,7 +735,11 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 //
 // #[resource] - this field is a resource record (sound, textures should be done in post-extraction)
 // Incompatible with: from_str, use_self, use_self_vec
-#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, resource))]
+//
+// #[mandatory_if(expr)] - expr is a condition, if the condition results in `true`, field value
+// must be Some(_)
+// Incompatible with: default, use_self, use_self_vec
+#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, resource, mandatory_if))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
@@ -757,11 +761,12 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     let gen = quote! {
         impl<'lua> crate::prototypes::PrototypeFromLua<'lua> for #name {
             fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::prototypes::DataTable) -> mlua::prelude::LuaResult<Self> {
+                let str_name = #str_name;
                 if let mlua::Value::Table(ref prot_table) = value {
                     #(#parsed_fields)*
                     Ok(Self{#(#field_names),*})
                 } else {
-                    Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: #str_name,
+                    Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: str_name,
                     message: Some("Expected Table".into())})
                 }
             }
@@ -771,7 +776,8 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
 }
 
 struct PrototypeFromLuaFieldAttrArgs {
-    default_value: Option<proc_macro2::TokenStream>, // Incompatible with: use_self_if_not_found
+    default_value: Option<proc_macro2::TokenStream>, // Incompatible with: use_self, use_self_vec
+    mandatory_if: Option<proc_macro2::TokenStream>,  // Incompatible with: default, use_self, use_self_vec
     // Only 1 can be used:
     use_from_str: bool,              // Incompatible with:
     use_self: bool,                  // Incompatible with: default
@@ -786,7 +792,13 @@ impl PrototypeFromLuaFieldAttrArgs {
             if attr.path.is_ident("default") {
                 if result.use_self { return Self::attr_error(attr, "`default()` is incompatible with `use_self`") }
                 if result.use_self_vec { return Self::attr_error(attr, "`default()` is incompatible with `use_self_vec`") }
+                if result.mandatory_if.is_some() { return Self::attr_error(attr, "`default()` is incompatible with `mandatory_if()`") }
                 result.default_value = Some(attr.tokens.clone())
+            } else if attr.path.is_ident("mandatory_if") {
+                if result.default_value.is_some() { return Self::attr_error(attr, "`mandatory_if()` attribute is incompatible with `default()`") }
+                if result.use_self { return Self::attr_error(attr, "`mandatory_if()` is incompatible with `use_self`") }
+                if result.use_self_vec { return Self::attr_error(attr, "`mandatory_if()` is incompatible with `use_self_vec`") }
+                result.mandatory_if = Some(attr.tokens.clone())
             } else if attr.path.is_ident("from_str") {
                 if result.is_resource { return Self::attr_error(attr, "`from_str` attribute is incompatible with `resource`") }
                 if result.use_self { return Self::attr_error(attr, "`from_str` is incompatible with `use_self`") }
@@ -796,11 +808,13 @@ impl PrototypeFromLuaFieldAttrArgs {
                 if result.default_value.is_some() { return Self::attr_error(attr, "`use_self` is incompatible with `default()`") }
                 if result.use_from_str { return Self::attr_error(attr, "`use_self` is incompatible with `from_str`") }
                 if result.use_self_vec { return Self::attr_error(attr, "`use_self` is incompatible with `use_self_vec`") }
+                if result.mandatory_if.is_some() { return Self::attr_error(attr, "`use_self` is incompatible with `mandatory_if()`") }
                 result.use_self = true
             } else if attr.path.is_ident("use_self_vec") {
                 if result.default_value.is_some() { return Self::attr_error(attr, "`use_self_vec` is incompatible with `default()`") }
                 if result.use_from_str { return Self::attr_error(attr, "`use_self_vec` is incompatible with `from_str`") }
                 if result.use_self { return Self::attr_error(attr, "`use_self_vec` is incompatible with `use_self`") }
+                if result.mandatory_if.is_some() { return Self::attr_error(attr, "`use_self_vec` is incompatible with `mandatory_if()`") }
                 result.use_self = true
             } else if attr.path.is_ident("resource") {
                 if result.use_from_str { return Self::attr_error(attr, "`resource` is incompatible with `from_str`") }
@@ -821,6 +835,7 @@ impl Default for PrototypeFromLuaFieldAttrArgs {
     fn default() -> Self {
         Self{
             default_value: None, 
+            mandatory_if: None,
             use_from_str: false,
             use_self: false,
             use_self_vec: false,
@@ -847,7 +862,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     } else {
         quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? }
     };
-    let get_expr = if prototype_field_attrs.is_resource {
+    let mut get_expr = if prototype_field_attrs.is_resource {
         quote! {
             {
                 let name = #field_get_expr;
@@ -870,6 +885,15 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     } else {
         quote! { #field_get_expr; }
     };
+    if let Some(mandatory_if) = prototype_field_attrs.mandatory_if {
+        let err_str = format!("{} is required", ident.clone().unwrap());
+        let mand_expr = quote! {
+            if #mandatory_if && #ident.is_none() {
+                return Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: str_name, message: Some(#err_str.into())})
+            };
+        };
+        get_expr = quote! { #get_expr #mand_expr };
+    }
     let gen = quote! {
         let #ident: #field_type = #get_expr
     };

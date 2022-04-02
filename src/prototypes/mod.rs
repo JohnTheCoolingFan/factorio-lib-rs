@@ -473,7 +473,7 @@ pub struct BoolModSetting {
     #[from_str]
     setting_type: ModSettingType,
     pub default_value: bool,
-    //#[mandatory_if(default_value)]
+    #[mandatory_if(hidden)]
     pub forced_value: Option<bool>,
 }
 
