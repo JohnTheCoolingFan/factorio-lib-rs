@@ -7,6 +7,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{self, Attribute, Ident, Result};
 use syn::spanned::Spanned;
+use core::iter::Iterator;
 
 #[proc_macro_derive(Prototype)]
 pub fn prototype_macro_derive(input: TokenStream) -> TokenStream {
@@ -762,7 +763,12 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
         syn::Fields::Named(f) => f.named.iter(),
         _ => panic!("expected named fields")
     }};
-    let parsed_fields = fields.clone().map(|f| prot_from_lua_field(f).unwrap());
+    let (parsed_fields, mut mandatory_exprs): (Vec<proc_macro2::TokenStream>, Vec<Option<proc_macro2::TokenStream>>) = fields
+        .clone()
+        .map(|f| prot_from_lua_field(f).unwrap())
+        .unzip();
+    mandatory_exprs.retain(|mex| mex.is_some());
+    let mandatory_exprs: Vec<proc_macro2::TokenStream> = mandatory_exprs.into_iter().map(|mex| mex.unwrap()).collect();
     let field_names = fields.map(|f| &f.ident);
     let post_extr_fn: Option<syn::Path> = {
         let mut result = None;
@@ -786,6 +792,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
                 let str_name = #str_name;
                 if let mlua::Value::Table(ref prot_table) = value {
                     #(#parsed_fields)*
+                    #(#mandatory_exprs)*
                     let result = Self{#(#field_names),*};
                     #post_extr
                     Ok(result)
@@ -884,7 +891,7 @@ impl Default for PrototypeFromLuaFieldAttrArgs {
     }
 }
 
-fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
+fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, Option<proc_macro2::TokenStream>)> { // First is get_expr, second is mandatory_if
     let ident = &field.ident;
     let str_field = ident.as_ref().unwrap().to_string();
     let field_type = &field.ty;
@@ -929,17 +936,18 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<proc_macro2::TokenStream> {
     } else {
         quote! { #field_get_expr; }
     };
-    if let Some(mandatory_if) = prototype_field_attrs.mandatory_if {
+    let mand_expr = if let Some(mandatory_if) = prototype_field_attrs.mandatory_if {
         let err_str = format!("{} is required", ident.clone().unwrap());
-        let mand_expr = quote! {
+        Some(quote! {
             if #mandatory_if && #ident.is_none() {
                 return Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: str_name, message: Some(#err_str.into())})
             };
-        };
-        get_expr = quote! { #get_expr #mand_expr };
-    }
+        })
+    } else {
+        None
+    };
     let gen = quote! {
         let #ident: #field_type = #get_expr
     };
-    Ok(gen)
+    Ok((gen, mand_expr))
 }
