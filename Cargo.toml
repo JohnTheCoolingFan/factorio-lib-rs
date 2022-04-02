@@ -12,7 +12,7 @@ webapi = ["data-structs", "const_format"]
 
 [dependencies]
 # Non-optional
-mlua = { git = "https://github.com/JohnTheCoolingFan/factorio-mlua", features = ["serialize"]}
+mlua = { git = "https://github.com/JohnTheCoolingFan/factorio-mlua", features = ["serialize", "lua-factorio"]}
 thiserror = "1.0"
 # Optional
 factorio-lib-rs-derive = { path = "./factorio-lib-rs-derive", optional = true }
