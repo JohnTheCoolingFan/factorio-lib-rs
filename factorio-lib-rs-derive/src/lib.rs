@@ -909,9 +909,12 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
     } else {
         quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? }
     };
+    let get_self = quote! {
+        crate::prototypes::PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table)
+    };
     let get_expr = if prototype_field_attrs.use_self_forced {
         quote! {
-            crate::prototypes::PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table)?;
+            #get_self?;
         }
     } else if prototype_field_attrs.is_resource {
         quote! {
@@ -926,12 +929,12 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
     } else if prototype_field_attrs.use_self_vec {
         quote! { 
             prot_table.get_prot::<_, Option<#field_extr_type>>(#str_field, lua, data_table).transpose()
-                .unwrap_or_else(|| Ok(Vec::from([crate::prototypes::PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table)?])))?;
+                .unwrap_or_else(|| Ok(Vec::from([#get_self?])))?;
         }
     } else if prototype_field_attrs.use_self {
         quote! {
             prot_table.get_prot::<_, Option<#field_extr_type>>(#str_field, lua, data_table).transpose()
-                .unwrap_or_else(|| crate::prototypes::PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table))?;
+                .unwrap_or_else(|| #get_self)?;
         }
     } else {
         quote! { #field_get_expr; }
