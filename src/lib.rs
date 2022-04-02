@@ -15,7 +15,7 @@ use mlua::{Lua, prelude::LuaResult, Integer, Table};
 /// Unfinished wrapper around [mlua::Lua::new] that sets some global variables
 /// Adds `table_size` global function into environment
 #[cfg(feature = "lua")]
-pub fn new_lua_instance() -> LuaResult<Lua> {
+pub fn new_factorio_lua() -> LuaResult<Lua> {
     let lua = Lua::new();
 
     {
