@@ -911,7 +911,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
     };
     let get_expr = if prototype_field_attrs.use_self_forced {
         quote! {
-            crate::prototypes::PrototypeFromLua::prottype_from_lua(value.clone(), lua, data_table)?;
+            crate::prototypes::PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table)?;
         }
     } else if prototype_field_attrs.is_resource {
         quote! {
