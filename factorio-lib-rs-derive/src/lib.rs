@@ -739,7 +739,10 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 // #[mandatory_if(expr)] - expr is a condition, if the condition results in `true`, field value
 // must be Some(_)
 // Incompatible with: default, use_self, use_self_vec
-#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, resource, mandatory_if))]
+//
+// #[post_extr_fn(path)] - path is a path to a function that needs to be executed after
+// mandatory_if checks
+#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, resource, mandatory_if, post_extr_fn))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
@@ -758,13 +761,31 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     }};
     let parsed_fields = fields.clone().map(|f| prot_from_lua_field(f).unwrap());
     let field_names = fields.map(|f| &f.ident);
+    let post_extr_fn: Option<syn::Path> = {
+        let mut result = None;
+        for attr in &ast.attrs {
+            if attr.path.is_ident("post_extr_fn") {
+                result = Some(attr.parse_args::<syn::Path>().unwrap())
+            }
+        }
+        result
+    };
+    let post_extr = if let Some(pef) = post_extr_fn {
+        quote! {
+            #pef(&result, lua, data_table)?;
+        }
+    } else {
+        quote! { }
+    };
     let gen = quote! {
         impl<'lua> crate::prototypes::PrototypeFromLua<'lua> for #name {
             fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::prototypes::DataTable) -> mlua::prelude::LuaResult<Self> {
                 let str_name = #str_name;
                 if let mlua::Value::Table(ref prot_table) = value {
                     #(#parsed_fields)*
-                    Ok(Self{#(#field_names),*})
+                    let result = Self{#(#field_names),*};
+                    #post_extr
+                    Ok(result)
                 } else {
                     Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: str_name,
                     message: Some("Expected Table".into())})
