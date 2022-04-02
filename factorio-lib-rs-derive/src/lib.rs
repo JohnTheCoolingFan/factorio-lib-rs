@@ -909,7 +909,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
     } else {
         quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? }
     };
-    let mut get_expr = if prototype_field_attrs.use_self_forced {
+    let get_expr = if prototype_field_attrs.use_self_forced {
         quote! {
             crate::prototypes::PrototypeFromLua::prottype_from_lua(value.clone(), lua, data_table)?;
         }
