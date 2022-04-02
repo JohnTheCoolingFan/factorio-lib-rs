@@ -822,58 +822,73 @@ impl PrototypeFromLuaFieldAttrArgs {
     fn from_attrs(attrs: &[Attribute]) -> Result<Self> {
         let mut result = Self::default();
         for attr in attrs {
-            if attr.path.is_ident("default") {
-                if result.use_self { return Self::attr_error(attr, "`default()` is incompatible with `use_self`") }
-                if result.use_self_vec { return Self::attr_error(attr, "`default()` is incompatible with `use_self_vec`") }
-                if result.use_self_forced { return Self::attr_error(attr, "`default()` is incompatible with `use_self_forced`") }
-                if result.mandatory_if.is_some() { return Self::attr_error(attr, "`default()` is incompatible with `mandatory_if()`") }
-                result.default_value = Some(attr.tokens.clone())
-            } else if attr.path.is_ident("mandatory_if") {
-                if result.default_value.is_some() { return Self::attr_error(attr, "`mandatory_if()` attribute is incompatible with `default()`") }
-                if result.use_self { return Self::attr_error(attr, "`mandatory_if()` is incompatible with `use_self`") }
-                if result.use_self_vec { return Self::attr_error(attr, "`mandatory_if()` is incompatible with `use_self_vec`") }
-                if result.use_self_forced { return Self::attr_error(attr, "`mandatory_if()` is incompatible with `use_self_forced`") }
-                result.mandatory_if = Some(attr.tokens.clone())
-            } else if attr.path.is_ident("from_str") {
-                if result.is_resource { return Self::attr_error(attr, "`from_str` attribute is incompatible with `resource`") }
-                if result.use_self { return Self::attr_error(attr, "`from_str` is incompatible with `use_self`") }
-                if result.use_self_vec { return Self::attr_error(attr, "`from_str` is incompatible with `use_self_vec`") }
-                if result.use_self_forced { return Self::attr_error(attr, "`from_str` is incompatible with `use_self_forced`") }
-                result.use_from_str = true
-            } else if attr.path.is_ident("use_self") {
-                if result.default_value.is_some() { return Self::attr_error(attr, "`use_self` is incompatible with `default()`") }
-                if result.use_from_str { return Self::attr_error(attr, "`use_self` is incompatible with `from_str`") }
-                if result.use_self_vec { return Self::attr_error(attr, "`use_self` is incompatible with `use_self_vec`") }
-                if result.use_self_forced { return Self::attr_error(attr, "`use_self` is incompatible with `use_self_forced`") }
-                if result.mandatory_if.is_some() { return Self::attr_error(attr, "`use_self` is incompatible with `mandatory_if()`") }
-                result.use_self = true
-            } else if attr.path.is_ident("use_self_vec") {
-                if result.default_value.is_some() { return Self::attr_error(attr, "`use_self_vec` is incompatible with `default()`") }
-                if result.use_from_str { return Self::attr_error(attr, "`use_self_vec` is incompatible with `from_str`") }
-                if result.use_self { return Self::attr_error(attr, "`use_self_vec` is incompatible with `use_self`") }
-                if result.use_self_forced { return Self::attr_error(attr, "`use_self_vec` is incompatible with `use_self_forced`") }
-                if result.mandatory_if.is_some() { return Self::attr_error(attr, "`use_self_vec` is incompatible with `mandatory_if()`") }
-                result.use_self = true
-            } else if attr.path.is_ident("use_self_forced") {
-                if result.default_value.is_some() { return Self::attr_error(attr, "`use_self_forced` is incompatible with `default()`") }
-                if result.use_from_str { return Self::attr_error(attr, "`use_self_forced` is incompatible with `from_str`") }
-                if result.use_self { return Self::attr_error(attr, "`use_self_forced` is incompatible with `use_self`") }
-                if result.use_self_vec { return Self::attr_error(attr, "`use_self_forced` is incompatible with `use_self_vec`") }
-                if result.mandatory_if.is_some() { return Self::attr_error(attr, "`use_self_forced` is incompatible with `mandatory_if()`") }
-                result.use_self_forced = true
-            } else if attr.path.is_ident("resource") {
-                if result.use_from_str { return Self::attr_error(attr, "`resource` is incompatible with `from_str`") }
-                if result.use_self { return Self::attr_error(attr, "`resource` is incompatible with `use_self_vec`") }
-                if result.use_self_vec { return Self::attr_error(attr, "`resource` is incompatible with `use_self_vec`") }
-                if result.use_self_forced { return Self::attr_error(attr, "`resource` is incompatible with `use_self_forced`") }
-                result.is_resource = true
+            for v in result.compat_check_matrix() {
+                if attr.path.is_ident(v.0) {
+                    result.check_compat(v.0, &v.2, attr)?;
+                    v.1(&mut result, attr)
+                }
             }
         }
         Ok(result)
     }
 
-    fn attr_error<T: Display>(attr: &Attribute, message: T) -> Result<Self> {
+    fn attr_error<T: Display>(attr: &Attribute, message: T) -> Result<()> {
         Err(syn::Error::new(attr.span(), message))
+    }
+
+    // This is horrifyingly inefficient, yet better than what was before
+    fn compat_check_matrix<'a, 'b>(&'a self) -> Vec<(&'b str, fn(&mut Self, &Attribute), Vec<(&'b str, bool)>)> {
+        // These names don't make sense because they are not supposed to
+        let sel = (
+            ("use_self", self.use_self),
+            ("use_self_vec", self.use_self_vec),
+            ("use_self_forced", self.use_self_forced)
+        );
+        let oth = (
+            ("default", self.default_value.is_some()),
+            ("mandatory_if", self.mandatory_if.is_some()),
+            ("from_str", self.use_from_str),
+            ("resource", self.is_resource)
+        );
+        vec![
+            ("default", |s, a| s.default_value = Some(a.tokens.clone()), vec![
+                ("mandatory_if", self.mandatory_if.is_some()),
+                sel.0, sel.1, sel.2
+            ]),
+            ("mandatory_if", |s, a| s.mandatory_if = Some(a.tokens.clone()), vec![
+                ("default", self.default_value.is_some()),
+                sel.0, sel.1, sel.2
+            ]),
+            ("from_str", |s, _| s.use_from_str = true, vec![
+                ("resource", self.is_resource),
+                sel.0, sel.1, sel.2
+            ]),
+            ("resource", |s, _| s.is_resource = true, vec![
+                ("from_str", self.use_from_str),
+                sel.0, sel.1, sel.2
+            ]),
+            ("use_self", |s, _| s.use_self = true, vec![
+                oth.0, oth.1, oth.2, oth.3,
+                sel.1, sel.2
+            ]),
+            ("use_self_vec", |s, _| s.use_self_vec = true, vec![
+                oth.0, oth.1, oth.2, oth.3,
+                sel.0, sel.2
+            ]),
+            ("use_self_forced", |s, _| s.use_self_forced = true, vec![
+                oth.0, oth.1, oth.2, oth.3,
+                sel.0, sel.1
+            ])
+        ]
+    }
+
+    fn check_compat(&self, name: &str, incompats: &Vec<(&str, bool)>, attr: &Attribute) -> Result<()> {
+        for incompat in incompats {
+            if incompat.1 {
+                return Self::attr_error(attr, format!("`{}` is incompatible with `{}`", name, incompat.0))
+            }
+        }
+        Ok(())
     }
 }
 
