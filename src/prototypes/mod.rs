@@ -3643,7 +3643,7 @@ pub struct Projectile {
     piercing_damage: f32, // Default: 0
     max_speed: f64, // Default: f64::MAX
     turn_speed: f32, // Default: 1 // Must be >= 0
-    speed_modifier: f32, // Default: 1
+    speed_modifier: Factorio2DVector, // Default: (1, 1)
     height: f64, // Default: 1
     action: Option<Trigger>,
     final_action: Option<Trigger>,
