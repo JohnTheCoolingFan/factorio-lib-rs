@@ -1430,7 +1430,7 @@ pub struct Beacon {
     pub animation: Option<Animation>, // Loaded only if `graphics_set` is not present
     pub base_picture: Option<Sprite>, // Loaded only if `graphics_set` is not present
     pub radius_visualization_picture: Option<Sprite>,
-    pub allowed_effects: Option<EffectTypeLimitation>
+    pub allowed_effects: EffectTypeLimitation // Default: No effects are allowed
 }
 
 /// <https://wiki.factorio.com/Prototype/Boiler>
