@@ -4538,6 +4538,7 @@ pub struct Particle {
 #[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(recipe)]
 pub struct Recipe {
+    // recipe with category named "crafting" cannot have fluid ingredients or products
     name: String,
     prototype_base: PrototypeBaseSpec,
     category: String, // Default: "crafting" // Name of RecipeCategory
