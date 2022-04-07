@@ -1711,7 +1711,7 @@ pub struct CraftingMachineBase {
     crafting_categories: Vec<String>, // (Names) Name of crafting category
     energy_source: EnergySource, // if drain is not specified, automatically set to energy_usage / 30
     fluid_boxes: Option<Vec<FluidBox>>,
-    allowed_effects: Option<EffectTypeLimitation>,
+    allowed_effects: EffectTypeLimitation, // Default: no effects are allowed
     scale_entity_info_icon: bool, // Default: false
     show_recipe_icon: bool, // Default: true
     return_ingredients_on_change: bool, // Default: true
