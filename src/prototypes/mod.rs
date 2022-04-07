@@ -3642,7 +3642,7 @@ pub struct Projectile {
     force_condition: ForceCondition, // Default: "all"
     piercing_damage: f32, // Default: 0
     max_speed: f64, // Default: f64::MAX
-    turn_speed: f32, // Default: 0.003
+    turn_speed: f32, // Default: 1 // Must be >= 0
     speed_modifier: f32, // Default: 1
     height: f64, // Default: 1
     action: Option<Trigger>,
