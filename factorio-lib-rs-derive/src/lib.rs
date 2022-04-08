@@ -431,7 +431,7 @@ fn impl_crafting_machine_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn crafting_categories(&self) -> &Vec<String>{ &self.crafting_machine_base.crafting_categories }
             fn energy_source(&self) -> &EnergySource { &self.crafting_machine_base.energy_source }
             fn fluid_boxes(&self) -> &Option<Vec<FluidBox>> { &self.crafting_machine_base.fluid_boxes }
-            fn allowed_effects(&self) -> &Option<EffectTypeLimitation> { &self.crafting_machine_base.allowed_effects }
+            fn allowed_effects(&self) -> EffectTypeLimitation { self.crafting_machine_base.allowed_effects }
             fn scale_entity_info_icon(&self) -> bool { self.crafting_machine_base.scale_entity_info_icon }
             fn show_recipe_icon(&self) -> bool { self.crafting_machine_base.show_recipe_icon }
             fn return_ingredients_on_change(&self) -> bool { self.crafting_machine_base.return_ingredients_on_change }
