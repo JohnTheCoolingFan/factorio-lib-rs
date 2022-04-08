@@ -305,6 +305,11 @@ impl DataTable {
         Ok(())
     }
 
+    /// Cleanup up Weak references
+    pub fn references_cleanup(&mut self) {
+        self.references.retain(|r| r.upgrade().is_some())
+    }
+
     /// Create new resource record
     pub fn register_resource(&mut self, resource_record: ResourceRecord) {
         self.resource_records.push(resource_record);
