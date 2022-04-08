@@ -242,7 +242,7 @@ pub enum ModDependencyErr {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum FactorioVersion {
     #[serde(rename = "0.13")]
     v0_13,
