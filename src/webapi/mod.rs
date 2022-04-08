@@ -1,3 +1,4 @@
+use strum::Display;
 use semver::Version;
 use crate::data_structs::{FactorioVersion, InfoJson};
 use const_format::concatcp;
@@ -14,7 +15,7 @@ pub fn mod_portal_mod_info_full_url(mod_name: &str) -> String {
     format!("{}/full", mod_portal_mod_info_url(mod_name))
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Copy, Serialize)]
 #[serde(untagged)]
 pub enum PageSize {
     Number(u64),
@@ -22,43 +23,86 @@ pub enum PageSize {
     Max
 }
 
-#[derive(Debug, Serialize)]
+impl std::fmt::Display for PageSize {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Number(n) => f.write_fmt(format_args!("{}", n)),
+            Self::Max => f.write_str("max")
+        }
+    }
+}
+
+#[derive(Debug, Default)]
 pub struct ModPortalModsApiRequestParameters {
-    pub hide_deprecated: bool,
-    pub sort: ModPortalRequestSort,
-    pub sort_order: ModPortalRequestSortOrder,
+    pub hide_deprecated: Option<bool>,
+    pub sort: Option<ModPortalRequestSort>,
+    pub sort_order: Option<ModPortalRequestSortOrder>,
     pub page: Option<u64>,
     pub page_size: Option<PageSize>,
     pub namelist: Option<Vec<String>>,
     pub version: Option<FactorioVersion>
 }
 
-impl Default for ModPortalModsApiRequestParameters {
-    fn default() -> Self {
-        Self{
-            hide_deprecated: false,
-            page: None,
-            page_size: None,
-            sort: ModPortalRequestSort::Name,
-            sort_order: ModPortalRequestSortOrder::Descending,
-            namelist: None,
-            version: None
+impl ModPortalModsApiRequestParameters {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    fn to_query_parameters(&self) -> Vec<(String, String)> {
+        let mut result = Vec::new();
+        if let Some(hide_deprecated) = self.hide_deprecated {
+            Self::push_arg(&mut result, "hide_deprecated", hide_deprecated)
         }
+        if let Some(sort) = self.sort {
+            Self::push_arg(&mut result, "sort", sort)
+        }
+        if let Some(sort_order) = self.sort_order {
+            Self::push_arg(&mut result, "sort_order", sort_order)
+        }
+        if let Some(page) = self.page {
+            Self::push_arg(&mut result, "page", page)
+        }
+        if let Some(page_size) = self.page_size {
+            Self::push_arg(&mut result, "page_size", page_size)
+        }
+        if let Some(namelist) = &self.namelist {
+            Self::push_arg(&mut result, "page_size", namelist.clone().join(","))
+        }
+        if let Some(version) = self.version {
+            Self::push_arg(&mut result, "version", version)
+        }
+        result
+    }
+
+    fn push_arg(result: &mut Vec<(String, String)>, name: &str, value: impl ToString) {
+        result.push((name.into(), value.to_string()))
     }
 }
 
-#[derive(Debug, Serialize)]
+impl Serialize for ModPortalModsApiRequestParameters {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer
+    {
+        self.to_query_parameters().serialize(serializer)
+    }
+}
+
+#[derive(Debug, Clone, Copy, Display, Serialize)]
 #[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 pub enum ModPortalRequestSort {
     Name,
     CreatedAt,
     UpdatedAt
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Copy, Display, Serialize)]
 pub enum ModPortalRequestSortOrder {
+    #[strum(serialize = "asc")]
     #[serde(rename = "asc")]
     Ascending,
+    #[strum(serialize = "desc")]
     #[serde(rename = "desc")]
     Descending
 }
