@@ -289,9 +289,9 @@ impl DataTable {
     }
 
     /// Creates new reference and keeps track of it to later be validated through [Self::validate_references]
-    pub fn new_reference<T: 'static + DataTableAccessable>(&mut self, name: String) -> Rc<PrototypeReference<T>> {
+    pub fn new_reference<T: DataTableAccessable>(&mut self, name: String) -> Rc<PrototypeReference<T>> {
         let prot_reference = Rc::new(PrototypeReference::<T>::new(name));
-        self.references.push(Rc::downgrade(&(prot_reference.clone() as Rc<dyn PrototypeReferenceValidate>)));
+        self.references.push(Rc::downgrade(&(prot_reference as Rc<dyn PrototypeReferenceValidate>)));
         prot_reference
     }
 
@@ -1739,7 +1739,7 @@ pub trait CraftingMachine {
     fn crafting_categories(&self) -> &Vec<String>;
     fn energy_source(&self) -> &EnergySource;
     fn fluid_boxes(&self) -> &Option<Vec<FluidBox>>;
-    fn allowed_effects(&self) -> &Option<EffectTypeLimitation>;
+    fn allowed_effects(&self) -> EffectTypeLimitation;
     fn scale_entity_info_icon(&self) -> bool;
     fn show_recipe_icon(&self) -> bool;
     fn return_ingredients_on_change(&self) -> bool;
