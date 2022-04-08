@@ -223,14 +223,6 @@ impl FromStr for MapGenSize {
     }
 }
 
-/// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
-#[derive(Debug, Clone)]
-pub struct MapGenAutoplaceControl {
-    pub frequency: Option<MapGenSize>,
-    pub size: Option<MapGenSize>,
-    pub richness: Option<MapGenSize>,
-}
-
 /// <https://lua-api.factorio.com/latest/Concepts.html#CliffPlacementSettings>
 #[derive(Debug, Clone)]
 pub struct CliffPlacementSettings {
@@ -247,8 +239,9 @@ pub struct MapGenPresetBasicSettings {
     pub terain_segmentation: MapGenSize, // Default is... Unknown
     pub water: MapGenSize, // Same here
     pub default_enable_all_autoplace_controls: bool, // Default: true
-    pub autoplace_controls: HashMap<String, MapGenAutoplaceControl>, // key is AutoplaceControl name
-    // autoplace_settings // TODO: UNDOCUMENTED // "Types/table", refuses to elaborate further
+    pub autoplace_controls: HashMap<String, AutoplaceSetting>, // key is AutoplaceControl name
+    // Quote: «Each setting in this table maps the string type to the settings for that type. Valid types are "entity", "tile" and "decorative".»
+    pub autoplace_settings: Vec<AutoplaceSettings>,
     pub property_expression_names: HashMap<String, String>, // Map property name to noise expression name
     pub starting_points: Position,
     pub seed: u32,
@@ -257,6 +250,22 @@ pub struct MapGenPresetBasicSettings {
     pub starting_area: MapGenSize,
     pub peaceful_mode: bool,
     pub cliff_settings: CliffPlacementSettings
+}
+
+/// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
+/// <https://lua-api.factorio.com/latest/Concepts.html#AutoplaceSettings>
+#[derive(Debug, Clone)]
+pub struct AutoplaceSettings {
+    pub treat_missing_as_default: bool, // Doesn't look like it's optional or has a default...
+    pub settings: HashMap<String, AutoplaceSetting>
+}
+
+/// <https://lua-api.factorio.com/latest/Concepts.html#AutoplaceSetting>
+#[derive(Debug, Clone)]
+pub struct AutoplaceSetting {
+    frequency: Option<MapGenSize>,
+    size: Option<MapGenSize>,
+    richness: Option<MapGenSize>
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
