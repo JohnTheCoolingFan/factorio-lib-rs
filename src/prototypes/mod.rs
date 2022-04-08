@@ -289,9 +289,9 @@ impl DataTable {
     }
 
     /// Creates new reference and keeps track of it to later be validated through [Self::validate_references]
-    pub fn new_reference<T: DataTableAccessable>(&mut self, name: String) -> Rc<PrototypeReference<T>> {
+    pub fn new_reference<T: DataTableAccessable + 'static>(&mut self, name: String) -> Rc<PrototypeReference<T>> {
         let prot_reference = Rc::new(PrototypeReference::<T>::new(name));
-        self.references.push(Rc::downgrade(&(prot_reference as Rc<dyn PrototypeReferenceValidate>)));
+        self.references.push(Rc::downgrade(&(prot_reference.clone() as Rc<dyn PrototypeReferenceValidate>)));
         prot_reference
     }
 
