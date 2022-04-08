@@ -48,6 +48,34 @@ impl ModPortalModsApiRequestParameters {
         Self::default()
     }
 
+    pub fn hide_deprecated(&mut self, v: bool) -> &mut Self {
+        self.hide_deprecated = Some(v); self
+    }
+
+    pub fn sort(&mut self, v: ModPortalRequestSort) -> &mut Self {
+        self.sort = Some(v); self
+    }
+
+    pub fn sort_order(&mut self, v: ModPortalRequestSortOrder) -> &mut Self {
+        self.sort_order = Some(v); self
+    }
+     
+    pub fn page(&mut self, v: u64) -> &mut Self {
+        self.page = Some(v); self
+    }
+     
+    pub fn page_size(&mut self, v: PageSize) -> &mut Self {
+        self.page_size = Some(v); self
+    }
+     
+    pub fn namelist(&mut self, v: Vec<String>) -> &mut Self {
+        self.namelist = Some(v); self
+    }
+     
+    pub fn version(&mut self, v: FactorioVersion) -> &mut Self {
+        self.version = Some(v); self
+    }
+
     fn to_query_parameters(&self) -> Vec<(String, String)> {
         let mut result = Vec::new();
         if let Some(hide_deprecated) = self.hide_deprecated {
