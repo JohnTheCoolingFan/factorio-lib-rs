@@ -1,9 +1,47 @@
 use std::fmt::Display;
 use thiserror::Error;
-
+use reqwest::{Client, StatusCode};
 use serde::{Serialize, Deserialize};
 
 pub const FACTORIO_API_AUTH: &str = "https://auth.factorio.com/api-login";
+
+pub async fn login(client: &Client, username: String, password: String, require_game_ownership: bool, email_auth_code: Option<String>) -> Result<LoginResponse, ClientLoginError> {
+    let data = ApiLoginRequestParameters {
+        username,
+        password,
+        require_game_ownership,
+        email_authentication_code: email_auth_code
+    };
+    let response = client.post(FACTORIO_API_AUTH).json(&data).send().await?;
+    if response.status() == StatusCode::OK {
+        response.json::<LoginResponse>().await.map_err(ClientLoginError::from)
+    } else {
+        match response.json::<LoginError>().await.map_err(ClientLoginError::from) {
+            Err(v) => Err(v),
+            Ok(v) => Err(v.into())
+        }
+    }
+}
+
+#[derive(Debug, Error)]
+pub enum ClientLoginError {
+    #[error("Error constructing/sending request: {0}")]
+    Client(reqwest::Error),
+    #[error("Login error: {0}")]
+    Login(LoginError)
+}
+
+impl From<reqwest::Error> for ClientLoginError {
+    fn from(v: reqwest::Error) -> Self {
+        Self::Client(v)
+    }
+}
+
+impl From<LoginError> for ClientLoginError {
+    fn from(v: LoginError) -> Self {
+        Self::Login(v)
+    }
+}
 
 /// <https://wiki.factorio.com/Web_authentication_API>
 /// Used for authenticating to factorio.
