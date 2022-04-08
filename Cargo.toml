@@ -8,7 +8,7 @@ default = ["prototypes", "concepts", "data-structs", "webapi"]
 prototypes = ["factorio-lib-rs-derive", "strum", "strum_macros", "lua"]
 concepts = ["rust-ini"]
 data-structs = ["lexical-sort", "serde", "semver", "itertools", "regex", "once_cell", "strum", "strum_macros"]
-webapi = ["data-structs", "const_format"]
+webapi = ["data-structs", "const_format", "reqwest"]
 lua = ["mlua"]
 
 [dependencies]
@@ -27,3 +27,4 @@ itertools = { version = "0.10", optional = true }
 regex = { version = "1.5", optional = true }
 once_cell = { version = "1.10", optional = true }
 const_format = { version = "0.2", optional = true }
+reqwest = { version = "0.11", optional = true }
