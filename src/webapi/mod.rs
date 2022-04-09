@@ -5,6 +5,7 @@ use const_format::concatcp;
 use serde::{Serialize, Deserialize};
 
 pub mod auth;
+pub mod mod_upload;
 
 pub const MOD_PORTAL_URL: &str = "https://mods.factorio.com";
 pub const MOD_PORTAL_MODS_API_URL: &str = concatcp!(MOD_PORTAL_URL, "/api/mods");
