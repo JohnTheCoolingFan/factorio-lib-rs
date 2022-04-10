@@ -718,39 +718,41 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
     Ok(ident.clone())
 }
 
-/// Attribute on field
+/// Attributes on fields
 ///
-/// #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
-/// Incompatible with: use_self, use_self_vec, use_self_forced
+/// `#[default(expr)]` - `expr` is default value, which is used in case value of thsi field is None
+/// after extraction
+/// Incompatible with: `use_self`, `use_self_vec`, `use_self_forced`
 ///
-/// #[from_str] - convert value to string, then parse from str
-/// Incompatible with: resource, use_self, use_self_vec, use_self_forced
+/// `#[from_str]` - convert value to string, then parse from str
+/// Incompatible with: `resource`, `use_self`, `use_self_vec`, `use_self_forced`
 ///
-/// #[use_self] - use self-Value for property if corresponding field does not exist
-/// Incompatible with: default, from_str, use_self_vec, use_self_forced, resource, mandatory_if
+/// `#[use_self]` - use the table which is used for constructing current prototype for property if
+/// corresponding field does not exist in the table
+/// Incompatible with: `default`, `from_str`, `use_self_vec`, `use_self_forced`, `resource`, `mandatory_if`
 ///
-/// #[use_self_vec] - same as use_self, but puts result in a Vec
-/// Incompatible with: default, from_str, use_self, use_self_forced, resource, mandatory_if
+/// #[use_self_vec] - same as `use_self`, but puts result in a Vec
+/// Incompatible with: `default`, `from_str`, `use_self`, `use_self_forced`, `resource`, `mandatory_if`
 ///
-/// #[use_self_forced] - forced to use self-Value for this field
-/// Incompatible with: default, from_str, use_self, use_self_vec, resource, mandatory_if
+/// `#[use_self_forced]` - same as `use_self`, but forced instead of defaulting in case of failure.
+/// Incompatible with: `default`, `from_str`, `use_self`, `use_self_vec`, `resource`, `mandatory_if`
 ///
-/// #[resource] - this field is a resource record (sound, textures should be done in post-extraction)
-/// Incompatible with: from_str, use_self, use_self_vec, use_self_forced
+/// `#[resource]` - this field is a resource record (sound only, textures should be done in post-extraction)
+/// Incompatible with: `from_str`, `use_self`, `use_self_vec`, `use_self_forced`
 ///
-/// #[mandatory_if(expr)] - expr is a condition, if the condition results in `true`, field value
+/// `#[mandatory_if(expr)] - expr is a condition, if the condition results in `true`, field value
 /// must be Some(_)
-/// Incompatible with: default, use_self, use_self_vec, use_self_forced
+/// Incompatible with: `default`, `use_self`, `use_self_vec`, `use_self_forced`
 ///
-/// #[aliases(list)] - `list` is an array of items where each is either identifier of fields or
+/// `#[aliases(list)]` - `list` is an array of items where each is either identifier of fields or
 /// tuple of identifiers of fields that should be retrieved from the table in case original
 /// extraction failed/returned None. If all of them fail, #[default()] is applied if available.
 /// Incompatible with: `use_self`, `use_self_vec`, `use_self_forced`
 ///
-/// Attribute on container
+/// Attributes on container
 ///
-/// #[post_extr_fn(path)] - path is a path to a function that needs to be executed after
-/// mandatory_if checks
+/// `#[post_extr_fn(path)]` - path is a path to a function that needs to be executed after
+/// field extraction and mandatory_if checks
 #[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
