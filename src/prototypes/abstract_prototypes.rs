@@ -1,4 +1,4 @@
-//! This module contains abstract prototypes used for [PrototypeReference](crate::PrototypeReference).
+//! This module contains abstract prototypes used for [PrototypeReference](super::PrototypeReference).
 //! Minimal amount of properties is implemented.
 //! Prototypes will be added on demand
 
