@@ -8,7 +8,7 @@
 // If concepts are disabled, LocalisedString can't be used...
 #[cfg(feature = "concepts")]
 pub mod concepts;
-#[cfg(feature = "data-structs")]
+#[cfg(feature = "data_structs")]
 pub mod data_structs;
 #[cfg(feature = "prototypes")]
 pub mod prototypes;
