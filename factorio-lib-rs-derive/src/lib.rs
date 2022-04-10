@@ -742,6 +742,11 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 /// must be Some(_)
 /// Incompatible with: default, use_self, use_self_vec, use_self_forced
 ///
+/// #[aliases(list)] - `list` is an array of items where each is either identifier of fields or
+/// tuple of identifiers of fields that should be retrieved from the table in case original
+/// extraction failed/returned None. If all of them fail, #[default()] is applied if available.
+/// Incompatible with: `use_self`, `use_self_vec`, `use_self_forced`
+///
 /// Attribute on container
 ///
 /// #[post_extr_fn(path)] - path is a path to a function that needs to be executed after
