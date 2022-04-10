@@ -718,34 +718,34 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
     Ok(ident.clone())
 }
 
-// Attribute on field
-//
-// #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
-// Incompatible with: use_self, use_self_vec, use_self_forced
-//
-// #[from_str] - convert value to string, then parse from str
-// Incompatible with: resource, use_self, use_self_vec, use_self_forced
-//
-// #[use_self] - use self-Value for property if corresponding field does not exist
-// Incompatible with: default, from_str, use_self_vec, use_self_forced, resource, mandatory_if
-//
-// #[use_self_vec] - same as use_self, but puts result in a Vec
-// Incompatible with: default, from_str, use_self, use_self_forced, resource, mandatory_if
-//
-// #[use_self_forced] - forced to use self-Value for this field
-// Incompatible with: default, from_str, use_self, use_self_vec, resource, mandatory_if
-//
-// #[resource] - this field is a resource record (sound, textures should be done in post-extraction)
-// Incompatible with: from_str, use_self, use_self_vec, use_self_forced
-//
-// #[mandatory_if(expr)] - expr is a condition, if the condition results in `true`, field value
-// must be Some(_)
-// Incompatible with: default, use_self, use_self_vec, use_self_forced
-//
-// Attribute on container
-//
-// #[post_extr_fn(path)] - path is a path to a function that needs to be executed after
-// mandatory_if checks
+/// Attribute on field
+///
+/// #[default(expr)] - expr is default value, which is used in case Option<PropertyType> is None
+/// Incompatible with: use_self, use_self_vec, use_self_forced
+///
+/// #[from_str] - convert value to string, then parse from str
+/// Incompatible with: resource, use_self, use_self_vec, use_self_forced
+///
+/// #[use_self] - use self-Value for property if corresponding field does not exist
+/// Incompatible with: default, from_str, use_self_vec, use_self_forced, resource, mandatory_if
+///
+/// #[use_self_vec] - same as use_self, but puts result in a Vec
+/// Incompatible with: default, from_str, use_self, use_self_forced, resource, mandatory_if
+///
+/// #[use_self_forced] - forced to use self-Value for this field
+/// Incompatible with: default, from_str, use_self, use_self_vec, resource, mandatory_if
+///
+/// #[resource] - this field is a resource record (sound, textures should be done in post-extraction)
+/// Incompatible with: from_str, use_self, use_self_vec, use_self_forced
+///
+/// #[mandatory_if(expr)] - expr is a condition, if the condition results in `true`, field value
+/// must be Some(_)
+/// Incompatible with: default, use_self, use_self_vec, use_self_forced
+///
+/// Attribute on container
+///
+/// #[post_extr_fn(path)] - path is a path to a function that needs to be executed after
+/// mandatory_if checks
 #[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
