@@ -746,7 +746,7 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 ///
 /// `#[aliases(list)]` - `list` is an array of items where each is either identifier of fields or
 /// tuple of identifiers of fields that should be retrieved from the table in case original
-/// extraction failed/returned None. If all of them fail, #[default()] is applied if available.
+/// extraction failed/returned None. If all of them fail, `#[default()]` is applied if available.
 /// Incompatible with: `use_self`, `use_self_vec`, `use_self_forced`
 ///
 /// Attributes on container
