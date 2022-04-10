@@ -5,7 +5,6 @@ pub mod concepts;
 pub mod data_structs;
 #[cfg(feature = "prototypes")]
 pub mod prototypes;
-/// <https://wiki.factorio.com/Factorio_HTTP_API_usage_guidelines#APIs>
 #[cfg(feature = "webapi")]
 pub mod webapi;
 

@@ -1,3 +1,4 @@
+//! <https://wiki.factorio.com/Factorio_HTTP_API_usage_guidelines#APIs>
 use strum::Display;
 use semver::Version;
 use crate::data_structs::{FactorioVersion, InfoJson};
