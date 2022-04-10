@@ -1,3 +1,7 @@
+//! <https://wiki.factorio.com/Web_authentication_API>
+//!
+//! This module provides interface to authenticate to factorio.com using a username and password
+
 use std::fmt::Display;
 use thiserror::Error;
 use reqwest::{Client, StatusCode};

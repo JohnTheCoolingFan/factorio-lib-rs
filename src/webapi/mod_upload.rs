@@ -1,5 +1,8 @@
-use std::fmt::Display;
+//! <https://wiki.factorio.com/Mod_upload_API>
+//!
+//! This module provides an easy interface to upload mods to a mod portal
 
+use std::fmt::Display;
 use reqwest::{Client, StatusCode};
 use strum::Display;
 use thiserror::Error;
