@@ -744,6 +744,8 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 // must be Some(_)
 // Incompatible with: default, use_self, use_self_vec, use_self_forced
 //
+// Attribute on container
+//
 // #[post_extr_fn(path)] - path is a path to a function that needs to be executed after
 // mandatory_if checks
 #[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn))]
