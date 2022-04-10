@@ -731,7 +731,7 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 /// corresponding field does not exist in the table
 /// Incompatible with: `default`, `from_str`, `use_self_vec`, `use_self_forced`, `resource`, `mandatory_if`
 ///
-/// #[use_self_vec] - same as `use_self`, but puts result in a Vec
+/// `#[use_self_vec]` - same as `use_self`, but puts result in a Vec
 /// Incompatible with: `default`, `from_str`, `use_self`, `use_self_forced`, `resource`, `mandatory_if`
 ///
 /// `#[use_self_forced]` - same as `use_self`, but forced instead of defaulting in case of failure.
