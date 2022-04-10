@@ -1,3 +1,10 @@
+//! Factorio lib
+//!
+//! This library provides an interface to Factorio data types, mod prototypes and Web API.
+//! Check the individual module documentation for details
+//!
+//! Modules are gated behind features, which are all enabled by default.
+
 // If concepts are disabled, LocalisedString can't be used...
 #[cfg(feature = "concepts")]
 pub mod concepts;
