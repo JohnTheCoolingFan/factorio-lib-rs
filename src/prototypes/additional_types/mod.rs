@@ -531,13 +531,13 @@ impl Energy {
         PrototypesErr::InvalidTypeStr("Energy".into(), s.into())
     }
 
-    fn split_num_and_suffix(s: &str) -> Result<(&str, &str), PrototypesErr> {
+    fn split_num_and_suffix(s: &str) -> Option<(&str, &str)> {
         let mut chars = s.chars();
-        // Error returned if string is too short
-        chars.next_back().ok_or_else(|| Self::err_fn(s))?;
-        let second_last_char = chars.next_back().ok_or_else(|| Self::err_fn(s))?;
+        // None returned if string is too short
+        chars.next_back()?;
+        let second_last_char = chars.next_back()?;
         // Panics if split is on UTF-8 boundary
-        Ok(s.split_at(s.len() - 2 + (second_last_char.is_ascii_digit() as usize))) 
+        Some(s.split_at(s.len() - 2 + (second_last_char.is_ascii_digit() as usize))) 
     }
 }
 
@@ -546,7 +546,7 @@ impl FromStr for Energy {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.ends_with('W') || s.ends_with('J') {
-            let (num, suffix) = Self::split_num_and_suffix(s)?;
+            let (num, suffix) = Self::split_num_and_suffix(s).ok_or_else(|| Self::err_fn(s))?;
             let multiplier = suffix.chars().next().and_then(Self::get_multiplier).ok_or_else(|| Self::err_fn(s))?;
             let mut value = num.parse::<f64>().map_err(|_| Self::err_fn(s))?;
             if s.ends_with('W') {
