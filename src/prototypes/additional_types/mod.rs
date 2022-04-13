@@ -513,22 +513,31 @@ pub struct IconData {
 pub struct Energy(f64); // I don't know which type factorio uses internally, so I will use this
 
 impl Energy {
-    fn parse_num(num_string: &str, original: &str) -> Result<f64, PrototypesErr> {
-        num_string.parse().map_err(|_| PrototypesErr::InvalidTypeStr("Energy".into(), original.into()))
+    fn get_multiplier(multiplier_char: char) -> Option<f64> {
+        match multiplier_char {
+            'k' | 'K' => Some(1e3),
+            'M' => Some(1e6),
+            'G' => Some(1e9),
+            'T' => Some(1e12),
+            'P' => Some(1e15),
+            'E' => Some(1e18),
+            'Z' => Some(1e21),
+            'Y' => Some(1e24),
+            _ => None
+        }
     }
 
-    fn get_multiplier(multiplier_char: &char, original: &str) -> Result<f64, PrototypesErr> {
-        match multiplier_char {
-            'k' | 'K' => Ok(1e3),
-            'M' => Ok(1e6),
-            'G' => Ok(1e9),
-            'T' => Ok(1e12),
-            'P' => Ok(1e15),
-            'E' => Ok(1e18),
-            'Z' => Ok(1e21),
-            'Y' => Ok(1e24),
-            _ => Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(original)))
-        }
+    fn err_fn(s: &str) -> PrototypesErr {
+        PrototypesErr::InvalidTypeStr("Energy".into(), s.into())
+    }
+
+    fn split_num_and_suffix(s: &str) -> Result<(&str, &str), PrototypesErr> {
+        let mut chars = s.chars();
+        // Error returned if string is too short
+        chars.next_back().ok_or_else(|| Self::err_fn(s))?;
+        let second_last_char = chars.next_back().ok_or_else(|| Self::err_fn(s))?;
+        // Panics if split is on UTF-8 boundary
+        Ok(s.split_at(s.len() - 2 + (second_last_char.is_ascii_digit() as usize))) 
     }
 }
 
@@ -536,28 +545,17 @@ impl FromStr for Energy {
     type Err = PrototypesErr;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let len = s.len();
-        let mut rev_s = s.chars().rev();
-        let last_char: char = rev_s.next().ok_or_else(|| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
-        if last_char == 'W' {
-            let next_char: char = rev_s.next().ok_or_else(|| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
-            if next_char.is_ascii_digit() {
-                Ok(Self(Self::parse_num(&s[0..len-1], s)?/60.0))
-            } else {
-                let value = Self::parse_num(&s[0..len-2], s)?;
-                Ok(Self(value * Self::get_multiplier(&next_char, s)?/60.0))
-            }
-        } else if last_char == 'J' {
-            let next_char: char = rev_s.next().ok_or_else(|| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
-            if next_char.is_ascii_digit() {
-                Ok(Self(Self::parse_num(&s[0..len-1], s)?))
-            } else {
-                let value = Self::parse_num(&s[0..len-2], s)?;
-                Ok(Self(value * Self::get_multiplier(&next_char, s)?))
-            }
+        if s.ends_with('W') || s.ends_with('J') {
+            let (num, suffix) = Self::split_num_and_suffix(s)?;
+            let multiplier = suffix.chars().next().and_then(Self::get_multiplier).ok_or_else(|| Self::err_fn(s))?;
+            let mut value = num.parse::<f64>().map_err(|_| Self::err_fn(s))?;
+            if s.ends_with('W') {
+                value /= 60.0
+            };
+            Ok(Self(value * multiplier))
         } else {
-            Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))
-        } 
+            Err(Self::err_fn(s))
+        }
     }
 }
 
