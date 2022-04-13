@@ -569,6 +569,7 @@ fn energy_parse() {
     assert_eq!(Energy(1e3 / 60.0), Energy::from_str("1KW").unwrap());
     assert!(Energy::from_str("1k").is_err());
     assert!(Energy::from_str("1000.0").is_err());
+    assert!(Energy::from_str("").is_err())
 }
 
 /// <https://wiki.factorio.com/Types/ProductPrototype>
