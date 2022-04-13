@@ -561,6 +561,16 @@ impl FromStr for Energy {
     }
 }
 
+#[test]
+fn energy_parse() {
+    assert_eq!(Energy(1e3), Energy::from_str("1kJ").unwrap());
+    assert_eq!(Energy(1e9), Energy::from_str("1000.0MJ").unwrap());
+    assert_eq!(Energy(1e3 / 60.0), Energy::from_str("1kW").unwrap());
+    assert_eq!(Energy(1e3 / 60.0), Energy::from_str("1KW").unwrap());
+    assert!(Energy::from_str("1k").is_err());
+    assert!(Energy::from_str("1000.0").is_err());
+}
+
 /// <https://wiki.factorio.com/Types/ProductPrototype>
 #[derive(Debug, Clone)]
 pub enum ProductType {
