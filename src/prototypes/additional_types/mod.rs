@@ -522,14 +522,14 @@ impl FromStr for Energy {
 
         fn get_multiplier(multiplier_char: &char, original: &str) -> Result<f64, PrototypesErr> {
             match multiplier_char {
-                    'k' | 'K' => Ok(1000.0),
-                    'M' => Ok(1000000.0),
-                    'G' => Ok(1000000000.0),
-                    'T' => Ok((10.0_f64).powi(12)),
-                    'P' => Ok((10.0_f64).powi(15)),
-                    'E' => Ok((10.0_f64).powi(18)),
-                    'Z' => Ok((10.0_f64).powi(21)),
-                    'Y' => Ok((10.0_f64).powi(24)),
+                    'k' | 'K' => Ok(1e3),
+                    'M' => Ok(1e6),
+                    'G' => Ok(1e9),
+                    'T' => Ok(1e12),
+                    'P' => Ok(1e15),
+                    'E' => Ok(1e18),
+                    'Z' => Ok(1e21),
+                    'Y' => Ok(1e24),
                     _ => Err(PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(original)))
             }
         }
