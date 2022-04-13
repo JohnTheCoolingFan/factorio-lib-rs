@@ -536,7 +536,6 @@ impl FromStr for Energy {
     type Err = PrototypesErr;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-
         let len = s.len();
         let mut rev_s = s.chars().rev();
         let last_char: char = rev_s.next().ok_or_else(|| PrototypesErr::InvalidTypeStr(String::from("Energy"), String::from(s)))?;
