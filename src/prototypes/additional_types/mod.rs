@@ -565,6 +565,7 @@ fn energy_parse() {
     assert_eq!(Energy(1e9), Energy::from_str("1000.0MJ").unwrap());
     assert_eq!(Energy(1e3 / 60.0), Energy::from_str("1kW").unwrap());
     assert_eq!(Energy(1e3 / 60.0), Energy::from_str("1KW").unwrap());
+    assert_eq!(Energy(1246890.0), Energy::from_str("1246.89kJ").unwrap());
     assert!(Energy::from_str("1k").is_err());
     assert!(Energy::from_str("1000.0").is_err());
     assert!(Energy::from_str("").is_err())
