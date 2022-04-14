@@ -617,17 +617,31 @@ pub struct Font {
 }
 
 /// <https://wiki.factorio.com/Prototype/GodController>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(god_controller)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct GodController {
-    name: String, // Must be "default"
-    inventory_size: ItemStackIndex,
-    movement_speed: f64, // Must be >= 0.34375
-    item_pickup_distance: f64,
-    loot_pickup_distance: f64,
-    mining_speed: f64,
-    crafting_categories: Option<Vec<String>>,
-    mining_categories: Option<Vec<String>>
+    pub name: String, // Must be "default"
+    pub inventory_size: ItemStackIndex,
+    pub movement_speed: f64, // Must be >= 0.34375
+    pub item_pickup_distance: f64,
+    pub loot_pickup_distance: f64,
+    pub mining_speed: f64,
+    pub crafting_categories: Option<Vec<String>>,
+    pub mining_categories: Option<Vec<String>>
+}
+
+impl GodController {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.name != "default" {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "GodController", message: Some("GodController name should only be \"default\"".into()) })
+        }
+        if self.movement_speed < 0.34375 {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "GodController", message: Some("movement speed must be >= 0.34375".into()) })
+        }
+        Ok(())
+    }
+
 }
 
 /// <https://wiki.factorio.com/Prototype/MapGenPresets>
