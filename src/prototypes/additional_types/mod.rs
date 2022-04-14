@@ -101,6 +101,22 @@ pub struct RealOrientation(pub f32);
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct Position(pub i32, pub i32);
 
+impl<'lua> PrototypeFromLua<'lua> for Position {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let mlua::Value::Table(p_table) = value {
+            if let Some((x, y)) = p_table.get::<_, Option<i32>>("x")?.zip(p_table.get::<_, Option<i32>>("y")?) {
+                Ok(Self(x, y))
+            } else if let Some((x, y)) = p_table.get::<isize, Option<i32>>(1)?.zip(p_table.get::<isize, Option<i32>>(2)?) {
+                Ok(Self(x, y))
+            } else {
+                Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "Position", message: Some("Expected x and y keys or an array".into()) })
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "Potision", message: Some("expected table".into()) })
+        }
+    }
+}
+
 /// Any of the color components are optional <https://wiki.factorio.com/Types/Color>
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Color(pub f32, pub f32, pub f32, pub f32);
