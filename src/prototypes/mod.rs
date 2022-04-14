@@ -366,10 +366,10 @@ impl<'lua> PrototypeFromLua<'lua> for Value<'lua> {
 impl<'lua, K, V> PrototypeFromLua<'lua> for HashMap<K, V>
 where
     K: Eq + Hash + FromLua<'lua>,
-    V: FromLua<'lua>,
+    V: PrototypeFromLua<'lua>,
 {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
-        HashMap::from_lua(value, lua)
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        HashMap::<K, Value>::from_lua(value, lua)?.into_iter().map(|(k, v)| Ok((k, V::prototype_from_lua(v, lua, data_table)?))).collect()
     }
 }
 
