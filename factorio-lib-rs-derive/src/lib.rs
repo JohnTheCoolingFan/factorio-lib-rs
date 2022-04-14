@@ -935,7 +935,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
     }
     let fallbacks = &prototype_field_attrs.fallbacks;
     let field_get_expr = {
-        let mut get_expr = quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? #( .unwrap_or_else(|| #fallbacks ) )* };
+        let mut get_expr = quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? #( .or_else(|| #fallbacks ) )* };
         if let Some(def_val) = prototype_field_attrs.default_value {
             get_expr = quote! { #get_expr.unwrap_or_else(|| #def_val.into()) }
         };
