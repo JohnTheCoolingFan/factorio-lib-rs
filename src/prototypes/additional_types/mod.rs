@@ -103,16 +103,17 @@ pub struct Position(pub i32, pub i32);
 
 impl<'lua> PrototypeFromLua<'lua> for Position {
     fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let type_name = value.type_name();
         if let mlua::Value::Table(p_table) = value {
             if let Some((x, y)) = p_table.get::<_, Option<i32>>("x")?.zip(p_table.get::<_, Option<i32>>("y")?) {
                 Ok(Self(x, y))
             } else if let Some((x, y)) = p_table.get::<isize, Option<i32>>(1)?.zip(p_table.get::<isize, Option<i32>>(2)?) {
                 Ok(Self(x, y))
             } else {
-                Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "Position", message: Some("Expected x and y keys or an array".into()) })
+                Err(mlua::Error::FromLuaConversionError { from: type_name, to: "Position", message: Some("Expected x and y keys or an array".into()) })
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "Potision", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "Potision", message: Some("expected table".into()) })
         }
     }
 }
@@ -204,14 +205,28 @@ pub enum MapGenPreset {
     NonDefault(Box<MapGenPresetNonDefault>)
 }
 
+impl<'lua> PrototypeFromLua<'lua> for MapGenPreset {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let mlua::Value::Table(p_table) = &value {
+             if p_table.get::<_, bool>("default")? {
+                 Ok(Self::Default(MapGenPresetDefault::prototype_from_lua(value.clone(), lua, data_table)?))
+             } else {
+                 Ok(Self::NonDefault(Box::new(MapGenPresetNonDefault::prototype_from_lua(value.clone(), lua, data_table)?)))
+             }
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "MapGenPreset", message: Some("Expected table".into()) })
+        }
+    }
+}
+
 /// <https://wiki.factorio.com/Types/MapGenPreset#default>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenPresetDefault {
     order: String
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#default>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenPresetNonDefault {
     order: String,
     // Should these be optional or just have defaults? TODO
@@ -239,30 +254,47 @@ impl FromStr for MapGenSize {
     }
 }
 
+impl<'lua> PrototypeFromLua<'lua> for MapGenSize {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::String(s) = value {
+            s.to_str().map_err(mlua::Error::external)?.parse().map_err(mlua::Error::external)
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "MapgenSize", message: Some("expected string".into()) })
+        }
+    }
+}
+
 /// <https://lua-api.factorio.com/latest/Concepts.html#CliffPlacementSettings>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CliffPlacementSettings {
     pub name: String, // Name of the cliff prototype
+    #[default(10.0_f32)]
     pub cliff_elevation_0: f32, // Default 10.0
     pub cliff_elevation_interval: f32,
+    #[from_str]
     pub richness: MapGenSize
 }
 
+// TODO: defaults
+// Quote: «All key/value pairs are optional. If not set they will just use the default values.»
 /// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenPresetBasicSettings {
     // Defaults are not documented for some f'ing reason
+    #[from_str]
     pub terain_segmentation: MapGenSize, // Default is... Unknown
     pub water: MapGenSize, // Same here
+    #[default(true)]
     pub default_enable_all_autoplace_controls: bool, // Default: true
     pub autoplace_controls: HashMap<String, AutoplaceSetting>, // key is AutoplaceControl name
     // Quote: «Each setting in this table maps the string type to the settings for that type. Valid types are "entity", "tile" and "decorative".»
     pub autoplace_settings: Vec<AutoplaceSettings>,
     pub property_expression_names: HashMap<String, String>, // Map property name to noise expression name
-    pub starting_points: Position,
+    pub starting_points: Vec<Position>,
     pub seed: u32,
     pub width: u32,
     pub height: u32,
+    #[from_str]
     pub starting_area: MapGenSize,
     pub peaceful_mode: bool,
     pub cliff_settings: CliffPlacementSettings
@@ -270,22 +302,24 @@ pub struct MapGenPresetBasicSettings {
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
 /// <https://lua-api.factorio.com/latest/Concepts.html#AutoplaceSettings>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AutoplaceSettings {
     pub treat_missing_as_default: bool, // Doesn't look like it's optional or has a default...
     pub settings: HashMap<String, AutoplaceSetting>
 }
 
 /// <https://lua-api.factorio.com/latest/Concepts.html#AutoplaceSetting>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AutoplaceSetting {
-    frequency: Option<MapGenSize>,
-    size: Option<MapGenSize>,
-    richness: Option<MapGenSize>
+    pub frequency: Option<MapGenSize>,
+    pub size: Option<MapGenSize>,
+    pub richness: Option<MapGenSize>
 }
 
+// About defaults, quote: «All key/value pairs are optional, if not set they will just use the
+// existing values.»
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenPresetAdvancedSettings {
     // Defaults are not documented too
     pub pollution: MapGenPollution,
@@ -295,44 +329,60 @@ pub struct MapGenPresetAdvancedSettings {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct MapGenPollution {
-    enabled: bool,
-    diffusion_ratio: f64, // Must be <= 0.25
-    ageing: f64, // Must be >= 0.5
-    enemy_attack_pollution_consumption_modifier: f64,
-    min_pollution_to_damage_trees: f64,
-    pollution_restored_per_tree_damage: f64
+    pub enabled: bool,
+    pub diffusion_ratio: f64, // Must be <= 0.25
+    pub ageing: f64, // Must be >= 0.5
+    pub enemy_attack_pollution_consumption_modifier: f64,
+    pub min_pollution_to_damage_trees: f64,
+    pub pollution_restored_per_tree_damage: f64
+}
+
+impl MapGenPollution {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.diffusion_ratio > 0.25 {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "MapGenPollution", message: Some("diffusion_ratio must be <= 0.25".into()) })
+        }
+        if self.ageing < 0.25 {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "MapGenPollution", message: Some("ageing must be >= 0.25".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenEnemyEvolution {
-    enabled: bool,
-    time_factor: f64,
-    destroy_factor: f64,
-    pollution_factor: f64
+    pub enabled: bool,
+    pub time_factor: f64,
+    pub destroy_factor: f64,
+    pub pollution_factor: f64
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenEnemyExpansion {
-    enabled: bool,
+    pub enabled: bool,
     // Oddly satisfying how lines strings line up
-    max_expansion_distance: f64,
-    settler_group_min_size: f64,
-    settler_group_max_size: f64,
-    max_expansion_cooldown: f64,
-    min_expansion_cooldown: f64
+    pub max_expansion_distance: f64,
+    pub settler_group_min_size: f64,
+    pub settler_group_max_size: f64,
+    pub max_expansion_cooldown: f64,
+    pub min_expansion_cooldown: f64
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenDifficultySettings {
-    recipe_difficulty: DifficultySetting,
-    technology_difficulty: DifficultySetting,
-    technology_price_multiplier: f64,
-    research_queue_setting: ResearchQueueSetting
+    #[from_str]
+    pub recipe_difficulty: DifficultySetting,
+    #[from_str]
+    pub technology_difficulty: DifficultySetting,
+    pub technology_price_multiplier: f64,
+    #[from_str]
+    pub research_queue_setting: ResearchQueueSetting
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#pollution>

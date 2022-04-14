@@ -663,6 +663,23 @@ pub struct MapGenPresets {
     presets: HashMap<String, MapGenPreset>
 }
 
+impl<'lua> PrototypeFromLua<'lua> for MapGenPresets {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(table) = value {
+            let name = table.get::<_, String>("name")?;
+            let mut result = HashMap::new();
+            for (k, v) in table.pairs::<String, Value>().collect::<LuaResult<HashMap<String, Value>>>()? {
+                if k != "name" {
+                    result.insert(k, MapGenPreset::prototype_from_lua(v, lua, data_table)?);
+                }
+            }
+            Ok(Self{name, presets: result})
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "MapGenPresets", message: Some("expected table".into()) })
+        }
+    }
+}
+
 /// <https://wiki.factorio.com/Prototype/MapSettings>
 #[derive(Debug, Prototype, DataTableAccessable)]
 #[data_table(map_settings)]
