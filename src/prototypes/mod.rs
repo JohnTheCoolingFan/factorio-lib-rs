@@ -606,9 +606,9 @@ pub struct Font {
     name: String,
     size: i32,
     from: String,
-    spacing: f32, // Default 0.0
-    border: bool, // Default fase
-    filtered: bool, // Default false
+    spacing: f32, // Default: 0.0
+    border: bool, // Default: false
+    filtered: bool, // Default: false
     border_color: Option<Color>
 }
 
