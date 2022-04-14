@@ -788,7 +788,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     };
     let post_extr = if let Some(pef) = post_extr_fn {
         quote! {
-            #pef(&result, lua, data_table)?;
+            #pef(&mut result, lua, data_table)?;
         }
     } else {
         quote! { }
@@ -800,7 +800,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
                 if let mlua::Value::Table(ref prot_table) = value {
                     #(#parsed_fields)*
                     #(#mandatory_exprs)*
-                    let result = Self{#(#field_names),*};
+                    let mut result = Self{#(#field_names),*};
                     #post_extr
                     Ok(result)
                 } else {
