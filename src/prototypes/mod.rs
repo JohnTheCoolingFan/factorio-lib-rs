@@ -377,6 +377,7 @@ prot_from_lua_blanket!(i64);
 prot_from_lua_blanket!(i32);
 prot_from_lua_blanket!(i16);
 prot_from_lua_blanket!(i8);
+prot_from_lua_blanket!(Color);
 #[cfg(feature = "concepts")]
 prot_from_lua_blanket!(LocalisedString);
 
@@ -600,16 +601,19 @@ impl EditorController {
 }
 
 /// <https://wiki.factorio.com/Prototype/Font>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(font)]
 pub struct Font {
-    name: String,
-    size: i32,
-    from: String,
-    spacing: f32, // Default: 0.0
-    border: bool, // Default: false
-    filtered: bool, // Default: false
-    border_color: Option<Color>
+    pub name: String,
+    pub size: i32,
+    pub from: String,
+    #[default(0.0_f32)]
+    pub spacing: f32, // Default: 0.0
+    #[default(false)]
+    pub border: bool, // Default: false
+    #[default(false)]
+    pub filtered: bool, // Default: false
+    pub border_color: Option<Color>
 }
 
 /// <https://wiki.factorio.com/Prototype/GodController>
