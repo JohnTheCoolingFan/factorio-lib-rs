@@ -557,8 +557,9 @@ pub struct AnimationPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/EditorController>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(editor_controller)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct EditorController {
     name: String, // Must be "default"
     pub inventory_size: ItemStackIndex,
@@ -584,6 +585,18 @@ pub struct EditorController {
     pub show_character_tab_in_controller_gui: bool,
     pub show_infinity_filter_in_controller_gui: bool,
     pub placed_corpses_never_expire: bool
+}
+
+impl EditorController {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.name != "default" {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "EditorController", message: Some("EditorController name should only be \"default\"".into()) })
+        }
+        if self.movement_speed < 0.34375 {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "EditorController", message: Some("movement speed must be >= 0.34375".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/Font>
