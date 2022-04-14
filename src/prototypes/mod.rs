@@ -10,11 +10,12 @@ pub use utility::*;
 use crate::concepts::LocalisedString;
 #[cfg(not(feature = "concepts"))]
 type LocalisedString = String;
-use mlua::{Value, Lua, prelude::LuaResult, ToLua};
+use mlua::{Value, Lua, prelude::LuaResult, ToLua, FromLua};
 use additional_types::SpriteSizeType;
 use std::collections::HashMap;
 use std::rc::{Rc, Weak};
 use std::marker::PhantomData;
+use std::hash::Hash;
 use thiserror::Error;
 use std::fmt;
 use factorio_lib_rs_derive::{
@@ -359,6 +360,16 @@ impl<'lua> PrototypeFromLua<'lua> for Value<'lua> {
     #[inline]
     fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
         Ok(value)
+    }
+}
+
+impl<'lua, K, V> PrototypeFromLua<'lua> for HashMap<K, V>
+where
+    K: Eq + Hash + FromLua<'lua>,
+    V: FromLua<'lua>,
+{
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+        HashMap::from_lua(value, lua)
     }
 }
 
