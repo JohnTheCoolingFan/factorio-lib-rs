@@ -5,7 +5,7 @@ extern crate proc_macro;
 use core::fmt::Display;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{self, Attribute, Ident, Result};
+use syn::{self, Attribute, Ident, Path, Meta, Result};
 use syn::spanned::Spanned;
 use core::iter::Iterator;
 
@@ -744,16 +744,16 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 /// must be Some(_)
 /// Incompatible with: `default`, `use_self`, `use_self_vec`, `use_self_forced`
 ///
-/// `#[aliases(list)]` - `list` is an array of items where each is either identifier of fields or
-/// tuple of identifiers of fields that should be retrieved from the table in case original
-/// extraction failed/returned None. If all of them fail, `#[default()]` is applied if available.
+/// `#[fallback(expr)]` - expr is used in case normal extraction retrieved None. Similar to
+/// `#[default()]`, but applied before it and can return None. Can be used multiple times.
+/// Use only on Option<>
 /// Incompatible with: `use_self`, `use_self_vec`, `use_self_forced`
 ///
 /// Attributes on container
 ///
 /// `#[post_extr_fn(path)]` - path is a path to a function that needs to be executed after
 /// field extraction and mandatory_if checks
-#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn))]
+#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn, fallback))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
@@ -816,6 +816,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
 struct PrototypeFromLuaFieldAttrArgs {
     default_value: Option<proc_macro2::TokenStream>, // Incompatible with: use_self, use_self_vec
     mandatory_if: Option<proc_macro2::TokenStream>,  // Incompatible with: default, use_self, use_self_vec
+    fallbacks: Vec<proc_macro2::TokenStream>,
     // use_self* is incompatible with default and mandatory_if
     // Only 1 can be used:
     use_from_str: bool,
@@ -832,7 +833,7 @@ impl PrototypeFromLuaFieldAttrArgs {
             for v in result.compat_check_matrix() {
                 if attr.path.is_ident(v.0) {
                     result.check_compat(v.0, &v.2, attr)?;
-                    v.1(&mut result, attr)
+                    v.1(&mut result, attr)?
                 }
             }
         }
@@ -844,7 +845,7 @@ impl PrototypeFromLuaFieldAttrArgs {
     }
 
     // This is horrifyingly inefficient, yet better than what was before
-    fn compat_check_matrix<'a, 'b>(&'a self) -> Vec<(&'b str, fn(&mut Self, &Attribute), Vec<(&'b str, bool)>)> {
+    fn compat_check_matrix<'a, 'b>(&'a self) -> Vec<(&'b str, fn(&mut Self, &Attribute) -> Result<()>, Vec<(&'b str, bool)>)> {
         // These names don't make sense because they are not supposed to
         let sel = (
             ("use_self", self.use_self),
@@ -855,36 +856,40 @@ impl PrototypeFromLuaFieldAttrArgs {
             ("default", self.default_value.is_some()),
             ("mandatory_if", self.mandatory_if.is_some()),
             ("from_str", self.use_from_str),
-            ("resource", self.is_resource)
+            ("resource", self.is_resource),
+            ("fallback", !self.fallbacks.is_empty())
         );
         vec![
-            ("default", |s, a| s.default_value = Some(a.tokens.clone()), vec![
+            ("default", |s, a| {s.default_value = Some(a.tokens.clone()); Ok(())}, vec![
                 ("mandatory_if", self.mandatory_if.is_some()),
                 sel.0, sel.1, sel.2
             ]),
-            ("mandatory_if", |s, a| s.mandatory_if = Some(a.tokens.clone()), vec![
+            ("mandatory_if", |s, a| {s.mandatory_if = Some(a.tokens.clone()); Ok(())}, vec![
                 ("default", self.default_value.is_some()),
                 sel.0, sel.1, sel.2
             ]),
-            ("from_str", |s, _| s.use_from_str = true, vec![
+            ("from_str", |s, _| {s.use_from_str = true; Ok(())}, vec![
                 ("resource", self.is_resource),
                 sel.0, sel.1, sel.2
             ]),
-            ("resource", |s, _| s.is_resource = true, vec![
+            ("resource", |s, _| {s.is_resource = true; Ok(())}, vec![
                 ("from_str", self.use_from_str),
                 sel.0, sel.1, sel.2
             ]),
-            ("use_self", |s, _| s.use_self = true, vec![
-                oth.0, oth.1, oth.2, oth.3,
+            ("use_self", |s, _| {s.use_self = true; Ok(())}, vec![
+                oth.0, oth.1, oth.2, oth.3, oth.4,
                 sel.1, sel.2
             ]),
-            ("use_self_vec", |s, _| s.use_self_vec = true, vec![
-                oth.0, oth.1, oth.2, oth.3,
+            ("use_self_vec", |s, _| {s.use_self_vec = true; Ok(())}, vec![
+                oth.0, oth.1, oth.2, oth.3, oth.4,
                 sel.0, sel.2
             ]),
-            ("use_self_forced", |s, _| s.use_self_forced = true, vec![
-                oth.0, oth.1, oth.2, oth.3,
+            ("use_self_forced", |s, _| {s.use_self_forced = true; Ok(())}, vec![
+                oth.0, oth.1, oth.2, oth.3, oth.4,
                 sel.0, sel.1
+            ]),
+            ("fallback", |s, a| {s.fallbacks.push(a.tokens.clone()); Ok(())}, vec![
+                sel.0, sel.1, sel.2
             ])
         ]
     }
@@ -904,6 +909,7 @@ impl Default for PrototypeFromLuaFieldAttrArgs {
         Self{
             default_value: None, 
             mandatory_if: None,
+            fallbacks: vec![],
             use_from_str: false,
             use_self: false,
             use_self_vec: false,
@@ -923,13 +929,16 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
     } else {
         quote! { #field_type }
     };
-    if prototype_field_attrs.default_value.is_some() {
+    if prototype_field_attrs.default_value.is_some() || !prototype_field_attrs.fallbacks.is_empty() {
         field_extr_type = quote! { Option<#field_extr_type> };
     }
-    let field_get_expr = if let Some(def_val) = prototype_field_attrs.default_value {
-        quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)?.unwrap_or_else(|| #def_val.into()) }
-    } else {
-        quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? }
+    let fallbacks = &prototype_field_attrs.fallbacks;
+    let field_get_expr = {
+        let mut get_expr = quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? #( .unwrap_or_else(|| #fallbacks ) )* };
+        if let Some(def_val) = prototype_field_attrs.default_value {
+            get_expr = quote! { #get_expr.unwrap_or_else(|| #def_val.into()) }
+        };
+        get_expr
     };
     let get_self = quote! {
         crate::prototypes::PrototypeFromLua::prototype_from_lua(value.clone(), lua, data_table)
