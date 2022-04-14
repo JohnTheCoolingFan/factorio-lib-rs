@@ -5,7 +5,7 @@ extern crate proc_macro;
 use core::fmt::Display;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{self, Attribute, Ident, Path, Meta, Result};
+use syn::{self, Attribute, Ident, Result};
 use syn::spanned::Spanned;
 use core::iter::Iterator;
 
