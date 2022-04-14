@@ -801,6 +801,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
                     #(#parsed_fields)*
                     #(#mandatory_exprs)*
                     let mut result = Self{#(#field_names),*};
+                    #[allow(unnecessary_mut_passed)]
                     #post_extr
                     Ok(result)
                 } else {
