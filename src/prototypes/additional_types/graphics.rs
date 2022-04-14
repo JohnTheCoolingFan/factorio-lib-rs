@@ -311,43 +311,55 @@ pub enum Animation {
     Single(Box<AnimationBase>)
 }
 
+impl Animation {
+    fn check_stripes(&self) -> bool {
+        match self {
+            Self::Layers(layers) => {
+                let mut flag = false;
+                for layer in layers {
+                    flag |= layer.check_stripes()
+                };
+                flag
+            },
+            Self::Single(ab) => {
+                ab.check_stripes()
+            }
+        }
+    }
+}
+
 impl<'lua> PrototypeFromLua<'lua> for Animation {
     fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
+        let type_name = &value.type_name();
         if let mlua::Value::Table(p_table) = value {
             let layers = p_table.get::<_, Option<Vec<mlua::Value>>>("layers")?;
-            if let Some(actual_layers) = layers {
-                let result_layers: mlua::Result<Vec<Self>> = actual_layers.into_iter().map(|v| Self::prototype_from_lua(v, lua, data_table)).collect();
-                Ok(Self::Layers(result_layers?))
+            let result = if let Some(actual_layers) = layers {
+                Self::Layers(actual_layers.into_iter().map(|v| Self::prototype_from_lua(v, lua, data_table)).collect::<mlua::Result<Vec<Self>>>()?)
             } else {
-                Ok(Self::Single(Box::new(AnimationBase::prototype_from_lua(p_table.to_lua(lua)?, lua, data_table)?)))
-            }
+                Self::Single(Box::new(AnimationBase::prototype_from_lua(p_table.to_lua(lua)?, lua, data_table)?))
+            };
+            if result.check_stripes() {
+                return Err(mlua::Error::FromLuaConversionError { from: type_name, to: "Animation",
+                message: Some("`height_in_frames` in stripes is mandatory".into()) })
+            };
+            Ok(result)
         } else {
-            Err(mlua::Error::FromLuaConversionError{from:value.type_name(), to: "Animation", message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError{from:type_name, to: "Animation", message: Some("Expected table".into())})
         }
     }
 }
 
 /// <https://wiki.factorio.com/Types/Animation#hr_version>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AnimationBase {
-    regular: AnimationSpec,
-    hr_version: Option<AnimationSpec>,
+    #[use_self_forced]
+    pub regular: AnimationSpec,
+    pub hr_version: Option<AnimationSpec>,
 }
 
-impl<'lua> PrototypeFromLua<'lua> for AnimationBase {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
-        if let mlua::Value::Table(p_table) = value {
-            let hr_version_opt = p_table.get::<_, Option<mlua::Value>>("hr_version")?;
-            let regular = AnimationSpec::prototype_from_lua(p_table.clone().to_lua(lua)?, lua, data_table)?;
-            if let Some(hr_version_value) = hr_version_opt {
-                let hr_version = AnimationSpec::prototype_from_lua(hr_version_value, lua, data_table)?;
-                Ok(Self{regular, hr_version: Some(hr_version)})
-            } else {
-                Ok(Self{regular, hr_version: None})
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError{from:value.type_name(), to: "AnimationBase", message: Some("Expected table".into())})
-        }
+impl AnimationBase {
+    fn check_stripes(&self) -> bool {
+        self.regular.check_stripes() || { if let Some(ans) = &self.hr_version { ans.check_stripes() } else { false } }
     }
 }
 
@@ -357,66 +369,51 @@ impl<'lua> PrototypeFromLua<'lua> for AnimationBase {
 pub struct AnimationSpec {
     // These types share same fields/values, so I decided to "combine" them
     #[mandatory_if(stripes.is_none())]
-    filename: Option<FileName>,
+    pub filename: Option<FileName>,
     #[use_self_forced]
-    sprite: SpriteSpecWithoutFilename, // Filename is mandatory unless `stripes` is specified
+    pub sprite: SpriteSpecWithoutFilename, // Filename is mandatory unless `stripes` is specified
     #[from_str]
-    run_mode: RunMode, // Default: "forward"
+    #[default("forward")]
+    pub run_mode: RunMode, // Default: "forward"
     #[default(1_u32)]
-    frame_count: u32, // Default: 1, can't be 0
+    pub frame_count: u32, // Default: 1, can't be 0
     #[default(0_u32)]
-    line_length: u32, // Default: 0
+    pub line_length: u32, // Default: 0
     #[default(1.0_f32)]
-    animation_speed: f32, // Default: 1.0
+    pub animation_speed: f32, // Default: 1.0
     #[default(f32::MAX)]
-    max_advance: f32, // Default: MAX_FLOAT
+    pub max_advance: f32, // Default: MAX_FLOAT
     #[default(1_u8)]
-    repeat_count: u8, // Default: 1, can't be 0
-    frame_sequence: Option<AnimationFrameSequence>,
-    stripes: Option<Vec<Stripe>>
+    pub repeat_count: u8, // Default: 1, can't be 0
+    pub frame_sequence: Option<AnimationFrameSequence>,
+    pub stripes: Option<Vec<Stripe>>
 }
 
 impl AnimationSpec {
     // TODO: clarify the required image sizes for stripes
     fn register_resources(&self, lua: &mlua::Lua, data_table: &mut DataTable) -> mlua::prelude::LuaResult<()> {
         todo!() // TODO
+        // List of things to do:
+        // Rename this function to a more fitting name
+        // check data: `frame_count`, `repeat_count`
     }
-}
 
-/*
-// TODO
-impl<'lua> PrototypeFromLua<'lua> for AnimationSpec {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
-        if let mlua::Value::Table(p_table) = value {
-            // TODO: register resource
-            let stripes: Option<Vec<Stripe>> = PrototypeFromLua::prototype_from_lua(p_table.get::<_, mlua::Value>("stripes")?, lua, data_table)?;
-            let mut filename = None;
-            if stripes.is_none() {
-                filename = Some(FileName(p_table.get("filename")?));
+    fn check_stripes(&self) -> bool {
+        let mut flag = false;
+        if let Some(stripes) = &self.stripes {
+            for stripe in stripes {
+                flag |= stripe.height_in_frames.is_none()
             }
-            let sprite = SpriteSpecWithoutFilename::prototype_from_lua(p_table.clone().to_lua(lua)?, lua, data_table)?;
-            let run_mode: RunMode = p_table.get::<_, Option<String>>("run_mode")?.unwrap_or_else(|| "forward".into()).parse().map_err(|_| mlua::Error::FromLuaConversionError{from:"String", to: "RunMode", message: Some("Invalid string".into())})?;
-            let frame_count: u32 = p_table.get::<_, Option<u32>>("frame_count")?.unwrap_or(1); // TODO: data check
-            let line_length: u32 = p_table.get::<_, Option<u32>>("line_length")?.unwrap_or(0);
-            let animation_speed: f32 = p_table.get::<_, Option<f32>>("animation_speed")?.unwrap_or(1.0_f32);
-            let max_advance: f32 = p_table.get::<_, Option<f32>>("max_advance")?.unwrap_or(f32::MAX);
-            let repeat_count: u8 = p_table.get::<_, Option<u8>>("repeat_count")?.unwrap_or(1); // TODO: data check
-            let frame_sequence: Option<AnimationFrameSequence> = p_table.get("frame_sequence")?;
-            let result = Self{filename, sprite, run_mode, frame_count, line_length, animation_speed, max_advance, repeat_count, frame_sequence, stripes};
-            result.register_resources(data_table);
-            Ok(result)
-        } else {
-            Err(mlua::Error::FromLuaConversionError{from:value.type_name(), to: "AnimationSpec", message: Some("Expected table".into())})
-        }
+        };
+        flag
     }
 }
-*/
 
 /// <https://wiki.factorio.com/Types/Stripe>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct Stripe {
     width_in_frames: u32,
-    height_in_frames: u32,
+    height_in_frames: Option<u32>, // Optional only in RotatedAnimation
     filename: FileName,
     #[default(0_u32)]
     x: u32, // Default: 0
@@ -466,6 +463,7 @@ pub struct RotatedAnimation {
 }
 
 // A: "Are you sure this will work?"; Me: "I have no idea!"
+// Don't forget to check Stripes to set `height_in_frames` to `direction_count` if it's None
 /// <https://wiki.factorio.com/Types/RotatedAnimation>
 #[derive(Debug, Clone)]
 pub struct RotatedAnimationSpec {
