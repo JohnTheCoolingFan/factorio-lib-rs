@@ -936,8 +936,12 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
     let fallbacks = &prototype_field_attrs.fallbacks;
     let field_get_expr = {
         let mut get_expr = quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? #( .or_else(|| #fallbacks ) )* };
-        if let Some(def_val) = prototype_field_attrs.default_value {
-            get_expr = quote! { #get_expr.unwrap_or_else(|| #def_val.into()) }
+        if let Some(def_val) = &prototype_field_attrs.default_value {
+            get_expr = quote! { #get_expr.or_else(|| Some(#def_val.into())) };
+            if prototype_field_attrs.use_from_str {
+                get_expr = quote! { #get_expr.map(|s| s.parse::<#field_type>().map_err(mlua::Error::external)).transpose()? }
+            };
+            get_expr = quote! { #get_expr.unwrap() }
         };
         get_expr
     };
@@ -956,7 +960,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
                 name.into()
             };
         }
-    } else if prototype_field_attrs.use_from_str {
+    } else if prototype_field_attrs.use_from_str && !prototype_field_attrs.default_value.is_some() {
         quote! { #field_get_expr.parse::<#field_type>().map_err(mlua::Error::external)?; }
     } else if prototype_field_attrs.use_self_vec {
         quote! { 
