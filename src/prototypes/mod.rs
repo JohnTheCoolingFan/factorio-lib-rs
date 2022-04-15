@@ -389,6 +389,14 @@ prot_from_lua_blanket!(Factorio2DVector);
 #[cfg(feature = "concepts")]
 prot_from_lua_blanket!(LocalisedString);
 
+fn prot_from_lua_err(cond: bool, type_name: &'static str, message: impl ToString) -> LuaResult<()> {
+    if cond {
+        Err(mlua::Error::FromLuaConversionError { from: "table", to: type_name, message: Some(message.to_string()) })
+    } else {
+        Ok(())
+    }
+}
+
 /// Trait for getting a prototype from table
 trait GetPrototype<'lua> {
     fn get_prot<K: ToLua<'lua>, V: PrototypeFromLua<'lua>>(&self, key: K, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<V>;
@@ -751,22 +759,45 @@ pub struct SpritePrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/TileEffect>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(tile_effect)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct TileEffect {
-    name: String, // Must be "water" // For some reason
-    specular_lightness: Color,
-    foam_color: Color,
-    foam_color_multiplier: f32,
-    tick_scale: f32,
-    animation_speed: f32,
-    animation_scale: Vec<f32>, // One or two members, same for other below
-    dark_threshold: Vec<f32>,
-    reflection_threshold: Vec<f32>,
-    specular_threshold: Vec<f32>,
-    texture: Sprite,
-    near_zoom: f32, // Default: 2.0
-    far_zoom: f32 // Default: 0.5
+    pub name: String, // Must be "water" // For some reason
+    pub specular_lightness: Color,
+    pub foam_color: Color,
+    pub foam_color_multiplier: f32,
+    pub tick_scale: f32,
+    pub animation_speed: f32,
+    pub animation_scale: Vec<f32>, // One or two members, same for other below
+    pub dark_threshold: Vec<f32>,
+    pub reflection_threshold: Vec<f32>,
+    pub specular_threshold: Vec<f32>,
+    pub texture: Sprite, // Size must be 512 x 512
+    #[default(2.0)]
+    pub near_zoom: f32, // Default: 2.0
+    #[default(0.5)]
+    pub far_zoom: f32 // Default: 0.5
+}
+
+impl TileEffect {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        prot_from_lua_err(self.name != "water", "TileEffect", "`name` must be \"water\"")?;
+        prot_from_lua_err(
+            self.animation_scale.is_empty() || self.animation_scale.len() > 2,
+            "TileEffect", "`animation_scale` must have one or two elements")?;
+        prot_from_lua_err(
+            self.dark_threshold.is_empty() || self.animation_scale.len() > 2,
+            "TileEffect", "`animation_scale` must have one or two elements")?;
+        prot_from_lua_err(
+            self.reflection_threshold.is_empty() || self.animation_scale.len() > 2,
+            "TileEffect", "`animation_scale` must have one or two elements")?;
+        prot_from_lua_err(
+            self.specular_threshold.is_empty() || self.animation_scale.len() > 2,
+            "TileEffect", "`animation_scale` must have one or two elements")?;
+        // TODO: sprite size check
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/TipsAndTricksItemCategory>
