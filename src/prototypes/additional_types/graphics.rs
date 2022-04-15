@@ -195,19 +195,27 @@ pub struct SecondaryDrawOrders {
 }
 
 /// <https://wiki.factorio.com/Types/LightDefinition>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct LightDefinition {
-    r#type: LightDefinitionType,
+    #[rename("type")]
+    #[from_str]
+    pub light_def_type: LightDefinitionType,
     // Next 2 are mandatory if type is "oriented"
-    picture: Option<Sprite>,
-    rotation_shift: Option<f32>,
-    intensity: f32,
-    size: f32,
-    source_orientation_offset: f32, // Default: 0
-    add_perspective: bool, // Default: false
-    shift: Option<Factorio2DVector>,
-    color: Color, // Default: no color
-    minimum_darkness: f32 // Default: 0
+    #[mandatory_if(light_def_type == LightDefinitionType::Oriented)]
+    pub picture: Option<Sprite>,
+    #[mandatory_if(light_def_type == LightDefinitionType::Oriented)]
+    pub rotation_shift: Option<f32>,
+    pub intensity: f32,
+    pub size: f32,
+    #[default(0.0_f32)]
+    pub source_orientation_offset: f32, // Default: 0
+    #[default(false)]
+    pub add_perspective: bool, // Default: false
+    pub shift: Option<Factorio2DVector>,
+    #[default(Color(0.0, 0.0, 0.0, 0.0))]
+    pub color: Color, // Default: no color
+    #[default(0.0_f32)]
+    pub minimum_darkness: f32 // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/LightFlickeringDefinition>
