@@ -826,11 +826,11 @@ pub struct WindSound {
 
 // PrototypeBase starts here
 /// <https://wiki.factorio.com/PrototypeBase>
-#[derive(Debug)]
+#[derive(Debug, PrototypeFromLua)]
 pub struct PrototypeBaseSpec {
-    localised_description: Option<LocalisedString>,
-    localised_name: Option<LocalisedString>,
-    order: String
+    pub localised_description: Option<LocalisedString>,
+    pub localised_name: Option<LocalisedString>,
+    pub order: String
 }
 
 /// <https://wiki.factorio.com/PrototypeBase>
@@ -841,12 +841,16 @@ pub trait PrototypeBase: Prototype {
 }
 
 /// Base for Achievement and all inherited types <https://wiki.factorio.com/Prototype/Achievement>
-#[derive(Debug)]
+#[derive(Debug, PrototypeFromLua)]
 pub struct AchievementBase {
-    icon: IconSpecification,
-    steam_stats_name: String, // Default: "" // Unusable
-    allowed_without_fight: bool, // Default: true
-    hidden: bool // Default: false
+    #[use_self_forced]
+    pub icon: IconSpecification,
+    #[default("")]
+    pub steam_stats_name: String, // Default: "" // Unusable
+    #[default(true)]
+    pub allowed_without_fight: bool, // Default: true
+    #[default(false)]
+    pub hidden: bool // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/Achievement>
