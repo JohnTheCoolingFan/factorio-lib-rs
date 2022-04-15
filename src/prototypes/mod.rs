@@ -741,11 +741,12 @@ impl SpectatorController {
 }
 
 /// <https://wiki.factorio.com/Prototype/Sprite>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(sprite)]
 pub struct SpritePrototype {
-    name: String,
-    sprite: Sprite
+    pub name: String,
+    #[use_self_forced]
+    pub sprite: Sprite
 }
 
 /// <https://wiki.factorio.com/Prototype/TileEffect>
