@@ -817,11 +817,11 @@ pub struct TriggerTargetType {
 }
 
 /// <https://wiki.factorio.com/Prototype/WindSound>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(wind_sound)]
 pub struct WindSound {
-    name: String,
-    sound: Sound
+    pub name: String,
+    pub sound: Sound
 }
 
 // PrototypeBase starts here
