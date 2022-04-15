@@ -720,11 +720,24 @@ pub struct SoundPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/SpectatorController>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 #[data_table(spectator_controller)]
 pub struct SpectatorController {
-    name: String, // Must be "default"
-    movement_speed: f64 // Must be >= 0.34375
+    pub name: String, // Must be "default"
+    pub movement_speed: f64 // Must be >= 0.34375
+}
+
+impl SpectatorController {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.name != "default" {
+            return Err(mlua::Error::FromLuaConversionError{from: "table", to: "SpectatorController", message: Some("`name` must be \"default\" since only one instance can be defined".into())})
+        }
+        if self.movement_speed < 0.34375 {
+            return Err(mlua::Error::FromLuaConversionError{from: "table", to: "SpectatorController", message: Some("`movement_speed` must be >= 0.34375".into())})
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/Sprite>
