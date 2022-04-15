@@ -944,6 +944,7 @@ pub struct DontBuildEntityAchievement {
     pub prototype_base: PrototypeBaseSpec,
     #[use_self_forced]
     pub achievement: AchievementBase,
+    #[required]
     #[fallback(Some(vec![prot_table.get("dont_build").ok()?]))] // yikes
     pub dont_buid: Vec<String>, // String is converted to Vec<String> with one element
     #[default(0_u32)]
@@ -951,125 +952,164 @@ pub struct DontBuildEntityAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/DontCraftManuallyAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(dont_craft_manually_achievement)]
 pub struct DontCraftManuallyAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    amount: f64
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    pub amount: f64
 }
 
 /// <https://wiki.factorio.com/Prototype/DontUseEntityInEnergyProductionAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(dont_use_entity_in_energy_production_achievement)]
 pub struct DontUseEntityInEnergyProductionAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    excluded: Vec<String>, // String is converted to Vec<String> with one element
-    included: Vec<String>, // Same as `excluded`
-    last_hour_only: bool, // Default: false
-    minimum_energy_produced: Energy // Default: 0W
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    #[required]
+    #[fallback(Some(vec![prot_table.get("excluded").ok()?]))] // yikes
+    pub excluded: Vec<String>, // String is converted to Vec<String> with one element
+    #[required]
+    #[fallback(Some(vec![prot_table.get("included").ok()?]))] // yikes
+    pub included: Vec<String>, // Same as `excluded`
+    #[default(false)]
+    pub last_hour_only: bool, // Default: false
+    #[default("0W")]
+    #[from_str]
+    pub minimum_energy_produced: Energy // Default: 0W
 }
 
 /// <https://wiki.factorio.com/Prototype/FinishTheGameAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(finish_the_game_achievement)]
 pub struct FinishTheGameAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    until_second: u32 // Default: 0 (means infinite)
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    #[default(0_u32)]
+    pub until_second: u32 // Default: 0 (means infinite)
 }
 
 /// <https://wiki.factorio.com/Prototype/GroupAttackAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(group_attack_achievement)]
 pub struct GroupAttackAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    amount: u32 // Default: 1
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    #[default(1_u32)]
+    pub amount: u32 // Default: 1
 }
 
 /// <https://wiki.factorio.com/Prototype/KillAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(kill_achievement)]
 pub struct KillAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    to_kill: String, // Default: ""
-    type_to_kill: Option<String>, // TODO: another prototype enum?
-    damage_type: String, // damage type
-    amount: u32, // Default: 1
-    in_vehicle: bool, // Default: false
-    personally: bool // Default: false
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    #[default("")]
+    pub to_kill: String, // Default: ""
+    pub type_to_kill: Option<String>, // TODO: another prototype enum? // Name of entity
+    #[default("")]
+    pub damage_type: String, // damage type
+    #[default(1_u32)]
+    pub amount: u32, // Default: 1
+    #[default(false)]
+    pub in_vehicle: bool, // Default: false
+    #[default(false)]
+    pub personally: bool // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/PlayerDamagedAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(player_damaged_achievement)]
 pub struct PlayerDamagedAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    minimum_damage: f32,
-    should_survive: bool,
-    type_of_dealer: Option<String> // TODO: another prototype enum?
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    pub minimum_damage: f32,
+    pub should_survive: bool,
+    pub type_of_dealer: Option<String> // TODO: another prototype enum? // name of entity
 }
 
 /// <https://wiki.factorio.com/Prototype/ProduceAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(produce_achievement)]
 pub struct ProduceAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    amount: f64,
-    limited_to_one_game: bool,
-    product: ProductType // Type is determined from item_product or fluid_product // Only one can be set!
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    pub amount: f64,
+    pub limited_to_one_game: bool,
+    #[use_self_forced]
+    pub product: ProductType // Type is determined from item_product or fluid_product // Only one can be set!
 }
 
 /// <https://wiki.factorio.com/Prototype/ProducePerHourAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(produce_per_hour_achievement)]
 pub struct ProducePerHourAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    amount: f64,
-    product: ProductType
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    pub amount: f64,
+    #[use_self_forced]
+    pub product: ProductType
 }
 
 /// <https://wiki.factorio.com/Prototype/ResearchAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(research_achievement)]
 pub struct ResearchAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    target: ResearchTarget // Determined from either `technology` or `research_all` is set
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    #[use_self_forced]
+    pub target: ResearchTarget // Determined from either `technology` or `research_all` is set
 }
 
 /// <https://wiki.factorio.com/Prototype/TrainPathAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(train_path_achievement)]
 pub struct TrainPathAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    minimum_distance: f64
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    pub minimum_distance: f64
 }
 
 /// <https://wiki.factorio.com/Prototype/AmmoCategory>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(ammo_category)]
 pub struct AmmoCategory {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    bonus_gui_order: String // Default: ""
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[default("")]
+    pub bonus_gui_order: String // Default: ""
 }
 
 /// <https://wiki.factorio.com/Prototype/AutoplaceControl>

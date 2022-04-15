@@ -729,11 +729,42 @@ pub enum ProductType {
     Fluid(String)
 }
 
+impl<'lua> PrototypeFromLua<'lua> for ProductType {
+    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(table) = &value {
+            if let Some(name) = table.get::<_, Option<String>>("item_product")? {
+                Ok(Self::Item(name))
+            } else if let Some(name) = table.get::<_, Option<String>>("fluid_product")? {
+                Ok(Self::Fluid(name))
+            } else {
+                Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ProductType",
+                message: Some("`item_product` or `fluid_product` must be defined".into()) })
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ProductType", message: Some("expected table".into()) })
+        }
+    }
+}
+
 /// <https://wiki.factorio.com/Prototype/ResearchAchievement>
 #[derive(Debug, Clone)]
 pub enum ResearchTarget {
     All,
     Technology(String)
+}
+
+impl<'lua> PrototypeFromLua<'lua> for ResearchTarget {
+    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(table) = &value {
+            if table.get::<_, Option<bool>>("research_all")?.unwrap_or(false) {
+                Ok(Self::All)
+            } else {
+                Ok(Self::Technology(table.get::<_, Option<String>>("technology")?.unwrap_or_else(|| String::from(""))))
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ResearchTarget", message: Some("expected table".into()) })
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/AutoplaceControl#category>
