@@ -1112,14 +1112,19 @@ pub struct AmmoCategory {
     pub bonus_gui_order: String // Default: ""
 }
 
+// 255 instances max
 /// <https://wiki.factorio.com/Prototype/AutoplaceControl>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(autoplace_control)]
 pub struct AutoplaceControl {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[from_str]
     pub category: AutoplaceControlCategory,
+    #[default(true)]
     pub can_be_disabled: bool, // Default: true
+    #[default(false)]
     pub richness: bool // Default: false
 }
 
