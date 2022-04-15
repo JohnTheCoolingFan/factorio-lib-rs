@@ -16,7 +16,7 @@ pub mod prototypes;
 pub mod webapi;
 
 #[cfg(feature = "lua")]
-use mlua::{Lua, prelude::LuaResult, Integer, Table};
+use mlua::{prelude::*, Lua, Integer, Table};
 
 // TODO: add more features
 /// Unfinished wrapper around [mlua::Lua::new] that sets some global variables
