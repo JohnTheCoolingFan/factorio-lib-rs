@@ -317,9 +317,9 @@ fn impl_entity_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn tile_width(&self) -> u32 { self.entity_base.tile_width }
             fn tile_height(&self) -> u32 { self.entity_base.tile_height }
             fn autoplace(&self) -> &Option<AutoplaceSpecification> { &self.entity_base.autoplace }
-            fn map_color(&self) -> Option<Color> { self.entity_base.map_color }
-            fn friendly_map_color(&self) -> Option<Color> { self.entity_base.friendly_map_color }
-            fn enemy_map_color(&self) -> Option<Color> { self.entity_base.enemy_map_color }
+            fn map_color(&self) -> &Option<Color> { &self.entity_base.map_color }
+            fn friendly_map_color(&self) -> &Option<Color> { &self.entity_base.friendly_map_color }
+            fn enemy_map_color(&self) -> &Option<Color> { &self.entity_base.enemy_map_color }
             fn water_reflection(&self) -> &Option<WaterReflectionDefinition> { &self.entity_base.water_reflection }
             fn protected_from_tile_building(&self) -> bool { self.entity_base.protected_from_tile_building }
         }

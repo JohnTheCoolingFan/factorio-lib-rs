@@ -1162,9 +1162,9 @@ pub trait Entity: PrototypeBase {
     fn tile_width(&self) -> u32;
     fn tile_height(&self) -> u32;
     fn autoplace(&self) -> &Option<AutoplaceSpecification>;
-    fn map_color(&self) -> Option<Color>;
-    fn friendly_map_color(&self) -> Option<Color>;
-    fn enemy_map_color(&self) -> Option<Color>;
+    fn map_color(&self) -> &Option<Color>;
+    fn friendly_map_color(&self) -> &Option<Color>;
+    fn enemy_map_color(&self) -> &Option<Color>;
     fn water_reflection(&self) -> &Option<WaterReflectionDefinition>;
     fn protected_from_tile_building(&self) -> bool;
 }
