@@ -119,7 +119,7 @@ impl<'lua> PrototypeFromLua<'lua> for Position {
 }
 
 /// Any of the color components are optional <https://wiki.factorio.com/Types/Color>
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Color(pub f32, pub f32, pub f32, pub f32);
 
 impl Color {
