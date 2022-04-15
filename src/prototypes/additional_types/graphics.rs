@@ -284,12 +284,16 @@ pub struct StatusColors {
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_secondary_draw_order>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CircuitConnectorSecondaryDrawOrder {
-    north: i8,
-    east: i8,
-    south: i8,
-    west: i8
+    #[default(100)]
+    pub north: i8,
+    #[default(100)]
+    pub east: i8,
+    #[default(100)]
+    pub south: i8,
+    #[default(100)]
+    pub west: i8
 }
 
 impl CircuitConnectorSecondaryDrawOrder {
