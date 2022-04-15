@@ -316,13 +316,28 @@ impl<'lua> PrototypeFromLua<'lua> for CircuitConnectorSecondaryDrawOrder {
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity#radius_visualisation_specification>
-#[derive(Debug, Clone)]
+/// <https://wiki.factorio.com/Types/RadiusVisualisationSpecification>
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct RadiusVisualizationSpecification {
-    sprite: Option<Sprite>,
-    distance: f64, // Default: 0 // Must be > 0
-    offset: Option<Factorio2DVector>,
-    draw_in_cursor: bool, // Default: true
-    draw_on_selection: bool // Default: true
+    pub sprite: Option<Sprite>,
+    #[default(0)]
+    pub distance: f64, // Default: 0 // Must be > 0
+    pub offset: Option<Factorio2DVector>,
+    #[default(true)]
+    pub draw_in_cursor: bool, // Default: true
+    #[default(true)]
+    pub draw_on_selection: bool // Default: true
+}
+
+impl RadiusVisualizationSpecification {
+    fn post_extr_fn(&mut self, _lua: &mlua::Lua, _data_table: &DataTable) -> mlua::prelude::LuaResult<()> {
+        if self.distance < 0.0 { // Not same as docs but makes sense
+            // Error message says same as docs
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "RadiusVisualizationSpecification", message: Some("`distance` must be > 0".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Types/WaterReflectionDefinition>
