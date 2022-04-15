@@ -702,11 +702,12 @@ impl MapSettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(mouse_cursor)]
 pub struct MouseCursor {
-    name: String,
-    cursor: MouseCursorType
+    pub name: String,
+    #[use_self_forced]
+    pub cursor: MouseCursorType
 }
 
 /// <https://wiki.factorio.com/Prototype/Sound>

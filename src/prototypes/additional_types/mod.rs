@@ -544,6 +544,20 @@ pub enum MouseCursorType {
     CustomCursor(CustomCursor)
 }
 
+impl<'lua> PrototypeFromLua<'lua> for MouseCursorType {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(table) = &value {
+            if let Some(s) = table.get::<_, Option<String>>("system_cursor")? {
+                Ok(Self::SystemCursor(s.parse().map_err(mlua::Error::external)?))
+            } else {
+                Ok(Self::CustomCursor(CustomCursor::prototype_from_lua(value, lua, data_table)?))
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "MouseCursor", message: Some("Expected table".into()) })
+        }
+    }
+}
+
 /// <https://wiki.factorio.com/Prototype/MouseCursor#system_cursor>
 #[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -558,11 +572,11 @@ pub enum SystemCursor {
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CustomCursor {
-    filename: FileName,
-    hot_pixel_x: i16,
-    hot_pixel_y: i16
+    pub filename: FileName,
+    pub hot_pixel_x: i16,
+    pub hot_pixel_y: i16
 }
 
 // Make different constructors for variants with different field names, like `icon_tintable` in https://wiki.factorio.com/Prototype/ItemWithEntityData
