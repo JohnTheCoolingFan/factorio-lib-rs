@@ -198,7 +198,7 @@ pub struct SecondaryDrawOrders {
 #[derive(Debug, Clone)]
 pub struct LightDefinition {
     r#type: LightDefinitionType,
-    // Next 2 are not optional if type is "oriented"
+    // Next 2 are mandatory if type is "oriented"
     picture: Option<Sprite>,
     rotation_shift: Option<f32>,
     intensity: f32,
