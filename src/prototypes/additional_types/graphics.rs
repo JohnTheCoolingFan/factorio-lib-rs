@@ -263,16 +263,24 @@ pub struct ShiftAnimationWaypoints {
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#status_colors>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct StatusColors {
-    idle: Color, // Default: White (1, 1, 1)
-    no_minable_resources: Color, // Default: `idle`
-    full_output: Color, // Default: `idle`
-    insufficient_output: Color, // Default: `idle`
-    disabled: Color, // Default: `idle`
-    no_power: Color, // Default: No color
-    working: Color, // Default: White (1, 1, 1)
-    low_power: Color, // Default: `working`
+    #[default(Color::new_rgb(1.0, 1.0, 1.0))]
+    pub idle: Color, // Default: White (1, 1, 1)
+    #[default(idle.clone())]
+    pub no_minable_resources: Color, // Default: `idle`
+    #[default(idle.clone())]
+    pub full_output: Color, // Default: `idle`
+    #[default(idle.clone())]
+    pub insufficient_output: Color, // Default: `idle`
+    #[default(idle.clone())]
+    pub disabled: Color, // Default: `idle`
+    #[default(Color(0.0, 0.0, 0.0, 0.0))]
+    pub no_power: Color, // Default: No color
+    #[default(Color::new_rgb(1.0, 1.0, 1.0))]
+    pub working: Color, // Default: White (1, 1, 1)
+    #[default(working.clone())]
+    pub low_power: Color, // Default: `working`
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_secondary_draw_order>
