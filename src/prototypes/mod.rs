@@ -854,12 +854,14 @@ pub struct AchievementBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Achievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(achievement)]
 pub struct Achievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase
 }
 
 /// <https://wiki.factorio.com/Prototype/BuildEntityAchievement>
