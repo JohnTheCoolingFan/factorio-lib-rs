@@ -711,11 +711,12 @@ pub struct MouseCursor {
 }
 
 /// <https://wiki.factorio.com/Prototype/Sound>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(sound)]
 pub struct SoundPrototype {
-    name: String,
-    sound: Sound
+    pub name: String,
+    #[use_self_forced]
+    pub sound: Sound
 }
 
 /// <https://wiki.factorio.com/Prototype/SpectatorController>
