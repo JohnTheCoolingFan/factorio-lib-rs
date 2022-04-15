@@ -6,18 +6,10 @@ pub mod prototype_type;
 pub use abstract_prototypes::*;
 pub use utility::*;
 
-#[cfg(feature = "concepts")]
-use crate::concepts::LocalisedString;
-#[cfg(not(feature = "concepts"))]
-type LocalisedString = String;
-use mlua::{Value, Lua, prelude::LuaResult, ToLua, FromLua};
-use additional_types::SpriteSizeType;
-use std::collections::HashMap;
-use std::rc::{Rc, Weak};
-use std::marker::PhantomData;
-use std::hash::Hash;
+use std::{collections::HashMap, rc::{Rc, Weak}, marker::PhantomData, hash::Hash, fmt};
 use thiserror::Error;
-use std::fmt;
+use mlua::{Value, Lua, prelude::LuaResult, ToLua, FromLua};
+use additional_types::*;
 use factorio_lib_rs_derive::{
     Prototype,
     ModSetting,
@@ -40,7 +32,11 @@ use factorio_lib_rs_derive::{
     PrototypeFromLua,
     prot_from_lua_blanket,
 };
-use additional_types::*;
+
+#[cfg(feature = "concepts")]
+use crate::concepts::LocalisedString;
+#[cfg(not(feature = "concepts"))]
+type LocalisedString = String;
 
 // TODO: Make fields not acessible through traits pub
 
