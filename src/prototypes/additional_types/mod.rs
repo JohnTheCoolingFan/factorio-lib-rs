@@ -89,6 +89,12 @@ impl<'lua> FromLua<'lua> for Factorio3DVector {
 /// Keyboard keys sequence <https://wiki.factorio.com/Prototype/CustomInput#key_sequence>
 #[derive(Debug, Clone)]
 pub struct KeySequence(pub String);
+
+impl<'lua> PrototypeFromLua<'lua> for KeySequence {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+        Ok(Self(lua.unpack(value)?))
+    }
+}
 // Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox? It's kinda undocumented
 /// <https://wiki.factorio.com/Types/BoundingBox>
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]

@@ -1129,21 +1129,31 @@ pub struct AutoplaceControl {
 }
 
 /// <https://wiki.factorio.com/Prototype/CustomInput>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(custom_input)]
 pub struct CustomInput {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    key_sequence: KeySequence, // TODO?: key_sequence parser and checker. Can be empty, if linked_game_control is set, also empty stands for unassigned
-    alternate_key_sequence: Option<KeySequence>,
-    linked_game_control: String, // Default: ""
-    consumed: ConsumingType, // Default: none
-    enabled: bool, // Default: true
-    enabled_while_spectating: bool, // Default: false
-    enabled_while_in_cutscene: bool, // Default: false
-    include_selected_prototype: bool, // Default: false
-    item_to_spawn: Option<String>, // Name of Item
-    action: CustomInputAction // Default: "lua"
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    pub key_sequence: KeySequence, // TODO?: key_sequence parser and checker. Can be empty, if linked_game_control is set, also empty stands for unassigned
+    pub alternate_key_sequence: Option<KeySequence>,
+    #[default("")]
+    pub linked_game_control: String, // Default: ""
+    #[from_str]
+    #[default("none")]
+    pub consumed: ConsumingType, // Default: none
+    #[default(true)]
+    pub enabled: bool, // Default: true
+    #[default(false)]
+    pub enabled_while_spectating: bool, // Default: false
+    #[default(false)]
+    pub enabled_while_in_cutscene: bool, // Default: false
+    #[default(false)]
+    pub include_selected_prototype: bool, // Default: false
+    pub item_to_spawn: Option<String>, // Name of Item
+    #[from_str]
+    #[default("lua")]
+    pub action: CustomInputAction // Default: "lua"
 }
 
 /// <https://wiki.factorio.com/Prototype/DamageType>
