@@ -808,11 +808,12 @@ pub struct TipsAndTricksItemCategory {
     pub order: String
 }
 
+// 56 instances max // weird number
 /// <https://wiki.factorio.com/Prototype/TriggerTargetType>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(trigger_target_type)]
 pub struct TriggerTargetType {
-    name: String
+    pub name: String
 }
 
 /// <https://wiki.factorio.com/Prototype/WindSound>
