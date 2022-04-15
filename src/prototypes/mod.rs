@@ -883,13 +883,16 @@ pub struct BuildEntityAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/CombatRobotCountAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(combat_robot_count)]
 pub struct CombatRobotCountAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    count: u32 // Default: 1
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    #[default(1_u32)]
+    pub count: u32 // Default: 1
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstructWithRobotsAchievement>
