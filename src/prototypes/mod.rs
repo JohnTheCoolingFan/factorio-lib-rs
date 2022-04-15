@@ -896,15 +896,19 @@ pub struct CombatRobotCountAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstructWithRobotsAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(construct_with_robots_achevement)]
 pub struct ConstructWithRobotsAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    limited_to_one_game: bool,
-    amount: u32, // Default: 0
-    more_than_manually: bool // Default: false
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    pub limited_to_one_game: bool,
+    #[default(0_u32)]
+    pub amount: u32, // Default: 0
+    #[default(false)]
+    pub more_than_manually: bool // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/DeconstructWithRobotsAchievement>
