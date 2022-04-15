@@ -865,16 +865,21 @@ pub struct Achievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/BuildEntityAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(build_entity_achievement)]
 pub struct BuildEntityAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    to_build: String,
-    amount: u32, // Default: 1
-    limited_to_one_game: bool, // Default: false
-    until_second: u32 // Default: 0 (means infinite)
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    pub to_build: String, // Name of entity
+    #[default(1_u32)]
+    pub amount: u32, // Default: 1
+    #[default(false)]
+    pub limited_to_one_game: bool, // Default: false
+    #[default(0_u32)]
+    pub until_second: u32 // Default: 0 (means infinite)
 }
 
 /// <https://wiki.factorio.com/Prototype/CombatRobotCountAchievement>
