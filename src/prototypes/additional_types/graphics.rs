@@ -254,12 +254,12 @@ pub struct RecipeTint {
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#shift_animation_waypoints>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ShiftAnimationWaypoints {
-    north: Option<Vec<Factorio2DVector>>,
-    east: Option<Vec<Factorio2DVector>>,
-    south: Option<Vec<Factorio2DVector>>,
-    west: Option<Vec<Factorio2DVector>>
+    pub north: Option<Vec<Factorio2DVector>>,
+    pub east: Option<Vec<Factorio2DVector>>,
+    pub south: Option<Vec<Factorio2DVector>>,
+    pub west: Option<Vec<Factorio2DVector>>
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#status_colors>
