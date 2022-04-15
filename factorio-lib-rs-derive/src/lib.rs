@@ -948,8 +948,11 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
             if prototype_field_attrs.use_from_str {
                 get_expr = quote! { #get_expr.map(|s| s.parse::<#field_type>().map_err(mlua::Error::external)).transpose()? }
             };
-            get_expr = quote! { #get_expr.unwrap() }
         };
+        // A quick hack to allow fallbacks to be used on non-Options
+        if prototype_field_attrs.default_value.is_some() || !prototype_field_attrs.fallbacks.is_empty(){
+            get_expr = quote! { #get_expr.unwrap() }
+        }
         get_expr
     };
     let get_self = quote! {
