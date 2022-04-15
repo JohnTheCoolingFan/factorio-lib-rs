@@ -188,6 +188,12 @@ pub enum ResearchQueueSetting {
     Never
 }
 
+impl<'lua> PrototypeFromLua<'lua> for ResearchQueueSetting {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        lua.unpack::<String>(value)?.parse().map_err(mlua::Error::external)
+    }
+}
+
 /// <https://wiki.factorio.com/Tutorial:Mod_settings#The_setting_type_property>
 #[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -386,126 +392,149 @@ pub struct MapGenDifficultySettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#pollution>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapPollutionSettings {
-    enabled: bool,
-    diffusion_ratio: f64,
-    min_to_diffuse: f64,
-    ageing: f64,
-    expected_max_per_chunk: f64,
-    min_to_show_per_chunk: f64,
-    min_pollution_to_damage_trees: f64,
-    pollution_with_max_forest_damage: f64,
-    pollution_restored_per_tree_damage: f64,
-    pollution_per_tree_damage: f64,
-    max_pollution_to_restore_trees: f64,
-    enemy_attack_pollution_consumption_modifier: f64
+    pub enabled: bool,
+    pub diffusion_ratio: f64,
+    pub min_to_diffuse: f64,
+    pub ageing: f64,
+    pub expected_max_per_chunk: f64,
+    pub min_to_show_per_chunk: f64,
+    pub min_pollution_to_damage_trees: f64,
+    pub pollution_with_max_forest_damage: f64,
+    pub pollution_restored_per_tree_damage: f64,
+    pub pollution_per_tree_damage: f64,
+    pub max_pollution_to_restore_trees: f64,
+    pub enemy_attack_pollution_consumption_modifier: f64
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#steering>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapSteering {
-    default: MapSteeringSettings,
-    moving: MapSteeringSettings
+    pub default: MapSteeringSettings,
+    pub moving: MapSteeringSettings
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#steering>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapSteeringSettings {
-    radius: f64,
-    separation_factor: f64,
-    separation_force: f64,
-    force_unit_fuzzy_goto_behavior: bool
+    pub radius: f64,
+    pub separation_factor: f64,
+    pub separation_force: f64,
+    pub force_unit_fuzzy_goto_behavior: bool
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#enemy_evolution>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapEnemyEvolution {
-    enabled: bool,
-    time_factor: f64,
-    destroy_factor: f64,
-    pollution_factor: f64
-}
-
-/// <https://wiki.factorio.com/Prototype/MapSettings#unit_group>
-#[derive(Debug, Clone)]
-pub struct MapUnitGroup {
-    min_group_gathering_time: u32,
-    max_group_gathering_time: u32,
-    max_wait_time_for_late_members: u32,
-    max_group_radius: f64,
-    min_group_radius: f64,
-    max_member_speedup_when_behind: f64,
-    max_member_slowdown_when_ahead: f64,
-    max_group_slowdown_facor: f64,
-    max_group_member_fallback_factor: f64,
-    member_disown_distance: f64,
-    tick_tolerance_when_member_arrives: u32,
-    max_gathering_unit_groups: u32,
-    max_unit_group_size: u32
+    pub enabled: bool,
+    pub time_factor: f64,
+    pub destroy_factor: f64,
+    pub pollution_factor: f64
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#enemy_expansion>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapEnemyExpansion {
-    enabled: bool,
-    max_expansion_distance: u32,
-    friendly_base_influence_radius: u32,
-    enemy_building_influence_radius: u32,
-    building_coefficient: f64,
-    other_base_coefficient: f64,
-    neighbouring_chunk_coefficient: f64,
-    neighbouring_base_chunk_coefficient: f64,
-    max_colliding_tiles_coefficient: f64,
-    settler_group_min_size: u32,
-    settler_group_max_size: u32,
-    min_expansion_cooldown: u32,
-    max_expansion_cooldown: u32
+    pub enabled: bool,
+    pub max_expansion_distance: u32,
+    pub friendly_base_influence_radius: u32,
+    pub enemy_building_influence_radius: u32,
+    pub building_coefficient: f64,
+    pub other_base_coefficient: f64,
+    pub neighbouring_chunk_coefficient: f64,
+    pub neighbouring_base_chunk_coefficient: f64,
+    pub max_colliding_tiles_coefficient: f64,
+    pub settler_group_min_size: u32,
+    pub settler_group_max_size: u32,
+    pub min_expansion_cooldown: u32,
+    pub max_expansion_cooldown: u32
+}
+
+/// <https://wiki.factorio.com/Prototype/MapSettings#unit_group>
+#[derive(Debug, Clone, PrototypeFromLua)]
+pub struct MapUnitGroup {
+    pub min_group_gathering_time: u32,
+    pub max_group_gathering_time: u32,
+    pub max_wait_time_for_late_members: u32,
+    pub max_group_radius: f64,
+    pub min_group_radius: f64,
+    pub max_member_speedup_when_behind: f64,
+    pub max_member_slowdown_when_ahead: f64,
+    pub max_group_slowdown_facor: f64,
+    pub max_group_member_fallback_factor: f64,
+    pub member_disown_distance: f64,
+    pub tick_tolerance_when_member_arrives: u32,
+    pub max_gathering_unit_groups: u32,
+    pub max_unit_group_size: u32
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#path_finder>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct MapPathFinder {
-    fwd2bwd_ratio: u32,
-    goal_pressure_ratio: f64,
-    use_path_cache: bool,
-    max_steps_worked_per_tick: f64,
-    max_work_done_per_tick: u32,
-    short_cache_size: u32,
-    short_cache_min_cacheable_distance: f64,
-    short_cache_min_algo_steps_to_cache: u32,
-    long_cache_min_cacheable_distance: f64,
-    cache_max_connect_to_cache_steps_multiplier: u32,
-    cache_accept_path_start_distance_ratio: f64,
-    cache_accept_path_end_distance_ratio: f64,
-    negative_cache_accept_path_start_distance_ratio: f64,
-    negative_cache_accept_path_end_distance_ratio: f64,
-    cache_path_start_distance_rating_multiplier: f64,
-    cache_path_end_distance_rating_multiplier: f64,
-    stale_enemy_with_same_destination_collision_penalty: f64,
-    ignore_moving_enemy_collision_distance: f64,
-    enemy_with_different_destination_collision_penalty: f64,
-    general_entity_collision_penalty: f64,
-    general_entity_subsequent_collision_penalty: f64,
-    extended_collision_penalty: f64,
-    max_clients_to_accept_any_new_request: u32,
-    max_clients_to_accept_short_new_request: u32,
-    direct_distance_to_consider_short_request: u32,
-    short_request_max_steps: u32,
-    short_request_ratio: f64,
-    min_steps_to_check_path_find_termination: u32,
-    start_to_goal_cost_multiplier_to_terminate_path_find: f64,
-    overload_levels: Vec<u32>,
-    overload_multipliers: Vec<f64>
+    pub fwd2bwd_ratio: u32,
+    pub goal_pressure_ratio: f64,
+    pub use_path_cache: bool,
+    pub max_steps_worked_per_tick: f64,
+    pub max_work_done_per_tick: u32,
+    pub short_cache_size: u32,
+    pub short_cache_min_cacheable_distance: f64,
+    pub short_cache_min_algo_steps_to_cache: u32,
+    pub long_cache_min_cacheable_distance: f64,
+    pub cache_max_connect_to_cache_steps_multiplier: u32,
+    pub cache_accept_path_start_distance_ratio: f64,
+    pub cache_accept_path_end_distance_ratio: f64,
+    pub negative_cache_accept_path_start_distance_ratio: f64,
+    pub negative_cache_accept_path_end_distance_ratio: f64,
+    pub cache_path_start_distance_rating_multiplier: f64,
+    pub cache_path_end_distance_rating_multiplier: f64,
+    pub stale_enemy_with_same_destination_collision_penalty: f64,
+    pub ignore_moving_enemy_collision_distance: f64,
+    pub enemy_with_different_destination_collision_penalty: f64,
+    pub general_entity_collision_penalty: f64,
+    pub general_entity_subsequent_collision_penalty: f64,
+    pub extended_collision_penalty: f64,
+    pub max_clients_to_accept_any_new_request: u32,
+    pub max_clients_to_accept_short_new_request: u32,
+    pub direct_distance_to_consider_short_request: u32,
+    pub short_request_max_steps: u32,
+    pub short_request_ratio: f64,
+    pub min_steps_to_check_path_find_termination: u32,
+    pub start_to_goal_cost_multiplier_to_terminate_path_find: f64,
+    pub overload_levels: Vec<u32>,
+    pub overload_multipliers: Vec<f64>
+}
+
+impl MapPathFinder {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.fwd2bwd_ratio < 2 {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "MapSettings.path_finder", message: Some("`fwd2bwd_ratio should not be less than 2`".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#difficulty_settings>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct MapDifficultySettings {
-    recipe_difficulty: DifficultySetting,
-    technology_difficulty: DifficultySetting,
-    technology_price_multiplier: f64, // Default: 1.0 // Must be >= 0.001 and <= 1000.0
-    research_queue_setting: Option<ResearchQueueSetting>
+    #[from_str]
+    pub recipe_difficulty: DifficultySetting,
+    #[from_str]
+    pub technology_difficulty: DifficultySetting,
+    #[default(1.0_f64)]
+    pub technology_price_multiplier: f64, // Default: 1.0 // Must be >= 0.001 and <= 1000.0
+    pub research_queue_setting: Option<ResearchQueueSetting>
+}
+
+impl MapDifficultySettings {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.technology_price_multiplier < 0.001 || self.technology_price_multiplier > 1000.0 {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "MapSettings.difficulty_settings", message: Some("`technology_price_multiplier` should be in a range [0.001, 1000.0]".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>

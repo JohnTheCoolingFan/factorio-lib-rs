@@ -655,8 +655,8 @@ impl GodController {
 #[derive(Debug, Prototype, DataTableAccessable)]
 #[data_table(map_gen_presets)]
 pub struct MapGenPresets {
-    name: String,
-    presets: HashMap<String, MapGenPreset>
+    pub name: String,
+    pub presets: HashMap<String, MapGenPreset>
 }
 
 impl<'lua> PrototypeFromLua<'lua> for MapGenPresets {
@@ -677,18 +677,28 @@ impl<'lua> PrototypeFromLua<'lua> for MapGenPresets {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(map_settings)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct MapSettings {
-    name: String, // Must be "map-settings"
-    pollution: MapPollutionSettings,
-    steering: MapSteering, // ???
-    enemy_evolution: MapEnemyEvolution,
-    enemy_expansion: MapEnemyExpansion,
-    unit_group: MapUnitGroup,
-    path_finder: MapPathFinder,
-    max_ffailed_behavior_count: u32,
-    difficulty_settings: MapDifficultySettings
+    pub name: String, // Must be "map-settings"
+    pub pollution: MapPollutionSettings,
+    pub steering: MapSteering, // ???
+    pub enemy_evolution: MapEnemyEvolution,
+    pub enemy_expansion: MapEnemyExpansion,
+    pub unit_group: MapUnitGroup,
+    pub path_finder: MapPathFinder,
+    pub max_ffailed_behavior_count: u32,
+    pub difficulty_settings: MapDifficultySettings
+}
+
+impl MapSettings {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.name != "map-settings" {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "MapSettings", message: Some("`name` of MapSettings prototype must be \"map-settings\"".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
