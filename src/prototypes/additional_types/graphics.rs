@@ -219,26 +219,38 @@ pub struct LightDefinition {
 }
 
 /// <https://wiki.factorio.com/Types/LightFlickeringDefinition>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct LightFlickeringDefinition {
-    minimum_intensity: f32, // Default: 0.2
-    maximum_intensity: f32, // Default: 0.8
-    derivation_change_frequency: f32, // Default: 0.3
-    derivation_change_deviation: f32, // Default: 0.06
-    border_fix_speed: f32, // Default: 0.02
-    minimum_light_size: f32, // Default: 0.5
-    light_intensity_to_size_coefficient: f32, // Default: 0.5
-    color: Color // Default: (1, 1, 1) (White)
+    #[default(0.2)]
+    pub minimum_intensity: f32, // Default: 0.2
+    #[default(0.8)]
+    pub maximum_intensity: f32, // Default: 0.8
+    #[default(0.3)]
+    pub derivation_change_frequency: f32, // Default: 0.3
+    #[default(0.06)]
+    pub derivation_change_deviation: f32, // Default: 0.06
+    #[default(0.02)]
+    pub border_fix_speed: f32, // Default: 0.02
+    #[default(0.5)]
+    pub minimum_light_size: f32, // Default: 0.5
+    #[default(0.5)]
+    pub light_intensity_to_size_coefficient: f32, // Default: 0.5
+    #[default(Color::new_rgb(1.0, 1.0, 1.0))]
+    pub color: Color // Default: (1, 1, 1) (White)
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#default_recipe_tint>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RecipeTint {
     // All default to (1, 1, 1, 1), except special cases
-    primary: Color,
-    secondary: Color,
-    tertiary: Color,
-    quaternary: Color
+    #[default(Color(1.0, 1.0, 1.0, 1.0))]
+    pub primary: Color,
+    #[default(Color(1.0, 1.0, 1.0, 1.0))]
+    pub secondary: Color,
+    #[default(Color(1.0, 1.0, 1.0, 1.0))]
+    pub tertiary: Color,
+    #[default(Color(1.0, 1.0, 1.0, 1.0))]
+    pub quaternary: Color
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#shift_animation_waypoints>
