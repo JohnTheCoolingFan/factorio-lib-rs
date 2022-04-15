@@ -587,31 +587,73 @@ pub enum IconSpecification {
     Icons(IconsSpec)
 }
 
+impl<'lua> PrototypeFromLua<'lua> for IconSpecification {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(table) = &value {
+            if table.contains_key("icons")? {
+                Ok(Self::Icons(IconsSpec::prototype_from_lua(value, lua, data_table)?))
+            } else {
+                Ok(Self::Icon(IconSpec::prototype_from_lua(value, lua, data_table)?))
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: "Iconspecification", message: Some("Expected table".into())})
+        }
+    }
+}
+
 /// <https://wiki.factorio.com/Types/IconSpecification#Prototype_properties:_Option_2>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct IconSpec {
-    icon: FileName,
-    icon_size: i16,
-    icon_mipmaps: u8 // Default: 0
+    pub icon: FileName,
+    pub icon_size: i16,
+    #[default(0)]
+    pub icon_mipmaps: u8 // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/IconSpecification#Prototype_properties:_Option_1>
 #[derive(Debug, Clone)]
 pub struct IconsSpec {
-    icons: Vec<IconData>,
+    pub icons: Vec<IconData>,
     // icon_size omitted here, it will be copied to each IconData
-    icon_mipmaps: u8 // Default: 0
+    pub icon_mipmaps: u8 // Default: 0
+}
+
+impl<'lua> PrototypeFromLua<'lua> for IconsSpec {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(table) = &value {
+            let mut icons: Vec<IconData> = table.get_prot("icons", lua, data_table)?;
+            let icon_mipmaps = table.get::<_, Option<u8>>("icon_mipmaps")?.unwrap_or(0);
+            let mut flag = false;
+            for icon in &icons {
+                flag = flag || icon.icon_size.is_none();
+            }
+            if flag {
+                let icon_size: SpriteSizeType = table.get("icon_size")?;
+                for mut icon in &mut icons {
+                    icon.icon_size = Some(icon_size)
+                }
+            };
+            Ok(Self{icons, icon_mipmaps})
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "IconsSpec",
+            message: Some("expected table. If you see this error message, something has gone VERY wrong".into()) })
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Types/IconData>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct IconData {
-    icon: FileName,
-    icon_size: i16, // Copied from `icon_size` from prototype
-    tint: Color, // Default: (0, 0, 0 , 1)
-    shift: Factorio2DVector, // Default: (0, 0)
-    scale: f64, // Default: 1
-    icon_mipmaps: u8 // Default: 0
+    pub icon: FileName,
+    pub icon_size: Option<i16>, // Copied from `icon_size` from prototype
+    #[default(Color(0.0, 0.0, 0.0, 1.0))]
+    pub tint: Color, // Default: (0, 0, 0 , 1)
+    #[default(Factorio2DVector(0.0, 0.0))]
+    pub shift: Factorio2DVector, // Default: (0, 0)
+    #[default(1.0)]
+    pub scale: f64, // Default: 1
+    #[default(0)]
+    pub icon_mipmaps: u8 // Default: 0
 }
 
 // TODO: fmt::Display
