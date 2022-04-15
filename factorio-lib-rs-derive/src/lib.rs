@@ -955,6 +955,9 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
             };
             get_expr = quote! { #get_expr.unwrap() }
         };
+        if prototype_field_attrs.default_value.is_none() && prototype_field_attrs.required {
+            get_expr = quote! { #get_expr.unwrap() }
+        }
         get_expr
     };
     let get_self = quote! {
