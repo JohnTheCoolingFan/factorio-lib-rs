@@ -284,21 +284,34 @@ pub struct StatusColors {
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_secondary_draw_order>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone)]
 pub struct CircuitConnectorSecondaryDrawOrder {
-    #[default(100)]
     pub north: i8,
-    #[default(100)]
     pub east: i8,
-    #[default(100)]
     pub south: i8,
-    #[default(100)]
     pub west: i8
 }
 
 impl CircuitConnectorSecondaryDrawOrder {
     pub fn new(draw_order: i8) -> Self {
         Self{north: draw_order, east: draw_order, south: draw_order, west: draw_order}
+    }
+}
+
+impl<'lua> PrototypeFromLua<'lua> for CircuitConnectorSecondaryDrawOrder {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut DataTable) -> mlua::Result<Self> {
+        if let Ok(num) = lua.unpack::<Option<i8>>(value.clone()) {
+            Ok(Self::new(num.unwrap_or(100)))
+        } else if let mlua::Value::Table(table) = &value {
+            let north = table.get::<_, Option<i8>>("north")?.unwrap_or(100);
+            let east = table.get::<_, Option<i8>>("east")?.unwrap_or(100);
+            let south = table.get::<_, Option<i8>>("south")?.unwrap_or(100);
+            let west = table.get::<_, Option<i8>>("west")?.unwrap_or(100);
+            Ok(Self{north, east, south, west})
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "MiningDrillGraphicsSet.circuit_connector_secondary_draw_order",
+            message: Some("Expected integer or table".into()) })
+        }
     }
 }
 
