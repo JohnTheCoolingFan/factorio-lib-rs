@@ -912,34 +912,42 @@ pub struct ConstructWithRobotsAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/DeconstructWithRobotsAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(deconstruct_with_robots_achievement)]
 pub struct DeconstructWithRobotsAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    amount: u32
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    pub amount: u32
 }
 
 /// <https://wiki.factorio.com/Prototype/DeliverByRobotsAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(deliver_by_robots_achievement)]
 pub struct DeliverByRobotsAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    amount: f64
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    pub amount: f64
 }
 
 /// <https://wiki.factorio.com/Prototype/DontBuildEntityAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(dont_build_entity_achievement)]
 pub struct DontBuildEntityAchievement {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    achievement: AchievementBase,
-    dont_buid: Vec<String>, // String is converted to Vec<String> with one element
-    amount: u32 // Default: 0
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub achievement: AchievementBase,
+    #[fallback(Some(vec![prot_table.get("dont_build").ok()?]))] // yikes
+    pub dont_buid: Vec<String>, // String is converted to Vec<String> with one element
+    #[default(0_u32)]
+    pub amount: u32 // Default: 0
 }
 
 /// <https://wiki.factorio.com/Prototype/DontCraftManuallyAchievement>
