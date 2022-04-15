@@ -801,11 +801,11 @@ impl TileEffect {
 }
 
 /// <https://wiki.factorio.com/Prototype/TipsAndTricksItemCategory>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(tips_and_tricks_item_category)]
 pub struct TipsAndTricksItemCategory {
-    name: String,
-    order: String
+    pub name: String,
+    pub order: String
 }
 
 /// <https://wiki.factorio.com/Prototype/TriggerTargetType>
