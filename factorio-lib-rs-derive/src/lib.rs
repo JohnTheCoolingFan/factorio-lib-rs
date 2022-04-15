@@ -749,6 +749,8 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 /// `#[default()]`, but applied before it and can return None. Can be used multiple times.
 /// Use only on Option<>
 /// Incompatible with: `use_self`, `use_self_vec`, `use_self_forced`
+/// 
+/// `#[required]` - use only with fallback. Yes, this is still a hack but a better one.
 ///
 /// `#[rename(str)]` - str is a string supposed to be used for extracting field from table in case
 /// name in table differs from name of this struct field
@@ -757,7 +759,7 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 ///
 /// `#[post_extr_fn(path)]` - path is a path to a function that needs to be executed after
 /// field extraction and mandatory_if checks
-#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn, fallback, rename))]
+#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn, fallback, rename, required))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
@@ -823,6 +825,7 @@ struct PrototypeFromLuaFieldAttrArgs {
     mandatory_if: Option<proc_macro2::TokenStream>,  // Incompatible with: default, use_self, use_self_vec
     fallbacks: Vec<proc_macro2::TokenStream>,
     rename: Option<String>,
+    required: bool,
     // use_self* is incompatible with default and mandatory_if
     // Only 1 can be used:
     use_from_str: bool,
@@ -897,7 +900,8 @@ impl PrototypeFromLuaFieldAttrArgs {
             ("fallback", |s, a| {s.fallbacks.push(a.tokens.clone()); Ok(())}, vec![
                 sel.0, sel.1, sel.2
             ]),
-            ("rename", |s, a| {s.rename = Some(a.parse_args::<LitStr>()?.value()); Ok(())}, vec![])
+            ("rename", |s, a| {s.rename = Some(a.parse_args::<LitStr>()?.value()); Ok(())}, vec![]),
+            ("required", |s, _| {s.required = true; Ok(())}, vec![])
         ]
     }
 
@@ -917,6 +921,7 @@ impl Default for PrototypeFromLuaFieldAttrArgs {
             default_value: None, 
             mandatory_if: None,
             rename: None,
+            required: false,
             fallbacks: vec![],
             use_from_str: false,
             use_self: false,
