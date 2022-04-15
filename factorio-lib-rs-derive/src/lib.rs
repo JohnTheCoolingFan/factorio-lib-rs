@@ -5,7 +5,7 @@ extern crate proc_macro;
 use core::fmt::Display;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{self, Attribute, Ident, Result};
+use syn::{self, Attribute, Ident, LitStr, Result};
 use syn::spanned::Spanned;
 use core::iter::Iterator;
 
@@ -749,11 +749,14 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 /// Use only on Option<>
 /// Incompatible with: `use_self`, `use_self_vec`, `use_self_forced`
 ///
+/// `#[rename(str)]` - str is a string supposed to be used for extracting field from table in case
+/// name in table differs from name of this struct field
+///
 /// Attributes on container
 ///
 /// `#[post_extr_fn(path)]` - path is a path to a function that needs to be executed after
 /// field extraction and mandatory_if checks
-#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn, fallback))]
+#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn, fallback, rename))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_from_lua_macro(&ast)
@@ -818,6 +821,7 @@ struct PrototypeFromLuaFieldAttrArgs {
     default_value: Option<proc_macro2::TokenStream>, // Incompatible with: use_self, use_self_vec
     mandatory_if: Option<proc_macro2::TokenStream>,  // Incompatible with: default, use_self, use_self_vec
     fallbacks: Vec<proc_macro2::TokenStream>,
+    rename: Option<String>,
     // use_self* is incompatible with default and mandatory_if
     // Only 1 can be used:
     use_from_str: bool,
@@ -891,7 +895,8 @@ impl PrototypeFromLuaFieldAttrArgs {
             ]),
             ("fallback", |s, a| {s.fallbacks.push(a.tokens.clone()); Ok(())}, vec![
                 sel.0, sel.1, sel.2
-            ])
+            ]),
+            ("rename", |s, a| {s.rename = Some(a.parse_args::<LitStr>()?.value()); Ok(())}, vec![])
         ]
     }
 
@@ -910,6 +915,7 @@ impl Default for PrototypeFromLuaFieldAttrArgs {
         Self{
             default_value: None, 
             mandatory_if: None,
+            rename: None,
             fallbacks: vec![],
             use_from_str: false,
             use_self: false,
@@ -922,9 +928,9 @@ impl Default for PrototypeFromLuaFieldAttrArgs {
 
 fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, Option<proc_macro2::TokenStream>)> { // First is get_expr, second is mandatory_if
     let ident = &field.ident;
-    let str_field = ident.as_ref().unwrap().to_string();
     let field_type = &field.ty;
     let prototype_field_attrs = PrototypeFromLuaFieldAttrArgs::from_attrs(&field.attrs)?;
+    let str_field = prototype_field_attrs.rename.unwrap_or_else(|| ident.as_ref().unwrap().to_string());
     let mut field_extr_type = if prototype_field_attrs.use_from_str || prototype_field_attrs.is_resource {
         quote! { String }
     } else {
