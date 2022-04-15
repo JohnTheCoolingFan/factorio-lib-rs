@@ -510,23 +510,26 @@ pub struct LightAnimations {
 // ============== // Sprites // ==============  //
 
 /// <https://wiki.factorio.com/Types/Sprite>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct Sprite {
-    layers: Vec<SpriteLayer>
+    #[use_self_vec]
+    pub layers: Vec<SpriteLayer>
 }
 
 /// <https://wiki.factorio.com/Types/Sprite>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SpriteLayer {
-    regular: SpriteSpec,
-    hr_version: Option<SpriteSpec>
+    #[use_self_forced]
+    pub regular: SpriteSpec,
+    pub hr_version: Option<SpriteSpec>
 }
 
 /// <https://wiki.factorio.com/Types/Sprite>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SpriteSpec {
-    filename: FileName, // Mandatory in some cases
-    body: SpriteSpecWithoutFilename,
+    pub filename: FileName, // Mandatory in some cases
+    #[use_self_forced]
+    pub body: SpriteSpecWithoutFilename,
 }
 
 #[derive(Debug, Clone)]
