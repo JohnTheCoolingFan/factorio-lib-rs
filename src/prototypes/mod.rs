@@ -1157,12 +1157,14 @@ pub struct CustomInput {
 }
 
 /// <https://wiki.factorio.com/Prototype/DamageType>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(damage_type)]
 pub struct DamageType {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    hidden: bool // Default: false
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[default(false)]
+    pub hidden: bool // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/Decorative>
