@@ -1054,6 +1054,13 @@ impl BitXorAssign for CollisionMask {
     }
 }
 
+impl<'lua> PrototypeFromLua<'lua> for CollisionMask {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let str_array = lua.unpack::<Vec<String>>(value)?;
+        Ok(Self::from_iter(str_array))
+    }
+}
+
 /// <https://wiki.factorio.com/Types/EntityPrototypeFlags>
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 pub struct EntityPrototypeFlags(u32);
