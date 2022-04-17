@@ -486,14 +486,14 @@ pub trait ModSetting: Prototype {
 #[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(bool_setting)]
 pub struct BoolModSetting {
-    name: String,
-    localised_name: Option<LocalisedString>,
-    localised_description: Option<LocalisedString>,
-    order: Option<String>,
+    pub name: String,
+    pub localised_name: Option<LocalisedString>,
+    pub localised_description: Option<LocalisedString>,
+    pub order: Option<String>,
     #[default(false)]
-    hidden: bool,
+    pub hidden: bool,
     #[from_str]
-    setting_type: ModSettingType,
+    pub setting_type: ModSettingType,
     pub default_value: bool,
     #[mandatory_if(hidden)]
     pub forced_value: Option<bool>,
@@ -502,14 +502,14 @@ pub struct BoolModSetting {
 #[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(int_setting)]
 pub struct IntModSetting {
-    name: String,
-    localised_name: Option<LocalisedString>,
-    localised_description: Option<LocalisedString>,
-    order: Option<String>,
+    pub name: String,
+    pub localised_name: Option<LocalisedString>,
+    pub localised_description: Option<LocalisedString>,
+    pub order: Option<String>,
     #[default(false)]
-    hidden: bool,
+    pub hidden: bool,
     #[from_str]
-    setting_type: ModSettingType,
+    pub setting_type: ModSettingType,
     pub default_value: i64,
     pub minimum_value: Option<i64>,
     pub maximum_value: Option<i64>,
@@ -519,14 +519,14 @@ pub struct IntModSetting {
 #[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(double_setting)]
 pub struct DoubleModSetting {
-    name: String,
-    localised_name: Option<LocalisedString>,
-    localised_description: Option<LocalisedString>,
-    order: Option<String>,
+    pub name: String,
+    pub localised_name: Option<LocalisedString>,
+    pub localised_description: Option<LocalisedString>,
+    pub order: Option<String>,
     #[default(false)]
-    hidden: bool,
+    pub hidden: bool,
     #[from_str]
-    setting_type: ModSettingType,
+    pub setting_type: ModSettingType,
     pub default_value: f64,
     pub minimum_value: Option<f64>,
     pub maximum_value: Option<f64>,
@@ -536,14 +536,14 @@ pub struct DoubleModSetting {
 #[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(string_setting)]
 pub struct StringModSetting {
-    name: String,
-    localised_name: Option<LocalisedString>,
-    localised_description: Option<LocalisedString>,
-    order: Option<String>,
+    pub name: String,
+    pub localised_name: Option<LocalisedString>,
+    pub localised_description: Option<LocalisedString>,
+    pub order: Option<String>,
     #[default(false)]
-    hidden: bool,
+    pub hidden: bool,
     #[from_str]
-    setting_type: ModSettingType,
+    pub setting_type: ModSettingType,
     pub default_value: String,
     #[default(false)]
     pub allow_blank: bool,
@@ -556,7 +556,7 @@ pub struct StringModSetting {
 #[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(ambient_sound)]
 pub struct AmbientSoundPrototype {
-    name: String,
+    pub name: String,
     pub sound: Sound,
     #[from_str]
     pub track_type: TrackType,
@@ -568,7 +568,7 @@ pub struct AmbientSoundPrototype {
 #[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(animation)]
 pub struct AnimationPrototype {
-    name: String,
+    pub name: String,
     #[use_self_vec]
     pub layers: Vec<Animation> // If lua table doesn't have layers, use same table for constructing just one
 }
@@ -578,7 +578,7 @@ pub struct AnimationPrototype {
 #[data_table(editor_controller)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct EditorController {
-    name: String, // Must be "default"
+    pub name: String, // Must be "default"
     pub inventory_size: ItemStackIndex,
     pub gun_inventory_size: ItemStackIndex,
     pub movement_speed: f64, // Must be >= 0.34375
