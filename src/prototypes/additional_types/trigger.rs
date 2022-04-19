@@ -107,11 +107,11 @@ pub struct LineTriggerItem {
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct ClusterTriggerItem {
     #[use_self_forced]
-    base: TriggerItem,
-    cluster_count: f64, // Must be at least 2
-    distance: f32,
+    pub base: TriggerItem,
+    pub cluster_count: f64, // Must be at least 2
+    pub distance: f32,
     #[default(0_f32)]
-    distance_deviation: f32 // Default: 0
+    pub distance_deviation: f32 // Default: 0
 }
 
 impl ClusterTriggerItem {
