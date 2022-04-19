@@ -38,7 +38,7 @@ impl From<String> for FileName {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for FileName {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
         let string = String::from_lua(value, lua)?;
         Ok(Self(string))
     }
@@ -101,7 +101,7 @@ impl<'lua> PrototypeFromLua<'lua> for KeySequence {
 pub struct BoundingBox(pub Position, pub Position);
 
 impl<'lua> PrototypeFromLua<'lua> for BoundingBox {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
         let v = lua.unpack::<[Position; 2]>(value)?;
         Ok(Self(v[0], v[1]))
     }
@@ -115,7 +115,7 @@ pub struct RealOrientation(pub f32);
 pub struct Position(pub i32, pub i32);
 
 impl<'lua> FromLua<'lua> for Position {
-    fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+    fn from_lua(value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let mlua::Value::Table(p_table) = value {
             if let Some((x, y)) = p_table.get::<_, Option<i32>>("x")?.zip(p_table.get::<_, Option<i32>>("y")?) {
@@ -202,7 +202,7 @@ pub enum ResearchQueueSetting {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for ResearchQueueSetting {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
         lua.unpack::<String>(value)?.parse().map_err(mlua::Error::external)
     }
 }
@@ -274,7 +274,7 @@ impl FromStr for MapGenSize {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for MapGenSize {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
         if let Value::String(s) = value {
             s.to_str().map_err(mlua::Error::external)?.parse().map_err(mlua::Error::external)
         } else {
@@ -1062,7 +1062,7 @@ impl BitXorAssign for CollisionMask {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for CollisionMask {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
         let str_array = lua.unpack::<Vec<String>>(value)?;
         Ok(Self::from_iter(str_array))
     }
@@ -1181,7 +1181,7 @@ impl BitXorAssign for EntityPrototypeFlags {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for EntityPrototypeFlags {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
         let flag_arr = lua.unpack::<Vec<String>>(value)?;
         Ok(Self::from_iter(flag_arr))
     }
@@ -1202,8 +1202,9 @@ pub struct DamageTypeFilters {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for DamageTypeFilters {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-        match &value {
+    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+        let type_name = value.type_name();
+        match value {
             mlua::Value::String(s) => Ok(Self{types: vec![s.to_str()?.to_string()], whitelist: false}),
             mlua::Value::Table(t) => {
                 if let Some(v) = t.get::<_, Option<mlua::Value>>("types")? {
@@ -1219,8 +1220,8 @@ impl<'lua> PrototypeFromLua<'lua> for DamageTypeFilters {
                     Ok(Self{types, whitelist: false})
                 }
             }
-            _ => Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "DamageTypeFilters",
-            message: Some("expected eitehr a string, a table or an array".into()) })
+            _ => Err(mlua::Error::FromLuaConversionError { from: type_name, to: "DamageTypeFilters",
+            message: Some("expected either a string, a table or an array".into()) })
         }
     }
 }
