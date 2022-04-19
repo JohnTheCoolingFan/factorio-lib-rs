@@ -1424,22 +1424,39 @@ pub struct ArtilleryFlare {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryProjectile>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(artillery_projectile)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct ArtilleryProjectile {
     // Bounding box must be zero
     // map_color is mandatory
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    reveal_map: bool,
-    pcture: Option<Sprite>,
-    shadow: Option<Sprite>,
-    chart_picture: Option<Sprite>,
-    action: Option<Trigger>,
-    final_action: Option<Trigger>,
-    height_from_ground: f32, // Default: 1
-    rotatable: bool, // Default: true
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    pub reveal_map: bool,
+    pub pcture: Option<Sprite>,
+    pub shadow: Option<Sprite>,
+    pub chart_picture: Option<Sprite>,
+    pub action: Option<Trigger>,
+    pub final_action: Option<Trigger>,
+    #[default(1_f32)]
+    pub height_from_ground: f32, // Default: 1
+    #[default(true)]
+    pub rotatable: bool, // Default: true
+}
+
+impl ArtilleryProjectile {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.entity_base.collision_box != BoundingBox::from(((0.0, 0.0), (0.0, 0.0))) {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "ArtilleryProjectile", message: Some("Bounding box must be zero".into()) })
+        }
+        if self.entity_base.map_color.is_none() {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "ArtilleryFlare", message: Some("`map_color` is mandatory".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/Beam>
