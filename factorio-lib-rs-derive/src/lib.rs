@@ -249,7 +249,7 @@ fn impl_create_entity_trigger_effect_item_base_macro(ast: &syn::DeriveInput) -> 
             fn offset_deviation(&self) -> &Option<BoundingBox> { &self.create_entity_base.offset_deviation }
             fn trigger_created_entity(&self) -> bool { self.create_entity_base.trigger_created_entity }
             fn check_buildability(&self) -> bool { self.create_entity_base.check_buildability }
-            fn show_in_tooltip(&self) -> bool { self.create_entity_base.show_in_tooltip }
+            //fn show_in_tooltip(&self) -> bool { self.create_entity_base.show_in_tooltip }
             fn tile_collision_mask(&self) -> &Option<CollisionMask> { &self.create_entity_base.tile_collision_mask }
             fn offsets(&self) -> &Option<Vec<Factorio2DVector>> { &self.create_entity_base.offsets }
         }
