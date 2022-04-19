@@ -22,8 +22,8 @@ use std::iter::FromIterator;
 use std::collections::HashMap;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
-use crate::prototypes::PrototypesErr;
-use super::{GetPrototype, LocalisedString, PrototypeFromLua, DataTable};
+use crate::prototypes::{GetPrototype, PrototypesErr};
+use super::{LocalisedString, PrototypeFromLua, DataTable};
 use mlua::{ToLua, Value, Lua, prelude::LuaResult, FromLua};
 use strum_macros::{EnumString, AsRefStr};
 
@@ -99,6 +99,13 @@ impl<'lua> PrototypeFromLua<'lua> for KeySequence {
 /// <https://wiki.factorio.com/Types/BoundingBox>
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct BoundingBox(pub Position, pub Position);
+
+impl<'lua> PrototypeFromLua<'lua> for BoundingBox {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let v = lua.unpack::<[Position; 2]>(value)?;
+        Ok(Self(v[0], v[1]))
+    }
+}
 /// Value range: [0.0; 1.0) <https://wiki.factorio.com/Types/RealOrientation>
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct RealOrientation(pub f32);
@@ -107,8 +114,8 @@ pub struct RealOrientation(pub f32);
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct Position(pub i32, pub i32);
 
-impl<'lua> PrototypeFromLua<'lua> for Position {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+impl<'lua> FromLua<'lua> for Position {
+    fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let mlua::Value::Table(p_table) = value {
             if let Some((x, y)) = p_table.get::<_, Option<i32>>("x")?.zip(p_table.get::<_, Option<i32>>("y")?) {
@@ -1173,11 +1180,18 @@ impl BitXorAssign for EntityPrototypeFlags {
     }
 }
 
+impl<'lua> PrototypeFromLua<'lua> for EntityPrototypeFlags {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let flag_arr = lua.unpack::<Vec<String>>(value)?;
+        Ok(Self::from_iter(flag_arr))
+    }
+}
+
 /// <https://wiki.factorio.com/Types/DamagePrototype>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct DamagePrototype {
     amount: f32,
-    r#type: String // Damage type
+    r#type: String // Name of Damage type
 }
 
 /// <https://wiki.factorio.com/Types/DamageTypeFilters>
@@ -1185,6 +1199,30 @@ pub struct DamagePrototype {
 pub struct DamageTypeFilters {
     types: Vec<String>, // If String, converted to Vec<String> with one element // Name of DamageType prototype
     whitelist: bool // Default: false
+}
+
+impl<'lua> PrototypeFromLua<'lua> for DamageTypeFilters {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        match &value {
+            mlua::Value::String(s) => Ok(Self{types: vec![s.to_str()?.to_string()], whitelist: false}),
+            mlua::Value::Table(t) => {
+                if let Some(v) = t.get::<_, Option<mlua::Value>>("types")? {
+                    let types = match v {
+                        mlua::Value::String(s) => vec![s.to_str()?.to_string()],
+                        mlua::Value::Table(t) => t.sequence_values::<String>().collect::<LuaResult<Vec<String>>>()?,
+                        _ => return Err(mlua::Error::FromLuaConversionError { from: v.type_name(), to: "DamageTypeFilters.types", message: Some("Expected table or a string".into()) })
+                    };
+                    let whitelist = t.get::<_, Option<bool>>("whitelist")?.unwrap_or(false);
+                    Ok(Self{types, whitelist})
+                } else {
+                    let types = t.sequence_values::<String>().collect::<LuaResult<Vec<String>>>()?;
+                    Ok(Self{types, whitelist: false})
+                }
+            }
+            _ => Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "DamageTypeFilters",
+            message: Some("expected eitehr a string, a table or an array".into()) })
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Types/ForceCondition>
