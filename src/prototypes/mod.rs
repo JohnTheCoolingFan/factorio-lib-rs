@@ -1361,15 +1361,18 @@ pub trait Entity: PrototypeBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Arrow>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(arrow)]
 pub struct Arrow {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    arrow_picture: Sprite,
-    circle_picture: Option<Sprite>,
-    blinking: bool, // Default: false
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    pub arrow_picture: Sprite,
+    pub circle_picture: Option<Sprite>,
+    #[default(false)]
+    pub blinking: bool, // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryFlare>
