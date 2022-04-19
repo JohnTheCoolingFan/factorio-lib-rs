@@ -722,7 +722,7 @@ pub enum TriggerTargetMask {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for TriggerTargetMask {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut DataTable) -> mlua::Result<Self> {
         Ok(Self::Specific(lua.unpack::<Vec<String>>(value)?))
     }
 }
