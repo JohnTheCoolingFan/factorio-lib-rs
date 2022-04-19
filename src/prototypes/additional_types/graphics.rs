@@ -474,25 +474,28 @@ impl AnimationSpec {
 /// <https://wiki.factorio.com/Types/Stripe>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct Stripe {
-    width_in_frames: u32,
-    height_in_frames: Option<u32>, // Optional only in RotatedAnimation
-    filename: FileName,
+    pub width_in_frames: u32,
+    pub height_in_frames: Option<u32>, // Optional only in RotatedAnimation
+    pub filename: FileName,
     #[default(0_u32)]
-    x: u32, // Default: 0
+    pub x: u32, // Default: 0
     #[default(0_u32)]
-    y: u32 // Default: 0
+    pub y: u32 // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/AnimationVariations>
 pub type AnimationVariations = Vec<AnimationVariation>;
 
 /// <https://wiki.factorio.com/Types/AnimationVariations>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AnimationVariation {
-    animation: AnimationBase, // Filename is mandatory
-    variation_count: u32,
-    frame_count: u32, // Default: 1
-    line_length: u32, // Default: variation_count
+    #[use_self_forced]
+    pub animation: AnimationBase, // Filename is mandatory
+    pub variation_count: u32,
+    #[default(1_u32)]
+    pub frame_count: u32, // Default: 1
+    #[default(variation_count)]
+    pub line_length: u32, // Default: variation_count
 }
 
 /// <https://wiki.factorio.com/Types/Animation4Way>

@@ -1222,7 +1222,7 @@ pub struct EntityBase {
     allow_copy_paste: bool, // Default: true
     #[default(true)]
     selectable_in_game: bool, // Default: true
-    #[default(50_u8)]
+    #[default(Self::default_selection_priority(prot_table.get::<_, String>("type").ok()?))]
     selection_priority: u8, // Default: 50
     #[default("automatic")]
     #[from_str]
@@ -1295,6 +1295,13 @@ impl EntityBase {
                 PrototypeType::HighlightBoxEntity | PrototypeType::ItemRequestProxy | PrototypeType::Projectile | PrototypeType::SmokeWithTrigger |
                 PrototypeType::SpeechBubble | PrototypeType::Sticker => CollisionMask(0),
             _ => default
+        }
+    }
+
+    fn default_selection_priority(t: String) -> u8 {
+        match t.parse::<PrototypeType>().unwrap() {
+            PrototypeType::Arrow => 48,
+            _ => 50
         }
     }
 
@@ -1376,31 +1383,44 @@ pub struct Arrow {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryFlare>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(artillery_flare)]
 pub struct ArtilleryFlare {
     // map_color is mandatory
     // selection_priority default: 48
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    pictures: Vec<AnimationVariation>,
-    life_time: u16,
-    shadows: Option<Vec<AnimationVariation>>,
-    render_layer: RenderLayer, // Default: "object"
-    render_layer_when_on_ground: RenderLayer, // Default: "lower-object"
-    regular_trigger_effect: Option<TriggerEffect>,
-    regular_trigger_effect_frequency: u32, // Default: 0
-    ended_in_water_trigger_effect: Option<TriggerEffect>,
-    movement_modifier_when_on_ground: f64, // Default: 0.8
-    creation_shift: Option<Factorio2DVector>,
-    initial_speed: Option<Factorio2DVector>,
-    initial_height: f32, // Default: 0
-    initial_vertical_speed: f32, // Default: 0
-    initial_frame_speed: f32, // Default: 1
-    shots_per_flare: u32, // Default: 1
-    early_death_ticks: u32, // Default: 3 * 60 (180)
-    shot_category: String, // Name of Prototype/AmmoCategory
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    pub pictures: Vec<AnimationVariation>,
+    pub life_time: u16,
+    pub shadows: Option<Vec<AnimationVariation>>,
+    #[default("object")]
+    #[from_str]
+    pub render_layer: RenderLayer, // Default: "object"
+    #[default("lower-object")]
+    #[from_str]
+    pub render_layer_when_on_ground: RenderLayer, // Default: "lower-object"
+    pub regular_trigger_effect: Option<TriggerEffect>,
+    #[default(0_u32)]
+    pub regular_trigger_effect_frequency: u32, // Default: 0
+    pub ended_in_water_trigger_effect: Option<TriggerEffect>,
+    #[default(0.8_f64)]
+    pub movement_modifier_when_on_ground: f64, // Default: 0.8
+    pub creation_shift: Option<Factorio2DVector>,
+    pub initial_speed: Option<Factorio2DVector>,
+    #[default(0_f32)]
+    pub initial_height: f32, // Default: 0
+    #[default(0_f32)]
+    pub initial_vertical_speed: f32, // Default: 0
+    #[default(1_f32)]
+    pub initial_frame_speed: f32, // Default: 1
+    #[default(1_u32)]
+    pub shots_per_flare: u32, // Default: 1
+    #[default(180_u32)]
+    pub early_death_ticks: u32, // Default: 3 * 60 (180)
+    pub shot_category: String, // Name of Prototype/AmmoCategory
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryProjectile>
