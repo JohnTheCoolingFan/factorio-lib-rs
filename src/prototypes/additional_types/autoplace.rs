@@ -72,57 +72,57 @@ impl<'lua> PrototypeFromLua<'lua> for AutoplaceSpecificationBase {
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ExpressionBasedAutoplaceSpecification {
-    probability_expression: NoiseExpression,
+    pub probability_expression: NoiseExpression,
     #[default(probability_expression.clone())]
-    richness_expression: NoiseExpression
+    pub richness_expression: NoiseExpression
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct PeakBasedAutoplaceSpecification {
     #[default(0_f64)]
-    sharpness: f64, // Default: 0
+    pub sharpness: f64, // Default: 0
     #[default(1_f64)]
-    max_probability: f64, // Default: 1
+    pub max_probability: f64, // Default: 1
     #[default(0_f64)]
-    richness_base: f64, // Default: 0
+    pub richness_base: f64, // Default: 0
     #[default(0_f64)]
-    richness_multiplier: f64, // Default: 0
+    pub richness_multiplier: f64, // Default: 0
     #[default(0_f64)]
-    richness_multiplier_distance_bonus: f64, // Default: 0
+    pub richness_multiplier_distance_bonus: f64, // Default: 0
     #[default(0_f64)]
-    random_probability_penalty: f64, // Default: 0
+    pub random_probability_penalty: f64, // Default: 0
     #[use_self_vec]
-    peaks: Vec<AutoplacePeak>, // If not specified, interpret specification as peak
+    pub peaks: Vec<AutoplacePeak>, // If not specified, interpret specification as peak
     #[default(0_f64)] // FIXME
-    coverage: f64, // Default: calculated from existing peaks // What
+    pub coverage: f64, // Default: calculated from existing peaks // What
     #[default(0_u32)]
-    starting_area_amount: u32, // Default: 0
+    pub starting_area_amount: u32, // Default: 0
     #[default(10_f64)]
-    starting_area_size: f64, // Default: 10
+    pub starting_area_size: f64, // Default: 10
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Autoplace_peaks>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AutoplacePeak {
     #[default(1.0_f64)]
-    influence: f64, // Default: 1
+    pub influence: f64, // Default: 1
     #[default(f64::MIN)]
-    min_influence: f64, // Default: f64::MIN
+    pub min_influence: f64, // Default: f64::MIN
     #[default(f64::MAX)]
-    max_influence: f64, // Default: f64::MAX
+    pub max_influence: f64, // Default: f64::MAX
     #[default(0)]
-    richness_influence: f64, // Default: 0
+    pub richness_influence: f64, // Default: 0
     #[default("")]
-    noise_layer: String, // Default: ""
+    pub noise_layer: String, // Default: ""
     #[default(0.5_f64)]
-    noise_persistence: f64, // Default: 0.5
+    pub noise_persistence: f64, // Default: 0.5
     #[default(0)]
-    noise_octaves_difference: f64, // Default: 0
+    pub noise_octaves_difference: f64, // Default: 0
     #[default(1)]
-    noise_scale: f64, // Default: 1
+    pub noise_scale: f64, // Default: 1
     #[use_self_forced]
-    dimensions: Dimensions // Default: empty // Only one of each type
+    pub dimensions: Dimensions // Default: empty // Only one of each type
 }
 
 #[derive(Debug, Clone)]
@@ -178,14 +178,14 @@ pub enum Dimension {
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Dimensions>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct DimensionSpec {
-    optimal: Option<f64>,
+    pub optimal: Option<f64>,
     #[default(0)]
-    range: f64, // Default: 0
+    pub range: f64, // Default: 0
     // ~~Default: range * 1.5 // Default value taken from Factorio base mod source code, version 1.1.37, decoratives.lua, lines 11-17~~
     // It's in code, you idiot, not in loader!
-    max_range: Option<f64>,
+    pub max_range: Option<f64>,
     #[default(f64::MAX)]
-    top_property_limit: f64, // Default: f64::MAX // Seems to be unused (in vanilla)
+    pub top_property_limit: f64, // Default: f64::MAX // Seems to be unused (in vanilla)
 }
 
 /* TODO
