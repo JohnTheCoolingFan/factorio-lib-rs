@@ -1199,7 +1199,7 @@ pub struct Decorative {
 #[derive(Debug, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct EntityBase {
-    #[use_self_forced]
+    #[use_self_forced] // FIXME
     icon: Option<IconSpecification>, // Mandatory if one of flags active: "placeable-neutral", "placeable-player", "placeable-enemy"
     #[default((0_f32, 0_f32), (0_f32, 0_f32))]
     collision_box: BoundingBox, // Default: ((0, 0), (0, 0))
