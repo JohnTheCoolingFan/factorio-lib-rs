@@ -3,8 +3,7 @@ use strum::IntoEnumIterator;
 use std::convert::AsRef;
 use strum::{EnumDiscriminants, EnumString, AsRefStr, EnumIter};
 
-use crate::prototypes::GetPrototype;
-use crate::prototypes::PrototypeFromLua;
+use crate::prototypes::{GetPrototype, PrototypeFromLua};
 
 pub type NoiseExpression = String;
 
