@@ -451,7 +451,7 @@ pub struct AnimationSpec {
 
 impl AnimationSpec {
     // TODO: clarify the required image sizes for stripes
-    fn register_resources(&self, lua: &mlua::Lua, data_table: &mut DataTable) -> mlua::prelude::LuaResult<()> {
+    fn register_resources(&self, _lua: &mlua::Lua, _data_table: &mut DataTable) -> mlua::prelude::LuaResult<()> {
         todo!() // TODO
         // List of things to do:
         // Rename this function to a more fitting name
@@ -761,26 +761,32 @@ pub struct RotatedSpriteSpec {
 pub type SpriteVariations = Vec<SpriteVariation>;
 
 /// <https://wiki.factorio.com/Types/SpriteVariations>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SpriteVariation {
-    layers: Vec<SpriteVariationLayer>
+    #[use_self_vec]
+    pub layers: Vec<SpriteVariationLayer>
 }
 
 /// <https://wiki.factorio.com/Types/SpriteVariations>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SpriteVariationLayer {
-    regular: SpriteVariationSpec,
-    hr_version: Option<SpriteVariationSpec>
+    #[use_self_forced]
+    pub regular: SpriteVariationSpec,
+    pub hr_version: Option<SpriteVariationSpec>
 }
 
 /// Extension of SpriteSpec, ignores dice and slice
 /// <https://wiki.factorio.com/Types/SpriteVariations>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SpriteVariationSpec {
-    sprite: SpriteSpec,
-    variation_count: u32, // Default: 1
-    repeat_count: u32, // Default: 1
-    line_length: u32 // Default: value of `variation_count`
+    #[use_self_forced]
+    pub sprite: SpriteSpec,
+    #[default(1_u32)]
+    pub variation_count: u32, // Default: 1
+    #[default(1_u32)]
+    pub repeat_count: u32, // Default: 1
+    #[default(variation_count)]
+    pub line_length: u32 // Default: value of `variation_count`
 }
 
 /// <https://wiki.factorio.com/Types/SpriteFlags>
