@@ -386,6 +386,7 @@ prot_from_lua_blanket!(i16);
 prot_from_lua_blanket!(i8);
 prot_from_lua_blanket!(Color);
 prot_from_lua_blanket!(Factorio2DVector);
+prot_from_lua_blanket!(Position);
 #[cfg(feature = "concepts")]
 prot_from_lua_blanket!(LocalisedString);
 
@@ -1168,21 +1169,28 @@ pub struct DamageType {
 }
 
 /// <https://wiki.factorio.com/Prototype/Decorative>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(optimized_decorative)]
 pub struct Decorative {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    pictures: Vec<SpriteVariation>, // At least 1 is required
-    collision_box: Option<BoundingBox>,
-    render_layer: RenderLayer, // Default: "decorative"
-    grows_through_rail_path: bool, // Default: false
-    tile_layer: i16, // Default: 0 // Mandatory if render_layer is "decals" // I don't understand how this works
-    decal_overdraw_priority: u16, // Default: 0 // Only loaded if render_layer is "decals"
-    walking_sound: Option<Sound>,
-    trigger_effect: Option<TriggerEffect>,
-    autoplace: Option<AutoplaceSpecification>,
-    collision_mask: CollisionMask // Default: "doodad-layer"
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    pub pictures: Vec<SpriteVariation>, // At least 1 is required
+    pub collision_box: Option<BoundingBox>,
+    #[default("decorative")]
+    #[from_str]
+    pub render_layer: RenderLayer, // Default: "decorative"
+    #[default(false)]
+    pub grows_through_rail_path: bool, // Default: false
+    #[default(0_i16)]
+    pub tile_layer: i16, // Default: 0 // fixme: Mandatory if render_layer is "decals" // I don't understand how this works
+    #[default(0_u16)]
+    pub decal_overdraw_priority: u16, // Default: 0 // fixme: Only loaded if render_layer is "decals"
+    pub walking_sound: Option<Sound>,
+    pub trigger_effect: Option<TriggerEffect>,
+    pub autoplace: Option<AutoplaceSpecification>,
+    #[default(CollisionMask::from_iter(["doodad-layer"]))]
+    pub collision_mask: CollisionMask // Default: "doodad-layer"
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity>
