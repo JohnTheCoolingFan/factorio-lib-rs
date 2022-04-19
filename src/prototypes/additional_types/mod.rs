@@ -96,7 +96,8 @@ impl<'lua> PrototypeFromLua<'lua> for KeySequence {
         Ok(Self(lua.unpack(value)?))
     }
 }
-// Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox? It's kinda undocumented
+// Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox?
+// It's unused in the game, so why bother?
 /// <https://wiki.factorio.com/Types/BoundingBox>
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct BoundingBox(pub Position, pub Position);
@@ -114,23 +115,28 @@ impl From<((f32, f32), (f32, f32))> for BoundingBox {
     }
 }
 
+impl From<BoundingBox> for ((f32, f32), (f32, f32)) {
+    fn from(bb: BoundingBox) -> Self {
+        (bb.0.into(), bb.1.into())
+    }
+}
+
 /// Value range: [0.0; 1.0) <https://wiki.factorio.com/Types/RealOrientation>
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct RealOrientation(pub f32);
 
 /// Can be constructed from an array or table with x and y values <https://wiki.factorio.com/Types/Position>
-// TODO: use ints for storage, convert from float
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Position(pub f32, pub f32);
+pub struct Position(pub i32, pub i32);
 
 impl<'lua> FromLua<'lua> for Position {
     fn from_lua(value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let mlua::Value::Table(p_table) = value {
-            if let Some((x, y)) = p_table.get::<_, Option<f32>>("x")?.zip(p_table.get::<_, Option<f32>>("y")?) {
-                Ok(Self(x, y))
-            } else if let Some((x, y)) = p_table.get::<isize, Option<f32>>(1)?.zip(p_table.get::<isize, Option<f32>>(2)?) {
-                Ok(Self(x, y))
+            if let Some(pos) = p_table.get::<_, Option<f32>>("x")?.zip(p_table.get::<_, Option<f32>>("y")?) {
+                Ok(Self::from(pos))
+            } else if let Some(pos) = p_table.get::<isize, Option<f32>>(1)?.zip(p_table.get::<isize, Option<f32>>(2)?) {
+                Ok(Self::from(pos))
             } else {
                 Err(mlua::Error::FromLuaConversionError { from: type_name, to: "Position", message: Some("Expected x and y keys or an array".into()) })
             }
@@ -142,7 +148,17 @@ impl<'lua> FromLua<'lua> for Position {
 
 impl From<(f32, f32)> for Position {
     fn from(v: (f32, f32)) -> Self {
-        Self(v.0, v.1)
+        let (x, y) = v;
+        let (x, y) = ((x * 256.0).round() as i32, (y * 256.0).round() as i32);
+        Self(x, y)
+    }
+}
+
+impl From<Position> for (f32, f32) {
+    fn from(p: Position) -> Self {
+        let (x, y) = (p.0, p.1);
+        let (x, y) = ((x as f32) / 256.0, (y as f32) / 256.0);
+        (x, y)
     }
 }
 

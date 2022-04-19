@@ -1251,9 +1251,9 @@ pub struct EntityBase {
     placeable_by: Option<ItemsToPlace>,
     remains_when_mined: Option<Vec<String>>,
     additional_pastable_entities: Option<Vec<String>>,
-    #[default((collision_box.0.0 - collision_box.1.0).abs().ceil() as u32)]
+    #[default({let bb: ((f32, f32), (f32, f32)) = collision_box.into(); (bb.0.0 - bb.1.0).abs().ceil() as u32})]
     tile_width: u32, // Default: Calculated from collision_box
-    #[default((collision_box.0.1 - collision_box.1.1).abs().ceil() as u32)]
+    #[default({let bb: ((f32, f32), (f32, f32)) = collision_box.into(); (bb.0.1 - bb.1.1).abs().ceil() as u32})]
     tile_height: u32, // Default: Calculated from collision_box
     autoplace: Option<AutoplaceSpecification>,
     map_color: Option<Color>,
