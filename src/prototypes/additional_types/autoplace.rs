@@ -34,13 +34,14 @@ pub enum TileRestriction {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for TileRestriction {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::prototypes::DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut crate::prototypes::DataTable) -> mlua::Result<Self> {
+        let type_name = value.type_name();
         if let Some(s) = lua.unpack::<Option<String>>(value.clone())? {
             Ok(Self::Single(s))
         } else if let Some(v) = lua.unpack::<Option<[String; 2]>>(value)? {
             Ok(Self::OnTransitions(v))
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "AutoplaceSpecification.tile_restriction", message: Some("Expected eitehr a string or an array of two strings".into()) })
+            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "AutoplaceSpecification.tile_restriction", message: Some("Expected eitehr a string or an array of two strings".into()) })
         }
     }
 }
@@ -132,7 +133,7 @@ impl<'lua> PrototypeFromLua<'lua> for Dimensions {
         if let mlua::Value::Table(table) = &value {
             let mut result = Vec::new();
             for dimension in DimensionDiscriminants::iter() {
-                let mut dim_table = lua.create_table()?;
+                let dim_table = lua.create_table()?;
                 if let Some(optimal) = table.get::<_, Option<f64>>(format!("{}_optimal", dimension.as_ref()))? {
                     dim_table.set("optimal", optimal)?; }
                 if let Some(range) = table.get::<_, Option<f64>>(format!("{}_range", dimension.as_ref()))? {
