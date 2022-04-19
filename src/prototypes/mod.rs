@@ -32,9 +32,11 @@ use factorio_lib_rs_derive::{
     PrototypeFromLua,
     prot_from_lua_blanket,
 };
+use prototype_type::PrototypeType;
 
 #[cfg(feature = "concepts")]
 use crate::concepts::LocalisedString;
+
 #[cfg(not(feature = "concepts"))]
 type LocalisedString = String;
 
@@ -1194,27 +1196,41 @@ pub struct Decorative {
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity>
-#[derive(Debug)]
+#[derive(Debug, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct EntityBase {
+    #[use_self_forced]
     icon: Option<IconSpecification>, // Mandatory if one of flags active: "placeable-neutral", "placeable-player", "placeable-enemy"
+    #[default((0_f32, 0_f32), (0_f32, 0_f32))]
     collision_box: BoundingBox, // Default: ((0, 0), (0, 0))
+    #[default(Self::default_collision_mask(prot_table.get::<_, String>("type").ok()?))]
     collision_mask: CollisionMask, // Default: ("item-layer", "object-layer", "player-layer", "water-tile") and depends on type
     map_generator_bounding_box: BoundingBox,
+    #[default((0_f32, 0_f32), (0_f32, 0_f32))]
     selection_box: BoundingBox, // Default: ((0, 0), (0, 0))
+    #[default((0_f32, 0_f32), (0_f32, 0_f32))]
     drawing_box: BoundingBox, // Default: ((0, 0), (0, 0)), selection_box is used instead
+    #[default(collision_box)]
     sticker_box: BoundingBox, // Default: collision_box
+    #[default((0_f32, 0_f32), (0_f32, 0_f32))]
     hit_visualization_box: BoundingBox, // Default: ((0, 0), (0, 0))
     trigger_target_mask: Option<TriggerTargetMask>,
     flags: Option<EntityPrototypeFlags>,
-    minable: MinableProperties, // Default: not minable
+    minable: Option<MinableProperties>, // Default: not minable (indicated by None)
     subgroup: Option<String>,
+    #[default(true)]
     allow_copy_paste: bool, // Default: true
+    #[default(true)]
     selectable_in_game: bool, // Default: true
+    #[default(50_u8)]
     selection_priority: u8, // Default: 50
+    #[default("automatic")]
+    #[from_str]
     remove_decoratives: RemoveDecoratives, // Default: "automatic"
+    #[default(0_f64)]
     emissions_per_second: f64, // Default: 0
     shooting_cursor_size: Option<f64>,
-    created_smoke: CreateTrivialSmokeEffectItem, // Default: "smoke-building"-smoke
+    created_smoke: Option<CreateTrivialSmokeEffectItem>, // Default: "smoke-building"-smoke // TODO
     working_sound: Option<WorkingSound>,
     created_effect: Option<Trigger>,
     build_sound: Option<Sound>,
@@ -1225,22 +1241,74 @@ pub struct EntityBase {
     open_sound: Option<Sound>,
     close_sound: Option<Sound>,
     radius_visualization_specification: Option<RadiusVisualizationSpecification>,
+    #[default(0_f32)]
     build_base_evolution_requirement: f64, // Default: 0
     alert_icon_shift: Option<Factorio2DVector>,
     alert_icon_scale: Option<f32>,
+    #[default("")]
     fast_replaceable_group: String, // Default: ""
     next_upgrade: Option<String>, // Name of the entity // Has limitations, listed on wiki
-    placeable_by: Option<Vec<ItemToPlace>>,
+    placeable_by: Option<ItemsToPlace>,
     remains_when_mined: Option<Vec<String>>,
     additional_pastable_entities: Option<Vec<String>>,
+    #[default((collision_box.0.0 - collision_box.1.0).abs().ceil() as u32)]
     tile_width: u32, // Default: Calculated from collision_box
+    #[default((collision_box.0.1 - collision_box.1.1).abs().ceil() as u32)]
     tile_height: u32, // Default: Calculated from collision_box
     autoplace: Option<AutoplaceSpecification>,
     map_color: Option<Color>,
     friendly_map_color: Option<Color>,
     enemy_map_color: Option<Color>,
     water_reflection: Option<WaterReflectionDefinition>,
+    #[default(true)]
     protected_from_tile_building: bool, // Default: true
+}
+
+impl EntityBase {
+    fn default_collision_mask(t: String) -> CollisionMask {
+        let player_train_consider: CollisionMask = CollisionMask::PLAYER_LAYER | CollisionMask::TRAIN_LAYER | CollisionMask::CONSIDER_TILE_TRANSITIONS;
+        let default: CollisionMask = CollisionMask::ITEM_LAYER | CollisionMask::OBJECT_LAYER | CollisionMask::PLAYER_LAYER | CollisionMask::WATER_TILE;
+        let belts: CollisionMask = CollisionMask::OBJECT_LAYER | CollisionMask::ITEM_LAYER | CollisionMask::TRANSPORT_BELT_LAYER | CollisionMask::WATER_TILE;
+        match t.parse::<PrototypeType>().unwrap() {
+            PrototypeType::Car | PrototypeType::Character => player_train_consider,
+            PrototypeType::Cliff => default | CollisionMask::NOT_COLLIDING_WITH_ITSELF,
+            PrototypeType::DeconstructibleTileProxy => CollisionMask::GROUND_TILE,
+            PrototypeType::EntityGhost | PrototypeType::TileGhost => CollisionMask::GHOST_LAYER,
+            PrototypeType::Fish => CollisionMask::GROUND_TILE | CollisionMask::COLLIDING_WITH_TILES_ONLY,
+            PrototypeType::Gate => default | CollisionMask::TRAIN_LAYER,
+            PrototypeType::HeatPipe => CollisionMask::OBJECT_LAYER | CollisionMask::FLOOR_LAYER | CollisionMask::WATER_TILE,
+            PrototypeType::ItemEntity => CollisionMask::ITEM_LAYER,
+            PrototypeType::LandMine => CollisionMask::OBJECT_LAYER | CollisionMask::WATER_TILE,
+            PrototypeType::TransportBelt => CollisionMask::OBJECT_LAYER | CollisionMask::FLOOR_LAYER | CollisionMask::TRANSPORT_BELT_LAYER | CollisionMask::WATER_TILE,
+            PrototypeType::LinkedBelt | PrototypeType::Loader1x1 | PrototypeType::Loader1x2 | PrototypeType::Splitter | PrototypeType::UndergroundBelt => belts,
+            PrototypeType::PlayerPort => CollisionMask::OBJECT_LAYER | CollisionMask::FLOOR_LAYER | CollisionMask::WATER_TILE,
+            PrototypeType::CurvedRail | PrototypeType::StraightRail => CollisionMask::ITEM_LAYER | CollisionMask::OBJECT_LAYER | CollisionMask::RAIL_LAYER | CollisionMask::FLOOR_LAYER | CollisionMask::WATER_TILE,
+            PrototypeType::RailSignal | PrototypeType::RailChainSignal => CollisionMask::FLOOR_LAYER | CollisionMask::RAIL_LAYER | CollisionMask::ITEM_LAYER,
+            PrototypeType::ResourceEntity => CollisionMask::RESOURCE_LAYER,
+            PrototypeType::ArtilleryWagon | PrototypeType::CargoWagon | PrototypeType::FluidWagon | PrototypeType::Locomotive => CollisionMask::TRAIN_LAYER,
+            PrototypeType::Unit => CollisionMask::PLAYER_LAYER | CollisionMask::TRAIN_LAYER | CollisionMask::NOT_COLLIDING_WITH_ITSELF,
+            PrototypeType::SpiderVehicle => CollisionMask::PLAYER_LAYER | CollisionMask::TRAIN_LAYER,
+            PrototypeType::Arrow | PrototypeType::ArtilleryFlare | PrototypeType::ArtilleryProjectile | PrototypeType::Beam |
+                PrototypeType::CharacterCorpse | PrototypeType::CorpsePrototype | PrototypeType::RailRemnants | PrototypeType::Particle |
+                PrototypeType::Explosion | PrototypeType::FireFlame | PrototypeType::FluidStream | PrototypeType::CombatRobot |
+                PrototypeType::ConstructionRobot | PrototypeType::LogisticRobot | PrototypeType::ParticleSource | PrototypeType::FlyingText |
+                PrototypeType::HighlightBoxEntity | PrototypeType::ItemRequestProxy | PrototypeType::Projectile | PrototypeType::SmokeWithTrigger |
+                PrototypeType::SpeechBubble | PrototypeType::Sticker => CollisionMask(0),
+            _ => default
+        }
+    }
+
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        let entity_flags_cond = if let Some(flags) = self.flags {
+            (flags & (EntityPrototypeFlags::PLACEABLE_PLAYER | EntityPrototypeFlags::PLACEABLE_NEUTRAL | EntityPrototypeFlags::PLACEABLE_ENEMY)).0 != 0
+        } else {
+            false
+        };
+        if self.icon.is_none() && entity_flags_cond {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "Entity", message: Some("`icon` is required".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity>
@@ -1255,7 +1323,7 @@ pub trait Entity: PrototypeBase {
     fn hit_visualization_box(&self) -> BoundingBox;
     fn trigger_target_mask(&self) -> &Option<TriggerTargetMask>;
     fn flags(&self) -> Option<EntityPrototypeFlags>;
-    fn minable(&self) -> &MinableProperties;
+    fn minable(&self) -> &Option<MinableProperties>;
     fn subgroup(&self) -> &Option<String>;
     fn allow_copy_paste(&self) -> bool;
     fn selectable_in_game(&self) -> bool;
@@ -1263,7 +1331,7 @@ pub trait Entity: PrototypeBase {
     fn remove_decoratives(&self) -> RemoveDecoratives;
     fn emissions_per_second(&self) -> f64;
     fn shooting_cursor_size(&self) -> Option<f64>;
-    fn created_smoke(&self) -> &CreateTrivialSmokeEffectItem;
+    fn created_smoke(&self) -> &Option<CreateTrivialSmokeEffectItem>;
     fn working_sound(&self) -> &Option<WorkingSound>;
     fn created_effect(&self) -> &Option<Trigger>;
     fn build_sound(&self) -> &Option<Sound>;
@@ -1279,7 +1347,7 @@ pub trait Entity: PrototypeBase {
     fn alert_icon_scale(&self) -> Option<f32>;
     fn fast_replaceable_group(&self) -> &String;
     fn next_upgrade(&self) -> &Option<String>;
-    fn placeable_by(&self) -> &Option<Vec<ItemToPlace>>;
+    fn placeable_by(&self) -> &Option<ItemsToPlace>;
     fn remains_when_mined(&self) -> &Option<Vec<String>>;
     fn additional_pastable_entities(&self) -> &Option<Vec<String>>;
     fn tile_width(&self) -> u32;

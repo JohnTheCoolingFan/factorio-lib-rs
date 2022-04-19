@@ -341,10 +341,12 @@ impl RadiusVisualizationSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/WaterReflectionDefinition>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct WaterReflectionDefinition {
     pictures: Option<Vec<SpriteVariation>>,
+    #[default(false)]
     orientation_to_variation: bool, // default: false
+    #[default(false)]
     rotate: bool, // Default: false
 }
 

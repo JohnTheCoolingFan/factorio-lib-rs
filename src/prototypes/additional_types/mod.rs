@@ -18,6 +18,7 @@ pub use tile_transitions::*;
 pub use tip_trigger::*;
 pub use trigger::*;
 
+use std::convert::From;
 use std::iter::FromIterator;
 use std::collections::HashMap;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
@@ -97,7 +98,7 @@ impl<'lua> PrototypeFromLua<'lua> for KeySequence {
 }
 // Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox? It's kinda undocumented
 /// <https://wiki.factorio.com/Types/BoundingBox>
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct BoundingBox(pub Position, pub Position);
 
 impl<'lua> PrototypeFromLua<'lua> for BoundingBox {
@@ -106,21 +107,29 @@ impl<'lua> PrototypeFromLua<'lua> for BoundingBox {
         Ok(Self(v[0], v[1]))
     }
 }
+
+impl From<((f32, f32), (f32, f32))> for BoundingBox {
+    fn from(bb: ((f32, f32), (f32, f32))) -> Self {
+        Self(bb.0.into(), bb.1.into())
+    }
+}
+
 /// Value range: [0.0; 1.0) <https://wiki.factorio.com/Types/RealOrientation>
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct RealOrientation(pub f32);
 
 /// Can be constructed from an array or table with x and y values <https://wiki.factorio.com/Types/Position>
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
-pub struct Position(pub i32, pub i32);
+// TODO: use ints for storage, convert from float
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Position(pub f32, pub f32);
 
 impl<'lua> FromLua<'lua> for Position {
     fn from_lua(value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let mlua::Value::Table(p_table) = value {
-            if let Some((x, y)) = p_table.get::<_, Option<i32>>("x")?.zip(p_table.get::<_, Option<i32>>("y")?) {
+            if let Some((x, y)) = p_table.get::<_, Option<f32>>("x")?.zip(p_table.get::<_, Option<f32>>("y")?) {
                 Ok(Self(x, y))
-            } else if let Some((x, y)) = p_table.get::<isize, Option<i32>>(1)?.zip(p_table.get::<isize, Option<i32>>(2)?) {
+            } else if let Some((x, y)) = p_table.get::<isize, Option<f32>>(1)?.zip(p_table.get::<isize, Option<f32>>(2)?) {
                 Ok(Self(x, y))
             } else {
                 Err(mlua::Error::FromLuaConversionError { from: type_name, to: "Position", message: Some("Expected x and y keys or an array".into()) })
@@ -128,6 +137,12 @@ impl<'lua> FromLua<'lua> for Position {
         } else {
             Err(mlua::Error::FromLuaConversionError { from: type_name, to: "Potision", message: Some("expected table".into()) })
         }
+    }
+}
+
+impl From<(f32, f32)> for Position {
+    fn from(v: (f32, f32)) -> Self {
+        Self(v.0, v.1)
     }
 }
 
@@ -810,7 +825,7 @@ pub enum CustomInputAction {
 
 /// <https://wiki.factorio.com/Types/CollisionMask>
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
-pub struct CollisionMask(u64);
+pub struct CollisionMask(pub(crate) u64);
 
 impl CollisionMask {
     pub const GROUND_TILE: CollisionMask = CollisionMask(1);
@@ -1070,7 +1085,7 @@ impl<'lua> PrototypeFromLua<'lua> for CollisionMask {
 
 /// <https://wiki.factorio.com/Types/EntityPrototypeFlags>
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
-pub struct EntityPrototypeFlags(u32);
+pub struct EntityPrototypeFlags(pub(crate) u32);
 
 impl EntityPrototypeFlags {
     pub const NOT_ROTATABLE: Self = Self(1);
@@ -1248,18 +1263,20 @@ pub enum CollisionMode {
 }
 
 /// <https://wiki.factorio.com/Types/MinableProperties>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MinableProperties {
-    mining_type: f64,
-    results: Vec<ProductPrototype>,
-    fluid_amount: f64, // Default: 0
-    mining_particle: Option<String>, // Name of Prototype/Particle
-    required_fluid: Option<String>, // Name of Prototype/Fluid
+    pub mining_time: f64,
+    #[use_self_vec]
+    pub results: Vec<ProductPrototype>,
+    #[default(0_f64)]
+    pub fluid_amount: f64, // Default: 0
+    pub mining_particle: Option<String>, // Name of Prototype/Particle
+    pub required_fluid: Option<String>, // Name of Prototype/Fluid
     // Converted to results item
     // if results are present, these are ignored
     //result: String,
     //count: u16, // Default: 1
-    mining_trigger: Option<Trigger>
+    pub mining_trigger: Option<Trigger>
 }
 
 /// <https://wiki.factorio.com/Types/ProductPrototype>
@@ -1271,31 +1288,122 @@ pub enum ProductPrototype {
     Fluid(FluidProductPrototype)
 }
 
+impl<'lua> PrototypeFromLua<'lua> for ProductPrototype {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let mlua::Value::Table(table) = &value {
+            if table.get::<_, Option<f64>>("mining_time")?.is_some() { // this means that we are in MinableProperties definition
+                let name = table.get::<_, String>("result")?;
+                let amount = table.get::<_, Option<u16>>("count")?.unwrap_or(1);
+                Ok(Self::Item(ItemProductPrototype::name_and_amount(name, amount)))
+            } else if let Some(pp_type) = table.get::<_, Option<String>>("type")? {
+                match pp_type.as_ref() {
+                    "item" => Ok(Self::Item(ItemProductPrototype::prototype_from_lua(value, lua, data_table)?)),
+                    "fluid" => Ok(Self::Fluid(FluidProductPrototype::prototype_from_lua(value, lua, data_table)?)),
+                    _ => Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ProductPrototype", message: Some("Invalid `type`".into()) })
+                }
+            } else {
+                Ok(Self::Item(ItemProductPrototype::from_sequence(value, lua, data_table)?))
+            }
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ProductPrototype", message: Some("expected table".into()) })
+        }
+    }
+}
+
 /// Either a sequence or a table, first item stands for name and second for amount
 /// <https://wiki.factorio.com/Types/ItemProductPrototype>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct ItemProductPrototype {
-    name: String, // Name of Prototype/Item
-    show_details_in_recipe_tooltip: bool, // Default: true
-    amount: Option<u16>, // Mandatory when defined in a sequence
-    probability: f64, // Default: 1
-    amount_min: Option<u16>, // Mandatory if amount is not specified
-    amount_max: Option<u16>, // Mandatory if amount is not specified // Set to amount_min if amount_max < amount_min
-    catalyst_amount: u16, // Default: 0
+    pub name: String, // Name of Prototype/Item
+    #[default(true)]
+    pub show_details_in_recipe_tooltip: bool, // Default: true
+    pub amount: Option<u16>, // Mandatory when defined in a sequence
+    #[default(1_f64)]
+    pub probability: f64, // Default: 1
+    #[mandatory_if(amount.is_none())]
+    pub amount_min: Option<u16>, // Mandatory if amount is not specified
+    #[mandatory_if(amount.is_none())]
+    pub amount_max: Option<u16>, // Mandatory if amount is not specified // Set to amount_min if amount_max < amount_min
+    #[default(0_u16)]
+    pub catalyst_amount: u16, // Default: 0
+}
+
+impl ItemProductPrototype {
+    fn post_extr_fn(&mut self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.probability < 0.0 || self.probability > 1.0 {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "ItemProductPrototype", message: Some("`probability` must be in a range of [0; 1]".into()) })
+        }
+        if let Some(amount_min) = self.amount_min {
+            if let Some(amount_max) = self.amount_max {
+                if amount_max < amount_min {
+                    self.amount_max = Some(amount_min)
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'lua> ItemProductPrototype {
+    fn from_sequence(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(t) = &value {
+            let name = t.get::<_, String>(1)?;
+            let amount = t.get::<_, u16>(2)?;
+            Ok(Self::name_and_amount(name, amount))
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ItemProductPrototype", message: Some("expected table".into()) })
+        }
+    }
+
+    fn name_and_amount(name: String, amount: u16) -> Self {
+        Self{name, amount: Some(amount), show_details_in_recipe_tooltip: true, probability: 1.0, amount_min: None, amount_max: None, catalyst_amount: 0}
+    }
 }
 
 /// <https://wiki.factorio.com/Types/FluidProductPrototype>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct FluidProductPrototype {
-    name: String, // Name of Prototype/Fluid
-    show_details_in_recipe_tooltip: bool, // Default: true
-    probability: f64, // Default: 1
-    amount: Option<u16>, // Mandatory when defined in a sequence // Cannot be < 0
-    amount_min: Option<u16>, // Mandatory if amount is not specified // Cannot be < 0
-    amount_max: Option<u16>, // Mandatory if amount is not specified // Set to amount_min if amount_max < amount_min
-    temperature: Option<f64>,
-    catalyst_amount: f64, // Default: 0
-    fuildbox_index: u32, // Default: 0
+    pub name: String, // Name of Prototype/Fluid
+    #[default(true)]
+    pub show_details_in_recipe_tooltip: bool, // Default: true
+    #[default(1_f64)]
+    pub probability: f64, // Default: 1
+    pub amount: Option<f64>, // Cannot be < 0
+    #[mandatory_if(amount.is_none())]
+    pub amount_min: Option<f64>, // Mandatory if amount is not specified // Cannot be < 0
+    #[mandatory_if(amount.is_none())]
+    pub amount_max: Option<f64>, // Mandatory if amount is not specified // Set to amount_min if amount_max < amount_min
+    pub temperature: Option<f64>,
+    #[default(0_f64)]
+    pub catalyst_amount: f64, // Default: 0
+    #[default(0_u32)]
+    pub fuildbox_index: u32, // Default: 0
+}
+
+impl FluidProductPrototype {
+    fn post_extr_fn(&mut self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.probability < 0.0 || self.probability > 1.0 {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "FluidProductPrototype", message: Some("`probability` must be in a range of [0; 1]".into()) })
+        }
+        if let Some(amount) = self.amount {
+            if amount.is_sign_negative() {
+                return Err(mlua::Error::FromLuaConversionError { from: "table", to: "FluidProductPrototype", message: Some("`amount` can't be negative".into()) })
+            }
+        }
+        if let Some(amount_min) = self.amount_min {
+            if amount_min.is_sign_negative() {
+                return Err(mlua::Error::FromLuaConversionError { from: "table", to: "FluidProductPrototype", message: Some("`amount_min` can't be negative".into()) })
+            }
+            if let Some(amount_max) = self.amount_max {
+                if amount_max < amount_min {
+                    self.amount_max = Some(amount_min)
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity#remove_decoratives>
@@ -1307,11 +1415,28 @@ pub enum RemoveDecoratives {
     False,
 }
 
-/// <https://wiki.factorio.com/Types/ItemToPlace>
+/// <https://wiki.factorio.com/Prototype/Entity#placeable_by>
 #[derive(Debug, Clone)]
+pub struct ItemsToPlace(pub Vec<ItemToPlace>);
+
+impl<'lua> PrototypeFromLua<'lua> for ItemsToPlace {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let type_name = value.type_name();
+        if let Ok(v) = ItemToPlace::prototype_from_lua(value.clone(), lua, data_table) {
+            Ok(Self(vec![v]))
+        } else if let Ok(v) = <Vec<ItemToPlace>>::prototype_from_lua(value, lua, data_table) {
+            Ok(Self(v))
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "ItemsToPlace", message: Some("expected ItemToPlace or array of ItemToPlace".into()) })
+        }
+    }
+}
+
+/// <https://wiki.factorio.com/Types/ItemToPlace>
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ItemToPlace {
-    item: String, // Name of Item
-    count: u32 // Can't be larger than the stack size of the item
+    pub item: String, // Name of Item
+    pub count: u32 // Can't be larger than the stack size of the item
 }
 
 /// <https://wiki.factorio.com/Prototype/Cliff#orientations>

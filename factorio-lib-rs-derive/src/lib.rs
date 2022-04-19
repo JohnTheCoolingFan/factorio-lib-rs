@@ -290,7 +290,7 @@ fn impl_entity_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn hit_visualization_box(&self) -> BoundingBox { self.entity_base.hit_visualization_box }
             fn trigger_target_mask(&self) -> &Option<TriggerTargetMask> { &self.entity_base.trigger_target_mask }
             fn flags(&self) -> Option<EntityPrototypeFlags> { self.entity_base.flags }
-            fn minable(&self) -> &MinableProperties { &self.entity_base.minable }
+            fn minable(&self) -> &Option<MinableProperties> { &self.entity_base.minable }
             fn subgroup(&self) -> &Option<String> { &self.entity_base.subgroup }
             fn allow_copy_paste(&self) -> bool { self.entity_base.allow_copy_paste }
             fn selectable_in_game(&self) -> bool { self.entity_base.selectable_in_game }
@@ -298,7 +298,7 @@ fn impl_entity_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn remove_decoratives(&self) -> RemoveDecoratives { self.entity_base.remove_decoratives }
             fn emissions_per_second(&self) -> f64 { self.entity_base.emissions_per_second }
             fn shooting_cursor_size(&self) -> Option<f64> { self.entity_base.shooting_cursor_size }
-            fn created_smoke(&self) -> &CreateTrivialSmokeEffectItem { &self.entity_base.created_smoke }
+            fn created_smoke(&self) -> &Option<CreateTrivialSmokeEffectItem> { &self.entity_base.created_smoke }
             fn working_sound(&self) -> &Option<WorkingSound> { &self.entity_base.working_sound }
             fn created_effect(&self) -> &Option<Trigger> { &self.entity_base.created_effect }
             fn build_sound(&self) -> &Option<Sound> { &self.entity_base.build_sound }
@@ -314,7 +314,7 @@ fn impl_entity_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn alert_icon_scale(&self) -> Option<f32> { self.entity_base.alert_icon_scale }
             fn fast_replaceable_group(&self) -> &String { &self.entity_base.fast_replaceable_group }
             fn next_upgrade(&self) -> &Option<String> { &self.entity_base.next_upgrade }
-            fn placeable_by(&self) -> &Option<Vec<ItemToPlace>> { &self.entity_base.placeable_by }
+            fn placeable_by(&self) -> &Option<ItemsToPlace> { &self.entity_base.placeable_by }
             fn remains_when_mined(&self) -> &Option<Vec<String>> { &self.entity_base.remains_when_mined }
             fn additional_pastable_entities(&self) -> &Option<Vec<String>> { &self.entity_base.additional_pastable_entities }
             fn tile_width(&self) -> u32 { self.entity_base.tile_width }
