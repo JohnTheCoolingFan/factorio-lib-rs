@@ -389,6 +389,9 @@ prot_from_lua_blanket!(i8);
 prot_from_lua_blanket!(Color);
 prot_from_lua_blanket!(Factorio2DVector);
 prot_from_lua_blanket!(Position);
+prot_from_lua_blanket!(RealOrientation);
+prot_from_lua_blanket!(Energy);
+prot_from_lua_blanket!(ActivationType);
 #[cfg(feature = "concepts")]
 prot_from_lua_blanket!(LocalisedString);
 

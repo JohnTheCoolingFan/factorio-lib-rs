@@ -521,24 +521,32 @@ pub struct AnimationElement {
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimation>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RotatedAnimation {
-    regular: RotatedAnimationSpec,
-    hr_version: Option<RotatedAnimationSpec>
+    #[use_self_forced]
+    pub regular: RotatedAnimationSpec,
+    pub hr_version: Option<RotatedAnimationSpec>
 }
 
 // A: "Are you sure this will work?"; Me: "I have no idea!"
 // Don't forget to check Stripes to set `height_in_frames` to `direction_count` if it's None
 /// <https://wiki.factorio.com/Types/RotatedAnimation>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RotatedAnimationSpec {
     direction_count: u32,
+    #[default(0_u32)]
     still_frame: u32, // Default: 0
+    #[default(false)]
     axially_symmetrical: bool, // Default: false
+    #[default(false)]
     counterclockwise: bool, // Default: false
+    #[default(0.5_f32)]
     middle_orientation: f32, // Default: 0.5
+    #[default(1_f32)]
     orientation_range: f32, // Default: 1
+    #[default(true)]
     apply_projection: bool, // Default: true
+    #[use_self_forced] // TODO
     animation: AnimationVariation
 }
 

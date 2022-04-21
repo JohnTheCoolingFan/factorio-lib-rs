@@ -5,7 +5,11 @@ use factorio_lib_rs_derive::PrototypeFromLua;
 use super::FileName;
 
 /// <https://wiki.factorio.com/Types/LayeredSound>
-pub type LayeredSound = Vec<Sound>; // `layers`
+#[derive(Debug, Clone, PrototypeFromLua)]
+pub struct LayeredSound {
+    #[use_self_vec]
+    layers: Vec<Sound>
+}
 
 /// <https://wiki.factorio.com/Types/Sound>
 #[derive(Debug, Clone, PrototypeFromLua)]

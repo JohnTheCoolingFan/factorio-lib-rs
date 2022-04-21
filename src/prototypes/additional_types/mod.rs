@@ -125,6 +125,18 @@ impl From<BoundingBox> for ((f32, f32), (f32, f32)) {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct RealOrientation(pub f32);
 
+impl<'lua> FromLua<'lua> for RealOrientation {
+    fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+        let type_name = value.type_name();
+        let v: f32 = lua.unpack(value)?;
+        if (0.0..1.0).contains(&v) {
+            Ok(Self(v))
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "RealOrientation", message: Some("value must be in a range [0.0; 1.0)".into()) })
+        }
+    }
+}
+
 /// Can be constructed from an array or table with x and y values <https://wiki.factorio.com/Types/Position>
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Position(pub i32, pub i32);
@@ -751,6 +763,12 @@ impl FromStr for Energy {
         } else {
             Err(Self::err_fn(s))
         }
+    }
+}
+
+impl<'lua> FromLua<'lua> for Energy {
+    fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+        lua.unpack::<String>(value)?.parse::<Self>().map_err(mlua::Error::external)
     }
 }
 
@@ -1857,16 +1875,31 @@ pub struct SpawnPoint {
 }
 
 /// <https://wiki.factorio.com/Types/AmmoType>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct AmmoType {
-    category: String, // Name of AmmoCategory
-    action: Option<Trigger>,
-    clamp_position: bool, // Default: false // Forced to be false if `target_type` is "entity"
-    energy_consumption: Option<Energy>,
-    range_modifier: f64, // Default: 1
-    cooldown_modifier: f64, // Default: 1
-    consumption_modifier: f64, // Default: 1
-    target_type: TargetType
+    pub category: String, // Name of AmmoCategory
+    pub action: Option<Trigger>,
+    #[default(false)]
+    pub clamp_position: bool, // Default: false // Forced to be false if `target_type` is "entity"
+    pub energy_consumption: Option<Energy>,
+    #[default(1_f64)]
+    pub range_modifier: f64, // Default: 1
+    #[default(1_f64)]
+    pub cooldown_modifier: f64, // Default: 1
+    #[default(1_f64)]
+    pub consumption_modifier: f64, // Default: 1
+    #[from_str]
+    pub target_type: TargetType
+}
+
+impl AmmoType {
+    fn post_extr_fn(&mut self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.target_type == TargetType::Entity {
+            self.clamp_position = false
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Types/AmmoType#target_type>
@@ -1879,7 +1912,66 @@ pub enum TargetType {
 }
 
 /// <https://wiki.factorio.com/Types/CircularProjectileCreationSpecification>
-pub type CircularParticleCreationSpecification = Vec<(RealOrientation, Factorio2DVector)>;
+#[derive(Debug, Clone)]
+pub struct CircularProjectileCreationSpecification(pub Vec<CircularProjectileCreationSpecificationItem>);
+
+impl<'lua> PrototypeFromLua<'lua> for CircularProjectileCreationSpecification {
+    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+        let type_name = value.type_name();
+        if let Value::Table(t) = value {
+            Ok(Self(t.sequence_values().collect::<LuaResult<_>>()?))
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "CircularProjectileCreationSpecification", message: Some("expected table".into()) })
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CircularProjectileCreationSpecificationItem(pub RealOrientation, pub Factorio2DVector);
+
+impl<'lua> FromLua<'lua> for CircularProjectileCreationSpecificationItem {
+    fn from_lua(value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
+        if let Value::Table(t) = &value {
+            let orientation: RealOrientation = t.get(1)?;
+            let vector: Factorio2DVector = t.get(2)?;
+            Ok(Self(orientation, vector))
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "CircularProjectileCreationSpecification item", message: Some("expected table".into()) })
+        }
+    }
+}
+
+/// <https://wiki.factorio.com/Types/CircularParticleCreationSpecification>
+#[derive(Debug, Clone, PrototypeFromLua)]
+pub struct CircularParticleCreationSpecification {
+    pub name: String, // Name of Entity
+    pub starting_frame_speed: f32,
+    #[default(0.5_f32)]
+    pub direction: f32,
+    #[default(0_f32)]
+    pub direction_deviation: f32,
+    #[default(0.1_f32)]
+    pub speed: f32,
+    #[default(0_f32)]
+    pub speed_deviation: f32,
+    #[default(0_f32)]
+    pub starting_frame_speed_deviation: f32,
+    #[default(1_f32)]
+    pub height: f32,
+    #[default(0_f32)]
+    pub height_deviation: f32,
+    #[default(0_f32)]
+    pub vertical_speed: f32,
+    #[default(0_f32)]
+    pub vertical_speed_deviation: f32,
+    #[default(Factorio2DVector(0.0, 0.0))]
+    pub center: Factorio2DVector,
+    #[default(0_f64)]
+    pub creation_distance: f64,
+    #[default(0_f64)]
+    pub creation_distance_orientation: f64,
+    pub use_source_position: Option<bool>
+}
 
 /// <https://wiki.factorio.com/Types/HeatBuffer>
 #[derive(Debug, Clone)]
