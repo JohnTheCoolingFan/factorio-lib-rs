@@ -378,10 +378,12 @@ prot_from_lua_blanket!(String);
 prot_from_lua_blanket!(f64);
 prot_from_lua_blanket!(f32);
 prot_from_lua_blanket!(bool);
+prot_from_lua_blanket!(usize);
 prot_from_lua_blanket!(u64);
 prot_from_lua_blanket!(u32);
 prot_from_lua_blanket!(u16);
 prot_from_lua_blanket!(u8);
+prot_from_lua_blanket!(isize);
 prot_from_lua_blanket!(i64);
 prot_from_lua_blanket!(i32);
 prot_from_lua_blanket!(i16);
@@ -1517,16 +1519,21 @@ impl Beam {
 }
 
 /// <https://wiki.factorio.com/Prototype/CharacterCorpse>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(character_corpse)]
 pub struct CharacterCorpse {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    time_to_live: u32,
-    render_layer: RenderLayer, // Default: "object"
-    pictures: Vec<AnimationVariation>, // Mandatory // picture field is converted to this
-    armor_picture_mapping: HashMap<String, usize> // Exact type of animation index is unknown, it references index in pictures field
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    pub time_to_live: u32,
+    #[from_str]
+    #[default("object")]
+    pub render_layer: RenderLayer, // Default: "object"
+    //#[fallback(Some(vec![prot_table.get_prot::<_, AnimationVariation>("picture", lua, data_table).ok()?]))]
+    pub pictures: Vec<AnimationVariation>, // Mandatory // picture field is converted to this
+    pub armor_picture_mapping: HashMap<String, usize> // Exact type of animation index is unknown, it references index in pictures field
 }
 
 /// <https://wiki.factorio.com/Prototype/Cliff>
