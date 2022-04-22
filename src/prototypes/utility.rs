@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use factorio_lib_rs_derive::DataTableAccessable;
-use crate::prototypes::{PrototypeBaseSpec, Prototype, PrototypeBase};
+use crate::prototypes::{PrototypeBaseSpec, Prototype, PrototypeBase, PrototypeType};
 use super::additional_types::{Color, Sound, DaytimeColorLookupTable, Factorio2DVector, TriggerTargetMask, FileName, SimulationDefinition, BoxSpecification, Animation, Sprite};
 use super::LocalisedString;
 

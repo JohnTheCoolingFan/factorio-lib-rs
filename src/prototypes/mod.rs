@@ -67,7 +67,12 @@ type LocalisedString = String;
 // Prototype
 // Contains all values (accessors) for every prototype in the game
 pub trait Prototype: fmt::Debug {
+    const PROTOTYPE_TYPE: PrototypeType = unimplemented!();
+
     fn name(&self) -> &String;
+    fn prototype_type(&self) -> PrototypeType {
+        Self::PROTOTYPE_TYPE
+    }
 }
 
 /// Shorthand for prototype category/type, used in [DataTable]
@@ -483,6 +488,10 @@ pub enum ResourceError {
     ImageSizeIncorrect(SpriteSizeType, SpriteSizeType, SpriteSizeType, SpriteSizeType)
 }
 
+
+
+// ========== // Prototypes // ========== //
+
 pub trait ModSetting: Prototype {
     fn localised_name(&self) -> &Option<LocalisedString>;
     fn localised_description(&self) -> &Option<LocalisedString>;
@@ -493,6 +502,7 @@ pub trait ModSetting: Prototype {
 
 #[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(bool_setting)]
+#[ptype(BoolSetting)]
 pub struct BoolModSetting {
     pub name: String,
     pub localised_name: Option<LocalisedString>,
@@ -509,6 +519,7 @@ pub struct BoolModSetting {
 
 #[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(int_setting)]
+#[ptype(IntSetting)]
 pub struct IntModSetting {
     pub name: String,
     pub localised_name: Option<LocalisedString>,
@@ -526,6 +537,7 @@ pub struct IntModSetting {
 
 #[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(double_setting)]
+#[ptype(DoubleSetting)]
 pub struct DoubleModSetting {
     pub name: String,
     pub localised_name: Option<LocalisedString>,
@@ -543,6 +555,7 @@ pub struct DoubleModSetting {
 
 #[derive(Debug, Clone, Prototype, ModSetting, DataTableAccessable, PrototypeFromLua)]
 #[data_table(string_setting)]
+#[ptype(StringSetting)]
 pub struct StringModSetting {
     pub name: String,
     pub localised_name: Option<LocalisedString>,

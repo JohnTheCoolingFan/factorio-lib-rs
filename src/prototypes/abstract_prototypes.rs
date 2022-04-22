@@ -9,19 +9,19 @@ use crate::prototypes::Prototype;
 // TODO (not important): type property
 
 /// <https://wiki.factorio.com/PrototypeBase>
-#[derive(Debug, Clone, Prototype)]
+#[derive(Debug, Clone)]
 pub struct AbstractPrototypeBase {
     pub name: String,
 }
 
 /// <https://wiki.factorio.com/Prototype/Achievement>
-#[derive(Debug, Clone, Prototype)]
+#[derive(Debug, Clone)]
 pub struct AbstractAchievement {
     pub name: String
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity>
-#[derive(Debug, Clone, Prototype)]
+#[derive(Debug, Clone)]
 pub struct AbstractEntity {
     pub name: String
 }

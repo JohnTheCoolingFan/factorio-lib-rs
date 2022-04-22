@@ -10,7 +10,7 @@ use syn::spanned::Spanned;
 use core::iter::Iterator;
 
 // TODO: add type() and try to infer it from struct name or use one specified in attribute
-#[proc_macro_derive(Prototype)]
+#[proc_macro_derive(Prototype, attributes(ptype))]
 pub fn prototype_macro_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_prototype_macro(&ast)
@@ -192,12 +192,23 @@ pub fn data_table_accessable_macro_derive(input: TokenStream) -> TokenStream {
 
 fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
+    let prot_type = get_prot_type(&ast.attrs).unwrap_or_else(|| name.clone());
     let gen = quote! {
         impl Prototype for #name {
+            const PROTOTYPE_TYPE: PrototypeType = PrototypeType::#prot_type;
             fn name(&self) -> &String { &self.name }
         }
     };
     gen.into()
+}
+
+fn get_prot_type(attrs: &Vec<Attribute>) -> Option<Ident> {
+    for attr in attrs {
+        if attr.path.is_ident("ptype") {
+            return attr.parse_args().ok();
+        }
+    }
+    None
 }
 
 fn impl_mod_setting_macro(ast: &syn::DeriveInput) -> TokenStream {
