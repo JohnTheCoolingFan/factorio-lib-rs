@@ -9,8 +9,6 @@ use syn::{self, Attribute, Ident, LitStr, Result};
 use syn::spanned::Spanned;
 use core::iter::Iterator;
 
-// TODO: switch to venial
-
 // TODO: add type() and try to infer it from struct name or use one specified in attribute
 #[proc_macro_derive(Prototype)]
 pub fn prototype_macro_derive(input: TokenStream) -> TokenStream {
