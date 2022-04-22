@@ -571,13 +571,13 @@ pub struct RotatedAnimation4Way {
 }
 
 /// <https://wiki.factorio.com/Prototype/Beam#light_animations>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct LightAnimations {
-    start: Option<Animation>,
-    ending: Option<Animation>,
-    head: Option<Animation>,
-    tail: Option<Animation>,
-    body: Option<Vec<AnimationVariation>>
+    pub start: Option<Animation>,
+    pub ending: Option<Animation>,
+    pub head: Option<Animation>,
+    pub tail: Option<Animation>,
+    pub body: Option<Vec<AnimationVariation>>
 }
 
 // ============== // Sprites // ==============  //

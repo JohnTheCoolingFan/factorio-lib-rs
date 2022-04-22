@@ -1468,34 +1468,52 @@ impl ArtilleryProjectile {
 }
 
 /// <https://wiki.factorio.com/Prototype/Beam>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(beam)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct Beam {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    width: f64,
-    damage_interval: u32, // Can't be 0
-    head: Animation,
-    tail: Animation,
-    body: Vec<AnimationVariation>, // Must have at least 1 variation
-    action: Option<Trigger>,
-    target_offset: Option<Factorio2DVector>,
-    random_target_offset: bool, // Default: false
-    action_triggered_automatically: bool, // Default: false
-    random_end_animation_rotation: bool, // Default: true
-    transparent_start_end_animations: bool, // Default: true
-    start: Option<Animation>,
-    ending: Option<Animation>,
-    light_animations: Option<LightAnimations>,
-    ground_light_animations: Option<LightAnimations>,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    pub width: f64,
+    pub damage_interval: u32, // Can't be 0
+    pub head: Animation,
+    pub tail: Animation,
+    pub body: Vec<AnimationVariation>, // Must have at least 1 variation
+    pub action: Option<Trigger>,
+    pub target_offset: Option<Factorio2DVector>,
+    #[default(false)]
+    pub random_target_offset: bool, // Default: false
+    #[default(false)]
+    pub action_triggered_automatically: bool, // Default: false
+    #[default(true)]
+    pub random_end_animation_rotation: bool, // Default: true
+    #[default(true)]
+    pub transparent_start_end_animations: bool, // Default: true
+    pub start: Option<Animation>,
+    pub ending: Option<Animation>,
+    pub light_animations: Option<LightAnimations>,
+    pub ground_light_animations: Option<LightAnimations>,
     // These values are considered deprecated.
-    // If present, converted to light_animations, other *_animations properties are ignored
     // start_light: Option<Animation>
     // ending_light: Option<Animation>
     // head_light: Option<Animation>
     // tail_light: Option<Animation>
     // body_light: Option<Vec<AnimationVariation>>
+}
+
+impl Beam {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.damage_interval == 0 {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "Beam", message: Some("`damage_interval` cannot be 0".into()) })
+        }
+        if self.body.is_empty() {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "Beam", message: Some("`body` must have at least 1 variation".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/CharacterCorpse>
