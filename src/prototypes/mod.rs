@@ -1259,6 +1259,7 @@ pub struct EntityBase {
     #[default({let bb: ((f32, f32), (f32, f32)) = collision_box.into(); (bb.0.1 - bb.1.1).abs().ceil() as u32})]
     tile_height: u32, // Default: Calculated from collision_box
     autoplace: Option<AutoplaceSpecification>,
+    #[mandatory_if(Self::map_color_mandatory(prot_table.get("type")?))]
     map_color: Option<Color>,
     friendly_map_color: Option<Color>,
     enemy_map_color: Option<Color>,
@@ -1306,6 +1307,10 @@ impl EntityBase {
             PrototypeType::Arrow => 48,
             _ => 50
         }
+    }
+
+    fn map_color_mandatory(t: String) -> bool {
+        matches!(t.parse::<PrototypeType>().unwrap(), PrototypeType::ArtilleryFlare | PrototypeType::ArtilleryProjectile)
     }
 
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
