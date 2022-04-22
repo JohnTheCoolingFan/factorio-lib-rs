@@ -793,14 +793,14 @@ impl TileEffect {
             self.animation_scale.is_empty() || self.animation_scale.len() > 2,
             "TileEffect", "`animation_scale` must have one or two elements")?;
         prot_from_lua_err(
-            self.dark_threshold.is_empty() || self.animation_scale.len() > 2,
-            "TileEffect", "`animation_scale` must have one or two elements")?;
+            self.dark_threshold.is_empty() || self.dark_threshold.len() > 2,
+            "TileEffect", "`dark_threshold` must have one or two elements")?;
         prot_from_lua_err(
-            self.reflection_threshold.is_empty() || self.animation_scale.len() > 2,
-            "TileEffect", "`animation_scale` must have one or two elements")?;
+            self.reflection_threshold.is_empty() || self.reflection_threshold.len() > 2,
+            "TileEffect", "`reflection_threshold` must have one or two elements")?;
         prot_from_lua_err(
-            self.specular_threshold.is_empty() || self.animation_scale.len() > 2,
-            "TileEffect", "`animation_scale` must have one or two elements")?;
+            self.specular_threshold.is_empty() || self.specular_threshold.len() > 2,
+            "TileEffect", "`specular_threshold` must have one or two elements")?;
         // TODO: sprite size check
         Ok(())
     }
