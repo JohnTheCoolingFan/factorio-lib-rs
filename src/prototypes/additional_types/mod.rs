@@ -120,6 +120,38 @@ impl From<BoundingBox> for ((f32, f32), (f32, f32)) {
         (bb.0.into(), bb.1.into())
     }
 }
+impl From<&((f32, f32), (f32, f32))> for BoundingBox {
+    fn from(bb: &((f32, f32), (f32, f32))) -> Self {
+        Self(bb.0.into(), bb.1.into())
+    }
+}
+
+impl From<&BoundingBox> for ((f32, f32), (f32, f32)) {
+    fn from(bb: &BoundingBox) -> Self {
+        (bb.0.into(), bb.1.into())
+    }
+}
+
+impl BoundingBox {
+    pub fn larger_than(&self, rhs: &Self) -> bool {
+        let lhs: ((f32, f32), (f32, f32)) = self.into();
+        let rhs: ((f32, f32), (f32, f32)) = rhs.into();
+        let lhs_width = (lhs.0.0 - lhs.1.0).abs();
+        let lhs_height = (lhs.0.1 - lhs.1.1).abs();
+        let rhs_width = (rhs.0.0 - rhs.1.0).abs();
+        let rhs_height = (rhs.0.1 - rhs.1.1).abs();
+        lhs_width >= rhs_width && lhs_height >= rhs_height
+    }
+}
+
+#[test]
+fn boundingbox_comparison() {
+    let zero_boundingbox = BoundingBox::from(((0.0, 0.0), (0.0, 0.0)));
+    let min_boundingbox = BoundingBox::from(((-0.0, -0.2), (0.0, 0.2)));
+    let larger_boundingbox = BoundingBox::from(((-0.2, -0.4), (0.2, 0.4)));
+    assert!(min_boundingbox.larger_than(&zero_boundingbox));
+    assert!(!min_boundingbox.larger_than(&larger_boundingbox));
+}
 
 /// Value range: [0.0; 1.0) <https://wiki.factorio.com/Types/RealOrientation>
 #[derive(Debug, Clone, Copy, PartialEq)]
