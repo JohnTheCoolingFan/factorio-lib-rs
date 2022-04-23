@@ -1,9 +1,7 @@
-mod abstract_prototypes;
 mod utility;
 pub mod additional_types;
 pub mod prototype_type;
 
-pub use abstract_prototypes::*;
 pub use utility::*;
 
 use std::{collections::HashMap, rc::{Rc, Weak}, marker::PhantomData, hash::Hash, fmt};
