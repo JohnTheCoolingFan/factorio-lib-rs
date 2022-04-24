@@ -316,11 +316,8 @@ impl DataTable {
     /// Validate resources
     /// callback is a function that should find the file and perform necessary checks, returning
     /// the Result of the check.
-    pub fn validate_resources<F: Fn(&ResourceRecord) -> Result<(), ResourceError>>(&self, callback: F) -> Result<(), ResourceError> {
-        for resource_record in &self.resource_records {
-            callback(resource_record)?;
-        }
-        Ok(())
+    pub fn validate_resources(&self, validator: impl ResourceValidator) -> Result<(), ResourceError> {
+        validator.validate(&self.resource_records)
     }
 }
 
@@ -458,6 +455,10 @@ pub trait DataTableAccessable: Prototype {
     fn find<'a>(data_table: &'a DataTable, name: &str) -> Result<&'a Self, PrototypesErr>;
     /// Extend [Data table](DataTable) with this prototype
     fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr>;
+}
+
+pub trait ResourceValidator {
+    fn validate(&self, resources: &Vec<ResourceRecord>) -> Result<(), ResourceError>;
 }
 
 /// Struct for recording resources (images, sound files)
