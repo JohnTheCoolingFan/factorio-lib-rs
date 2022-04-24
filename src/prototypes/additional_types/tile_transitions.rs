@@ -16,7 +16,7 @@ pub struct TileTransitionsBase {
     inner_corner_background: Option<TileTransitionSprite>, // And _mask
     inner_corner_effect_map: Option<TileTransitionSprite>,
     inner_corner_weights: Option<Vec<f32>>,
-    outer_corner_background: Option<TileTransitionSprite>, // namd _mask
+    outer_corner_background: Option<TileTransitionSprite>, // And _mask
     outer_corner_effect_map: Option<TileTransitionSprite>,
     outer_corner_weights: Option<Vec<f32>>,
     u_transition: Option<TileTransitionSprite>, // And _mask
