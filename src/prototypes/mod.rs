@@ -337,7 +337,7 @@ impl DataTable {
     /// Validate resources
     /// callback is a function that should find the file and perform necessary checks, returning
     /// the Result of the check.
-    pub fn validate_resources(&self, validator: impl ResourceValidator) -> Result<(), ResourceError> {
+    pub fn validate_resources(&self, validator: &impl ResourceValidator) -> Result<(), ResourceError> {
         validator.validate(&self.resource_records)
     }
 }
