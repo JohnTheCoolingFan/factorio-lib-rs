@@ -6,37 +6,37 @@ use strum_macros::{EnumString, AsRefStr};
 pub struct TileTransitionsBase {
     // 3 properties need to be specified if `empty_transitions` is false
     // They also correspond to *_mask names
-    side: Option<TileTransitionSprite>,
-    inner_corner: Option<TileTransitionSprite>,
-    outer_corner: Option<TileTransitionSprite>,
-    empty_transitions: bool, // default: false
-    side_background: Option<TileTransitionSprite>, // And _mask
-    side_effect_map: Option<TileTransitionSprite>,
-    side_weights: Option<Vec<f32>>,
-    inner_corner_background: Option<TileTransitionSprite>, // And _mask
-    inner_corner_effect_map: Option<TileTransitionSprite>,
-    inner_corner_weights: Option<Vec<f32>>,
-    outer_corner_background: Option<TileTransitionSprite>, // And _mask
-    outer_corner_effect_map: Option<TileTransitionSprite>,
-    outer_corner_weights: Option<Vec<f32>>,
-    u_transition: Option<TileTransitionSprite>, // And _mask
-    u_transition_background: Option<TileTransitionSprite>, // And _mask
-    u_transition_effect_map: Option<TileTransitionSprite>,
-    u_transition_weights: Option<Vec<f32>>,
-    o_transition: Option<TileTransitionSprite>, // And _mask
-    o_transition_background: Option<TileTransitionSprite>, // And _mask
-    o_transition_effect_map: Option<TileTransitionSprite>,
-    water_patch: Option<Sprite>,
-    effect_mask: Option<Animation>,
-    layer: u8,
-    overlay_layer_group: Option<LayerGroup>,
-    background_layer_group: Option<LayerGroup>,
-    overlay_layer_offset: Option<i8>,
-    masked_overlay_layer_offset: i8, // Default: 0
-    background_layer_offset: i8, // Default: 0
-    masked_background_layer_offset: Option<i8>,
-    apply_effect_color_to_overlay: bool, // Default: false
-    offset_background_layer_by_tile_layer: bool, // Default: false
+    pub side: Option<TileTransitionSprite>,
+    pub inner_corner: Option<TileTransitionSprite>,
+    pub outer_corner: Option<TileTransitionSprite>,
+    pub empty_transitions: bool, // default: false
+    pub side_background: Option<TileTransitionSprite>, // And _mask
+    pub side_effect_map: Option<TileTransitionSprite>,
+    pub side_weights: Option<Vec<f32>>,
+    pub inner_corner_background: Option<TileTransitionSprite>, // And _mask
+    pub inner_corner_effect_map: Option<TileTransitionSprite>,
+    pub inner_corner_weights: Option<Vec<f32>>,
+    pub outer_corner_background: Option<TileTransitionSprite>, // And _mask
+    pub outer_corner_effect_map: Option<TileTransitionSprite>,
+    pub outer_corner_weights: Option<Vec<f32>>,
+    pub u_transition: Option<TileTransitionSprite>, // And _mask
+    pub u_transition_background: Option<TileTransitionSprite>, // And _mask
+    pub u_transition_effect_map: Option<TileTransitionSprite>,
+    pub u_transition_weights: Option<Vec<f32>>,
+    pub o_transition: Option<TileTransitionSprite>, // And _mask
+    pub o_transition_background: Option<TileTransitionSprite>, // And _mask
+    pub o_transition_effect_map: Option<TileTransitionSprite>,
+    pub water_patch: Option<Sprite>,
+    pub effect_mask: Option<Animation>,
+    pub layer: u8,
+    pub overlay_layer_group: Option<LayerGroup>,
+    pub background_layer_group: Option<LayerGroup>,
+    pub overlay_layer_offset: Option<i8>,
+    pub masked_overlay_layer_offset: i8, // Default: 0
+    pub background_layer_offset: i8, // Default: 0
+    pub masked_background_layer_offset: Option<i8>,
+    pub apply_effect_color_to_overlay: bool, // Default: false
+    pub offset_background_layer_by_tile_layer: bool, // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#layer_group>
