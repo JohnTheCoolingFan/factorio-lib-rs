@@ -8,7 +8,7 @@ use super::FileName;
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct LayeredSound {
     #[use_self_vec]
-    layers: Vec<Sound>
+    pub layers: Vec<Sound>
 }
 
 /// <https://wiki.factorio.com/Types/Sound>
