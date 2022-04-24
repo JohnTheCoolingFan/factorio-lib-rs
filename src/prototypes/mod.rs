@@ -380,11 +380,21 @@ impl<'lua> PrototypeFromLua<'lua> for Value<'lua> {
 
 impl<'lua, K, V> PrototypeFromLua<'lua> for HashMap<K, V>
 where
-    K: Eq + Hash + FromLua<'lua>,
+    K: Eq + Hash + PrototypeFromLua<'lua>,
     V: PrototypeFromLua<'lua>,
 {
     fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-        HashMap::<K, Value>::from_lua(value, lua)?.into_iter().map(|(k, v)| Ok((k, V::prototype_from_lua(v, lua, data_table)?))).collect()
+        let type_name = value.type_name();
+        if let Value::Table(t) = value {
+            let pairs = t.pairs().collect::<LuaResult<Vec<(Value, Value)>>>()?;
+            let prot_pairs = pairs
+                .into_iter()
+                .map(|(k, v)| Ok((K::prototype_from_lua(k, lua, data_table)?, V::prototype_from_lua(v, lua, data_table)?)))
+                .collect::<LuaResult<Vec<(K, V)>>>()?;
+            Ok(HashMap::from_iter(prot_pairs))
+        } else {
+            Err(LuaError::FromLuaConversionError { from: type_name, to: "HashMap", message: Some("expected table".into()) })
+        }
     }
 }
 
