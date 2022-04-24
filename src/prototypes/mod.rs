@@ -277,6 +277,21 @@ pub struct DataTable {
     string_setting: PrototypeCategory<StringModSetting>,
 }
 
+/// Planned DataTable api:
+/// FromLua just extracts prototypes without doing any checks
+/// `load()` will do FromLua and run checks for prototype references and possibly use provided
+/// resource validator to validate resources.
+///
+/// A draft of how choosing a prototype will work in FromLua
+/// ```
+/// let ptype = t.get::<_, String>("type").parse::<Prototypetype>().map_err(LuaError::external);
+/// match ptype {
+///     // ...
+///     PrototypeType::Arrow => Arrow::extend(Arrow::prototype_from_lua(value, lua,
+///     data_table)).map_err(LuaError::external)?,
+///     // ...
+/// }
+/// ```
 impl DataTable {
     /// Shorthand for [DataTableAccessable::find]
     pub fn find<T: DataTableAccessable>(&self, name: &str) -> Result<&T, PrototypesErr> {
