@@ -490,6 +490,18 @@ impl<T: DataTableAccessable> PrototypeReferenceValidate for PrototypeReference<T
     }
 }
 
+impl<'lua, T: DataTableAccessable + 'static> PrototypeFromLua<'lua> for Rc<PrototypeReference<T>> {
+    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::String(s) = &value {
+            let name = s.to_str()?.to_string();
+            let result = data_table.new_reference(name);
+            Ok(result)
+        } else {
+            Err(LuaError::FromLuaConversionError { from: value.type_name(), to: "PrototypeReference", message: Some("expected string".into()) })
+        }
+    }
+}
+
 /// Trait for manipulating prototypes in [Data table](DataTable).
 /// Primarily used for [`PrototypeReference`]
 pub trait DataTableAccessable: Prototype
