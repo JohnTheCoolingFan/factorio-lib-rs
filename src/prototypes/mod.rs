@@ -65,12 +65,8 @@ type LocalisedString = String;
 // Prototype
 // Contains all values (accessors) for every prototype in the game
 pub trait Prototype: fmt::Debug {
-    const PROTOTYPE_TYPE: PrototypeType = unimplemented!();
-
     fn name(&self) -> &String;
-    fn prototype_type(&self) -> PrototypeType {
-        Self::PROTOTYPE_TYPE
-    }
+    fn prototype_type() -> PrototypeType;
 }
 
 /// Shorthand for prototype category/type, used in [DataTable]
