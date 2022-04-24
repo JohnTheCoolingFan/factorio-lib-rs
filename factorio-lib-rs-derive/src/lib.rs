@@ -5,49 +5,49 @@ extern crate proc_macro;
 use core::fmt::Display;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{self, Attribute, Ident, LitStr, Result, NestedMeta, parse_macro_input, Meta, Path, punctuated::Punctuated, Token, parenthesized, parse::Parser};
+use syn::{self, Attribute, Ident, LitStr, Result, parse_macro_input, punctuated::Punctuated, Token, DeriveInput};
 use syn::spanned::Spanned;
 use core::iter::Iterator;
 
 #[proc_macro_derive(Prototype, attributes(ptype))]
 pub fn prototype_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_prototype_macro(&ast)
 }
 
 #[proc_macro_derive(ModSetting)]
 pub fn mod_setting_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_mod_setting_macro(&ast)
 }
 
 #[proc_macro_derive(PrototypeBase)]
 pub fn prototype_base_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_prototype_base_macro(&ast)
 }
 
 #[proc_macro_derive(TriggerEffectItemBase)]
 pub fn trigger_effect_item_base_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_trigger_efffect_item_base_macro(&ast)
 }
 
 #[proc_macro_derive(CreateEntityTriggerEffectItemBase)]
 pub fn create_entity_trigger_effect_item_base_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_create_entity_trigger_effect_item_base_macro(&ast)
 }
 
 #[proc_macro_derive(TriggerItemBase)]
 pub fn trigger_item_base_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_trigger_item_base_macro(&ast)
 }
 
 #[proc_macro_derive(Entity)]
 pub fn entity_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_entity_macro(&ast);
     ts.extend(impl_prototype_base_macro(&ast));
     ts
@@ -55,7 +55,7 @@ pub fn entity_macro_derive(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(Corpse)]
 pub fn corpse_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_corpse_macro(&ast);
     ts.extend(impl_entity_macro(&ast));
     ts.extend(impl_prototype_base_macro(&ast));
@@ -64,7 +64,7 @@ pub fn corpse_macro_derive(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(EntityWithHealth)]
 pub fn entity_with_health_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_entity_with_health_macro(&ast);
     ts.extend(impl_entity_macro(&ast));
     ts.extend(impl_prototype_base_macro(&ast));
@@ -73,7 +73,7 @@ pub fn entity_with_health_macro_derive(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(EntityWithOwner)]
 pub fn entity_with_owner_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_entity_with_owner_macro(&ast);
     ts.extend(impl_entity_with_health_macro(&ast));
     ts.extend(impl_entity_macro(&ast));
@@ -83,7 +83,7 @@ pub fn entity_with_owner_macro_derive(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(Combinator)]
 pub fn combinator_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_combinator_macro(&ast);
     ts.extend(impl_entity_with_owner_macro(&ast));
     ts.extend(impl_entity_with_health_macro(&ast));
@@ -94,7 +94,7 @@ pub fn combinator_macro_derive(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(CraftingMachine)]
 pub fn crafting_machine_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_crafting_machine_macro(&ast);
     ts.extend(impl_entity_with_owner_macro(&ast));
     ts.extend(impl_entity_with_health_macro(&ast));
@@ -105,7 +105,7 @@ pub fn crafting_machine_macro_derive(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(FlyingRobot)]
 pub fn flying_robot_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_flying_robot_macro(&ast);
     ts.extend(impl_entity_with_owner_macro(&ast));
     ts.extend(impl_entity_with_health_macro(&ast));
@@ -116,7 +116,7 @@ pub fn flying_robot_macro_derive(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(TransportBeltConnectable)]
 pub fn transport_belt_connectable_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_transport_belt_connectable_macro(&ast);
     ts.extend(impl_entity_with_owner_macro(&ast));
     ts.extend(impl_entity_with_health_macro(&ast));
@@ -127,7 +127,7 @@ pub fn transport_belt_connectable_macro_derive(input: TokenStream) -> TokenStrea
 
 #[proc_macro_derive(Turret)]
 pub fn turret_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_turret_macro(&ast);
     ts.extend(impl_entity_with_owner_macro(&ast));
     ts.extend(impl_entity_with_health_macro(&ast));
@@ -138,7 +138,7 @@ pub fn turret_macro_derive(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(Vehicle)]
 pub fn vehicle_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_vehicle_macro(&ast);
     ts.extend(impl_entity_with_owner_macro(&ast));
     ts.extend(impl_entity_with_health_macro(&ast));
@@ -150,7 +150,7 @@ pub fn vehicle_macro_derive(input: TokenStream) -> TokenStream {
 /// <https://wiki.factorio.com/Prototype/RollingStock>
 #[proc_macro_derive(RollingStock)]
 pub fn rolling_stock_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_rolling_stock_macro(&ast);
     ts.extend(impl_vehicle_macro(&ast));
     ts.extend(impl_entity_with_owner_macro(&ast));
@@ -163,7 +163,7 @@ pub fn rolling_stock_macro_derive(input: TokenStream) -> TokenStream {
 /// <https://wiki.factorio.com/Prototype/Equipment>
 #[proc_macro_derive(Equipment)]
 pub fn equipment_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     let mut ts = impl_equipment_macro(&ast);
     ts.extend(impl_prototype_base_macro(&ast));
     ts
@@ -172,20 +172,20 @@ pub fn equipment_macro_derive(input: TokenStream) -> TokenStream {
 /// <https://wiki.factorio.com/Prototype/Item>
 #[proc_macro_derive(Item)]
 pub fn item_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_item_macro(&ast)
 }
 
 /// <https://wiki.factorio.com/Prototype/SelectionTool>
 #[proc_macro_derive(SelectionTool)]
 pub fn selection_tool_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_selection_tool_macro(&ast)
 }
 
 #[proc_macro_derive(DataTableAccessable, attributes(data_table))]
 pub fn data_table_accessable_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_data_table_accessable_macro(&ast)
 }
 
@@ -784,7 +784,7 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 /// field extraction and mandatory_if checks
 #[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn, fallback, rename, required))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast = parse_macro_input!(input as DeriveInput);
     impl_prototype_from_lua_macro(&ast)
 }
 
