@@ -5,7 +5,7 @@ extern crate proc_macro;
 use core::fmt::Display;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{self, Attribute, Ident, LitStr, Result};
+use syn::{self, Attribute, Ident, LitStr, Result, NestedMeta, parse_macro_input, Meta, Path, punctuated::Punctuated, Token, parenthesized, parse::Parser};
 use syn::spanned::Spanned;
 use core::iter::Iterator;
 
@@ -688,13 +688,26 @@ fn impl_selection_tool_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 #[proc_macro]
 pub fn prot_from_lua_blanket(input: TokenStream) -> TokenStream {
-    let target_type = syn::parse::<syn::Type>(input).unwrap();
+    let target_type = parse_macro_input!(input as syn::Type);
     let gen = quote! {
         impl<'lua> PrototypeFromLua<'lua> for #target_type {
             fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::prototypes::DataTable) -> mlua::prelude::LuaResult<Self> {
                 lua.unpack(value)
             }
         }
+    };
+    gen.into()
+}
+
+#[proc_macro]
+pub fn abstract_prototype_get(input: TokenStream) -> TokenStream {
+    let idents = parse_macro_input!(input with Punctuated<Ident, Token![,]>::parse_terminated);
+    let mut idents = idents.into_iter();
+    let first_ident = idents.next().unwrap();
+    let gen = quote! {
+        data_table.#first_ident.get(name).map(|p| Self{name: p.name.clone(), prototype_type: p.prototype_type()})
+            #(.or_else(|| data_table.#idents.get(name).map(|p| Self{name: p.name.clone(), prototype_type: p.prototype_type()})) )*
+            .ok_or_else(|| PrototypesErr::PrototypeNotFound(name.into()))
     };
     gen.into()
 }
