@@ -8,7 +8,7 @@ pub use abstract_prototypes::*;
 
 use std::{collections::HashMap, rc::{Rc, Weak}, marker::PhantomData, hash::Hash, fmt};
 use thiserror::Error;
-use mlua::{Value, Lua, prelude::LuaResult, ToLua, FromLua};
+use mlua::{Value, Lua, prelude::*, ToLua, FromLua};
 use additional_types::*;
 use factorio_lib_rs_derive::{
     Prototype,
@@ -370,6 +370,23 @@ where
 {
     fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
         HashMap::<K, Value>::from_lua(value, lua)?.into_iter().map(|(k, v)| Ok((k, V::prototype_from_lua(v, lua, data_table)?))).collect()
+    }
+}
+
+impl<'lua, T, const N: usize> PrototypeFromLua<'lua> for [T; N]
+where
+    T: PrototypeFromLua<'lua>,
+{
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let values_arr = lua.unpack::<[Value; N]>(value)?;
+        let values_arr: Vec<T> = values_arr
+            .map(|v| T::prototype_from_lua(v, lua, data_table))
+            .into_iter()
+            .collect::<Result<Vec<T>, LuaError>>()
+            .map_err(LuaError::external)?;
+        let result: [T; N] = values_arr.try_into().map_err(|v: Vec<T>| LuaError::FromLuaConversionError { from: "table", to: "Array",
+            message: Some(format!("Expected table of length {}, got {}", N, v.len())) })?;
+        Ok(result)
     }
 }
 

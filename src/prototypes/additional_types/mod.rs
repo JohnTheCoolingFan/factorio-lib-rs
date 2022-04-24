@@ -25,7 +25,7 @@ use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
 use crate::prototypes::{GetPrototype, PrototypesErr};
 use super::{LocalisedString, PrototypeFromLua, DataTable};
-use mlua::{ToLua, Value, Lua, prelude::LuaResult, FromLua};
+use mlua::{ToLua, Value, Lua, prelude::*, FromLua};
 use strum_macros::{EnumString, AsRefStr};
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
@@ -35,6 +35,12 @@ pub struct FileName(String);
 impl From<String> for FileName {
     fn from(s: String) -> Self {
         Self(s)
+    }
+}
+
+impl From<&str> for FileName {
+    fn from(s: &str) -> Self {
+        Self(s.into())
     }
 }
 
@@ -2169,17 +2175,44 @@ pub enum EquipmentShapeType {
 // Constructor should accept width and height, as points can't exceed them.
 /// <https://wiki.factorio.com/Types/EquipmentShape#points>
 #[derive(Debug, Clone)]
-pub struct EquipmentShapePoints(Vec<Vec<u32>>);
+pub struct EquipmentShapePoints(pub Vec<Vec<u32>>);
 
 /// <https://wiki.factorio.com/Prototype/NightVisionEquipment>
+pub type DaytimeColorLookupTable = Vec<DaytimeColorLookupTableItem>;
+
 #[derive(Debug, Clone)]
-pub struct DaytimeColorLookupTable(Vec<(f64, ColorLookupTable)>);
+pub struct DaytimeColorLookupTableItem(pub f64, pub ColorLookupTable);
+
+impl<'lua> PrototypeFromLua<'lua> for DaytimeColorLookupTableItem {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(t) = &value {
+            Ok(Self(t.get(1_isize)?, t.get_prot(2, lua, data_table)?))
+        } else {
+            Err(LuaError::FromLuaConversionError{ from: value.type_name(), to: "DaytimeColorLookupTable item", message: Some("expected table".into())})
+        }
+    }
+}
 
 /// <https://wiki.factorio.com/Types/DaytimeColorLookupTable#Second_member>
 #[derive(Debug, Clone)]
 pub enum ColorLookupTable {
     Identity,
     Filename(FileName)
+}
+
+impl<'lua> PrototypeFromLua<'lua> for ColorLookupTable {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::String(s) = &value {
+            let s = s.to_str()?;
+            if s == "identity" {
+                Ok(Self::Identity)
+            } else {
+                Ok(Self::Filename(s.into()))
+            }
+        } else {
+            Err(LuaError::FromLuaConversionError { from: value.type_name(), to: "ColorLookupTable", message: Some("expected string".into()) })
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Types/PlaceAsTile>
@@ -2702,19 +2735,26 @@ pub enum ModifierPrototypeType {
 }
 
 /// <https://wiki.factorio.com/Types/SimulationDefinition>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SimulationDefinition {
-    save: Option<FileName>,
-    init_file: Option<FileName>,
-    init: String, // Default: "" // Only loaded if `init_file` is not present
-    update_file: Option<FileName>,
-    update: String, // Default: "" // Only loaded if `update_file` is not present
-    init_update_count: u32, // Default: 0
-    length: u32, // Default: 0
-    generate_map: bool, // Default: false
-    checkboard: bool, // Default: true
-    volume_modifier: Option<f32>,
-    override_volume: bool, // Default: false // default not confirmed
+    pub save: Option<FileName>,
+    pub init_file: Option<FileName>,
+    #[default("")]
+    pub init: String, // Default: "" // Only loaded if `init_file` is not present
+    pub update_file: Option<FileName>,
+    #[default("")]
+    pub update: String, // Default: "" // Only loaded if `update_file` is not present
+    #[default(0_u32)]
+    pub init_update_count: u32, // Default: 0
+    #[default(0_u32)]
+    pub length: u32, // Default: 0
+    #[default(false)]
+    pub generate_map: bool, // Default: false
+    #[default(true)]
+    pub checkboard: bool, // Default: true
+    pub volume_modifier: Option<f32>,
+    #[default(false)]
+    pub override_volume: bool, // Default: false // default not confirmed
 }
 
 /// <https://wiki.factorio.com/Types/TipStatus>
@@ -2734,8 +2774,28 @@ pub enum TipStatus {
 /// <https://wiki.factorio.com/Types/BoxSpecification>
 #[derive(Debug, Clone)]
 pub struct BoxSpecification {
-    sprite: Sprite,
-    dimension_spec: BoxSpecificationDimensionSpec
+    pub sprite: Sprite,
+    pub dimension_spec: BoxSpecificationDimensionSpec
+}
+
+impl<'lua> PrototypeFromLua<'lua> for BoxSpecification {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(t) = &value {
+            let sprite = t.get_prot::<_, Sprite>("sprite", lua, data_table)?;
+            let is_whole_box: bool = t.get("is_whole_box")?;
+            let dimension_spec = if is_whole_box {
+                let side_length: f64 = t.get("side_length")?;
+                let side_height: f64 = t.get("side_height")?;
+                BoxSpecificationDimensionSpec::WholeBox(side_length, side_height)
+            } else {
+                let max_side_length: f64 = t.get("max_side_length")?;
+                BoxSpecificationDimensionSpec::NotWholeBox(max_side_length)
+            };
+            Ok(Self{sprite, dimension_spec})
+        } else {
+            Err(LuaError::FromLuaConversionError { from: value.type_name(), to: "BoxSpecification", message: Some("expected table".into()) })
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
