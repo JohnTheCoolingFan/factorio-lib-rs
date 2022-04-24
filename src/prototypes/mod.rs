@@ -458,7 +458,7 @@ pub trait DataTableAccessable: Prototype {
 }
 
 pub trait ResourceValidator {
-    fn validate(&self, resources: &Vec<ResourceRecord>) -> Result<(), ResourceError>;
+    fn validate(&self, resources: &[ResourceRecord]) -> Result<(), ResourceError>;
 }
 
 /// Struct for recording resources (images, sound files)
