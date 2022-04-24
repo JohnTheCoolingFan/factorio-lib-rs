@@ -184,7 +184,7 @@ pub struct StreamAttackParameters {
 // =============== // Other // ================ //
 
 /// <https://wiki.factorio.com/Types/BaseAttackParameters#activation_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ActivationType {
     Shoot,

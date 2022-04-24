@@ -84,7 +84,7 @@ pub struct CraftItemTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#event_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum CraftItemTipTriggerEventType {
     CraftingOfSingleItemOrdered,
@@ -115,7 +115,7 @@ pub struct StackTransferTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#transfer>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum StackTransferType {
     Stack,
@@ -131,7 +131,7 @@ pub struct EntityTransferTipTrigger {
 }
 
 /// <https://wiki.factorio.com/Types/TipTrigger#transfer_2>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum EntityTransferType {
     In,

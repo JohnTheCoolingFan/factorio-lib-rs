@@ -23,7 +23,7 @@ pub type SpriteSizeType = i16;
         // Enums with FromStr
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_recipe_tint>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ApplyRecipeTint {
     Primary,
@@ -34,7 +34,7 @@ pub enum ApplyRecipeTint {
 }
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_tint>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ApplyTint {
     ResourceColor,
@@ -46,7 +46,7 @@ pub enum ApplyTint {
 
 
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet#apply_module_tint>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ApplyModuleTint {
     Primary,
@@ -56,7 +56,7 @@ pub enum ApplyModuleTint {
 }
 
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet#module_tint_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ModuleTintMode {
     SingleModule,
@@ -64,7 +64,7 @@ pub enum ModuleTintMode {
 }
 
 /// <https://wiki.factorio.com/Types/LightDefinition#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum LightDefinitionType {
     Basic,
@@ -72,7 +72,7 @@ pub enum LightDefinitionType {
 }
 
 /// <https://wiki.factorio.com/Types/BaseAttackParameters#range_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum RangeMode {
     CenterToCenter,
@@ -80,7 +80,7 @@ pub enum RangeMode {
 }
 
 /// <https://wiki.factorio.com/Prototype/Lamp#glow_render_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum GlowRenderMode {
     Additive,
@@ -88,7 +88,7 @@ pub enum GlowRenderMode {
 }
 
 /// <https://wiki.factorio.com/Types/RenderLayer>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum RenderLayer {
     WaterTile,
@@ -137,7 +137,7 @@ pub enum RenderLayer {
 }
 
 /// <https://wiki.factorio.com/Types/Sprite#draw_as_shadow>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub enum DrawAs {
     DrawAsShadow,
     DrawAsGlow,
@@ -160,7 +160,7 @@ impl DrawAs {
 }
 
 /// <https://wiki.factorio.com/Types/Sprite#blend_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum BlendMode {
     Normal,
@@ -171,7 +171,7 @@ pub enum BlendMode {
 }
 
 /// <https://wiki.factorio.com/Types/Animation#run_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum RunMode {
     Forward,
@@ -182,7 +182,7 @@ pub enum RunMode {
         // Structs
 
 /// <https://wiki.factorio.com/Types/FluidBox#secondary_draw_orders>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, PrototypeFromLua)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, PrototypeFromLua)]
 pub struct SecondaryDrawOrders {
     #[default(1)]
     north: i8,
@@ -351,7 +351,7 @@ pub struct WaterReflectionDefinition {
 }
 
 /// <https://wiki.factorio.com/Types/Sprite#slice_or_dice>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub struct Dice(i16, i16);
 
 impl Dice {
@@ -803,7 +803,7 @@ pub struct SpriteVariationSpec {
 }
 
 /// <https://wiki.factorio.com/Types/SpriteFlags>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash)]
 pub struct SpriteFlags(u32);
 
 impl SpriteFlags {
@@ -970,7 +970,7 @@ impl BitXorAssign for SpriteFlags {
 }
 
 /// <https://wiki.factorio.com/Types/Sprite#priority>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum SpritePriority {
     ExtraHighNoScale,
@@ -1119,7 +1119,7 @@ pub struct WorkingVisualisation {
 }
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#effect>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum WorkingVisualisationEffect {
     Flicker,

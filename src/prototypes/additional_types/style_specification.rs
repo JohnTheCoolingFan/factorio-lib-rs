@@ -68,7 +68,7 @@ pub struct StyleSpecificationBase {
 }
 
 /// <https://wiki.factorio.com/Types/StyleSpecification#horizontal_align>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum HorizontalAlignment {
     Left,
@@ -77,7 +77,7 @@ pub enum HorizontalAlignment {
 }
 
 /// <https://wiki.factorio.com/Types/StyleSpecification#vertical_align>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum VerticalAlignment {
     Top,
@@ -86,7 +86,7 @@ pub enum VerticalAlignment {
 }
 
 /// <https://wiki.factorio.com/Types/StretchRule>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "snake_case")]
 pub enum StretchRule {
     On,
@@ -193,7 +193,7 @@ pub struct ElementImageSetLayer {
 }
 
 /// <https://wiki.factorio.com/Types/ElementImageSetLayer#draw_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum DrawType {
     Inner,
@@ -201,7 +201,7 @@ pub enum DrawType {
 }
 
 /// <https://wiki.factorio.com/Types/ElementImageSetLayer#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ElementImageSetLayerType {
     None,
@@ -336,7 +336,7 @@ pub struct LabelStyleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/LabelStyleSpecification#rich_text_setting>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum RichTextSetting {
     Enabled,
@@ -647,7 +647,7 @@ pub struct ColumnWidth {
     width: [i32; 2], // `minimal_width` and `maximal_width` // Default: 0
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ColumnAlignmentStr {
     Center,

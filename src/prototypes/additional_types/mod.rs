@@ -207,7 +207,7 @@ impl From<Position> for (f32, f32) {
 }
 
 /// Any of the color components are optional <https://wiki.factorio.com/Types/Color>
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Color(pub f32, pub f32, pub f32, pub f32);
 
 impl Color {
@@ -260,7 +260,7 @@ impl<'lua> FromLua<'lua> for Color {
 }
 
 /// <https://lua-api.factorio.com/latest/defines.html#defines.difficulty_settings>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum DifficultySetting {
     Normal,
@@ -268,7 +268,7 @@ pub enum DifficultySetting {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#difficulty_settings>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ResearchQueueSetting {
     AfterVictory,
@@ -283,7 +283,7 @@ impl<'lua> PrototypeFromLua<'lua> for ResearchQueueSetting {
 }
 
 /// <https://wiki.factorio.com/Tutorial:Mod_settings#The_setting_type_property>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ModSettingType {
     Startup,
@@ -329,7 +329,7 @@ pub struct MapGenPresetNonDefault {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenSize>
-#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct MapGenSize(pub f64); // Exact type is unknown, so slap an f64
 
 impl FromStr for MapGenSize {
@@ -647,7 +647,7 @@ impl<'lua> PrototypeFromLua<'lua> for MouseCursorType {
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor#system_cursor>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum SystemCursor {
     Arrow,
@@ -748,7 +748,7 @@ pub struct IconData {
 /// Input data is converted to J/tick or Joule
 /// J/s (Joule/second) is not supported, as I can't find any uses and it's equvalent to W (Watt)
 /// <https://wiki.factorio.com/Types/Energy>
-#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Copy)]
 pub struct Energy(f64); // I don't know which type factorio uses internally, so I will use this
 
 impl Energy {
@@ -862,7 +862,7 @@ impl<'lua> PrototypeFromLua<'lua> for ResearchTarget {
 }
 
 /// <https://wiki.factorio.com/Prototype/AutoplaceControl#category>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum AutoplaceControlCategory {
     Resource,
@@ -871,7 +871,7 @@ pub enum AutoplaceControlCategory {
 }
 
 /// <https://wiki.factorio.com/Prototype/CustomInput#consuming>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ConsumingType {
     None,
@@ -879,7 +879,7 @@ pub enum ConsumingType {
 }
 
 /// <https://wiki.factorio.com/Prototype/CustomInput#action>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum CustomInputAction {
     Lua,
@@ -890,7 +890,7 @@ pub enum CustomInputAction {
 }
 
 /// <https://wiki.factorio.com/Types/CollisionMask>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash)]
 pub struct CollisionMask(pub(crate) u64);
 
 impl CollisionMask {
@@ -1150,7 +1150,7 @@ impl<'lua> PrototypeFromLua<'lua> for CollisionMask {
 }
 
 /// <https://wiki.factorio.com/Types/EntityPrototypeFlags>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash)]
 pub struct EntityPrototypeFlags(pub(crate) u32);
 
 impl EntityPrototypeFlags {
@@ -1308,7 +1308,7 @@ impl<'lua> PrototypeFromLua<'lua> for DamageTypeFilters {
 }
 
 /// <https://wiki.factorio.com/Types/ForceCondition>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ForceCondition {
     All,
@@ -1473,7 +1473,7 @@ impl FluidProductPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity#remove_decoratives>
-#[derive(Debug,  Clone, Copy, Eq, PartialEq, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum RemoveDecoratives {
     Automatic,
@@ -1539,7 +1539,7 @@ pub struct OrientedCliffPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/RailRemnants#bending_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum BendingType {
     Straight,
@@ -1659,7 +1659,7 @@ pub struct FluidEnergySource {
 }
 
 /// <https://wiki.factorio.com/Types/ElectricUsagePriority>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ElectricUsagePriority {
     PrimaryInput,
@@ -1730,7 +1730,7 @@ pub struct PipeConnectionDefinition {
 }
 
 /// <https://wiki.factorio.com/Types/Direction>
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub struct Direction(u32);
 
 impl From<u32> for Direction {
@@ -1746,7 +1746,7 @@ impl From<Direction> for u32 {
 }
 
 /// <https://wiki.factorio.com/Types/FluidBox#production_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ProductionType {
     Input,
@@ -1789,7 +1789,7 @@ pub struct ModuleSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/EffectTypeLimitation>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash)]
 pub struct EffectTypeLimitation(u8);
 
 impl EffectTypeLimitation {
@@ -1854,7 +1854,7 @@ impl BitXorAssign for EffectTypeLimitation {
 }
 
 /// <https://wiki.factorio.com/Prototype/Boiler#mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum BoilerMode {
     HeatWaterInside,
@@ -1870,7 +1870,7 @@ pub struct FootprintParticle {
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticContainer#logistic_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum LogisticMode {
     PassiveProvider,
@@ -1882,7 +1882,7 @@ pub enum LogisticMode {
 
 /// Used in many places, specified as string
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface#gui_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum GuiMode {
     All,
@@ -1935,7 +1935,7 @@ impl AmmoType {
 }
 
 /// <https://wiki.factorio.com/Types/AmmoType#target_type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum TargetType {
     Entity,
@@ -2031,7 +2031,7 @@ pub struct SignalColorMapping {
 }
 
 /// <https://wiki.factorio.com/Types/SignalColorMapping#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum SignalType {
     Virtual,
@@ -2127,7 +2127,7 @@ pub struct FireFlameBurntPatchAlphaVariation {
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingText>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum TextAlignment {
     Left,
@@ -2136,7 +2136,7 @@ pub enum TextAlignment {
 }
 
 /// <https://wiki.factorio.com/Types/CursorBoxType>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum CursorBoxType {
     Entity,
@@ -2159,7 +2159,7 @@ pub struct EquipmentShape {
 }
 
 /// <https://wiki.factorio.com/Types/EquipmentShape#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum EquipmentShapeType {
     Full,
@@ -2191,7 +2191,7 @@ pub struct PlaceAsTile {
 }
 
 /// <https://wiki.factorio.com/Types/ItemPrototypeFlags>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash)]
 pub struct ItemPrototypeFlags(u16);
 
 impl ItemPrototypeFlags {
@@ -2278,7 +2278,7 @@ pub struct AmmoItemAmmoType {
 }
 
 /// <https://wiki.factorio.com/Types/AmmoSourceType>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum AmmoSourceType {
     Default,
@@ -2288,7 +2288,7 @@ pub enum AmmoSourceType {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemWithInventory#filter_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum FilterMode {
     Whitelist,
@@ -2296,7 +2296,7 @@ pub enum FilterMode {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemWithInventory#insertion_priority_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum InsertionPriorityMode {
     Default,
@@ -2306,7 +2306,7 @@ pub enum InsertionPriorityMode {
 }
 
 /// <https://wiki.factorio.com/Prototype/SelectionTool#selection_mode>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash)]
 pub struct SelectionMode(u32);
 
 impl SelectionMode {
@@ -2474,7 +2474,7 @@ pub struct FluidIngredientPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/Shortcut#action>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ShortcutAction {
     ToggleAltMode,
@@ -2490,7 +2490,7 @@ pub enum ShortcutAction {
 }
 
 /// <https://wiki.factorio.com/Prototype/Shortcut#style>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ShortcutStyle {
     Default,
@@ -2655,7 +2655,7 @@ pub struct NothingModifierPrototype {
 }
 
 /// <https://wiki.factorio.com/Types/ModifierPrototype#type>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ModifierPrototypeType {
     InserterStackSizeBonus,
@@ -2718,7 +2718,7 @@ pub struct SimulationDefinition {
 }
 
 /// <https://wiki.factorio.com/Types/TipStatus>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum TipStatus {
     Locked,
@@ -2744,7 +2744,7 @@ pub enum BoxSpecificationDimensionSpec {
     NotWholeBox(f64), // `is_whole_box` = false (Default); `max_side_length`
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum TrackType {
     EarlyGame,

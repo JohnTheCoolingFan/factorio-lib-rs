@@ -40,7 +40,7 @@ pub struct TileTransitionsBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#layer_group>
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum LayerGroup {
     Zero,

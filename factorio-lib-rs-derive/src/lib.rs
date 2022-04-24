@@ -196,7 +196,7 @@ fn impl_prototype_macro(ast: &syn::DeriveInput) -> TokenStream {
     let gen = quote! {
         impl Prototype for #name {
             fn name(&self) -> &String { &self.name }
-            fn prototype_type() -> PrototypeType { PrototypeType::#prot_type }
+            fn prototype_type(&self) -> PrototypeType { PrototypeType::#prot_type }
         }
     };
     gen.into()

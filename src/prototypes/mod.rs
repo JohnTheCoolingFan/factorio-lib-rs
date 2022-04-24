@@ -66,14 +66,14 @@ type LocalisedString = String;
 // Contains all values (accessors) for every prototype in the game
 pub trait Prototype: fmt::Debug {
     fn name(&self) -> &String;
-    fn prototype_type() -> PrototypeType;
+    fn prototype_type(&self) -> PrototypeType;
 }
 
 /// Shorthand for prototype category/type, used in [DataTable]
 pub type PrototypeCategory<T> = HashMap<String, T>;
 
 /// Struct representing global `data` table in lua environment
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DataTable {
     references: Vec<Weak<dyn PrototypeReferenceValidate>>,
     resource_records: Vec<ResourceRecord>,
@@ -281,6 +281,10 @@ impl DataTable {
         T::find(self, name)
     }
 
+    pub fn find_cloned<T: DataTableAccessable>(&self, name: &str) -> Result<T, PrototypesErr> {
+        T::find_cloned(self, name)
+    }
+
     /// Shorthand for [DataTableAccessable::extend]
     pub fn extend<T: DataTableAccessable>(&mut self, prototype: T) -> Result<(), PrototypesErr> {
         prototype.extend(self)
@@ -419,7 +423,7 @@ trait PrototypeReferenceValidate: fmt::Debug {
 }
 
 /// Reference to a prototype by name.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PrototypeReference<T: DataTableAccessable> {
     pub name: String,
     prot: PhantomData<T>
@@ -435,9 +439,13 @@ impl<T: DataTableAccessable> PrototypeReference<T> {
         data_table.find::<T>(&self.name)
     }
 
+    pub fn find_cloned(&self, data_table: &DataTable) -> Result<T, PrototypesErr> {
+        data_table.find_cloned::<T>(&self.name)
+    }
+
     /// Checks if reference is valid.
     pub fn is_valid(&self, data_table: &DataTable) -> bool {
-        matches!(self.find(data_table), Ok(_))
+        self.find(data_table).is_ok() || self.find_cloned(data_table).is_ok()
     }
 }
 
@@ -450,11 +458,58 @@ impl<T: DataTableAccessable> PrototypeReferenceValidate for PrototypeReference<T
 
 /// Trait for manipulating prototypes in [Data table](DataTable).
 /// Primarily used for [`PrototypeReference`]
-pub trait DataTableAccessable: Prototype {
-    /// Find prototype in [Data table](DataTable) by it's name
+pub trait DataTableAccessable: Prototype
+where
+    Self: Sized + Clone
+{
+    /// Find prototype in [Data table](DataTable) by it's name. Always returns an error for
+    /// abstract prototypes
     fn find<'a>(data_table: &'a DataTable, name: &str) -> Result<&'a Self, PrototypesErr>;
+    /// Find and clone the prototype. Doesn't clone when searching for abstract prototype.
+    fn find_cloned(data_table: &DataTable, name: &str) -> Result<Self, PrototypesErr> {
+        Ok(Self::find(data_table, name)?.clone())
+    }
     /// Extend [Data table](DataTable) with this prototype
     fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr>;
+}
+
+#[derive(Debug, Clone)]
+pub struct AbstractEntity {
+    pub name: String,
+    pub prototype_type: PrototypeType
+}
+
+impl Prototype for AbstractEntity {
+    fn name(&self) -> &String {
+        &self.name
+    }
+
+    fn prototype_type(&self) -> PrototypeType {
+        self.prototype_type
+    }
+}
+
+impl DataTableAccessable for AbstractEntity {
+    fn find<'a>(_data_table: &'a DataTable, _name: &str) -> Result<&'a Self, PrototypesErr> {
+        Err(PrototypesErr::AbstractFind)
+    }
+
+    fn find_cloned(data_table: &DataTable, name: &str) -> Result<Self, PrototypesErr> {
+        // TODO
+        data_table.arrow.get(name).map(|p| Self{name: p.name.clone(), prototype_type: p.prototype_type()})
+            .or_else(|| data_table.artillery_flare.get(name).map(|p| Self{name: p.name.clone(), prototype_type: p.prototype_type()}))
+            .ok_or_else(|| PrototypesErr::PrototypeNotFound(name.into()))
+    }
+
+    fn extend(self, _data_table: &mut DataTable) -> Result<(), PrototypesErr> {
+        Err(PrototypesErr::AbstractExtend)
+    }
+}
+
+impl From<&Arrow> for AbstractEntity {
+    fn from(p: &Arrow) -> Self {
+        Self{name: p.name.clone(), prototype_type: p.prototype_type()}
+    }
 }
 
 pub trait ResourceValidator {
@@ -462,20 +517,20 @@ pub trait ResourceValidator {
 }
 
 /// Struct for recording resources (images, sound files)
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResourceRecord {
     pub path: String,
     pub resource_type: ResourceType
 }
 
 /// Resource type with additional info if needed
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ResourceType {
     Image(SpriteSizeType, SpriteSizeType), // x and y dimensions of an image
     Sound // Only .ogg, .wav and .voc are accepted
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, Clone, Error)]
 pub enum ResourceError {
     #[error("File not found: \"{0}\"")]
     FileNotFound(String),
@@ -590,7 +645,7 @@ pub struct AnimationPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/EditorController>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(editor_controller)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct EditorController {
@@ -633,7 +688,7 @@ impl EditorController {
 }
 
 /// <https://wiki.factorio.com/Prototype/Font>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(font)]
 pub struct Font {
     pub name: String,
@@ -649,7 +704,7 @@ pub struct Font {
 }
 
 /// <https://wiki.factorio.com/Prototype/GodController>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(god_controller)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct GodController {
@@ -677,7 +732,7 @@ impl GodController {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapGenPresets>
-#[derive(Debug, Prototype, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable)]
 #[data_table(map_gen_presets)]
 pub struct MapGenPresets {
     pub name: String,
@@ -702,7 +757,7 @@ impl<'lua> PrototypeFromLua<'lua> for MapGenPresets {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(map_settings)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct MapSettings {
@@ -727,7 +782,7 @@ impl MapSettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(mouse_cursor)]
 pub struct MouseCursor {
     pub name: String,
@@ -736,7 +791,7 @@ pub struct MouseCursor {
 }
 
 /// <https://wiki.factorio.com/Prototype/Sound>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(sound)]
 pub struct SoundPrototype {
     pub name: String,
@@ -745,7 +800,7 @@ pub struct SoundPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/SpectatorController>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 #[data_table(spectator_controller)]
 pub struct SpectatorController {
@@ -766,7 +821,7 @@ impl SpectatorController {
 }
 
 /// <https://wiki.factorio.com/Prototype/Sprite>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(sprite)]
 pub struct SpritePrototype {
     pub name: String,
@@ -775,7 +830,7 @@ pub struct SpritePrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/TileEffect>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(tile_effect)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct TileEffect {
@@ -817,7 +872,7 @@ impl TileEffect {
 }
 
 /// <https://wiki.factorio.com/Prototype/TipsAndTricksItemCategory>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(tips_and_tricks_item_category)]
 pub struct TipsAndTricksItemCategory {
     pub name: String,
@@ -826,14 +881,14 @@ pub struct TipsAndTricksItemCategory {
 
 // 56 instances max // weird number
 /// <https://wiki.factorio.com/Prototype/TriggerTargetType>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(trigger_target_type)]
 pub struct TriggerTargetType {
     pub name: String
 }
 
 /// <https://wiki.factorio.com/Prototype/WindSound>
-#[derive(Debug, Prototype, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, DataTableAccessable, PrototypeFromLua)]
 #[data_table(wind_sound)]
 pub struct WindSound {
     pub name: String,
@@ -842,7 +897,7 @@ pub struct WindSound {
 
 // PrototypeBase starts here
 /// <https://wiki.factorio.com/PrototypeBase>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct PrototypeBaseSpec {
     pub localised_description: Option<LocalisedString>,
     pub localised_name: Option<LocalisedString>,
@@ -857,7 +912,7 @@ pub trait PrototypeBase: Prototype {
 }
 
 /// Base for Achievement and all inherited types <https://wiki.factorio.com/Prototype/Achievement>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AchievementBase {
     #[use_self_forced]
     pub icon: IconSpecification,
@@ -870,7 +925,7 @@ pub struct AchievementBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Achievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(achievement)]
 pub struct Achievement {
     pub name: String,
@@ -881,7 +936,7 @@ pub struct Achievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/BuildEntityAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(build_entity_achievement)]
 pub struct BuildEntityAchievement {
     pub name: String,
@@ -899,7 +954,7 @@ pub struct BuildEntityAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/CombatRobotCountAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(combat_robot_count)]
 pub struct CombatRobotCountAchievement {
     pub name: String,
@@ -912,7 +967,7 @@ pub struct CombatRobotCountAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstructWithRobotsAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(construct_with_robots_achevement)]
 pub struct ConstructWithRobotsAchievement {
     pub name: String,
@@ -928,7 +983,7 @@ pub struct ConstructWithRobotsAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/DeconstructWithRobotsAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(deconstruct_with_robots_achievement)]
 pub struct DeconstructWithRobotsAchievement {
     pub name: String,
@@ -940,7 +995,7 @@ pub struct DeconstructWithRobotsAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/DeliverByRobotsAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(deliver_by_robots_achievement)]
 pub struct DeliverByRobotsAchievement {
     pub name: String,
@@ -952,7 +1007,7 @@ pub struct DeliverByRobotsAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/DontBuildEntityAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(dont_build_entity_achievement)]
 pub struct DontBuildEntityAchievement {
     pub name: String,
@@ -968,7 +1023,7 @@ pub struct DontBuildEntityAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/DontCraftManuallyAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(dont_craft_manually_achievement)]
 pub struct DontCraftManuallyAchievement {
     pub name: String,
@@ -980,7 +1035,7 @@ pub struct DontCraftManuallyAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/DontUseEntityInEnergyProductionAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(dont_use_entity_in_energy_production_achievement)]
 pub struct DontUseEntityInEnergyProductionAchievement {
     pub name: String,
@@ -1002,7 +1057,7 @@ pub struct DontUseEntityInEnergyProductionAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/FinishTheGameAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(finish_the_game_achievement)]
 pub struct FinishTheGameAchievement {
     pub name: String,
@@ -1015,7 +1070,7 @@ pub struct FinishTheGameAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/GroupAttackAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(group_attack_achievement)]
 pub struct GroupAttackAchievement {
     pub name: String,
@@ -1028,7 +1083,7 @@ pub struct GroupAttackAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/KillAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(kill_achievement)]
 pub struct KillAchievement {
     pub name: String,
@@ -1050,7 +1105,7 @@ pub struct KillAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/PlayerDamagedAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(player_damaged_achievement)]
 pub struct PlayerDamagedAchievement {
     pub name: String,
@@ -1064,7 +1119,7 @@ pub struct PlayerDamagedAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/ProduceAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(produce_achievement)]
 pub struct ProduceAchievement {
     pub name: String,
@@ -1079,7 +1134,7 @@ pub struct ProduceAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/ProducePerHourAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(produce_per_hour_achievement)]
 pub struct ProducePerHourAchievement {
     pub name: String,
@@ -1093,7 +1148,7 @@ pub struct ProducePerHourAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/ResearchAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(research_achievement)]
 pub struct ResearchAchievement {
     pub name: String,
@@ -1106,7 +1161,7 @@ pub struct ResearchAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/TrainPathAchievement>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(train_path_achievement)]
 pub struct TrainPathAchievement {
     pub name: String,
@@ -1118,7 +1173,7 @@ pub struct TrainPathAchievement {
 }
 
 /// <https://wiki.factorio.com/Prototype/AmmoCategory>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(ammo_category)]
 pub struct AmmoCategory {
     pub name: String,
@@ -1130,7 +1185,7 @@ pub struct AmmoCategory {
 
 // 255 instances max
 /// <https://wiki.factorio.com/Prototype/AutoplaceControl>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(autoplace_control)]
 pub struct AutoplaceControl {
     pub name: String,
@@ -1145,7 +1200,7 @@ pub struct AutoplaceControl {
 }
 
 /// <https://wiki.factorio.com/Prototype/CustomInput>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(custom_input)]
 pub struct CustomInput {
     pub name: String,
@@ -1173,7 +1228,7 @@ pub struct CustomInput {
 }
 
 /// <https://wiki.factorio.com/Prototype/DamageType>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(damage_type)]
 pub struct DamageType {
     pub name: String,
@@ -1184,7 +1239,7 @@ pub struct DamageType {
 }
 
 /// <https://wiki.factorio.com/Prototype/Decorative>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
 #[data_table(optimized_decorative)]
 pub struct Decorative {
     pub name: String,
@@ -1209,7 +1264,7 @@ pub struct Decorative {
 }
 
 /// <https://wiki.factorio.com/Prototype/Entity>
-#[derive(Debug, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct EntityBase {
     #[use_self_forced] // FIXME
@@ -1386,7 +1441,7 @@ pub trait Entity: PrototypeBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Arrow>
-#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(arrow)]
 pub struct Arrow {
     pub name: String,
@@ -1401,7 +1456,7 @@ pub struct Arrow {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryFlare>
-#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(artillery_flare)]
 pub struct ArtilleryFlare {
     // map_color is mandatory
@@ -1442,7 +1497,7 @@ pub struct ArtilleryFlare {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryProjectile>
-#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(artillery_projectile)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct ArtilleryProjectile {
@@ -1478,7 +1533,7 @@ impl ArtilleryProjectile {
 }
 
 /// <https://wiki.factorio.com/Prototype/Beam>
-#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(beam)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct Beam {
@@ -1527,7 +1582,7 @@ impl Beam {
 }
 
 /// <https://wiki.factorio.com/Prototype/CharacterCorpse>
-#[derive(Debug, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(character_corpse)]
 pub struct CharacterCorpse {
     pub name: String,
@@ -1545,7 +1600,7 @@ pub struct CharacterCorpse {
 }
 
 /// <https://wiki.factorio.com/Prototype/Cliff>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(cliff)]
 pub struct Cliff {
     name: String,
@@ -1559,7 +1614,7 @@ pub struct Cliff {
 }
 
 /// <https://wiki.factorio.com/Prototype/Corpse>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CorpseBase {
     dying_speed: f32, // Default: 1
     splash_speed: f32, // Default: 1
@@ -1616,7 +1671,7 @@ pub trait Corpse: Entity {
 }
 
 /// <https://wiki.factorio.com/Prototype/Corpse>
-#[derive(Debug, Prototype, Corpse, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Corpse, DataTableAccessable)]
 #[data_table(corpse)]
 pub struct CorpsePrototype {
     name: String,
@@ -1626,7 +1681,7 @@ pub struct CorpsePrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/RailRemnants>
-#[derive(Debug, Prototype, Corpse, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Corpse, DataTableAccessable)]
 #[data_table(rail_remnants)]
 pub struct RailRemnants {
     name: String,
@@ -1638,7 +1693,7 @@ pub struct RailRemnants {
 }
 
 /// <https://wiki.factorio.com/Prototype/DeconstructibleTileProxy>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(deconstructible_tile_proxy)]
 pub struct DeconstructibleTileProxy {
     name: String,
@@ -1647,7 +1702,7 @@ pub struct DeconstructibleTileProxy {
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityGhost>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(entity_ghost)]
 pub struct EntityGhost {
     name: String,
@@ -1658,7 +1713,7 @@ pub struct EntityGhost {
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityWithHealth>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EntityWithHealthBase {
     max_health: f32, // Default: 10
     healing_per_tick: f32, // Default: 0.001666 for Prototype/Tree, 0 for the rest
@@ -1701,7 +1756,7 @@ pub trait EntityWithHealth: Entity {
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityWithOwner>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EntityWithOwnerBase {
     is_military_target: bool, // Default: false
     allow_run_time_change_of_is_military_target: bool, // Default: false
@@ -1714,7 +1769,7 @@ pub trait EntityWithOwner {
 }
 
 /// <https://wiki.factorio.com/Prototype/Accumulator>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(accumulator)]
 pub struct Accumulator {
     name: String,
@@ -1739,7 +1794,7 @@ pub struct Accumulator {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryTurret>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(artillery_turret)]
 pub struct ArtilleryTurret {
     name: String,
@@ -1772,7 +1827,7 @@ pub struct ArtilleryTurret {
 }
 
 /// <https://wiki.factorio.com/Prototype/Beacon>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(beacon)]
 pub struct Beacon {
     name: String,
@@ -1793,7 +1848,7 @@ pub struct Beacon {
 }
 
 /// <https://wiki.factorio.com/Prototype/Boiler>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(boiler)]
 pub struct Boiler {
     name: String,
@@ -1817,7 +1872,7 @@ pub struct Boiler {
 }
 
 /// <https://wiki.factorio.com/Prototype/BurnerGenerator>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(burner_generator)]
 pub struct BurnerGenerator {
     name: String,
@@ -1836,7 +1891,7 @@ pub struct BurnerGenerator {
 }
 
 /// <https://wiki.factorio.com/Prototype/Character>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(character)]
 pub struct Character {
     name: String,
@@ -1883,7 +1938,7 @@ pub struct Character {
 }
 
 /// <https://wiki.factorio.com/Prototype/Combinator>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CombinatorBase {
     energy_source: EnergySource, // Must be an electric void energy source
     active_energy_usage: Energy,
@@ -1924,7 +1979,7 @@ pub trait Combinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArithmeticCombinator>
-#[derive(Debug, Prototype, Combinator, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Combinator, DataTableAccessable)]
 #[data_table(arithmetic_combinator)]
 pub struct ArithmeticCombinator {
     name: String,
@@ -1947,7 +2002,7 @@ pub struct ArithmeticCombinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/DeciderCombinator>
-#[derive(Debug, Prototype, Combinator, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Combinator, DataTableAccessable)]
 #[data_table(decider_combinator)]
 pub struct DeciderCombinator {
     name: String,
@@ -1965,7 +2020,7 @@ pub struct DeciderCombinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstantCombinator>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(constant_combinator)]
 pub struct ConstantCombinator {
     name: String,
@@ -1985,7 +2040,7 @@ pub struct ConstantCombinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/Container>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(container)]
 pub struct Container {
     name: String,
@@ -2005,7 +2060,7 @@ pub struct Container {
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticContainer>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(logistic_container)]
 pub struct LogisticContainer {
     name: String,
@@ -2032,7 +2087,7 @@ pub struct LogisticContainer {
 }
 
 /// <https://wiki.factorio.com/Prototype/InfinityContainer>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(infinity_container)]
 pub struct InfinityContainer {
     name: String,
@@ -2061,7 +2116,7 @@ pub struct InfinityContainer {
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CraftingMachineBase {
     // If module inventory size > 0 and no effects allowed, its' and error
     // https://discord.com/channels/139677590393716737/306402592265732098/898733801679757332
@@ -2120,7 +2175,7 @@ pub trait CraftingMachine {
 }
 
 /// <https://wiki.factorio.com/Prototype/AssemblingMachine>
-#[derive(Debug, Prototype, CraftingMachine, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, CraftingMachine, DataTableAccessable)]
 #[data_table(assembling_machine)]
 pub struct AssemblingMachine {
     name: String,
@@ -2135,7 +2190,7 @@ pub struct AssemblingMachine {
 }
 
 /// <https://wiki.factorio.com/Prototype/RocketSilo>
-#[derive(Debug, Prototype, CraftingMachine, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, CraftingMachine, DataTableAccessable)]
 #[data_table(rocket_silo)]
 pub struct RocketSilo {
     name: String,
@@ -2194,7 +2249,7 @@ pub struct RocketSilo {
 }
 
 /// <https://wiki.factorio.com/Prototype/Furnace>
-#[derive(Debug, Prototype, CraftingMachine, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, CraftingMachine, DataTableAccessable)]
 #[data_table(furnace)]
 pub struct Furnace {
     name: String,
@@ -2208,7 +2263,7 @@ pub struct Furnace {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(electric_energy_interface)]
 pub struct ElectricEnergyInterface {
     name: String,
@@ -2227,7 +2282,7 @@ pub struct ElectricEnergyInterface {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface#picture>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ElectricEnergyInterfaceVisuals {
     Picture(Sprite),
     Pictures(Sprite4Way),
@@ -2236,7 +2291,7 @@ pub enum ElectricEnergyInterfaceVisuals {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricPole>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(electric_pole)]
 pub struct ElectricPole {
     name: String,
@@ -2257,7 +2312,7 @@ pub struct ElectricPole {
 }
 
 /// <https://wiki.factorio.com/Prototype/EnemySpawner>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(unit_spawner)]
 pub struct EnemySpawner {
     name: String,
@@ -2288,7 +2343,7 @@ pub struct EnemySpawner {
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingRobot>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FlyingRobotBase {
     speed: f64,
     max_speed: f64, // Default: max double
@@ -2313,7 +2368,7 @@ pub trait FlyingRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/CombatRobot>
-#[derive(Debug, Prototype, FlyingRobot, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, FlyingRobot, DataTableAccessable)]
 #[data_table(combat_robot)]
 pub struct CombatRobot {
     name: String,
@@ -2336,7 +2391,7 @@ pub struct CombatRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstructionRobot>
-#[derive(Debug, Prototype, FlyingRobot, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, FlyingRobot, DataTableAccessable)]
 #[data_table(construction_robot)]
 pub struct ConstructionRobot {
     // Must have collision box of zero
@@ -2366,7 +2421,7 @@ pub struct ConstructionRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticRobot>
-#[derive(Debug, Prototype, FlyingRobot, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, FlyingRobot, DataTableAccessable)]
 #[data_table(logistic_robot)]
 pub struct LogisticRobot {
     // Must have collision box of zero
@@ -2393,7 +2448,7 @@ pub struct LogisticRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/Gate>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(gate)]
 pub struct Gate {
     name: String,
@@ -2420,7 +2475,7 @@ pub struct Gate {
 }
 
 /// <https://wiki.factorio.com/Prototype/Generator>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(generator)]
 pub struct Generator {
     name: String,
@@ -2445,7 +2500,7 @@ pub struct Generator {
 }
 
 /// <https://wiki.factorio.com/Prototype/HeatInterface>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(heat_interface)]
 pub struct HeatInterface {
     name: String,
@@ -2459,7 +2514,7 @@ pub struct HeatInterface {
 }
 
 /// <https://wiki.factorio.com/Prototype/HeatPipe>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(heat_pipe)]
 pub struct HeatPipe {
     name: String,
@@ -2473,7 +2528,7 @@ pub struct HeatPipe {
 }
 
 /// <https://wiki.factorio.com/Prototype/Inserter>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(inserter)]
 pub struct Inserter {
     name: String,
@@ -2514,7 +2569,7 @@ pub struct Inserter {
 }
 
 /// <https://wiki.factorio.com/Prototype/Lab>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(lab)]
 pub struct Lab {
     name: String,
@@ -2536,7 +2591,7 @@ pub struct Lab {
 }
 
 /// <https://wiki.factorio.com/Prototype/Lamp>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(lamp)]
 pub struct Lamp {
     name: String,
@@ -2565,7 +2620,7 @@ pub struct Lamp {
 }
 
 /// <https://wiki.factorio.com/Prototype/LandMine>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(land_mine)]
 pub struct LandMine {
     name: String,
@@ -2586,7 +2641,7 @@ pub struct LandMine {
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedContainer>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(linked_container)]
 pub struct LinkedContainer {
     name: String,
@@ -2601,7 +2656,7 @@ pub struct LinkedContainer {
 }
 
 /// <https://wiki.factorio.com/Prototype/Market>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(market)]
 pub struct Market {
     name: String,
@@ -2614,7 +2669,7 @@ pub struct Market {
 }
 
 /// <https://wiki.factorio.com/Prototype/MiningDrill>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(mining_drill)]
 pub struct MiningDrill {
     name: String,
@@ -2648,7 +2703,7 @@ pub struct MiningDrill {
 }
 
 /// <https://wiki.factorio.com/Prototype/OffshorePump>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(offshore_pump)]
 pub struct OffshorePump {
     name: String,
@@ -2678,7 +2733,7 @@ pub struct OffshorePump {
 }
 
 /// <https://wiki.factorio.com/Prototype/Pipe>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(pipe)]
 pub struct Pipe {
     name: String,
@@ -2693,7 +2748,7 @@ pub struct Pipe {
 }
 
 /// <https://wiki.factorio.com/Prototype/InfinityPipe>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(infinity_pipe)]
 pub struct InfinityPipe {
     name: String,
@@ -2709,7 +2764,7 @@ pub struct InfinityPipe {
 }
 
 /// <https://wiki.factorio.com/Prototype/PipeToGround>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(pipe_to_ground)]
 pub struct PipeToGround {
     name: String,
@@ -2723,7 +2778,7 @@ pub struct PipeToGround {
 }
 
 /// <https://wiki.factorio.com/Prototype/PlayerPort>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(player_port)]
 pub struct PlayerPort {
     name: String,
@@ -2735,7 +2790,7 @@ pub struct PlayerPort {
 }
 
 /// <https://wiki.factorio.com/Prototype/PowerSwitch>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(power_switch)]
 pub struct PowerSwitch {
     name: String,
@@ -2758,7 +2813,7 @@ pub struct PowerSwitch {
 }
 
 /// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(programmable_speaker)]
 pub struct ProgrammableSpeaker {
     name: String,
@@ -2780,7 +2835,7 @@ pub struct ProgrammableSpeaker {
 }
 
 /// <https://wiki.factorio.com/Prototype/Pump>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(pump)]
 pub struct Pump {
     name: String,
@@ -2807,7 +2862,7 @@ pub struct Pump {
 }
 
 /// <https://wiki.factorio.com/Prototype/Radar>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(radar)]
 pub struct Radar {
     name: String,
@@ -2828,7 +2883,7 @@ pub struct Radar {
 
 /// <https://wiki.factorio.com/Prototype/CurvedRail>
 /// <https://wiki.factorio.com/Prototype/Rail>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(curved_rail)]
 pub struct CurvedRail {
     name: String,
@@ -2843,7 +2898,7 @@ pub struct CurvedRail {
 
 /// <https://wiki.factorio.com/Prototype/StraightRail>
 /// <https://wiki.factorio.com/Prototype/Rail>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(straight_rail)]
 pub struct StraightRail {
     name: String,
@@ -2861,7 +2916,7 @@ pub struct StraightRail {
 /// Rail signals must collide with each other
 /// <https://wiki.factorio.com/Prototype/RailChainSignal>
 /// <https://wiki.factorio.com/Prototype/RailSignalBase>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(rail_chain_signal)]
 pub struct RailChainSignal {
     name: String,
@@ -2892,7 +2947,7 @@ pub struct RailChainSignal {
 /// Rail signals must collide with each other
 /// <https://wiki.factorio.com/Prototype/RailSignal>
 /// <https://wiki.factorio.com/Prototype/RailSignalBase>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(rail_signal)]
 pub struct RailSignal {
     name: String,
@@ -2916,7 +2971,7 @@ pub struct RailSignal {
 }
 
 /// <https://wiki.factorio.com/Prototype/Reactor>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(reactor)]
 pub struct Reactor {
     name: String,
@@ -2945,7 +3000,7 @@ pub struct Reactor {
 }
 
 /// <https://wiki.factorio.com/Prototype/Roboport>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(roboport)]
 pub struct Roboport {
     name: String,
@@ -2998,7 +3053,7 @@ pub struct Roboport {
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntityWithOwner>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(simple_entity_with_owner)]
 pub struct SimpleEntityWithOwner {
     name: String,
@@ -3015,7 +3070,7 @@ pub struct SimpleEntityWithOwner {
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntityWithForce>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(simple_entity_with_force)]
 pub struct SimpleEntityWithForce {
     name: String,
@@ -3032,7 +3087,7 @@ pub struct SimpleEntityWithForce {
 }
 
 /// <https://wiki.factorio.com/Prototype/SolarPanel>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(solar_panel)]
 pub struct SolarPanel {
     name: String,
@@ -3047,7 +3102,7 @@ pub struct SolarPanel {
 }
 
 /// <https://wiki.factorio.com/Prototype/StorageTank>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(storage_tank)]
 pub struct StorageTank {
     name: String,
@@ -3069,7 +3124,7 @@ pub struct StorageTank {
 }
 
 /// <https://wiki.factorio.com/Prototype/TrainStop>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(train_stop)]
 pub struct TrainStop {
     name: String,
@@ -3098,7 +3153,7 @@ pub struct TrainStop {
 
 // TODO: Clean up graphics properties
 /// <https://wiki.factorio.com/Prototype/TransportBeltConnectable>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TransportBeltConnectableBase {
     speed: f64,
     animation_speed_coefficient: f64, // Default: 1
@@ -3106,7 +3161,7 @@ pub struct TransportBeltConnectableBase {
     belt_animation_set: TransportBeltConnectableGraphics,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TransportBeltConnectableGraphics {
     AnimationSet(Box<BeltAnimationSet>),
     GraphicsSet(Box<BeltGraphicsSet>)
@@ -3120,7 +3175,7 @@ pub trait TransportBeltConnectable {
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedBelt>
-#[derive(Debug, Prototype, TransportBeltConnectable, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, TransportBeltConnectable, DataTableAccessable)]
 #[data_table(linked_belt)]
 pub struct LinkedBelt {
     name: String,
@@ -3137,7 +3192,7 @@ pub struct LinkedBelt {
 }
 
 /// <https://wiki.factorio.com/Prototype/Loader1x1>
-#[derive(Debug, Prototype, TransportBeltConnectable, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, TransportBeltConnectable, DataTableAccessable)]
 #[data_table(loader_1x1)]
 pub struct Loader1x1 {
     name: String,
@@ -3154,7 +3209,7 @@ pub struct Loader1x1 {
 }
 
 /// <https://wiki.factorio.com/Prototype/Loader1x2>
-#[derive(Debug, Prototype, TransportBeltConnectable, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, TransportBeltConnectable, DataTableAccessable)]
 #[data_table(loader)]
 pub struct Loader1x2 {
     name: String,
@@ -3171,7 +3226,7 @@ pub struct Loader1x2 {
 }
 
 /// <https://wiki.factorio.com/Prototype/Splitter>
-#[derive(Debug, Prototype, TransportBeltConnectable, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, TransportBeltConnectable, DataTableAccessable)]
 #[data_table(splitter)]
 pub struct Splitter {
     name: String,
@@ -3187,7 +3242,7 @@ pub struct Splitter {
 }
 
 /// <https://wiki.factorio.com/Prototype/TransportBelt>
-#[derive(Debug, Prototype, TransportBeltConnectable, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, TransportBeltConnectable, DataTableAccessable)]
 #[data_table(transport_belt)]
 pub struct TransportBelt {
     name: String,
@@ -3208,7 +3263,7 @@ pub struct TransportBelt {
 }
 
 /// <https://wiki.factorio.com/Prototype/UndergroundBelt>
-#[derive(Debug, Prototype, TransportBeltConnectable, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, TransportBeltConnectable, DataTableAccessable)]
 #[data_table(underground_belt)]
 pub struct UndergroundBelt {
     name: String,
@@ -3224,7 +3279,7 @@ pub struct UndergroundBelt {
 }
 
 /// <https://wiki.factorio.com/Prototype/Turret>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TurretBase {
     attack_parameters: AttackParameters,
     folded_animation: RotatedAnimation4Way,
@@ -3333,7 +3388,7 @@ pub trait Turret {
 }
 
 /// <https://wiki.factorio.com/Prototype/Turret>
-#[derive(Debug, Prototype, Turret, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Turret, DataTableAccessable)]
 #[data_table(turret)]
 pub struct TurretPrototype {
     name: String,
@@ -3345,7 +3400,7 @@ pub struct TurretPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/AmmoTurret>
-#[derive(Debug, Prototype, Turret, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Turret, DataTableAccessable)]
 #[data_table(ammo_turret)]
 pub struct AmmoTurret {
     name: String,
@@ -3360,7 +3415,7 @@ pub struct AmmoTurret {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricTurret>
-#[derive(Debug, Prototype, Turret, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Turret, DataTableAccessable)]
 #[data_table(electric_turret)]
 pub struct ElectricTurret {
     name: String,
@@ -3374,7 +3429,7 @@ pub struct ElectricTurret {
 
 // `turret_base_has_direction` must = true
 /// <https://wiki.factorio.com/Prototype/FluidTurret>
-#[derive(Debug, Prototype, Turret, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Turret, DataTableAccessable)]
 #[data_table(fluid_turret)]
 pub struct FluidTurret {
     name: String,
@@ -3404,7 +3459,7 @@ pub struct FluidTurret {
 }
 
 /// <https://wiki.factorio.com/Prototype/Unit>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(unit)]
 pub struct Unit {
     name: String,
@@ -3439,7 +3494,7 @@ pub struct Unit {
 }
 
 /// <https://wiki.factorio.com/Prototype/Vehicle>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VehicleBase {
     weight: f64, // Mus be positive
     braking_force: f64, // Must be positive // braking_power is converted to this
@@ -3476,7 +3531,7 @@ pub trait Vehicle {
 }
 
 /// <https://wiki.factorio.com/Prototype/Car>
-#[derive(Debug, Prototype, Vehicle, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Vehicle, DataTableAccessable)]
 #[data_table(car)]
 pub struct Car {
     name: String,
@@ -3508,7 +3563,7 @@ pub struct Car {
 }
 
 /// <https://wiki.factorio.com/Prototype/RollingStock>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RollingStockBase {
     max_speed: f64,
     air_resistance: f64,
@@ -3549,7 +3604,7 @@ pub trait RollingStock: Vehicle {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryWagon>
-#[derive(Debug, Prototype, RollingStock, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, RollingStock, DataTableAccessable)]
 #[data_table(artillery_wagon)]
 pub struct ArtilleryWagon {
     name: String,
@@ -3579,7 +3634,7 @@ pub struct ArtilleryWagon {
 }
 
 /// <https://wiki.factorio.com/Prototype/CargoWagon>
-#[derive(Debug, Prototype, RollingStock, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, RollingStock, DataTableAccessable)]
 #[data_table(cargo_wagon)]
 pub struct CargoWagon {
     name: String,
@@ -3593,7 +3648,7 @@ pub struct CargoWagon {
 }
 
 /// <https://wiki.factorio.com/Prototype/FluidWagon>
-#[derive(Debug, Prototype, RollingStock, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, RollingStock, DataTableAccessable)]
 #[data_table(fluid_wagon)]
 pub struct FluidWagon {
     name: String,
@@ -3608,7 +3663,7 @@ pub struct FluidWagon {
 }
 
 /// <https://wiki.factorio.com/Prototype/Locomotive>
-#[derive(Debug, Prototype, RollingStock, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, RollingStock, DataTableAccessable)]
 #[data_table(locomotive)]
 pub struct Locomotive {
     name: String,
@@ -3628,7 +3683,7 @@ pub struct Locomotive {
 }
 
 /// <https://wiki.factorio.com/Prototype/SpiderVehicle>
-#[derive(Debug, Prototype, Vehicle, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Vehicle, DataTableAccessable)]
 #[data_table(spider_vehicle)]
 pub struct SpiderVehicle {
     name: String,
@@ -3652,7 +3707,7 @@ pub struct SpiderVehicle {
 }
 
 /// <https://wiki.factorio.com/Prototype/Wall>
-#[derive(Debug, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
 #[data_table(wall)]
 pub struct Wall {
     name: String,
@@ -3686,7 +3741,7 @@ pub struct Wall {
 //
 
 /// <https://wiki.factorio.com/Prototype/Fish>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithHealth, DataTableAccessable)]
 #[data_table(fish)]
 pub struct Fish {
     name: String,
@@ -3697,7 +3752,7 @@ pub struct Fish {
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntity>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithHealth, DataTableAccessable)]
 #[data_table(simple_entity)]
 pub struct SimpleEntity {
     name: String,
@@ -3713,7 +3768,7 @@ pub struct SimpleEntity {
 }
 
 /// <https://wiki.factorio.com/Prototype/SpiderLeg>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithHealth, DataTableAccessable)]
 #[data_table(spider_leg)]
 pub struct SpiderLeg {
     name: String,
@@ -3731,7 +3786,7 @@ pub struct SpiderLeg {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tree>
-#[derive(Debug, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithHealth, DataTableAccessable)]
 #[data_table(tree)]
 pub struct Tree {
     name: String,
@@ -3745,7 +3800,7 @@ pub struct Tree {
 }
 
 /// <https://wiki.factorio.com/Prototype/Explosion>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(explosion)]
 pub struct Explosion {
     name: String,
@@ -3784,7 +3839,7 @@ pub struct Explosion {
 }
 
 /// <https://wiki.factorio.com/Prototype/FlameThrowerExplosion>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(flame_thrower_explosion)]
 pub struct FlameThrowerExplosion {
     name: String,
@@ -3823,7 +3878,7 @@ pub struct FlameThrowerExplosion {
 }
 
 /// <https://wiki.factorio.com/Prototype/FireFlame>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(fire)]
 pub struct FireFlame {
     name: String,
@@ -3878,7 +3933,7 @@ pub struct FireFlame {
 }
 
 /// <https://wiki.factorio.com/Prototype/FluidStream>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(stream)]
 pub struct FluidStream {
     name: String,
@@ -3916,7 +3971,7 @@ pub struct FluidStream {
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingText>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(flying_text)]
 pub struct FlyingText {
     name: String,
@@ -3928,7 +3983,7 @@ pub struct FlyingText {
 }
 
 /// <https://wiki.factorio.com/Prototype/HighlightBoxEntity>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(highlight_box)]
 pub struct HighlightBoxEntity {
     // Bruh
@@ -3938,7 +3993,7 @@ pub struct HighlightBoxEntity {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemEntity>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(item_entity)]
 pub struct ItemEntity {
     // Bruh
@@ -3948,7 +4003,7 @@ pub struct ItemEntity {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemRequestProxy>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(item_request_proxy)]
 pub struct ItemRequestProxy {
     name: String,
@@ -3959,7 +4014,7 @@ pub struct ItemRequestProxy {
 }
 
 /// <https://wiki.factorio.com/Prototype/ParticleSource>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(particle_source)]
 pub struct ParticleSource {
     name: String,
@@ -3979,14 +4034,14 @@ pub struct ParticleSource {
 }
 
 /// <https://wiki.factorio.com/Prototype/ParticleSource#particle>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ParticleSourceParticleOrSmoke {
     Particle(String), // Name of Particle prototype
     Smoke(Vec<SmokeSource>) // 1 or more
 }
 
 /// <https://wiki.factorio.com/Prototype/Projectile>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(projectile)]
 pub struct Projectile {
     name: String,
@@ -4015,7 +4070,7 @@ pub struct Projectile {
 }
 
 /// <https://wiki.factorio.com/Prototype/ResourceEntity>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(resource)]
 pub struct ResourceEntity {
     name: String,
@@ -4045,7 +4100,7 @@ pub struct ResourceEntity {
 }
 
 /// <https://wiki.factorio.com/Prototype/RocketSiloRocket>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(rocket_silo_rocket)]
 pub struct RocketSiloRocket {
     name: String,
@@ -4088,7 +4143,7 @@ pub struct RocketSiloRocket {
 }
 
 /// <https://wiki.factorio.com/Prototype/RocketSiloRocketShadow>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(rocket_silo_rocket_shadow)]
 pub struct RocketSiloRocketShadow {
     name: String,
@@ -4097,7 +4152,7 @@ pub struct RocketSiloRocketShadow {
 }
 
 /// <https://wiki.factorio.com/Prototype/SmokeWithTrigger>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(smoke_with_trigger)]
 pub struct SmokeWithTrigger {
     // Collision box must be zero
@@ -4133,7 +4188,7 @@ pub struct SmokeWithTrigger {
 }
 
 /// <https://wiki.factorio.com/Prototype/SpeechBubble>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(speech_bubble)]
 pub struct SpeechBubble {
     name: String,
@@ -4146,7 +4201,7 @@ pub struct SpeechBubble {
 }
 
 /// <https://wiki.factorio.com/Prototype/Sticker>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(sticker)]
 pub struct Sticker {
     name: String,
@@ -4175,7 +4230,7 @@ pub struct Sticker {
 }
 
 /// <https://wiki.factorio.com/Prototype/TileGhost>
-#[derive(Debug, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
 #[data_table(tile_ghost)]
 pub struct TileGhost {
     name: String,
@@ -4184,7 +4239,7 @@ pub struct TileGhost {
 }
 
 /// <https://wiki.factorio.com/Prototype/Equipment>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EquipmentBase {
     sprite: Sprite,
     shape: EquipmentShape,
@@ -4209,7 +4264,7 @@ pub trait Equipment: PrototypeBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/ActiveDefenseEquipment>
-#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Equipment, DataTableAccessable)]
 #[data_table(active_defense_equipment)]
 pub struct ActiveDefenseEquipment {
     name: String,
@@ -4220,7 +4275,7 @@ pub struct ActiveDefenseEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/BatteryEquipment>
-#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Equipment, DataTableAccessable)]
 #[data_table(battery_equipment)]
 pub struct BatteryEquipment {
     name: String,
@@ -4229,7 +4284,7 @@ pub struct BatteryEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/BeltImmunityEquipment>
-#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Equipment, DataTableAccessable)]
 #[data_table(belt_immunity_equipment)]
 pub struct BeltImmunityEquipment {
     name: String,
@@ -4239,7 +4294,7 @@ pub struct BeltImmunityEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/EnergyShieldEquipment>
-#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Equipment, DataTableAccessable)]
 #[data_table(energy_shield_equipment)]
 pub struct EnergyShieldEquipment {
     name: String,
@@ -4250,7 +4305,7 @@ pub struct EnergyShieldEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/GeneratorEquipment>
-#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Equipment, DataTableAccessable)]
 #[data_table(generator_equipment)]
 pub struct GeneratorEquipment {
     name: String,
@@ -4261,7 +4316,7 @@ pub struct GeneratorEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/MovementBonusEquipment>
-#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Equipment, DataTableAccessable)]
 #[data_table(movement_bonus_equipment)]
 pub struct MovementBonusEquipment {
     name: String,
@@ -4272,7 +4327,7 @@ pub struct MovementBonusEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/NightVisionEquipment>
-#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Equipment, DataTableAccessable)]
 #[data_table(night_vision_equipment)]
 pub struct NightVisionEquipment {
     name: String,
@@ -4286,7 +4341,7 @@ pub struct NightVisionEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/RoboportEquipment>
-#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Equipment, DataTableAccessable)]
 #[data_table(roboport_equipment)]
 pub struct RoboportEquipment {
     name: String,
@@ -4316,7 +4371,7 @@ pub struct RoboportEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/SolarPanelEquipment>
-#[derive(Debug, Prototype, Equipment, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Equipment, DataTableAccessable)]
 #[data_table(solar_panel_equipment)]
 pub struct SolarPanelEquipment {
     name: String,
@@ -4326,7 +4381,7 @@ pub struct SolarPanelEquipment {
 }
 
 /// <https://wiki.factorio.com/Prototype/EquipmentCategory>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(equipment_category)]
 pub struct EquipmentCategory {
     name: String,
@@ -4334,7 +4389,7 @@ pub struct EquipmentCategory {
 }
 
 /// <https://wiki.factorio.com/Prototype/EquipmentGrid>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(equipment_grid)]
 pub struct EquipmentGrid {
     name: String,
@@ -4346,7 +4401,7 @@ pub struct EquipmentGrid {
 }
 
 /// <https://wiki.factorio.com/Prototype/Fluid>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(fluid)]
 pub struct Fluid {
     name: String,
@@ -4366,7 +4421,7 @@ pub struct Fluid {
 }
 
 /// <https://wiki.factorio.com/Prototype/FuelCategory>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(fuel_category)]
 pub struct FuelCategory {
     name: String,
@@ -4375,7 +4430,7 @@ pub struct FuelCategory {
 
 // Documentation is confusing, not deriving PrototypeBase because it's probably the intended way
 /// <https://wiki.factorio.com/Prototype/GuiStyle>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(gui_style)]
 pub struct GuiStyle {
     name: String,
@@ -4390,7 +4445,7 @@ pub struct GuiStyle {
 }
 
 /// <https://wiki.factorio.com/Prototype/Item>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ItemBase {
     icon: IconSpecification,
     stack_size: u32, // Must be 1 when "not-stackable" flag is set
@@ -4443,7 +4498,7 @@ pub trait Item: PrototypeBase {
 }
 
 /// <https://wiki.factorio.com/Prototype/Item>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(item)]
 pub struct ItemPrototype {
     name: String,
@@ -4452,7 +4507,7 @@ pub struct ItemPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/AmmoItem>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(ammo)]
 pub struct AmmoItem {
     name: String,
@@ -4464,7 +4519,7 @@ pub struct AmmoItem {
 }
 
 /// <https://wiki.factorio.com/Prototype/Capsule>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(capsule)]
 pub struct Capsule {
     name: String,
@@ -4475,7 +4530,7 @@ pub struct Capsule {
 }
 
 /// <https://wiki.factorio.com/Prototype/Gun>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(gun)]
 pub struct Gun {
     name: String,
@@ -4485,7 +4540,7 @@ pub struct Gun {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemWithEntityData>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(item_with_entity_data)]
 pub struct ItemWithEntityData {
     name: String,
@@ -4496,7 +4551,7 @@ pub struct ItemWithEntityData {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemWithLabel>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(item_with_label)]
 pub struct ItemWithLabel {
     name: String,
@@ -4507,7 +4562,7 @@ pub struct ItemWithLabel {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemWithInventory>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(item_with_inventory)]
 pub struct ItemWithInventory {
     // Stack size must be 1
@@ -4527,7 +4582,7 @@ pub struct ItemWithInventory {
 }
 
 /// <https://wiki.factorio.com/Prototype/BlueprintBook>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(blueprint_book)]
 pub struct BlueprintBook {
     // Stack size must be 1
@@ -4547,7 +4602,7 @@ pub struct BlueprintBook {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemWithTags>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(item_with_tags)]
 pub struct ItemWithTags {
     name: String,
@@ -4558,7 +4613,7 @@ pub struct ItemWithTags {
 }
 
 /// <https://wiki.factorio.com/Prototype/SelectionTool>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SelectionToolBase {
     selection_color: Color,
     alt_selection_color: Color,
@@ -4621,7 +4676,7 @@ pub trait SelectionTool: Item {
 }
 
 /// <https://wiki.factorio.com/Prototype/SelectionTool>
-#[derive(Debug, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
 #[data_table(selection_tool)]
 pub struct SelectionToolPrototype {
     name: String,
@@ -4633,7 +4688,7 @@ pub struct SelectionToolPrototype {
 }
 
 /// <https://wiki.factorio.com/Prototype/BlueprintItem>
-#[derive(Debug, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
 #[data_table(blueprint)]
 pub struct BlueprintItem {
     // Stack size must be 1
@@ -4660,7 +4715,7 @@ pub struct BlueprintItem {
 }
 
 /// <https://wiki.factorio.com/Prototype/CopyPasteTool>
-#[derive(Debug, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
 #[data_table(copy_paste_tool)]
 pub struct CopyPasteTool {
     // Stack size must be 1
@@ -4686,7 +4741,7 @@ pub struct CopyPasteTool {
 }
 
 /// <https://wiki.factorio.com/Prototype/DeconstructionItem>
-#[derive(Debug, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
 #[data_table(deconstruction_item)]
 pub struct DeconstructionItem {
     // Stack size must be 1
@@ -4715,7 +4770,7 @@ pub struct DeconstructionItem {
 }
 
 /// <https://wiki.factorio.com/Prototype/UpgradeItem>
-#[derive(Debug, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, SelectionTool, DataTableAccessable)]
 #[data_table(upgrade_item)]
 pub struct UpgradeItem {
     // Stack size must be 1
@@ -4743,7 +4798,7 @@ pub struct UpgradeItem {
 }
 
 /// <https://wiki.factorio.com/Prototype/Module>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(module)]
 pub struct Module {
     name: String,
@@ -4761,7 +4816,7 @@ pub struct Module {
 }
 
 /// <https://wiki.factorio.com/Prototype/RailPlanner>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(rail_planner)]
 pub struct RailPlanner {
     name: String,
@@ -4772,7 +4827,7 @@ pub struct RailPlanner {
 }
 
 /// <https://wiki.factorio.com/Prototype/SpidertronRemote>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(spidertron_remote)]
 pub struct SpidertronRemote {
     name: String,
@@ -4782,7 +4837,7 @@ pub struct SpidertronRemote {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tool>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(tool)]
 pub struct Tool {
     name: String,
@@ -4795,7 +4850,7 @@ pub struct Tool {
 }
 
 /// <https://wiki.factorio.com/Prototype/Armor>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(armor)]
 pub struct Armor {
     name: String,
@@ -4811,7 +4866,7 @@ pub struct Armor {
 }
 
 /// <https://wiki.factorio.com/Prototype/RepairTool>
-#[derive(Debug, Prototype, PrototypeBase, Item, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, Item, DataTableAccessable)]
 #[data_table(repair_tool)]
 pub struct RepairTool {
     name: String,
@@ -4826,7 +4881,7 @@ pub struct RepairTool {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemGroup>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(item_group)]
 pub struct ItemGroup {
     name: String,
@@ -4836,7 +4891,7 @@ pub struct ItemGroup {
 }
 
 /// <https://wiki.factorio.com/Prototype/ItemSubGroup>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(item_subgroup)]
 pub struct ItemSubGroup {
     name: String,
@@ -4845,7 +4900,7 @@ pub struct ItemSubGroup {
 }
 
 /// <https://wiki.factorio.com/Prototype/ModuleCategory>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(module_category)]
 pub struct ModuleCategory {
     name: String,
@@ -4853,7 +4908,7 @@ pub struct ModuleCategory {
 }
 
 /// <https://wiki.factorio.com/Prototype/NamedNoiseExpression>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(noise_expression)]
 pub struct NamedNoiseExpression {
     name: String,
@@ -4863,7 +4918,7 @@ pub struct NamedNoiseExpression {
 }
 
 /// <https://wiki.factorio.com/Prototype/NoiseLayer>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(noise_layer)]
 pub struct NoiseLayer {
     name: String,
@@ -4871,7 +4926,7 @@ pub struct NoiseLayer {
 }
 
 /// <https://wiki.factorio.com/Prototype/Particle>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(optimized_particle)]
 pub struct Particle {
     name: String,
@@ -4894,7 +4949,7 @@ pub struct Particle {
 }
 
 /// <https://wiki.factorio.com/Prototype/Recipe>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(recipe)]
 pub struct Recipe {
     // recipe with category named "crafting" cannot have fluid ingredients or products
@@ -4912,7 +4967,7 @@ pub struct Recipe {
 }
 
 /// <https://wiki.factorio.com/Prototype/RecipeCategory>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(recipe_category)]
 pub struct RecipeCategory {
     name: String,
@@ -4920,7 +4975,7 @@ pub struct RecipeCategory {
 }
 
 /// <https://wiki.factorio.com/Prototype/ResourceCategory>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(resource_category)]
 pub struct ResourceCategory {
     name: String,
@@ -4928,7 +4983,7 @@ pub struct ResourceCategory {
 }
 
 /// <https://wiki.factorio.com/Prototype/Shortcut>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(shortcut)]
 pub struct Shortcut {
     name: String,
@@ -4946,7 +5001,7 @@ pub struct Shortcut {
 }
 
 /// <https://wiki.factorio.com/Prototype/Technology>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(technology)]
 pub struct Technology {
     name: String,
@@ -4958,7 +5013,7 @@ pub struct Technology {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(tile)]
 pub struct Tile {
     // 255 instances max
@@ -5000,7 +5055,7 @@ pub struct Tile {
 }
 
 /// <https://wiki.factorio.com/Prototype/TipsAndTricksItem>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(tips_and_tricks_item)]
 pub struct TipsAndTricksItem {
     name: String,
@@ -5019,7 +5074,7 @@ pub struct TipsAndTricksItem {
 }
 
 /// <https://wiki.factorio.com/Prototype/TrivialSmoke>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(trivial_smoke)]
 pub struct TrivialSmoke {
     name: String,
@@ -5042,7 +5097,7 @@ pub struct TrivialSmoke {
 }
 
 /// <https://wiki.factorio.com/Prototype/Tutorial>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(tutorial)]
 pub struct Tutorial {
     name: String,
@@ -5052,7 +5107,7 @@ pub struct Tutorial {
 }
 
 /// <https://wiki.factorio.com/Prototype/VirtualSignal>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(virtual_signal)]
 pub struct VirtualSignal {
     name: String,
@@ -5072,5 +5127,9 @@ pub enum PrototypesErr {
     #[error("Prototype \"{0}\" not found")]
     PrototypeNotFound(String),
     #[error("Field {0} is required")]
-    FieldRequired(String)
+    FieldRequired(String),
+    #[error("`DataTableAccessable::find()` is not available on Abstract types, use `DataTableAccessable::find_cloned()`")]
+    AbstractFind,
+    #[error("`dataTableAccessable::extend()` is not available for Abstract types")]
+    AbstractExtend
 }

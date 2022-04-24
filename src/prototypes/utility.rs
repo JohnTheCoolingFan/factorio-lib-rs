@@ -5,7 +5,7 @@ use super::additional_types::{Color, Sound, DaytimeColorLookupTable, Factorio2DV
 use super::LocalisedString;
 
 /// <https://wiki.factorio.com/Prototype/UtilityConstants>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(utility_constants)]
 pub struct UtilityConstants {
     name: String,
@@ -107,7 +107,7 @@ pub struct UtilityConstants {
     light_renderer_search_distance_limit: u8
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UtiliyConstantsChart {
     electric_lines_color: Color,
     electric_lines_color_switch_enabled: Color,
@@ -146,14 +146,14 @@ pub struct UtiliyConstantsChart {
     custom_tag_selected_overlay_tint: Color
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UtilityConstantsPlayerColor {
     name: String,
     player_color: Color,
     chat_color: Color
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UtilityConstantsTrainPathFinding {
     train_stop_penalty: u32,
     stopped_manually_controlled_train_penalty: u32,
@@ -169,7 +169,7 @@ pub struct UtilityConstantsTrainPathFinding {
     train_auto_without_schedule_penalty: u32
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UtilityConstantsMapEditor {
     clone_editor_copy_source_color: Color,
     clone_editor_copy_destination_allowed_color: Color,
@@ -189,14 +189,14 @@ pub struct UtilityConstantsMapEditor {
     decorative_editor_selection_preview_radius: u8
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UtilityConstantColorFilter {
     name: String,
     localised_name: LocalisedString,
     matrix: [[f32; 4]; 4]
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UtilityConstantsEntityRendererSerahcBoxLimits {
     left: u8, // Range [6, 15]
     top: u8, // Range [3, 15]
@@ -205,7 +205,7 @@ pub struct UtilityConstantsEntityRendererSerahcBoxLimits {
 }
 
 /// <https://wiki.factorio.com/Prototype/UtilitySounds>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(utility_sounds)]
 pub struct UtilitySounds {
     name: String,
@@ -274,7 +274,7 @@ pub struct UtilitySounds {
 }
 
 /// <https://wiki.factorio.com/Prototype/UtilitySprites>
-#[derive(Debug, Prototype, PrototypeBase, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable)]
 #[data_table(utility_sprites)]
 pub struct UtilitySprites {
     // Only one instance allowed
@@ -654,7 +654,7 @@ pub struct UtilitySprites {
     character_logistic_requests_modifier_constant: Option<Sprite>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UtilitySpritesCursorBox {
     regular: Vec<BoxSpecification>,
     not_allowed: Vec<BoxSpecification>,
