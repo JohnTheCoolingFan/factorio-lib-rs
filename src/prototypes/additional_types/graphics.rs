@@ -3,7 +3,7 @@ use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
 use std::iter::{Iterator, FromIterator};
 use super::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
 use strum_macros::{EnumString, AsRefStr};
-use mlua::ToLua;
+use mlua::{prelude::*, Value};
 
 // ============ // Simple types // ============ //
 
@@ -533,21 +533,21 @@ pub struct RotatedAnimation {
 /// <https://wiki.factorio.com/Types/RotatedAnimation>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RotatedAnimationSpec {
-    direction_count: u32,
+    pub direction_count: u32,
     #[default(0_u32)]
-    still_frame: u32, // Default: 0
+    pub still_frame: u32, // Default: 0
     #[default(false)]
-    axially_symmetrical: bool, // Default: false
+    pub axially_symmetrical: bool, // Default: false
     #[default(false)]
-    counterclockwise: bool, // Default: false
+    pub counterclockwise: bool, // Default: false
     #[default(0.5_f32)]
-    middle_orientation: f32, // Default: 0.5
+    pub middle_orientation: f32, // Default: 0.5
     #[default(1_f32)]
-    orientation_range: f32, // Default: 1
+    pub orientation_range: f32, // Default: 1
     #[default(true)]
-    apply_projection: bool, // Default: true
+    pub apply_projection: bool, // Default: true
     #[use_self_forced] // TODO
-    animation: AnimationVariation
+    pub animation: AnimationVariation
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimationVariations>
@@ -558,6 +558,24 @@ pub type RotatedAnimationVariations = Vec<RotatedAnimationVariation>;
 pub enum RotatedAnimationVariation {
     Layers(Vec<RotatedAnimationVariation>),
     Single(Box<RotatedAnimation>)
+}
+
+impl<'lua> PrototypeFromLua<'lua> for RotatedAnimationVariation {
+    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
+        let type_name = value.type_name();
+        if let Value::Table(t) = value {
+            if t.get::<_, Option<String>>("direction_count")?.is_some() {
+                Ok(Self::Single(Box::new(RotatedAnimation::prototype_from_lua(t.to_lua(lua)?, lua, data_table)?)))
+            } else {
+                Ok(Self::Layers(t
+                        .sequence_values::<Value>()
+                        .map(|v| RotatedAnimationVariation::prototype_from_lua(v?, lua, data_table))
+                        .collect::<LuaResult<Vec<RotatedAnimationVariation>>>()?))
+            }
+        } else {
+            Err(LuaError::FromLuaConversionError { from: type_name, to: "RotatedAnimationVariation", message: Some("expected table".into()) })
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimation4Way>

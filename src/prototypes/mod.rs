@@ -1634,32 +1634,56 @@ pub struct Cliff {
 }
 
 /// <https://wiki.factorio.com/Prototype/Corpse>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CorpseBase {
-    dying_speed: f32, // Default: 1
-    splash_speed: f32, // Default: 1
-    time_before_shading_off: i32, // Default: 60 * 15
-    time_before_removed: i32, // Default: 60 * 120
-    remove_on_entity_placemen: bool, // Default: true
-    remove_on_tile_placement: bool, // Default: true
-    final_render_layer: RenderLayer, // Default: "corpse"
-    gound_patch_render_layer: RenderLayer, // Default: "ground-patch"
-    animation_render_layer: RenderLayer, // Default: "object"
-    splash_render_layer: RenderLayer, // Default: "object"
-    animation_overlay_render_layer: RenderLayer, // Default: "object"
-    animation_overlay_final_render_layer: RenderLayer, // Default: "corpse"
-    shuffle_directions_at_frame: u8, // Default: 1
-    use_tile_color_for_ground_patch_tint: bool, // Default: false
-    ground_patch_fade_in_delay: f32, // Default: 0
-    ground_patch_fade_in_speed: f32, // Default: 0
-    ground_patch_fade_out_start: f32, // Default: 0
-    animation: Option<Vec<RotatedAnimationVariation>>,
-    animation_overlay: Option<Vec<RotatedAnimationVariation>>,
-    splash: Option<Vec<AnimationVariation>>,
-    ground_patch: Option<Vec<AnimationVariation>>,
-    ground_patch_higher: Option<Vec<AnimationVariation>>,
-    ground_patch_fade_out_duration: f32, // Default: 0
-    direction_shuffle: Option<Vec<Vec<u16>>> // Inner Vecs should be the same size
+    #[default(1_f32)]
+    pub dying_speed: f32, // Default: 1
+    #[default(1_f32)]
+    pub splash_speed: f32, // Default: 1
+    #[default(900_i32)]
+    pub time_before_shading_off: i32, // Default: 60 * 15
+    #[default(7200_i32)]
+    pub time_before_removed: i32, // Default: 60 * 120
+    #[default(true)]
+    pub remove_on_entity_placemen: bool, // Default: true
+    #[default(true)]
+    pub remove_on_tile_placement: bool, // Default: true
+    #[from_str]
+    #[default("corpse")]
+    pub final_render_layer: RenderLayer, // Default: "corpse"
+    #[from_str]
+    #[default("ground-patch")]
+    pub gound_patch_render_layer: RenderLayer, // Default: "ground-patch"
+    #[from_str]
+    #[default("object")]
+    pub animation_render_layer: RenderLayer, // Default: "object"
+    #[from_str]
+    #[default("object")]
+    pub splash_render_layer: RenderLayer, // Default: "object"
+    #[from_str]
+    #[default("object")]
+    pub animation_overlay_render_layer: RenderLayer, // Default: "object"
+    #[from_str]
+    #[default("corpse")]
+    pub animation_overlay_final_render_layer: RenderLayer, // Default: "corpse"
+    #[default(1_u8)]
+    pub shuffle_directions_at_frame: u8, // Default: 1
+    #[default(false)]
+    pub use_tile_color_for_ground_patch_tint: bool, // Default: false
+    #[default(0_f32)]
+    pub ground_patch_fade_in_delay: f32, // Default: 0
+    #[default(0_f32)]
+    pub ground_patch_fade_in_speed: f32, // Default: 0
+    #[default(0_f32)]
+    pub ground_patch_fade_out_start: f32, // Default: 0
+    pub animation: Option<Vec<RotatedAnimationVariation>>,
+    pub animation_overlay: Option<Vec<RotatedAnimationVariation>>,
+    pub splash: Option<Vec<AnimationVariation>>,
+    pub ground_patch: Option<Vec<AnimationVariation>>,
+    pub ground_patch_higher: Option<Vec<AnimationVariation>>,
+    #[default(0_f32)]
+    pub ground_patch_fade_out_duration: f32, // Default: 0
+    pub direction_shuffle: Option<Vec<Vec<u16>>> // Inner Vecs should be the same size
 }
 
 /// <https://wiki.factorio.com/Prototype/Corpse>
