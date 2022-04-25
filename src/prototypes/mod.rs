@@ -1617,17 +1617,20 @@ pub struct CharacterCorpse {
 }
 
 /// <https://wiki.factorio.com/Prototype/Cliff>
-#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(cliff)]
 pub struct Cliff {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    orientations: OrientedCliffPrototypes,
-    grid_size: Factorio2DVector,
-    grid_offset: Factorio2DVector,
-    cliff_height: f32, // Default: 4
-    cliff_explosive: String, // Name of capsule that has a robot_action to explode cliffs
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    pub orientations: OrientedCliffPrototypes,
+    pub grid_size: Factorio2DVector,
+    pub grid_offset: Factorio2DVector,
+    #[default(4_f32)]
+    pub cliff_height: f32, // Default: 4
+    pub cliff_explosive: String, // Name of capsule that has a robot_action to explode cliffs
 }
 
 /// <https://wiki.factorio.com/Prototype/Corpse>

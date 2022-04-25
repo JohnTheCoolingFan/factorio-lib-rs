@@ -1512,36 +1512,36 @@ pub struct ItemToPlace {
 }
 
 /// <https://wiki.factorio.com/Prototype/Cliff#orientations>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct OrientedCliffPrototypes {
-    west_to_east: OrientedCliffPrototype,
-    north_to_south: OrientedCliffPrototype,
-    east_to_west: OrientedCliffPrototype,
-    south_to_north: OrientedCliffPrototype,
-    west_to_north: OrientedCliffPrototype,
-    north_to_east: OrientedCliffPrototype,
-    east_to_south: OrientedCliffPrototype,
-    south_to_west: OrientedCliffPrototype,
-    west_to_south: OrientedCliffPrototype,
-    north_to_west: OrientedCliffPrototype,
-    east_to_north: OrientedCliffPrototype,
-    south_to_east: OrientedCliffPrototype,
-    west_to_none: OrientedCliffPrototype,
-    none_to_east: OrientedCliffPrototype,
-    north_to_none: OrientedCliffPrototype,
-    none_to_south: OrientedCliffPrototype,
-    east_to_none: OrientedCliffPrototype,
-    none_to_west: OrientedCliffPrototype,
-    south_to_none: OrientedCliffPrototype,
-    none_to_north: OrientedCliffPrototype,
+    pub west_to_east: OrientedCliffPrototype,
+    pub north_to_south: OrientedCliffPrototype,
+    pub east_to_west: OrientedCliffPrototype,
+    pub south_to_north: OrientedCliffPrototype,
+    pub west_to_north: OrientedCliffPrototype,
+    pub north_to_east: OrientedCliffPrototype,
+    pub east_to_south: OrientedCliffPrototype,
+    pub south_to_west: OrientedCliffPrototype,
+    pub west_to_south: OrientedCliffPrototype,
+    pub north_to_west: OrientedCliffPrototype,
+    pub east_to_north: OrientedCliffPrototype,
+    pub south_to_east: OrientedCliffPrototype,
+    pub west_to_none: OrientedCliffPrototype,
+    pub none_to_east: OrientedCliffPrototype,
+    pub north_to_none: OrientedCliffPrototype,
+    pub none_to_south: OrientedCliffPrototype,
+    pub east_to_none: OrientedCliffPrototype,
+    pub none_to_west: OrientedCliffPrototype,
+    pub south_to_none: OrientedCliffPrototype,
+    pub none_to_north: OrientedCliffPrototype,
 }
 
 /// <https://wiki.factorio.com/Types/OrientedCliffPrototype>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct OrientedCliffPrototype {
-    collision_bounding_box: BoundingBox,
-    pictures: Vec<SpriteVariation>,
-    fill_volume: u32
+    pub collision_bounding_box: BoundingBox,
+    pub pictures: Vec<SpriteVariation>,
+    pub fill_volume: u32
 }
 
 /// <https://wiki.factorio.com/Prototype/RailRemnants#bending_type>
