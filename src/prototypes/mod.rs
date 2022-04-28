@@ -1715,25 +1715,32 @@ pub trait Corpse: Entity {
 }
 
 /// <https://wiki.factorio.com/Prototype/Corpse>
-#[derive(Debug, Clone, Prototype, Corpse, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Corpse, DataTableAccessable, PrototypeFromLua)]
 #[data_table(corpse)]
 pub struct CorpsePrototype {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    corpse_base: CorpseBase
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub corpse_base: CorpseBase
 }
 
 /// <https://wiki.factorio.com/Prototype/RailRemnants>
-#[derive(Debug, Clone, Prototype, Corpse, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Corpse, DataTableAccessable, PrototypeFromLua)]
 #[data_table(rail_remnants)]
 pub struct RailRemnants {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    corpse_base: CorpseBase,
-    bending_type: BendingType,
-    pictures: RailPictures
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub corpse_base: CorpseBase,
+    #[from_str]
+    pub bending_type: BendingType,
+    pub pictures: RailPictures
 }
 
 /// <https://wiki.factorio.com/Prototype/DeconstructibleTileProxy>

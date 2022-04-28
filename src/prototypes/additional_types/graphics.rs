@@ -762,10 +762,21 @@ pub struct Sprite4Way {
 }
 
 /// <https://wiki.factorio.com/Types/Sprite8Way>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone)] // TODO
 pub struct Sprite8Way {
     // Priority list (most priority first): sheets, sheet, other properties
     sheets: Vec<SpriteNWaySheet>
+}
+
+impl<'lua> PrototypeFromLua<'lua> for Sprite8Way {
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let type_name = value.type_name();
+        if let LuaValue::Table(t) = value {
+            todo!()
+        } else {
+            Err(LuaError::FromLuaConversionError { from: type_name, to: "Sprite8Way", message: Some("expected table".into()) })
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite#layers>
@@ -1003,38 +1014,39 @@ pub enum SpritePriority {
 // ===== // Graphics Sets and Pictures // ===== //
 
 /// <https://wiki.factorio.com/Prototype/Rail#pictures>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RailPictures {
-    straight_rail_horizontal: RailPieceLayers,
-    straight_rail_vertical: RailPieceLayers,
-    straight_rail_diagonal_left_top: RailPieceLayers,
-    straight_rail_diagonal_right_top: RailPieceLayers,
-    straight_rail_diagonal_right_bottom: RailPieceLayers,
-    straight_rail_diagonal_left_bottom: RailPieceLayers,
-    curved_rail_vertical_left_top: RailPieceLayers,
-    curved_rail_vertical_right_top: RailPieceLayers,
-    curved_rail_vertical_right_bottom: RailPieceLayers,
-    curved_rail_vertical_left_bottom: RailPieceLayers,
-    curved_rail_horizontal_left_top: RailPieceLayers,
-    curved_rail_horizontal_right_top: RailPieceLayers,
-    curved_rail_horizontal_right_bottom: RailPieceLayers,
-    curved_rail_horizontal_left_bottom: RailPieceLayers,
-    rail_endings: Sprite8Way
+    pub straight_rail_horizontal: RailPieceLayers,
+    pub straight_rail_vertical: RailPieceLayers,
+    pub straight_rail_diagonal_left_top: RailPieceLayers,
+    pub straight_rail_diagonal_right_top: RailPieceLayers,
+    pub straight_rail_diagonal_right_bottom: RailPieceLayers,
+    pub straight_rail_diagonal_left_bottom: RailPieceLayers,
+    pub curved_rail_vertical_left_top: RailPieceLayers,
+    pub curved_rail_vertical_right_top: RailPieceLayers,
+    pub curved_rail_vertical_right_bottom: RailPieceLayers,
+    pub curved_rail_vertical_left_bottom: RailPieceLayers,
+    pub curved_rail_horizontal_left_top: RailPieceLayers,
+    pub curved_rail_horizontal_right_top: RailPieceLayers,
+    pub curved_rail_horizontal_right_bottom: RailPieceLayers,
+    pub curved_rail_horizontal_left_bottom: RailPieceLayers,
+    pub rail_endings: Sprite8Way
 }
 
 /// <https://wiki.factorio.com/Types/RailPieceLayers>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RailPieceLayers {
-    metals: Vec<SpriteVariation>,
-    backplayes: Vec<SpriteVariation>, // Must have same number of variations as `metals`
-    ties: Vec<SpriteVariation>, // Must have between 1 and 4 items
-    stone_path: Vec<SpriteVariation>, // Must have between 1 and 4 items
-    stone_path_background: Option<Vec<SpriteVariation>>,
-    segment_visualisation_middle: Option<Sprite>,
-    segment_visualisation_ending_front: Option<Sprite>,
-    segment_visualisation_ending_back: Option<Sprite>,
-    segment_visualisation_continuing_front: Option<Sprite>,
-    segment_visualisation_continuing_back: Option<Sprite>,
+    // TODO: checks
+    pub metals: Vec<SpriteVariation>,
+    pub backplayes: Vec<SpriteVariation>, // Must have same number of variations as `metals`
+    pub ties: Vec<SpriteVariation>, // Must have between 1 and 4 items
+    pub stone_path: Vec<SpriteVariation>, // Must have between 1 and 4 items
+    pub stone_path_background: Option<Vec<SpriteVariation>>,
+    pub segment_visualisation_middle: Option<Sprite>,
+    pub segment_visualisation_ending_front: Option<Sprite>,
+    pub segment_visualisation_ending_back: Option<Sprite>,
+    pub segment_visualisation_continuing_front: Option<Sprite>,
+    pub segment_visualisation_continuing_back: Option<Sprite>,
 }
 
 /// <https://wiki.factorio.com/Types/CircuitConnectorSprites>
