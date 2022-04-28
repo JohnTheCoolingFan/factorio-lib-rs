@@ -726,7 +726,9 @@ fn impl_data_table_accessable_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn find<'a>(data_table: &'a crate::prototypes::DataTable, name: &str) -> Result<&'a Self, crate::prototypes::PrototypesErr> {
                 data_table.#attr.get(name).ok_or_else(|| crate::prototypes::PrototypesErr::PrototypeNotFound(name.into()))
             }
+        }
 
+        impl crate::prototypes::DataTableExtend for #name {
             fn extend(self, data_table: &mut crate::prototypes::DataTable) -> Result<(), crate::prototypes::PrototypesErr> {
                 data_table.#attr.insert(self.name.clone(), self);
                 Ok(())

@@ -3,6 +3,7 @@ mod utility;
 pub mod additional_types;
 pub mod prototype_type;
 
+use serde::{de::{DeserializeSeed, MapAccess, Visitor}, Deserializer};
 pub use utility::*;
 pub use abstract_prototypes::*;
 
@@ -75,7 +76,7 @@ pub trait Prototype: fmt::Debug {
 pub type PrototypeCategory<T> = HashMap<String, T>;
 
 /// Struct representing global `data` table in lua environment
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct DataTable {
     references: Vec<Weak<dyn PrototypeReferenceValidate>>,
     resource_records: Vec<ResourceRecord>,
@@ -303,7 +304,7 @@ impl DataTable {
     }
 
     /// Shorthand for [DataTableAccessable::extend]
-    pub fn extend<T: DataTableAccessable>(&mut self, prototype: T) -> Result<(), PrototypesErr> {
+    pub fn extend<T: DataTableExtend>(&mut self, prototype: T) -> Result<(), PrototypesErr> {
         prototype.extend(self)
     }
 
@@ -339,6 +340,41 @@ impl DataTable {
     /// the Result of the check.
     pub fn validate_resources(&self, validator: &impl ResourceValidator) -> Result<(), ResourceError> {
         validator.validate(&self.resource_records)
+    }
+}
+
+impl<'de> DeserializeSeed<'de> for DataTable {
+    type Value = Self;
+
+    fn deserialize<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+    where
+        D: Deserializer<'de>
+    {
+        struct DataTableVisitor<'a>(&'a mut DataTable);
+
+        impl <'de, 'a> Visitor<'de> for DataTableVisitor<'a> {
+            type Value = ();
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                write!(formatter, "a map of string to map")
+            }
+
+            fn visit_map<A>(self, map: A) -> Result<(), A::Error>
+            where
+                A: MapAccess<'de>
+            {
+                while let Some((_, prot_with_name)) = map.next_entry::<PrototypeType, HashMap<String, Box<dyn DataTableExtend + DeserializeSeed + Clone + Sized>>>()? {
+                    while let Some((name, prot)) = prot_with_name.into_iter().next() {
+                        DataTableExtend::extend(*prot, self.0).unwrap()
+                    }
+                }
+                Ok(())
+            }
+        }
+
+        let mut result = DataTable::default();
+
+        Ok(result)
     }
 }
 
@@ -525,6 +561,10 @@ where
     fn find_cloned(data_table: &DataTable, name: &str) -> Result<Self, PrototypesErr> {
         Ok(Self::find(data_table, name)?.clone())
     }
+}
+
+// Possible improvement: if we add a Prototype as supertrait, we can provide implementation
+pub trait DataTableExtend: Prototype {
     /// Extend [Data table](DataTable) with this prototype
     fn extend(self, data_table: &mut DataTable) -> Result<(), PrototypesErr>;
 }

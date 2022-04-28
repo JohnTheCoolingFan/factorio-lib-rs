@@ -26,8 +26,4 @@ impl DataTableAccessable for AbstractEntity {
         // TODO 
         abstract_prototype_get!(arrow, artillery_flare)
     }
-
-    fn extend(self, _data_table: &mut DataTable) -> Result<(), PrototypesErr> {
-        Err(PrototypesErr::AbstractExtend)
-    }
 }
