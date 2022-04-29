@@ -1755,14 +1755,16 @@ pub struct DeconstructibleTileProxy {
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityGhost>
-#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(entity_ghost)]
 pub struct EntityGhost {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    medium_build_sound: Option<Sound>,
-    large_build_sound: Option<Sound>
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    pub medium_build_sound: Option<Sound>,
+    pub large_build_sound: Option<Sound>
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityWithHealth>
