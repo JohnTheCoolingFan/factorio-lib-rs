@@ -434,6 +434,7 @@ prot_from_lua_blanket!(i16);
 prot_from_lua_blanket!(i8);
 prot_from_lua_blanket!(Color);
 prot_from_lua_blanket!(Factorio2DVector);
+prot_from_lua_blanket!(Factorio3DVector);
 prot_from_lua_blanket!(Position);
 prot_from_lua_blanket!(RealOrientation);
 prot_from_lua_blanket!(Energy);
@@ -1880,23 +1881,32 @@ pub struct Accumulator {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArtilleryTurret>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(artillery_turret)]
 pub struct ArtilleryTurret {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub gun: String, // Name of a gun item
     pub inventory_size: u16, // Must be > 0
     pub ammo_stack_limit: u32, // Must be > 0
     pub automated_ammo_count: u32,
     pub turret_rotation_speed: f64,
     pub manual_range_modifier: f64, // Must be positive
+    #[default(true)]
     pub alert_when_attacking: bool, // Default: true
+    #[default(false)]
     pub disable_automatic_firing: bool, // Default: false
+    #[default(0_u8)]
     pub base_picture_secondary_draw_order: u8, // Default: 0
+    #[from_str]
+    #[default("lower-object")]
     pub base_picture_render_layer: RenderLayer, // Default: "lower-object"
     pub base_shift: Option<Factorio2DVector>,
     pub base_picture: Option<Animation4Way>,
@@ -1904,12 +1914,15 @@ pub struct ArtilleryTurret {
     pub cannon_barrel_pictures: Option<RotatedSprite>,
     pub rotating_sound: Option<InterruptibleSound>,
     pub rotating_stopped_sound: Option<Sound>,
+    #[default(0_u16)]
     pub turn_after_shooting_cooldown: u16, // Default: 0
+    #[default(0_u16)]
     pub cannon_parking_frame_count: u16, // Default: 0
+    #[default(1_u16)]
     pub cannon_parking_speed: u16, // Default: 1
     pub cannon_barrel_recoil_shiftings: Option<Vec<Factorio3DVector>>,
     pub cannon_barrel_recoil_shiftings_load_correction_matrix: Option<Vec<Factorio3DVector>>, // Only loaded if cannon_barrel_recoil_shiftings is loaded
-    cannon_barrel_light_direction: Option<Factorio3DVector> // Only loaded if cannon_barrel_recoil_shiftings is loaded
+    pub cannon_barrel_light_direction: Option<Factorio3DVector> // Only loaded if cannon_barrel_recoil_shiftings is loaded
 }
 
 /// <https://wiki.factorio.com/Prototype/Beacon>

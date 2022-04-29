@@ -499,13 +499,17 @@ pub struct AnimationVariation {
 }
 
 /// <https://wiki.factorio.com/Types/Animation4Way>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct Animation4Way {
     // All fancy shenanigans are omitted, this program/library behaves like a game
-    north: Animation,
-    east: Animation,
-    south: Animation,
-    west: Animation,
+    #[use_self]
+    pub north: Animation,
+    #[mandatory_if(prot_table.get::<_, Option<Value>>("north")?.is_some())]
+    pub east: Option<Animation>,
+    #[mandatory_if(prot_table.get::<_, Option<Value>>("north")?.is_some())]
+    pub south: Option<Animation>,
+    #[mandatory_if(prot_table.get::<_, Option<Value>>("north")?.is_some())]
+    pub west: Option<Animation>,
 }
 
 /// <https://wiki.factorio.com/Types/AnimationElement>
@@ -647,6 +651,8 @@ pub struct SpriteSpecWithoutFilename {
     pub premul_alpha: bool, // Default: true
     pub generate_sfd: bool // Default: false // Only used by sprites in UtilitySprites with "icon" flag
 }
+
+// TODO: do this with a macro
 
 impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
     fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut DataTable) -> mlua::Result<Self> {
@@ -827,34 +833,36 @@ impl From<Vec<SpriteNWaySheet>> for DirectionalSprite {
 
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SpriteDirections {
-    north: Option<Sprite>,
-    north_east: Option<Sprite>,
-    east: Option<Sprite>,
-    south_east: Option<Sprite>,
-    south: Option<Sprite>,
-    south_west: Option<Sprite>,
-    west: Option<Sprite>,
-    north_west: Option<Sprite>,
+    pub north: Option<Sprite>,
+    pub north_east: Option<Sprite>,
+    pub east: Option<Sprite>,
+    pub south_east: Option<Sprite>,
+    pub south: Option<Sprite>,
+    pub south_west: Option<Sprite>,
+    pub west: Option<Sprite>,
+    pub north_west: Option<Sprite>,
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite#layers>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RotatedSprite {
-    layers: Vec<RotatedSpriteLayer>
+    #[use_self_vec]
+    pub layers: Vec<RotatedSpriteLayer>
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RotatedSpriteLayer {
-    regular: RotatedSpriteSpec,
-    hr_version: Option<RotatedSpriteSpec>
+    #[use_self_forced]
+    pub regular: RotatedSpriteSpec,
+    pub hr_version: Option<RotatedSpriteSpec>
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RotatedSpriteSpec {
-    sprites: Vec<SpriteSpec>, // If `filenames` is set, copy all properties to each object for each filename
-    direction_count: u16
+    pub sprites: Vec<SpriteSpec>, // If `filenames` is set, copy all properties to each object for each filename // FIXME
+    pub direction_count: u16
 }
 
 /// <https://wiki.factorio.com/Types/SpriteVariations>
