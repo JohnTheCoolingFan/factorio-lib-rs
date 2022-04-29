@@ -1,6 +1,6 @@
 //! <https://wiki.factorio.com/Factorio_HTTP_API_usage_guidelines#APIs>
 //!
-//! This module provides structs and functions to interface various Factorio-related Web APIs
+//! This module provides functions and structs to simplify interaction with Factorio Web API
 
 use strum::Display;
 use semver::Version;
