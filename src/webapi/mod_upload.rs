@@ -3,15 +3,14 @@
 //! This module provides an easy interface to upload mods to a mod portal
 
 use std::fmt::Display;
-use reqwest::{Client, StatusCode};
+use reqwest::{Client, StatusCode, Body};
 use strum::Display;
 use thiserror::Error;
 use serde::Deserialize;
-use tokio::fs::File;
 
 pub const INIT_UPLOAD_URL: &str = "https://mods.factorio.com/api/v2/mods/releases/init_upload";
 
-pub async fn upload_mod<T>(client: &Client, api_key: &str, mod_name: &str, file: File) -> Result<(), ModUploadError> {
+pub async fn upload_mod(client: &Client, api_key: &str, mod_name: &str, file: impl Into<Body>) -> Result<(), ModUploadError> {
     let response =  client.post(INIT_UPLOAD_URL).bearer_auth(api_key).body(mod_name.to_string()).send().await?;
     if response.status() == StatusCode::OK {
         let data = response.json::<ModUploadInitResponse>().await?;
