@@ -752,31 +752,90 @@ impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
 pub struct SpriteNWaySheet {
     sprite: SpriteSpec,
     frames: u32, // 4 or 8
+
+}
+
+impl SpriteNWaySheet {
+    fn new<'lua>(value: mlua::Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable, frames: u32) -> LuaResult<Self> {
+        if let mlua::Value::Table(t) = &value {
+            let frames = t.get::<_, Option<u32>>("frames")?.unwrap_or(frames);
+            drop(t);
+            let sprite = SpriteSpec::prototype_from_lua(value, lua, data_table)?;
+            Ok(Self{sprite, frames})
+        } else {
+            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "SpriteNWaySheet", message: Some("Expected table".into()) })
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Types/Sprite4Way>
 #[derive(Debug, Clone)]
-pub struct Sprite4Way {
-    // Priority list (most priority first): sheets, sheet, other properties
-    sheets: Vec<SpriteNWaySheet>
+pub struct Sprite4Way(pub DirectionalSprite);
+
+impl<'lua> PrototypeFromLua<'lua> for Sprite4Way {
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let type_name = value.type_name();
+        if let LuaValue::Table(t) = value {
+            if let Some(sheets) = t.get::<_, Option<Vec<Value>>>("sheets")? {
+                let sheets = sheets.iter().map(|v| SpriteNWaySheet::new(*v, lua, data_table, 4)).collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
+                Ok(Self(sheets.into()))
+            } else if let Some(sheet) = t.get::<_, Option<Value>>("sheet")? {
+                let sheets = vec![SpriteNWaySheet::new(sheet, lua, data_table, 4)?];
+                Ok(Self(sheets.into()))
+            } else {
+                Ok(Self(DirectionalSprite::Directions(SpriteDirections::prototype_from_lua(value, lua, data_table)?)))
+            }
+        } else {
+            Err(LuaError::FromLuaConversionError { from: type_name, to: "Sprite8Way", message: Some("expected table".into()) })
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Types/Sprite8Way>
-#[derive(Debug, Clone)] // TODO
-pub struct Sprite8Way {
-    // Priority list (most priority first): sheets, sheet, other properties
-    sheets: Vec<SpriteNWaySheet>
-}
+#[derive(Debug, Clone)]
+pub struct Sprite8Way(pub DirectionalSprite);
 
 impl<'lua> PrototypeFromLua<'lua> for Sprite8Way {
     fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let LuaValue::Table(t) = value {
-            todo!()
+            if let Some(sheets) = t.get::<_, Option<Vec<Value>>>("sheets")? {
+                let sheets = sheets.iter().map(|v| SpriteNWaySheet::new(*v, lua, data_table, 8)).collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
+                Ok(Self(sheets.into()))
+            } else if let Some(sheet) = t.get::<_, Option<Value>>("sheet")? {
+                let sheets = vec![SpriteNWaySheet::new(sheet, lua, data_table, 8)?];
+                Ok(Self(sheets.into()))
+            } else {
+                Ok(Self(DirectionalSprite::Directions(SpriteDirections::prototype_from_lua(value, lua, data_table)?)))
+            }
         } else {
             Err(LuaError::FromLuaConversionError { from: type_name, to: "Sprite8Way", message: Some("expected table".into()) })
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum DirectionalSprite {
+    Sheets(Vec<SpriteNWaySheet>),
+    Directions(SpriteDirections)
+}
+
+impl From<Vec<SpriteNWaySheet>> for DirectionalSprite {
+    fn from(sheets: Vec<SpriteNWaySheet>) -> Self {
+        Self::Sheets(sheets)
+    }
+}
+
+#[derive(Debug, Clone, PrototypeFromLua)]
+pub struct SpriteDirections {
+    north: Option<Sprite>,
+    north_east: Option<Sprite>,
+    east: Option<Sprite>,
+    south_east: Option<Sprite>,
+    south: Option<Sprite>,
+    south_west: Option<Sprite>,
+    west: Option<Sprite>,
+    north_west: Option<Sprite>,
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite#layers>

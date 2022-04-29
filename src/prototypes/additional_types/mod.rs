@@ -1553,36 +1553,53 @@ pub enum BendingType {
 }
 
 /// <https://wiki.factorio.com/Types/ExplosionDefinition>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ExplosionDefinition {
-    name: String, // Name of Prototype/Entity
-    offset: Option<Factorio2DVector>
+    pub name: String, // Name of Prototype/Entity
+    pub offset: Option<Factorio2DVector>
 }
 
 /// <https://wiki.factorio.com/Types/Resistances>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct Resistance {
-    r#type: String, // Name of Prototype/DamageType
-    decrease: f32, // Default: 0
-    percent: f32, // Default: 0
+    #[rename("type")]
+    pub resistance_type: String, // Name of Prototype/DamageType
+    #[default(0_f32)]
+    pub decrease: f32, // Default: 0
+    #[default(0_f32)]
+    pub percent: f32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/Loot>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct Loot {
-    item: String, // Name of Prototype/Item
-    probability: f64, // Default: 1
-    count_min: f64, // Default: 1
-    count_max: f64, // Default: 1 // Must be > 0
+    pub item: String, // Name of Prototype/Item
+    #[default(1_f64)]
+    pub probability: f64, // Default: 1
+    #[default(1_f64)]
+    pub count_min: f64, // Default: 1
+    #[default(1_f64)]
+    pub count_max: f64, // Default: 1 // Must be > 0
+}
+
+impl Loot {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.count_max <= 0.0 {
+            return Err(LuaError::FromLuaConversionError { from: "table", to: "Loot", message: Some("`count_max` must be > 0".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Types/AttackReactionItem>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AttackReactionItem {
-    range: f32,
-    action: Option<Trigger>,
-    reaction_modifier: f32, // Default: 0
-    damage_type: Option<String>, // name of Prototype/DamageType
+    pub range: f32,
+    pub action: Option<Trigger>,
+    #[default(0_f32)]
+    pub reaction_modifier: f32, // Default: 0
+    pub damage_type: Option<String>, // name of Prototype/DamageType
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource>

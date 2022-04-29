@@ -1768,25 +1768,45 @@ pub struct EntityGhost {
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityWithHealth>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct EntityWithHealthBase {
-    max_health: f32, // Default: 10
-    healing_per_tick: f32, // Default: 0.001666 for Prototype/Tree, 0 for the rest
-    repair_speed_multiplier: f32, // Default: 1
-    dying_explosion: Option<Vec<ExplosionDefinition>>,
-    drying_trigger_effect: Option<TriggerEffect>,
-    damaged_trigger_effect: Option<TriggerEffect>,
-    loot: Option<Vec<Loot>>,
-    resistances: Option<Vec<Resistance>>,
-    attack_reaction: Vec<AttackReactionItem>, // Default: Empty
-    repair_sound: Sound, // Default: Utility Sound (defaultManualRepair)
-    alert_when_damaged: bool, // Default: true
-    hide_resistances: bool, // Default: true
-    create_ghost_on_death: bool, // Default: true
-    random_corpse_variation: bool, // Default: false
-    integration_patch_render_layer: RenderLayer, // Default: "lower-object"
-    corpse: Vec<String>, // Default: Empty // (Names) Name of Prototype/Corpse
-    integration_patch: Sprite4Way
+    #[default(10_f32)]
+    pub max_health: f32, // Default: 10
+    #[default(Self::healing_per_tick_default(prot_table.get::<_, String>("type").unwrap()))]
+    pub healing_per_tick: f32, // Default: 0.001666 for Prototype/Tree, 0 for the rest
+    #[default(1_f32)]
+    pub repair_speed_multiplier: f32, // Default: 1
+    pub dying_explosion: Option<Vec<ExplosionDefinition>>,
+    pub drying_trigger_effect: Option<TriggerEffect>,
+    pub damaged_trigger_effect: Option<TriggerEffect>,
+    pub loot: Option<Vec<Loot>>,
+    pub resistances: Option<Vec<Resistance>>,
+    #[default(vec![])]
+    pub attack_reaction: Vec<AttackReactionItem>, // Default: Empty
+    pub repair_sound: Sound, // Default: Utility Sound (defaultManualRepair)
+    #[default(true)]
+    pub alert_when_damaged: bool, // Default: true
+    #[default(true)]
+    pub hide_resistances: bool, // Default: true
+    #[default(true)]
+    pub create_ghost_on_death: bool, // Default: true
+    #[default(false)]
+    pub random_corpse_variation: bool, // Default: false
+    #[from_str]
+    #[default("lower-object")]
+    pub integration_patch_render_layer: RenderLayer, // Default: "lower-object"
+    #[default(vec![])]
+    pub corpse: Vec<String>, // Default: Empty // (Names) Name of Prototype/Corpse
+    pub integration_patch: Sprite4Way
+}
+
+impl EntityWithHealthBase {
+    fn healing_per_tick_default(ptype: String) -> f32 {
+        match ptype.parse::<PrototypeType>().unwrap() {
+            PrototypeType::Tree => 0.001666,
+            _ => 0.0
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityWithHealth>
