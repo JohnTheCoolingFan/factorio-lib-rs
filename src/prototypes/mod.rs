@@ -416,8 +416,8 @@ where
 }
 
 // "Manual" PrototypeFromLua implementations for types that implement FromLua
-// The reason I can't do impl<T> PrototypeFromLua for T is because I need special handling for Vec
-// and Option to allow to pass through DataTable reference
+// The reason I can't do impl<T> PrototypeFromLua for T is because I need special handling for Vec,
+// Option and HashMap to allow to pass through DataTable reference
 prot_from_lua_blanket!(String);
 prot_from_lua_blanket!(f64);
 prot_from_lua_blanket!(f32);
@@ -438,6 +438,8 @@ prot_from_lua_blanket!(Position);
 prot_from_lua_blanket!(RealOrientation);
 prot_from_lua_blanket!(Energy);
 prot_from_lua_blanket!(ActivationType);
+prot_from_lua_blanket!(Direction);
+prot_from_lua_blanket!(ProductionType);
 #[cfg(feature = "concepts")]
 prot_from_lua_blanket!(LocalisedString);
 
@@ -1846,14 +1848,18 @@ pub trait EntityWithOwner {
 }
 
 /// <https://wiki.factorio.com/Prototype/Accumulator>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(accumulator)]
 pub struct Accumulator {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub energy_source: EnergySource,
     pub picture: Sprite,
     pub charge_cooldown: u16,
@@ -1863,8 +1869,11 @@ pub struct Accumulator {
     pub discharge_animation: Option<Animation>,
     pub discharge_light: Option<LightDefinition>,
     pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    #[default(0_f64)]
     pub circuit_wire_max_distance: f64, // Default: 0
+    #[default(true)]
     pub draw_copper_wires: bool, // Default: true
+    #[default(true)]
     pub draw_circuit_wires: bool, // Default: true
     pub circuit_connector_sprites: Option<CircuitConnectorSprites>,
     pub default_output_signal: Option<SignalIDConnector>

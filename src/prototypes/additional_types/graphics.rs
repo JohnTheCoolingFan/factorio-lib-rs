@@ -185,13 +185,13 @@ pub enum RunMode {
 #[derive(Debug, Clone, Eq, PartialEq, Copy, PrototypeFromLua)]
 pub struct SecondaryDrawOrders {
     #[default(1)]
-    north: i8,
+    pub north: i8,
     #[default(1)]
-    east: i8,
+    pub east: i8,
     #[default(1)]
-    south: i8,
+    pub south: i8,
     #[default(1)]
-    west: i8
+    pub west: i8
 }
 
 /// <https://wiki.factorio.com/Types/LightDefinition>
@@ -750,8 +750,8 @@ impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
 /// <https://wiki.factorio.com/Types/SpriteNWaySheet>
 #[derive(Debug, Clone)]
 pub struct SpriteNWaySheet {
-    sprite: SpriteSpec,
-    frames: u32, // 4 or 8
+    pub sprite: SpriteSpec,
+    pub frames: u32, // 4 or 8
 
 }
 
@@ -759,7 +759,6 @@ impl SpriteNWaySheet {
     fn new<'lua>(value: mlua::Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable, frames: u32) -> LuaResult<Self> {
         if let mlua::Value::Table(t) = &value {
             let frames = t.get::<_, Option<u32>>("frames")?.unwrap_or(frames);
-            drop(t);
             let sprite = SpriteSpec::prototype_from_lua(value, lua, data_table)?;
             Ok(Self{sprite, frames})
         } else {
@@ -775,9 +774,9 @@ pub struct Sprite4Way(pub DirectionalSprite);
 impl<'lua> PrototypeFromLua<'lua> for Sprite4Way {
     fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
         let type_name = value.type_name();
-        if let LuaValue::Table(t) = value {
+        if let LuaValue::Table(t) = &value {
             if let Some(sheets) = t.get::<_, Option<Vec<Value>>>("sheets")? {
-                let sheets = sheets.iter().map(|v| SpriteNWaySheet::new(*v, lua, data_table, 4)).collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
+                let sheets = sheets.into_iter().map(|v| SpriteNWaySheet::new(v, lua, data_table, 4)).collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
                 Ok(Self(sheets.into()))
             } else if let Some(sheet) = t.get::<_, Option<Value>>("sheet")? {
                 let sheets = vec![SpriteNWaySheet::new(sheet, lua, data_table, 4)?];
@@ -798,9 +797,9 @@ pub struct Sprite8Way(pub DirectionalSprite);
 impl<'lua> PrototypeFromLua<'lua> for Sprite8Way {
     fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
         let type_name = value.type_name();
-        if let LuaValue::Table(t) = value {
+        if let LuaValue::Table(t) = &value {
             if let Some(sheets) = t.get::<_, Option<Vec<Value>>>("sheets")? {
-                let sheets = sheets.iter().map(|v| SpriteNWaySheet::new(*v, lua, data_table, 8)).collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
+                let sheets = sheets.into_iter().map(|v| SpriteNWaySheet::new(v, lua, data_table, 8)).collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
                 Ok(Self(sheets.into()))
             } else if let Some(sheet) = t.get::<_, Option<Value>>("sheet")? {
                 let sheets = vec![SpriteNWaySheet::new(sheet, lua, data_table, 8)?];
@@ -1109,19 +1108,19 @@ pub struct RailPieceLayers {
 }
 
 /// <https://wiki.factorio.com/Types/CircuitConnectorSprites>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CircuitConnectorSprites {
-    led_red: Sprite,
-    led_green: Sprite,
-    led_blue: Sprite,
-    led_light: LightDefinition,
-    connector_main: Option<Sprite>,
-    connector_shadow: Option<Sprite>,
-    wire_pins: Option<Sprite>,
-    wire_pins_shadow: Option<Sprite>,
-    led_blue_off: Option<Sprite>,
-    blue_led_light_offset: Option<Factorio2DVector>,
-    red_green_led_light_offset: Option<Factorio2DVector>
+    pub led_red: Sprite,
+    pub led_green: Sprite,
+    pub led_blue: Sprite,
+    pub led_light: LightDefinition,
+    pub connector_main: Option<Sprite>,
+    pub connector_shadow: Option<Sprite>,
+    pub wire_pins: Option<Sprite>,
+    pub wire_pins_shadow: Option<Sprite>,
+    pub led_blue_off: Option<Sprite>,
+    pub blue_led_light_offset: Option<Factorio2DVector>,
+    pub red_green_led_light_offset: Option<Factorio2DVector>
 }
 
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet>

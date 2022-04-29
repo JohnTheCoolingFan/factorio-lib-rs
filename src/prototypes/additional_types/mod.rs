@@ -26,7 +26,7 @@ use std::str::FromStr;
 use crate::prototypes::{GetPrototype, PrototypesErr};
 use super::{LocalisedString, PrototypeFromLua, DataTable};
 use mlua::{ToLua, Value, Lua, prelude::*, FromLua};
-use strum_macros::{EnumString, AsRefStr};
+use strum_macros::{EnumDiscriminants, EnumString, AsRefStr};
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
 #[derive(Debug, Clone)]
@@ -1603,82 +1603,143 @@ pub struct AttackReactionItem {
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct EnergySourceBase {
-    emissions_per_minute: f64, // Default: 0
-    render_no_power_icon: bool, // Default: true
-    render_no_network_icon: bool, // Default: true
+    #[default(0_f64)]
+    pub emissions_per_minute: f64, // Default: 0
+    #[default(true)]
+    pub render_no_power_icon: bool, // Default: true
+    #[default(true)]
+    pub render_no_network_icon: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, EnumDiscriminants)]
+#[strum_discriminants(derive(EnumString), strum(serialize_all = "kebab-case"))]
 pub enum EnergySource {
     /// <https://wiki.factorio.com/Types/EnergySource#Electric_energy_source>
     Electric(ElectricEnergySource),
     /// <https://wiki.factorio.com/Types/EnergySource#Burner>
     Burner(BurnerEnergySource),
     /// <https://wiki.factorio.com/Types/EnergySource#Heat_energy_source>
-    Heat(HeatEnergySource),
+    Heat(Box<HeatEnergySource>),
     /// <https://wiki.factorio.com/Types/EnergySource#Fluid_energy_source>
-    Fluid(FluidEnergySource),
+    Fluid(Box<FluidEnergySource>),
     /// <https://wiki.factorio.com/Types/EnergySource#Void_energy_source>
     Void
 }
 
+impl<'lua> PrototypeFromLua<'lua> for EnergySource {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let Value::Table(t) = &value {
+            Ok(match t.get::<_, String>("type")?.parse::<EnergySourceDiscriminants>().map_err(LuaError::external)? {
+                EnergySourceDiscriminants::Electric => Self::Electric(ElectricEnergySource::prototype_from_lua(value, lua, data_table)?),
+                EnergySourceDiscriminants::Burner => Self::Burner(BurnerEnergySource::prototype_from_lua(value, lua, data_table)?),
+                EnergySourceDiscriminants::Heat => Self::Heat(Box::new(HeatEnergySource::prototype_from_lua(value, lua, data_table)?)),
+                EnergySourceDiscriminants::Fluid => Self::Fluid(Box::new(FluidEnergySource::prototype_from_lua(value, lua, data_table)?)),
+                EnergySourceDiscriminants::Void => Self::Void
+            })
+        } else {
+            Err(LuaError::FromLuaConversionError { from: value.type_name(), to: "EnergySource", message: Some("Expected table".into()) })
+        }
+    }
+}
+
 /// <https://wiki.factorio.com/Types/EnergySource#Electric_energy_source>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ElectricEnergySource {
-    base: EnergySourceBase,
-    buffer_capacity: Option<Energy>,
-    usage_priority: ElectricUsagePriority,
-    input_flow_limit: Energy, // Default: f64::MAX
-    output_flow_limit: Energy, // Default: f64::MAX
-    drain: Option<Energy>
+    #[use_self_forced]
+    pub base: EnergySourceBase,
+    pub buffer_capacity: Option<Energy>,
+    #[from_str]
+    pub usage_priority: ElectricUsagePriority,
+    #[default(Energy(f64::MAX))]
+    pub input_flow_limit: Energy, // Default: f64::MAX
+    #[default(Energy(f64::MAX))]
+    pub output_flow_limit: Energy, // Default: f64::MAX
+    pub drain: Option<Energy>
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource#Burner>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct BurnerEnergySource {
-    base: EnergySourceBase,
-    fuel_inventory_size: ItemStackIndex,
-    burnt_inventory_size: ItemStackIndex, // Default: 0
-    smoke: Option<Vec<SmokeSource>>,
-    light_flicker: Option<LightFlickeringDefinition>,
-    effectivity: f64, // Default: 1
-    fuel_categories: Vec<String>, // Default: "chemical"
+    #[use_self_forced]
+    pub base: EnergySourceBase,
+    pub fuel_inventory_size: ItemStackIndex,
+    #[default(0_u16)]
+    pub burnt_inventory_size: ItemStackIndex, // Default: 0
+    pub smoke: Option<Vec<SmokeSource>>,
+    pub light_flicker: Option<LightFlickeringDefinition>,
+    #[default(1_f64)]
+    pub effectivity: f64, // Default: 1
+    #[default(vec!["chemical".to_string()])]
+    pub fuel_categories: Vec<String>, // Default: "chemical"
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource#Heat_energy_source>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct HeatEnergySource {
-    base: EnergySourceBase,
-    max_temperature: f64, // Must be >= default_temperature
-    default_temperature: f64, // Default: 15
-    specific_heat: Energy,
-    max_transfer: Energy,
-    max_temperature_gradient: f64, // Default: 1
-    min_working_temperature: f64, // Default: 15 // Must be >= default_temperature AND <= max_temperature
-    minimum_glow_temperature: f32, // Default: 1
-    pipe_covers: Option<Sprite4Way>,
-    heat_pipe_covers: Option<Sprite4Way>,
-    heat_picture: Option<Sprite4Way>,
-    heat_glow: Option<Sprite4Way>,
-    connections: Option<Vec<HeatConnection>> // Up to 32 connections
+    #[use_self_forced]
+    pub base: EnergySourceBase,
+    pub max_temperature: f64, // Must be >= default_temperature
+    #[default(15_f64)]
+    pub default_temperature: f64, // Default: 15
+    pub specific_heat: Energy,
+    pub max_transfer: Energy,
+    #[default(1_f64)]
+    pub max_temperature_gradient: f64, // Default: 1
+    #[default(15_f64)]
+    pub min_working_temperature: f64, // Default: 15 // Must be >= default_temperature AND <= max_temperature
+    #[default(1_f32)]
+    pub minimum_glow_temperature: f32, // Default: 1
+    pub pipe_covers: Option<Sprite4Way>,
+    pub heat_pipe_covers: Option<Sprite4Way>,
+    pub heat_picture: Option<Sprite4Way>,
+    pub heat_glow: Option<Sprite4Way>,
+    pub connections: Option<Vec<HeatConnection>> // Up to 32 connections
+}
+
+impl HeatEnergySource {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.max_temperature < self.default_temperature {
+            return Err(LuaError::FromLuaConversionError { from: "table", to: "HeatEnergySource",
+                message: Some("`max_temperature` must be >= `default_temperature`".into()) }) }
+        if self.min_working_temperature < self.default_temperature {
+            return Err(LuaError::FromLuaConversionError { from: "table", to: "HeatEnergySource",
+                message: Some("`min_working_temperature` must be >= `default_temperature`".into()) }) }
+        if self.min_working_temperature > self.max_temperature {
+            return Err(LuaError::FromLuaConversionError { from: "table", to: "HeatEnergySource",
+                message: Some("`min_working_temperature` must be <= `max_temperature`".into()) }) }
+        if let Some(connections) = &self.connections {
+            if connections.len() > 32 {
+                return Err(LuaError::FromLuaConversionError { from: "table", to: "HeatEnergySource",
+                    message: Some("`connections` amount must be <= 32".into()) }) }
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource#Fluid_energy_source>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct FluidEnergySource {
-    base: EnergySourceBase,
-    fluid_box: FluidBox,
-    smoke: Option<Vec<SmokeSource>>,
-    light_flicker: Option<LightFlickeringDefinition>,
-    effectivity: f64, // Default: 1
-    burns_fluid: bool, // Default: false
-    scale_fluid_usage: bool, // Default: false
-    fluid_usage_per_tick: f64, // Default: 0
-    maximum_temperature: f64, // Default: f64::INFINITY
-    destroy_non_fuel_fluid: bool, // Default: true
+    #[use_self_forced]
+    pub base: EnergySourceBase,
+    pub fluid_box: FluidBox,
+    pub smoke: Option<Vec<SmokeSource>>,
+    pub light_flicker: Option<LightFlickeringDefinition>,
+    #[default(1_f64)]
+    pub effectivity: f64, // Default: 1
+    #[default(false)]
+    pub burns_fluid: bool, // Default: false
+    #[default(false)]
+    pub scale_fluid_usage: bool, // Default: false
+    #[default(0_f64)]
+    pub fluid_usage_per_tick: f64, // Default: 0
+    #[default(f64::INFINITY)]
+    pub maximum_temperature: f64, // Default: f64::INFINITY
+    #[default(true)]
+    pub destroy_non_fuel_fluid: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Types/ElectricUsagePriority>
@@ -1697,74 +1758,128 @@ pub enum ElectricUsagePriority {
 }
 
 /// <https://wiki.factorio.com/Types/SmokeSource>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct SmokeSource {
-    name: String, // Name of Prototype/TrivialSmoke
-    frequency: f64, // Can't be negative, NaN or infinite
-    offset: f64, // Default: 0
-    position: Option<Factorio2DVector>,
-    north_position: Option<Factorio2DVector>,
-    east_position: Option<Factorio2DVector>,
-    south_position: Option<Factorio2DVector>,
-    west_position: Option<Factorio2DVector>,
-    deviation: Option<Position>,
-    starting_frame_speed: u16, // Default: 0
-    starting_frame_speed_deviation: f64, // Default: 0
-    starting_frame: u16, // Default: 0
-    starting_frame_deviation: f64, // Default: 0
-    slow_down_factor: u8, // Default: 1
-    height: f32, // Default: 0
-    height_deviation: f32, // Default: 0
-    starting_vertical_speed: f32, // Default: 0
-    starting_vertical_speed_deviation: f32, // Default: 0
-    vertical_speed_slowdown: f32 // Default: 0.965
+    pub name: String, // Name of Prototype/TrivialSmoke
+    pub frequency: f64, // Can't be negative, NaN or infinite
+    #[default(0_f64)]
+    pub offset: f64, // Default: 0
+    pub position: Option<Factorio2DVector>,
+    pub north_position: Option<Factorio2DVector>,
+    pub east_position: Option<Factorio2DVector>,
+    pub south_position: Option<Factorio2DVector>,
+    pub west_position: Option<Factorio2DVector>,
+    pub deviation: Option<Position>,
+    #[default(0_u16)]
+    pub starting_frame_speed: u16, // Default: 0
+    #[default(0_f64)]
+    pub starting_frame_speed_deviation: f64, // Default: 0
+    #[default(0_u16)]
+    pub starting_frame: u16, // Default: 0
+    #[default(0_f64)]
+    pub starting_frame_deviation: f64, // Default: 0
+    #[default(1_u8)]
+    pub slow_down_factor: u8, // Default: 1
+    #[default(0_f32)]
+    pub height: f32, // Default: 0
+    #[default(0_f32)]
+    pub height_deviation: f32, // Default: 0
+    #[default(0_f32)]
+    pub starting_vertical_speed: f32, // Default: 0
+    #[default(0_f32)]
+    pub starting_vertical_speed_deviation: f32, // Default: 0
+    #[default(0.965_f32)]
+    pub vertical_speed_slowdown: f32 // Default: 0.965
+}
+
+impl SmokeSource {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.frequency.is_sign_negative() || self.frequency.is_nan() || self.frequency.is_infinite() {
+            return Err(LuaError::FromLuaConversionError { from: "table", to: "SmokeSource", message: Some("`frequency` can't be negative, NaN or infinite".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Types/HeatConnection>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct HeatConnection {
-    position: Position,
-    direction: Direction
+    pub position: Position,
+    pub direction: Direction
 }
 
 /// <https://wiki.factorio.com/Types/FluidBox>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
+#[post_extr_fn(Self::post_extr_fn)]
 pub struct FluidBox {
-    pipe_connections: Vec<PipeConnectionDefinition>, // Max: 256
-    base_area: f64, // Default: 1 // Must be > 0
-    base_level: f64, // Default: 0
-    height: f64, // Default: 1 // Must be > 0
-    filter: Option<String>, // Name of Prototype/Fluid
-    render_layer: RenderLayer, // Default: "object"
-    pipe_covers: Option<Sprite4Way>,
-    minimum_temperature: Option<f64>,
-    maximum_temperature: Option<f64>,
-    production_type: Option<ProductionType>, // Default: None
-    //secondary_draw_order: u8, // Default: 1 // Converted to secondary_draw_orders
-    secondary_draw_orders: SecondaryDrawOrders // Default: (north = 1, east = 1, south = 1, west = 1)
+    pub pipe_connections: Vec<PipeConnectionDefinition>, // Max: 256
+    #[default(1_f64)]
+    pub base_area: f64, // Default: 1 // Must be > 0
+    #[default(0_f64)]
+    pub base_level: f64, // Default: 0
+    #[default(1_f64)]
+    pub height: f64, // Default: 1 // Must be > 0
+    pub filter: Option<String>, // Name of Prototype/Fluid
+    #[default("object")]
+    #[from_str]
+    pub render_layer: RenderLayer, // Default: "object"
+    pub pipe_covers: Option<Sprite4Way>,
+    pub minimum_temperature: Option<f64>,
+    pub maximum_temperature: Option<f64>,
+    pub production_type: Option<ProductionType>, // Default: None
+    //secondary_draw_order: u8, // Default: 1 // Converted to secondary_draw_orders // FIXME
+    pub secondary_draw_orders: SecondaryDrawOrders // Default: (north = 1, east = 1, south = 1, west = 1)
+}
+
+impl FluidBox {
+    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
+        if self.pipe_connections.len() > 255 {
+            return Err(LuaError::FromLuaConversionError { from: "table", to: "FluidBox", message: Some("no more than 255 `pipe_connections` are allowed".into()) })
+        }
+        Ok(())
+    }
 }
 
 /// <https://wiki.factorio.com/Types/PipeConnectionDefinition>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct PipeConnectionDefinition {
-    positions: Vec<Factorio2DVector>, // `position` takes priority and gets converted to this
-    max_underground_distance: u32, // Default: 0
-    r#type: ProductionType, // Default: "input-output"
+    pub positions: Vec<Factorio2DVector>, // `position` takes priority and gets converted to this // FIXME
+    #[default(0_u32)]
+    pub max_underground_distance: u32, // Default: 0
+    #[default("input-output")]
+    #[rename("type")]
+    #[from_str]
+    pub production_rype: ProductionType, // Default: "input-output"
 }
 
 /// <https://wiki.factorio.com/Types/Direction>
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
-pub struct Direction(u32);
-
-impl From<u32> for Direction {
-    fn from(value: u32) -> Self {
-        Self(value)
-    }
+#[repr(u8)]
+pub enum Direction {
+    North = 0,
+    Northeast = 1,
+    East = 2,
+    Southeast = 3,
+    South = 4,
+    Southwest = 5,
+    West = 6,
+    Northwest = 7
 }
 
-impl From<Direction> for u32 {
-    fn from(value: Direction) -> Self {
-        value.0
+impl<'lua> FromLua<'lua> for Direction {
+    fn from_lua(lua_value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+        Ok(match lua.unpack::<u8>(lua_value)? {
+            0 => Self::North,
+            1 => Self::Northeast,
+            2 => Self::East,
+            3 => Self::Southeast,
+            4 => Self::South,
+            5 => Self::Southwest,
+            6 => Self::West,
+            7 => Self::Northwest,
+            _ => return Err(LuaError::FromLuaConversionError { from: "u8", to: "Direction", message: Some("Value must be in range [0; 7]".into()) })
+        })
     }
 }
 
@@ -1777,26 +1892,34 @@ pub enum ProductionType {
     Output,
 }
 
+impl<'lua> FromLua<'lua> for ProductionType {
+    fn from_lua(value: Value<'lua>, lua: &Lua) -> LuaResult<Self> {
+        lua.unpack::<String>(value)?.parse().map_err(LuaError::external)
+    }
+}
+
 /// <https://wiki.factorio.com/Types/WireConnectionPoint>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct WireConnectionPoint {
-    wire: WirePosition,
-    shadow: WirePosition
+    pub wire: WirePosition,
+    pub shadow: WirePosition
 }
 
 /// <https://wiki.factorio.com/Types/WirePosition>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct WirePosition {
-    copper: Option<Factorio2DVector>,
-    red: Option<Factorio2DVector>,
-    green: Option<Factorio2DVector>
+    pub copper: Option<Factorio2DVector>,
+    pub red: Option<Factorio2DVector>,
+    pub green: Option<Factorio2DVector>
 }
 
 /// <https://wiki.factorio.com/Types/SignalIDConnector>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SignalIDConnector {
-    r#type: SignalType,
-    name: String, // Name of a circuit network signal
+    #[rename("type")]
+    #[from_str]
+    pub signal_type: SignalType,
+    pub name: String, // Name of a circuit network signal
 }
 
 /// <https://wiki.factorio.com/Types/ModuleSpecification>
