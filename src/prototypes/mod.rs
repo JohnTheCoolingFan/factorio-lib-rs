@@ -1831,10 +1831,12 @@ pub trait EntityWithHealth: Entity {
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityWithOwner>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct EntityWithOwnerBase {
-    is_military_target: bool, // Default: false
-    allow_run_time_change_of_is_military_target: bool, // Default: false
+    #[default(true)]
+    pub is_military_target: bool, // Default: false
+    #[default(false)]
+    pub allow_run_time_change_of_is_military_target: bool, // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityWithOwner>
