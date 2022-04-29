@@ -322,7 +322,7 @@ impl<'lua> PrototypeFromLua<'lua> for CircuitConnectorSecondaryDrawOrder {
 pub struct RadiusVisualizationSpecification {
     pub sprite: Option<Sprite>,
     #[default(0)]
-    pub distance: f64, // Default: 0 // Must be > 0
+    pub distance: f64, // Default: 0 // Must be >= 0
     pub offset: Option<Factorio2DVector>,
     #[default(true)]
     pub draw_in_cursor: bool, // Default: true
@@ -332,10 +332,9 @@ pub struct RadiusVisualizationSpecification {
 
 impl RadiusVisualizationSpecification {
     fn post_extr_fn(&mut self, _lua: &mlua::Lua, _data_table: &DataTable) -> mlua::prelude::LuaResult<()> {
-        if self.distance < 0.0 { // Not same as docs but makes sense
-            // Error message says same as docs
-            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "RadiusVisualizationSpecification", message: Some("`distance` must be > 0".into()) })
-        }
+        if self.distance.is_sign_negative() {
+            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "RadiusVisualizationSpecification",
+                message: Some("`distance` must be positive (>= 0)".into()) }) }
         Ok(())
     }
 }
