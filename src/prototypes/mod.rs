@@ -1744,12 +1744,14 @@ pub struct RailRemnants {
 }
 
 /// <https://wiki.factorio.com/Prototype/DeconstructibleTileProxy>
-#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Entity, DataTableAccessable, PrototypeFromLua)]
 #[data_table(deconstructible_tile_proxy)]
 pub struct DeconstructibleTileProxy {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
 }
 
 /// <https://wiki.factorio.com/Prototype/EntityGhost>
