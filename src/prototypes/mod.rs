@@ -1,3 +1,7 @@
+//! # Prototypes
+//!
+//! This module aims to simulate the way Factorio loads mods.
+
 mod abstract_prototypes;
 mod utility;
 pub mod additional_types;
