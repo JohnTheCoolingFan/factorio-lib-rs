@@ -12,7 +12,7 @@ pub use abstract_prototypes::*;
 
 use std::{collections::HashMap, rc::{Rc, Weak}, marker::PhantomData, hash::Hash, fmt};
 use thiserror::Error;
-use mlua::{Value, Lua, prelude::*, ToLua, FromLua};
+use mlua::prelude::*;
 use additional_types::*;
 use factorio_lib_rs_derive::{
     Prototype,
@@ -348,13 +348,13 @@ impl DataTable {
 
 /// [mlua::FromLua] alternative with [DataTable] reference being passed
 pub trait PrototypeFromLua<'lua>: Sized {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self>;
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self>;
 }
 
 impl<'lua, T: PrototypeFromLua<'lua>> PrototypeFromLua<'lua> for Vec<T> {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-        if let Value::Table(value) = value {
-            value.sequence_values::<Value>().collect::<LuaResult<Vec<Value>>>()?.into_iter().map(|v| T::prototype_from_lua(v, lua, data_table)).collect()
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let LuaValue::Table(value) = value {
+            value.sequence_values::<LuaValue>().collect::<LuaResult<Vec<LuaValue>>>()?.into_iter().map(|v| T::prototype_from_lua(v, lua, data_table)).collect()
         } else {
             Err(mlua::Error::FromLuaConversionError{
                 from: value.type_name(),
@@ -367,17 +367,17 @@ impl<'lua, T: PrototypeFromLua<'lua>> PrototypeFromLua<'lua> for Vec<T> {
 
 impl<'lua, T: PrototypeFromLua<'lua>> PrototypeFromLua<'lua> for Option<T> {
     #[inline]
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
         match value {
-            Value::Nil => Ok(None),
+            LuaValue::Nil => Ok(None),
             value => Ok(Some(T::prototype_from_lua(value, lua, data_table)?))
         }
     }
 }
 
-impl<'lua> PrototypeFromLua<'lua> for Value<'lua> {
+impl<'lua> PrototypeFromLua<'lua> for LuaValue<'lua> {
     #[inline]
-    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(value: LuaValue<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
         Ok(value)
     }
 }
@@ -387,10 +387,10 @@ where
     K: Eq + Hash + PrototypeFromLua<'lua>,
     V: PrototypeFromLua<'lua>,
 {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
         let type_name = value.type_name();
-        if let Value::Table(t) = value {
-            let pairs = t.pairs().collect::<LuaResult<Vec<(Value, Value)>>>()?;
+        if let LuaValue::Table(t) = value {
+            let pairs = t.pairs().collect::<LuaResult<Vec<(LuaValue, LuaValue)>>>()?;
             let prot_pairs = pairs
                 .into_iter()
                 .map(|(k, v)| Ok((K::prototype_from_lua(k, lua, data_table)?, V::prototype_from_lua(v, lua, data_table)?)))
@@ -406,8 +406,8 @@ impl<'lua, T, const N: usize> PrototypeFromLua<'lua> for [T; N]
 where
     T: PrototypeFromLua<'lua>,
 {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-        let values_arr = lua.unpack::<[Value; N]>(value)?;
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let values_arr = lua.unpack::<[LuaValue; N]>(value)?;
         let values_arr: Vec<T> = values_arr
             .map(|v| T::prototype_from_lua(v, lua, data_table))
             .into_iter()
@@ -463,7 +463,7 @@ trait GetPrototype<'lua> {
 
 impl<'lua> GetPrototype<'lua> for mlua::Table<'lua> {
     fn get_prot<K: ToLua<'lua>, V: PrototypeFromLua<'lua>>(&self, key: K, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<V> {
-        let value = self.get::<K, Value>(key)?;
+        let value = self.get::<K, LuaValue>(key)?;
         V::prototype_from_lua(value, lua, data_table)
     }
 }
@@ -508,8 +508,8 @@ impl<T: DataTableAccessable> PrototypeReferenceValidate for PrototypeReference<T
 }
 
 impl<'lua, T: DataTableAccessable + 'static> PrototypeFromLua<'lua> for Rc<PrototypeReference<T>> {
-    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-        if let Value::String(s) = &value {
+    fn prototype_from_lua(value: LuaValue<'lua>, _lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let LuaValue::String(s) = &value {
             let name = s.to_str()?.to_string();
             let result = data_table.new_reference(name);
             Ok(result)
@@ -764,11 +764,11 @@ pub struct MapGenPresets {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for MapGenPresets {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-        if let Value::Table(table) = value {
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let LuaValue::Table(table) = value {
             let name = table.get::<_, String>("name")?;
             let mut result = HashMap::new();
-            for (k, v) in table.pairs::<String, Value>().collect::<LuaResult<HashMap<String, Value>>>()? {
+            for (k, v) in table.pairs::<String, LuaValue>().collect::<LuaResult<HashMap<String, LuaValue>>>()? {
                 if k != "name" {
                     result.insert(k, MapGenPreset::prototype_from_lua(v, lua, data_table)?);
                 }
