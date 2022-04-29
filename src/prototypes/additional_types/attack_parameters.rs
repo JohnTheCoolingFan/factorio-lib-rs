@@ -66,7 +66,9 @@ pub struct ProjectileAttackParameters {
     #[default(1_f64)]
     pub movement_slow_down_factor: f64, // Default: 1
     pub ammo_type: Option<AmmoType>,
-    pub activation_type: Option<ActivationType>,
+    #[from_str]
+    #[default("shoot")]
+    pub activation_type: ActivationType,
     pub sound: Option<LayeredSound>,
     pub animation: Option<RotatedAnimation>,
     pub cyclic_sound: Option<CyclicSound>,
@@ -118,7 +120,9 @@ pub struct BeamAttackParameters {
     #[default(1_f64)]
     pub movement_slow_down_factor: f64, // Default: 1
     pub ammo_type: Option<AmmoType>,
-    pub activation_type: Option<ActivationType>,
+    #[from_str]
+    #[default("shoot")]
+    pub activation_type: ActivationType,
     pub sound: Option<LayeredSound>,
     pub animation: Option<RotatedAnimation>,
     pub cyclic_sound: Option<CyclicSound>,
@@ -165,7 +169,9 @@ pub struct StreamAttackParameters {
     #[default(1_f64)]
     pub movement_slow_down_factor: f64, // Default: 1
     pub ammo_type: Option<AmmoType>,
-    pub activation_type: Option<ActivationType>,
+    #[from_str]
+    #[default("shoot")]
+    pub activation_type: ActivationType,
     pub sound: Option<LayeredSound>,
     pub animation: Option<RotatedAnimation>,
     pub cyclic_sound: Option<CyclicSound>,
