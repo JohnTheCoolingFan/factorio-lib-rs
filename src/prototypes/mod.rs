@@ -2070,24 +2070,28 @@ pub struct Character {
 }
 
 /// <https://wiki.factorio.com/Prototype/Combinator>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CombinatorBase {
-    energy_source: EnergySource, // Must be an electric void energy source
-    active_energy_usage: Energy,
-    sprites: Sprite4Way,
-    activity_led_sprites: Sprite4Way,
-    input_connection_bounding_box: BoundingBox,
-    output_connection_bounding_box: BoundingBox,
-    activity_led_light_offsets: [Factorio2DVector; 4],
-    screen_light_offsets: [Factorio2DVector; 4],
-    input_connection_points: [WireConnectionPoint; 4],
-    output_connection_points: [WireConnectionPoint; 4],
-    activity_led_light: Option<LightDefinition>,
-    screen_light: Option<LightDefinition>,
-    activity_led_hold_time: u8, // Default: 5
-    circuit_wire_max_distance: f64, // Default: 0
-    draw_copper_wires: bool, // Default: true
-    draw_circuit_wires: bool, // Default: true
+    pub energy_source: EnergySource, // Must be an electric or void energy source
+    pub active_energy_usage: Energy,
+    pub sprites: Sprite4Way,
+    pub activity_led_sprites: Sprite4Way,
+    pub input_connection_bounding_box: BoundingBox,
+    pub output_connection_bounding_box: BoundingBox,
+    pub activity_led_light_offsets: [Factorio2DVector; 4],
+    pub screen_light_offsets: [Factorio2DVector; 4],
+    pub input_connection_points: [WireConnectionPoint; 4],
+    pub output_connection_points: [WireConnectionPoint; 4],
+    pub activity_led_light: Option<LightDefinition>,
+    pub screen_light: Option<LightDefinition>,
+    #[default(5_u8)]
+    pub activity_led_hold_time: u8, // Default: 5
+    #[default(0_f64)]
+    pub circuit_wire_max_distance: f64, // Default: 0
+    #[default(true)]
+    pub draw_copper_wires: bool, // Default: true
+    #[default(true)]
+    pub draw_circuit_wires: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Prototype/Combinator>
