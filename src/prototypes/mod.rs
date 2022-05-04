@@ -2015,14 +2015,18 @@ pub struct BurnerGenerator {
 }
 
 /// <https://wiki.factorio.com/Prototype/Character>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(character)]
 pub struct Character {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub mining_speed: f64,
     pub running_speed: f64,
     pub distance_per_frame: f64,
@@ -2046,9 +2050,13 @@ pub struct Character {
     pub crafting_categories: Option<Vec<String>>, // (Names) Name of crafting category
     pub mining_categories: Option<Vec<String>>, // (Names) Name of mining category
     pub light: Option<LightDefinition>,
+    #[default(3_f64)]
     pub enter_vehicle_distance: f64, // Default: 3.0
+    #[default(1.5_f64)]
     pub tool_attack_distance: f64, // Default: 1.5
+    #[default(10_u32)]
     pub respawn_time: u32, // Default: 10
+    #[default(false)]
     pub has_belt_immunity: bool, // Default: false
     pub character_corpse: Option<String>,
     pub footstep_particle_triggers: Option<FootstepTriggerEffectList>,

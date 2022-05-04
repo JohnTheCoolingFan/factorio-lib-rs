@@ -1211,15 +1211,15 @@ pub struct BeaconModuleVisualization {
 }
 
 /// <https://wiki.factorio.com/Types/CharacterArmorAnimation>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CharacterArmorAnimation {
-    idle: RotatedAnimation,
-    idle_with_gun: RotatedAnimation,
-    running: RotatedAnimation,
-    running_with_gun: RotatedAnimation,
-    mining_with_tool: RotatedAnimation,
-    flipped_shadow_running_with_gun: Option<RotatedAnimation>, // If set, must containt exactly 18 directions
-    armors: Option<Vec<String>>,
+    pub idle: RotatedAnimation,
+    pub idle_with_gun: RotatedAnimation,
+    pub running: RotatedAnimation,
+    pub running_with_gun: RotatedAnimation,
+    pub mining_with_tool: RotatedAnimation,
+    pub flipped_shadow_running_with_gun: Option<RotatedAnimation>, // If set, must containt exactly 18 directions // TODO
+    pub armors: Option<Vec<String>>,
 }
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation>

@@ -2017,11 +2017,12 @@ pub enum BoilerMode {
 }
 
 /// <https://wiki.factorio.com/Types/FootprintParticle>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct FootprintParticle {
-    tiles: Vec<String>, // (Names) Name of a tile
-    particle_name: Option<String>, // Name of a particle
-    use_as_default: bool, // Default: false
+    pub tiles: Vec<String>, // (Names) Name of a tile
+    pub particle_name: Option<String>, // Name of a particle
+    #[default(false)]
+    pub use_as_default: bool, // Default: false
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticContainer#logistic_mode>
