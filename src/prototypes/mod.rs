@@ -1957,14 +1957,18 @@ pub struct Beacon {
 }
 
 /// <https://wiki.factorio.com/Prototype/Boiler>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(boiler)]
 pub struct Boiler {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub energy_source: EnergySource,
     pub fluid_box: FluidBox,
     pub output_fluid_box: FluidBox,
@@ -1974,8 +1978,12 @@ pub struct Boiler {
     pub structure: Animation4Way,
     pub fire: Animation4Way, // Can be empty
     pub fire_glow: Animation4Way, // Can be empty
+    #[default(false)]
     pub fire_glow_flicker_enabled: bool, // Default: false
+    #[default(false)]
     pub fire_flicker_enabled: bool, // Default: false
+    #[from_str]
+    #[default("heat-water-inside")]
     pub mode: BoilerMode, // Default: "heat-water-inside"
     pub patch: Option<Sprite4Way>,
 }
