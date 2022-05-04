@@ -1923,7 +1923,7 @@ pub struct SignalIDConnector {
 }
 
 /// <https://wiki.factorio.com/Types/ModuleSpecification>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ModuleSpecification {
     module_slots: u16, // Default: 0
     module_info_max_icons_per_row: u8, // Default: width of selection box / 0,75
@@ -1943,11 +1943,13 @@ impl EffectTypeLimitation {
     pub const PRODUCTIVITY: Self = Self(1 << 1);
     pub const CONSUMPTION: Self = Self(1 << 2);
     pub const POLLUTION: Self = Self(1 << 3);
+    pub const NONE: Self = Self(0);
 }
 
 impl<T: AsRef<str>> FromIterator<T> for EffectTypeLimitation {
     fn from_iter<I: IntoIterator<Item = T>>(in_arr: I) -> Self {
-        let mut result = Self(0);        for item in in_arr {
+        let mut result = Self(0);
+        for item in in_arr {
             match item.as_ref() {
                 "speed" => result |= Self::SPEED,
                 "productivity" => result |= Self::PRODUCTIVITY,
@@ -1957,6 +1959,13 @@ impl<T: AsRef<str>> FromIterator<T> for EffectTypeLimitation {
             }
         }
         result
+    }
+}
+
+impl<'lua> FromLua<'lua> for EffectTypeLimitation {
+    fn from_lua(lua_value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
+        let arr: Vec<String> = lua.unpack(lua_value)?;
+        Ok(Self::from_iter(arr))
     }
 }
 

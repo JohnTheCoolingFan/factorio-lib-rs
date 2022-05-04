@@ -445,6 +445,7 @@ prot_from_lua_blanket!(Energy);
 prot_from_lua_blanket!(ActivationType);
 prot_from_lua_blanket!(Direction);
 prot_from_lua_blanket!(ProductionType);
+prot_from_lua_blanket!(EffectTypeLimitation);
 #[cfg(feature = "concepts")]
 prot_from_lua_blanket!(LocalisedString);
 
@@ -1930,14 +1931,18 @@ pub struct ArtilleryTurret {
 }
 
 /// <https://wiki.factorio.com/Prototype/Beacon>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(beacon)]
 pub struct Beacon {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub energy_usage: Energy,
     pub energy_source: EnergySource,
     pub supply_area_distance: f64,
@@ -1947,6 +1952,7 @@ pub struct Beacon {
     pub animation: Option<Animation>, // Loaded only if `graphics_set` is not present
     pub base_picture: Option<Sprite>, // Loaded only if `graphics_set` is not present
     pub radius_visualization_picture: Option<Sprite>,
+    #[default(EffectTypeLimitation::NONE)]
     pub allowed_effects: EffectTypeLimitation // Default: No effects are allowed
 }
 

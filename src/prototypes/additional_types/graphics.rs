@@ -49,6 +49,7 @@ pub enum ApplyTint {
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ApplyModuleTint {
+    None,
     Primary,
     Secondary,
     Tertiary,
@@ -512,15 +513,21 @@ pub struct Animation4Way {
 }
 
 /// <https://wiki.factorio.com/Types/AnimationElement>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AnimationElement {
-    render_layer: RenderLayer, // Default: "object"
-    secondary_draw_order: Option<i8>,
-    draw_as_sprite: bool, // Default: true
-    draw_as_light: bool, // Default: false
-    apply_tint: bool, // Default: false
-    always_draw: bool, // Default: true
-    animation: Animation
+    #[from_str]
+    #[default("object")]
+    pub render_layer: RenderLayer, // Default: "object"
+    pub secondary_draw_order: Option<i8>,
+    #[default(true)]
+    pub draw_as_sprite: bool, // Default: true
+    #[default(false)]
+    pub draw_as_light: bool, // Default: false
+    #[default(false)]
+    pub apply_tint: bool, // Default: false
+    #[default(true)]
+    pub always_draw: bool, // Default: true
+    pub animation: Animation
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimation>
@@ -1131,46 +1138,76 @@ pub struct CircuitConnectorSprites {
 }
 
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct BeaconGraphicsSet {
-    draw_animation_when_idle: bool, //Default: true
-    draw_light_when_idle: bool, // Default: false
-    random_animation_offset: bool, // Default: false
-    module_icons_suppressed: bool, // Default: false
-    base_layer: RenderLayer, // Default: "object"
-    animation_layer: RenderLayer, // Default: "object"
-    top_layer: RenderLayer, // Default: "object"
-    animation_progress: f32, // Default: 1
-    min_animation_progress: f32, // Default: 0
-    max_animation_progress: f32, // Default: 1000
-    apply_module_tint: Option<ApplyModuleTint>, // Default: "none"
-    apply_module_tint_to_light: Option<ApplyModuleTint>, // Default: "none"
-    no_modules_tint: Color, //Default: no color
-    animation_list: Option<Vec<AnimationElement>>,
-    light: Option<LightDefinition>,
-    module_visualisations: Option<BeaconModuleVisualizations>,
-    module_tint_mode: ModuleTintMode // Default: "single-module"
+    #[default(true)]
+    pub draw_animation_when_idle: bool, //Default: true
+    #[default(false)]
+    pub draw_light_when_idle: bool, // Default: false
+    #[default(false)]
+    pub random_animation_offset: bool, // Default: false
+    #[default(false)]
+    pub module_icons_suppressed: bool, // Default: false
+    #[default("object")]
+    #[from_str]
+    pub base_layer: RenderLayer, // Default: "object"
+    #[default("object")]
+    #[from_str]
+    pub animation_layer: RenderLayer, // Default: "object"
+    #[default("object")]
+    #[from_str]
+    pub top_layer: RenderLayer, // Default: "object"
+    #[default(1_f32)]
+    pub animation_progress: f32, // Default: 1
+    #[default(0_f32)]
+    pub min_animation_progress: f32, // Default: 0
+    #[default(1000_f32)]
+    pub max_animation_progress: f32, // Default: 1000
+    #[default("none")]
+    #[from_str]
+    pub apply_module_tint: ApplyModuleTint, // Default: "none"
+    #[default("none")]
+    #[from_str]
+    pub apply_module_tint_to_light: ApplyModuleTint, // Default: "none"
+    #[default(Color(0.0, 0.0, 0.0, 1.0))]
+    pub no_modules_tint: Color, //Default: no color
+    pub animation_list: Option<Vec<AnimationElement>>,
+    pub light: Option<LightDefinition>,
+    pub module_visualisations: Option<BeaconModuleVisualizations>,
+    #[default("single-module")]
+    #[from_str]
+    pub module_tint_mode: ModuleTintMode // Default: "single-module"
 }
 
 /// <https://wiki.factorio.com/Types/BeaconModuleVisualizations>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct BeaconModuleVisualizations {
-    art_style: String,
-    use_for_empty_slots: bool, // Default: false
-    tier_offset: i32, // Default: 0
-    slots: Option<Vec<Vec<BeaconModuleVisualization>>>
+    pub art_style: String,
+    #[default(false)]
+    pub use_for_empty_slots: bool, // Default: false
+    #[default(0_i32)]
+    pub tier_offset: i32, // Default: 0
+    pub slots: Option<Vec<Vec<BeaconModuleVisualization>>>
 }
 
 /// <https://wiki.factorio.com/Types/BeaconModuleVisualization>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct BeaconModuleVisualization {
-    has_empty_slot: bool, // Default: false
-    draw_as_light: bool, // Default: false
-    draw_as_sprite: bool, // Default: true
-    secondary_draw_order: i8, // Default: 0
-    apply_module_tint: ApplyModuleTint, // Default: "none"
-    render_layer: RenderLayer, // Default: "object"
-    pictures: Option<Vec<SpriteVariation>>
+    #[default(false)]
+    pub has_empty_slot: bool, // Default: false
+    #[default(false)]
+    pub draw_as_light: bool, // Default: false
+    #[default(true)]
+    pub draw_as_sprite: bool, // Default: true
+    #[default(0_i8)]
+    pub secondary_draw_order: i8, // Default: 0
+    #[from_str]
+    #[default("none")]
+    pub apply_module_tint: ApplyModuleTint, // Default: "none"
+    #[from_str]
+    #[default("object")]
+    pub render_layer: RenderLayer, // Default: "object"
+    pub pictures: Option<Vec<SpriteVariation>>
 }
 
 /// <https://wiki.factorio.com/Types/CharacterArmorAnimation>
