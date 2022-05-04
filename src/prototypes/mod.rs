@@ -1989,21 +1989,28 @@ pub struct Boiler {
 }
 
 /// <https://wiki.factorio.com/Prototype/BurnerGenerator>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(burner_generator)]
 pub struct BurnerGenerator {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
-    pub energy_source: EnergySource, // Emissions are ignored
-    pub burner: EnergySource, // Must be a burner energy source
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource, // Emissions are ignored // Must be electric // TODO
+    pub burner: EnergySource, // Must be a burner energy source // TODO
     pub animation: Animation4Way,
     pub max_power_output: Energy,
     pub idle_animation: Option<Animation4Way>,
+    #[default(false)]
     pub always_draw_idle_animation: bool, // Default: false
+    #[default(0.25_f64)]
     pub min_perceived_performance: f64, // Default: 0.25
+    #[default(0.5_f64)]
     pub performance_to_sound_speedup: f64, // Default: 0.5
 }
 
