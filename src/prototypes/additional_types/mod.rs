@@ -1672,7 +1672,7 @@ pub struct BurnerEnergySource {
     pub light_flicker: Option<LightFlickeringDefinition>,
     #[default(1_f64)]
     pub effectivity: f64, // Default: 1
-    #[default(vec!["chemical".to_string()])]
+    #[default(vec!["chemical".to_string()])] // FIXME: ignores fuel_category
     pub fuel_categories: Vec<String>, // Default: "chemical"
 }
 
