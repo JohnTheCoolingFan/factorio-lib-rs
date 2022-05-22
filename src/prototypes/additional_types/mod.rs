@@ -222,10 +222,10 @@ impl Color {
     }
 
     pub fn new_rgba_opt(r: Option<f32>, g: Option<f32>, b: Option<f32>, a: Option<f32>) -> Self {
-        let r = r.or(Some(0.0_f32)).unwrap();
-        let g = g.or(Some(0.0_f32)).unwrap();
-        let b = b.or(Some(0.0_f32)).unwrap();
-        let a = a.or(Some(1.0_f32)).unwrap();
+        let r = r.unwrap_or(0.0_f32);
+        let g = g.unwrap_or(0.0_f32);
+        let b = b.unwrap_or(0.0_f32);
+        let a = a.unwrap_or(1.0_f32);
         Self(r, g, b, a)
     }
 
