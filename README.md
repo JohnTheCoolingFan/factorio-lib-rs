@@ -8,8 +8,8 @@ This library consists of a number of modules:
 - `data_structs`: data structures related to factorio, like info.json
 - `concepts`: Factorio runtime concepts, like LocalisedString
 
-These features are available through corresponding features, all enabled by default
+These features are available through corresponding feature flags, all enabled by default
 
 This library is still WIP.
 
-Development status: Implementing PrototypeFromLua, making derive macro.
+Development status: Implementing PrototypeFromLua, improving derive macro when needed.
