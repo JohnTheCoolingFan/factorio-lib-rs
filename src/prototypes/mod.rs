@@ -2115,15 +2115,20 @@ pub trait Combinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/ArithmeticCombinator>
-#[derive(Debug, Clone, Prototype, Combinator, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, Combinator, DataTableAccessable, PrototypeFromLua)]
 #[data_table(arithmetic_combinator)]
 pub struct ArithmeticCombinator {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
-    combinator_base: CombinatorBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
+    #[use_self_forced]
+    pub combinator_base: CombinatorBase,
     pub plus_symbol_sprites: Sprite4Way,
     pub minus_symbol_sprites: Sprite4Way,
     pub multiply_symbol_sprites: Sprite4Way,
