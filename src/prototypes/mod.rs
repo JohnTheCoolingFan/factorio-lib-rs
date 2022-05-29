@@ -2166,22 +2166,29 @@ pub struct DeciderCombinator {
 }
 
 /// <https://wiki.factorio.com/Prototype/ConstantCombinator>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(constant_combinator)]
 pub struct ConstantCombinator {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub item_slot_count: u32,
     pub sprites: Sprite4Way,
     pub activity_led_sprites: Sprite4Way,
     pub activity_led_light_offsets: [Factorio2DVector; 4],
     pub circuit_wire_connection_points: [WireConnectionPoint; 4],
     pub activity_led_light: Option<LightDefinition>,
+    #[default(0_f64)]
     pub circuit_wire_max_distance: f64, // Default: 0
+    #[default(true)]
     pub draw_copper_wires: bool, // Default: true
+    #[default(true)]
     pub draw_circuit_wires: bool, // Default: true
 }
 
