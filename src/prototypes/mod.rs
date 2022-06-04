@@ -2222,26 +2222,38 @@ pub struct Container {
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticContainer>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(logistic_container)]
 pub struct LogisticContainer {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub inventory_size: u16,
     pub picture: Option<Sprite>,
+    #[from_str]
     pub logistic_mode: LogisticMode,
+    #[default(true)]
     pub enable_inventory_bar: bool, // Default: true
+    #[default(false)]
     pub scale_info_icons: bool, // Default: false
     pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    #[default(0_f64)]
     pub circuit_wire_max_distance: f64, // Default: 0
+    #[default(true)]
     pub draw_copper_wires: bool, // Default: true
+    #[default(true)]
     pub draw_circuit_wires: bool, // Default: true
     pub circuit_connector_sprites: Option<CircuitConnectorSprites>,
-    pub max_logistic_slots: Option<u16>, // requester-type must have > 0 and <= 1000 // Storage type must have <= 1
+    pub max_logistic_slots: Option<u16>, // requester-type must have > 0 and <= 1000 // Storage type must have <= 1 // TODO
+    #[default(true)]
     pub render_not_in_network_icon: bool, // Default: true
+    #[default(0_u8)]
     pub opened_duration: u8, // Default: 0
     pub animation: Option<Animation>,
     pub landing_location_offset: Option<Factorio2DVector>,
