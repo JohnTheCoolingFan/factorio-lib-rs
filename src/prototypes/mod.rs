@@ -2275,7 +2275,6 @@ pub struct InfinityContainer {
     pub entity_with_owner_base: EntityWithOwnerBase,
     pub inventory_size: u16, // Can't be 0 // TODO
     pub picture: Option<Sprite>,
-    #[from_str]
     pub logistic_mode: Option<LogisticMode>,
     pub erase_contents_when_mined: bool,
     #[default(true)]

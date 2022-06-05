@@ -2036,6 +2036,13 @@ pub enum LogisticMode {
     Requester,
 }
 
+impl<'lua> PrototypeFromLua<'lua> for LogisticMode {
+    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let s: String = lua.unpack(value)?;
+        s.parse().map_err(LuaError::external)
+    }
+}
+
 /// Used in many places, specified as string
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface#gui_mode>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
