@@ -700,6 +700,20 @@ pub fn prot_from_lua_blanket(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro]
+pub fn prot_from_str(input: TokenStream) -> TokenStream {
+    let target_type = parse_macro_input!(input as syn::Type);
+    let gen = quote! {
+        impl<'lua> PrototypeFromLua<'lua> for #target_type {
+            fn prototype_from_lua(v: mlua::Value<'lua>, l: &'lua mlua::Lua, dt: &mut crate::prototypes::DataTable) -> mlua::prelude::LuaResult<Self> {
+                let s: String = l.unpack(v)?;
+                s.parse().map_err(mlua::prelude::LuaError::external)
+            }
+        }
+    };
+    gen.into()
+}
+
+#[proc_macro]
 pub fn abstract_prototype_get(input: TokenStream) -> TokenStream {
     let idents = parse_macro_input!(input with Punctuated<Ident, Token![,]>::parse_terminated);
     let mut idents = idents.into_iter();
