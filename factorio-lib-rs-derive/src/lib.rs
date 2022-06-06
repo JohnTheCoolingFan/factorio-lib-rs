@@ -857,6 +857,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+#[derive(Default)]
 struct PrototypeFromLuaFieldAttrArgs {
     default_value: Option<proc_macro2::TokenStream>, // Incompatible with: use_self, use_self_vec
     mandatory_if: Option<proc_macro2::TokenStream>,  // Incompatible with: default, use_self, use_self_vec
@@ -952,23 +953,6 @@ impl PrototypeFromLuaFieldAttrArgs {
     }
 }
 
-impl Default for PrototypeFromLuaFieldAttrArgs {
-    fn default() -> Self {
-        Self{
-            default_value: None, 
-            mandatory_if: None,
-            rename: None,
-            required: false,
-            fallbacks: vec![],
-            use_from_str: false,
-            use_self: false,
-            use_self_vec: false,
-            use_self_forced: false,
-            is_resource: false
-        }
-    }
-}
-
 fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, Option<proc_macro2::TokenStream>)> { // First is get_expr, second is mandatory_if
     let ident = &field.ident;
     let field_type = &field.ty;
@@ -1012,7 +996,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
                 name.into()
             };
         }
-    } else if prototype_field_attrs.use_from_str && !prototype_field_attrs.default_value.is_some() {
+    } else if prototype_field_attrs.use_from_str && prototype_field_attrs.default_value.is_none() {
         quote! { #field_get_expr.parse::<#field_type>().map_err(mlua::Error::external)?; }
     } else if prototype_field_attrs.use_self_vec {
         quote! { 
