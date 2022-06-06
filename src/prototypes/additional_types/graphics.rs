@@ -33,6 +33,13 @@ pub enum ApplyRecipeTint {
     None,
 }
 
+impl<'lua> PrototypeFromLua<'lua> for ApplyRecipeTint {
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let s: String = lua.unpack(value)?;
+        s.parse().map_err(LuaError::external)
+    }
+}
+
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_tint>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -44,6 +51,12 @@ pub enum ApplyTint {
     None,
 }
 
+impl<'lua> PrototypeFromLua<'lua> for ApplyTint {
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let s: String = lua.unpack(value)?;
+        s.parse().map_err(LuaError::external)
+    }
+}
 
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet#apply_module_tint>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
@@ -1223,31 +1236,41 @@ pub struct CharacterArmorAnimation {
 }
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct WorkingVisualisation {
-    render_layer: RenderLayer, // Default: "object"
-    fadeout: bool, // Default: false
-    synced_fadeout: bool, // Default: false
-    constant_speed: bool, // Default: false
-    always_draw: bool, // Default: false
-    animated_shift: bool, // Default: false
-    align_to_waypoint: bool, // Default: false
-    secondary_draw_order: Option<i8>,
-    draw_as_sprite: bool, // Default: true
-    draw_as_light: bool, // Default: false
-    light: Option<LightDefinition>,
-    effect: Option<WorkingVisualisationEffect>,
-    apply_recipe_tint: Option<ApplyRecipeTint>,
-    apply_tint: Option<ApplyTint>,
-    north_animation: Option<Animation>,
-    west_animation: Option<Animation>,
-    south_animation: Option<Animation>,
-    east_animation: Option<Animation>,
-    animation: Option<Animation>,
-    north_position: Option<Factorio2DVector>,
-    west_position: Option<Factorio2DVector>,
-    south_position: Option<Factorio2DVector>,
-    east_position: Option<Factorio2DVector>,
+    #[from_str]
+    #[default("object")]
+    pub render_layer: RenderLayer, // Default: "object"
+    #[default(false)]
+    pub fadeout: bool, // Default: false
+    #[default(false)]
+    pub synced_fadeout: bool, // Default: false
+    #[default(false)]
+    pub constant_speed: bool, // Default: false
+    #[default(false)]
+    pub always_draw: bool, // Default: false
+    #[default(false)]
+    pub animated_shift: bool, // Default: false
+    #[default(false)]
+    pub align_to_waypoint: bool, // Default: false
+    pub secondary_draw_order: Option<i8>,
+    #[default(true)]
+    pub draw_as_sprite: bool, // Default: true
+    #[default(false)]
+    pub draw_as_light: bool, // Default: false
+    pub light: Option<LightDefinition>,
+    pub effect: Option<WorkingVisualisationEffect>,
+    pub apply_recipe_tint: Option<ApplyRecipeTint>,
+    pub apply_tint: Option<ApplyTint>,
+    pub north_animation: Option<Animation>,
+    pub west_animation: Option<Animation>,
+    pub south_animation: Option<Animation>,
+    pub east_animation: Option<Animation>,
+    pub animation: Option<Animation>,
+    pub north_position: Option<Factorio2DVector>,
+    pub west_position: Option<Factorio2DVector>,
+    pub south_position: Option<Factorio2DVector>,
+    pub east_position: Option<Factorio2DVector>,
 }
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#effect>
@@ -1259,25 +1282,32 @@ pub enum WorkingVisualisationEffect {
     None,
 }
 
+impl<'lua> PrototypeFromLua<'lua> for WorkingVisualisationEffect {
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        let s: String = lua.unpack(value)?;
+        s.parse().map_err(LuaError::external)
+    }
+}
+
 /// <https://wiki.factorio.com/Types/ConnectableEntityGraphics>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ConnectableEntityGraphics {
-    single: Vec<SpriteVariation>,
-    straight_vertical: Vec<SpriteVariation>,
-    straight_horizontal: Vec<SpriteVariation>,
-    corner_right_down: Vec<SpriteVariation>,
-    corner_left_down: Vec<SpriteVariation>,
-    corner_right_up: Vec<SpriteVariation>,
-    corner_left_up: Vec<SpriteVariation>,
-    t_up: Vec<SpriteVariation>,
-    t_right: Vec<SpriteVariation>,
-    t_down: Vec<SpriteVariation>,
-    t_left: Vec<SpriteVariation>,
-    ending_up: Vec<SpriteVariation>,
-    ending_right: Vec<SpriteVariation>,
-    ending_down: Vec<SpriteVariation>,
-    ending_left: Vec<SpriteVariation>,
-    cross: Vec<SpriteVariation>,
+    pub single: Vec<SpriteVariation>,
+    pub straight_vertical: Vec<SpriteVariation>,
+    pub straight_horizontal: Vec<SpriteVariation>,
+    pub corner_right_down: Vec<SpriteVariation>,
+    pub corner_left_down: Vec<SpriteVariation>,
+    pub corner_right_up: Vec<SpriteVariation>,
+    pub corner_left_up: Vec<SpriteVariation>,
+    pub t_up: Vec<SpriteVariation>,
+    pub t_right: Vec<SpriteVariation>,
+    pub t_down: Vec<SpriteVariation>,
+    pub t_left: Vec<SpriteVariation>,
+    pub ending_up: Vec<SpriteVariation>,
+    pub ending_right: Vec<SpriteVariation>,
+    pub ending_down: Vec<SpriteVariation>,
+    pub ending_left: Vec<SpriteVariation>,
+    pub cross: Vec<SpriteVariation>,
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet>

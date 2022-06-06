@@ -2303,34 +2303,46 @@ pub struct InfinityContainer {
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CraftingMachineBase {
-    // If module inventory size > 0 and no effects allowed, its' and error
+    // If module inventory size > 0 and no effects allowed, its' and error // TODO
     // https://discord.com/channels/139677590393716737/306402592265732098/898733801679757332
-    energy_usage: Energy, // Must be positive
-    crafting_speed: f64, // Must be positive
-    crafting_categories: Vec<String>, // (Names) Name of crafting category
-    energy_source: EnergySource, // if drain is not specified, automatically set to energy_usage / 30
-    fluid_boxes: Option<Vec<FluidBox>>,
-    allowed_effects: EffectTypeLimitation, // Default: no effects are allowed
-    scale_entity_info_icon: bool, // Default: false
-    show_recipe_icon: bool, // Default: true
-    return_ingredients_on_change: bool, // Default: true
-    animation: Option<Animation4Way>,
-    idle_animation: Option<Animation4Way>,
-    always_draw_idle_animation: bool, // Default: false
-    default_recipe_tint: Option<RecipeTint>,
-    shift_animation_waypoints: Option<ShiftAnimationWaypoints>, // Only loaded if `shift_animation_waypoint_stop_duration` or `shift_animation_transition_duration` is not 0
-    shift_animation_waypoint_stop_duration: u16, // Default: 0 // Only loaded if `shift_animation_waypoints` is present
-    shift_animation_transition_duration: u16, // Default: 0 // Only loaded if `shift_animation_waypoints` is present
-    status_colors: Option<StatusColors>,
-    entity_info_icon_shift: Factorio2DVector, // Default: {0, -0.3} for 
-    draw_entity_info_icon_background: bool, // Default: true
-    match_animation_speed_to_activity: bool, // Default: false
-    show_recipe_icon_on_map: bool, // Default: true
-    base_productivity: f32, // Default: 0
-    module_specification: Option<ModuleSpecification>,
-    working_visualisations: Option<Vec<WorkingVisualisation>>,
+    pub energy_usage: Energy, // Must be positive
+    pub crafting_speed: f64, // Must be positive
+    pub crafting_categories: Vec<String>, // (Names) Name of crafting category
+    pub energy_source: EnergySource, // if drain is not specified, automatically set to energy_usage / 30
+    pub fluid_boxes: Option<Vec<FluidBox>>,
+    #[default(EffectTypeLimitation::NONE)]
+    pub allowed_effects: EffectTypeLimitation, // Default: no effects are allowed
+    #[default(false)]
+    pub scale_entity_info_icon: bool, // Default: false
+    #[default(true)]
+    pub show_recipe_icon: bool, // Default: true
+    #[default(true)]
+    pub return_ingredients_on_change: bool, // Default: true
+    pub animation: Option<Animation4Way>,
+    pub idle_animation: Option<Animation4Way>,
+    #[default(false)]
+    pub always_draw_idle_animation: bool, // Default: false
+    pub default_recipe_tint: Option<RecipeTint>,
+    pub shift_animation_waypoints: Option<ShiftAnimationWaypoints>, // Only loaded if `shift_animation_waypoint_stop_duration` or `shift_animation_transition_duration` is not 0
+    #[default(0_u16)]
+    pub shift_animation_waypoint_stop_duration: u16, // Default: 0 // Only loaded if `shift_animation_waypoints` is present
+    #[default(0_u16)]
+    pub shift_animation_transition_duration: u16, // Default: 0 // Only loaded if `shift_animation_waypoints` is present
+    pub status_colors: Option<StatusColors>,
+    #[default(Factorio2DVector(0.0, -0.3))]
+    pub entity_info_icon_shift: Factorio2DVector, // Default: {0, -0.3} for 
+    #[default(true)]
+    pub draw_entity_info_icon_background: bool, // Default: true
+    #[default(false)]
+    pub match_animation_speed_to_activity: bool, // Default: false
+    #[default(true)]
+    pub show_recipe_icon_on_map: bool, // Default: true
+    #[default(0_f32)]
+    pub base_productivity: f32, // Default: 0
+    pub module_specification: Option<ModuleSpecification>,
+    pub working_visualisations: Option<Vec<WorkingVisualisation>>,
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine>
