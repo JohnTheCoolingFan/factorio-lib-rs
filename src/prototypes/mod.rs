@@ -2397,17 +2397,25 @@ pub struct AssemblingMachine {
 }
 
 /// <https://wiki.factorio.com/Prototype/RocketSilo>
-#[derive(Debug, Clone, Prototype, CraftingMachine, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, CraftingMachine, DataTableAccessable, PrototypeFromLua)]
 #[data_table(rocket_silo)]
 pub struct RocketSilo {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
-    crafting_machine_base: CraftingMachineBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
+    #[use_self_forced]
+    pub crafting_machine_base: CraftingMachineBase,
+    #[default("")]
     pub fixed_recipe: String, // Default: "" // Name of Recipe
+    #[default("")]
     pub gui_title_key: String, // Default: ""
+    #[default(255_u8)]
     pub ingredient_count: u8, // Default: 255
     pub active_energy_usage: Energy,
     pub idle_energy_usage: Energy,
@@ -2452,6 +2460,7 @@ pub struct RocketSilo {
     pub doors_sound: Option<Sound>,
     pub raise_rocket_sound: Option<Sound>,
     pub flying_sound: Option<Sound>,
+    #[default(0_u16)]
     pub rocket_result_inventory_size: u16 // Default: 0
 }
 
