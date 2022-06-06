@@ -2465,17 +2465,22 @@ pub struct RocketSilo {
 }
 
 /// <https://wiki.factorio.com/Prototype/Furnace>
-#[derive(Debug, Clone, Prototype, CraftingMachine, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, CraftingMachine, DataTableAccessable, PrototypeFromLua)]
 #[data_table(furnace)]
 pub struct Furnace {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
-    crafting_machine_base: CraftingMachineBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
+    #[use_self_forced]
+    pub crafting_machine_base: CraftingMachineBase,
     pub result_inventory_size: u16,
-    pub source_inventory_size: u16 // Not more than 1
+    pub source_inventory_size: u16 // Not more than 1 // TODO
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface>
