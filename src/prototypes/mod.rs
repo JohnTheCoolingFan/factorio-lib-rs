@@ -2374,17 +2374,25 @@ pub trait CraftingMachine {
 }
 
 /// <https://wiki.factorio.com/Prototype/AssemblingMachine>
-#[derive(Debug, Clone, Prototype, CraftingMachine, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, CraftingMachine, DataTableAccessable, PrototypeFromLua)]
 #[data_table(assembling_machine)]
 pub struct AssemblingMachine {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
-    crafting_machine_base: CraftingMachineBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
+    #[use_self_forced]
+    pub crafting_machine_base: CraftingMachineBase,
+    #[default("")]
     pub fixed_recipe: String, // Default: "" // Name of Recipe
+    #[default("")]
     pub gui_title_key: String, // Default: ""
+    #[default(255_u8)]
     pub ingredient_count: u8, // Default: 255
 }
 
