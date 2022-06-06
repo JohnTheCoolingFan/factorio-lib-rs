@@ -2484,21 +2484,33 @@ pub struct Furnace {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(electric_energy_interface)]
 pub struct ElectricEnergyInterface {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub energy_source: EnergySource, // Must be electric
+    #[default(Energy(0.0))]
     pub energy_production: Energy, // Default: 0
+    #[default(Energy(0.0))]
     pub energy_usage: Energy, // Default: 0
+    #[from_str]
+    #[default("none")]
     pub gui_mode: GuiMode, // Default: "none"
+    #[default(false)]
     pub continuous_animation: bool, // Default: false
+    #[from_str]
+    #[default("object")]
     pub render_layer: RenderLayer, // Default: "object"
     pub light: Option<LightDefinition>,
+    #[use_self_forced]
     pub visuals: ElectricEnergyInterfaceVisuals
 }
 
@@ -2509,6 +2521,27 @@ pub enum ElectricEnergyInterfaceVisuals {
     Pictures(Sprite4Way),
     Animation(Animation),
     Animations(Animation4Way)
+}
+
+impl<'lua> PrototypeFromLua<'lua> for ElectricEnergyInterfaceVisuals {
+    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+        if let LuaValue::Table(t) = &value {
+            if let Some(sprite) = t.get_prot::<_, Option<Sprite>>("picture", lua, data_table)? {
+                Ok(Self::Picture(sprite))
+            } else if let Some(pictures) = t.get_prot::<_, Option<Sprite4Way>>("pictures", lua, data_table)? {
+                Ok(Self::Pictures(pictures))
+            } else if let Some(animation) = t.get_prot::<_, Option<Animation>>("animation", lua, data_table)? {
+                Ok(Self::Animation(animation))
+            } else if let Some(animation4way) = t.get_prot::<_, Option<Animation4Way>>("animations", lua, data_table)? {
+                Ok(Self::Animations(animation4way))
+            } else {
+                Err(LuaError::FromLuaConversionError { from: value.type_name(), to: "ElectricEnergyInterfaceVisuals",
+                message: Some("One of these properties has to exist: `picture`, `pictures`, `animation`, `animations`".into()) })
+            }
+        } else {
+            Err(LuaError::FromLuaConversionError { from: value.type_name(), to: "ElectricEnergyInterfaceVisuals", message: Some("expected table".into()) })
+        }
+    }
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricPole>

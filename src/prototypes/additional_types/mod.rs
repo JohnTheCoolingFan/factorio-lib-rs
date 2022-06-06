@@ -755,7 +755,7 @@ pub struct IconData {
 /// J/s (Joule/second) is not supported, as I can't find any uses and it's equvalent to W (Watt)
 /// <https://wiki.factorio.com/Types/Energy>
 #[derive(Debug, Clone, PartialEq, PartialOrd, Copy)]
-pub struct Energy(f64); // I don't know which type factorio uses internally, so I will use this
+pub struct Energy(pub f64); // I don't know which type factorio uses internally, so I will use this
 
 impl Energy {
     fn get_multiplier(multiplier_char: char) -> Option<f64> {
