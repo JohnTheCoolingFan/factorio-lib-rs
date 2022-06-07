@@ -2712,16 +2712,21 @@ pub struct ConstructionRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/LogisticRobot>
-#[derive(Debug, Clone, Prototype, FlyingRobot, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, FlyingRobot, DataTableAccessable, PrototypeFromLua)]
 #[data_table(logistic_robot)]
 pub struct LogisticRobot {
-    // Must have collision box of zero
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
-    flying_robot_base: FlyingRobotBase,
+    // Must have collision box of zero // TODO
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
+    #[use_self_forced]
+    pub flying_robot_base: FlyingRobotBase,
     // RobotWithLogisticInterface
     pub max_payload_size: u32,
     pub cargo_centered: Factorio2DVector,
@@ -2730,6 +2735,7 @@ pub struct LogisticRobot {
     pub shadow_idle: Option<RotatedAnimation>,
     pub shadow_in_motion: Option<RotatedAnimation>,
     pub destroy_action: Option<Trigger>,
+    #[default(true)]
     pub draw_cargo: bool, // Default: true
     // LogisticRobot
     pub idle_with_cargo: Option<RotatedAnimation>,
