@@ -1898,7 +1898,7 @@ pub struct ArtilleryTurret {
     pub entity_with_health_base: EntityWithHealthBase,
     #[use_self_forced]
     pub entity_with_owner_base: EntityWithOwnerBase,
-    pub gun: String, // Name of a gun item
+    pub gun: String, // Name of a Gun
     pub inventory_size: u16, // Must be > 0
     pub ammo_stack_limit: u32, // Must be > 0
     pub automated_ammo_count: u32,
