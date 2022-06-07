@@ -74,7 +74,8 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedStringEntry {
     }
 }
 
-// LocalisedString
+/// LocalisedString
+///
 /// This is unfinished but working implementation.
 /// Referencing other locale entries is not implemented
 #[derive(Debug, Clone)]
