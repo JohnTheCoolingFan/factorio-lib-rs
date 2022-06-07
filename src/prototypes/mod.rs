@@ -2778,27 +2778,36 @@ pub struct Gate {
 }
 
 /// <https://wiki.factorio.com/Prototype/Generator>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(generator)]
 pub struct Generator {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
-    pub energy_source: EnergySource, // Must be electric
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
+    pub energy_source: EnergySource, // Must be electric // TODO
     pub fluid_box: FluidBox,
     pub horizontal_animation: Animation,
     pub vertical_animation: Animation,
     pub effectivity: f64,
     pub fluid_usage_per_tick: f64,
     pub maximum_temperature: f64,
-    pub smoke: Option<Vec<SmokeSource>>, // 1 or more, if specified
+    pub smoke: Option<Vec<SmokeSource>>, // 1 or more, if specified // TODO
+    #[default(false)]
     pub burns_fluid: bool, // Default: false
+    #[default(false)]
     pub scale_fluid_usage: bool, // Default: false
+    #[default(0.25_f64)]
     pub min_perceived_performance: f64, // Default: 0.25
+    #[default(0.5_f64)]
     pub performance_to_sound_speedup: f64, // Default: 0.5
     pub max_power_output: Option<Energy>,
+    #[default(true)]
     pub destroy_non_fuel_fluid: bool, // Default: true
 }
 
