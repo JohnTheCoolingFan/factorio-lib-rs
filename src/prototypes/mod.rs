@@ -1032,9 +1032,7 @@ pub struct DontBuildEntityAchievement {
     pub prototype_base: PrototypeBaseSpec,
     #[use_self_forced]
     pub achievement: AchievementBase,
-    #[required]
-    #[fallback(Some(vec![prot_table.get("dont_build").ok()?]))] // yikes
-    pub dont_buid: Vec<String>, // String is converted to Vec<String> with one element
+    pub dont_buid: Vec<String>, // String is converted to Vec<String> with one element // TODO
     #[default(0_u32)]
     pub amount: u32 // Default: 0
 }
@@ -1060,12 +1058,8 @@ pub struct DontUseEntityInEnergyProductionAchievement {
     pub prototype_base: PrototypeBaseSpec,
     #[use_self_forced]
     pub achievement: AchievementBase,
-    #[required]
-    #[fallback(Some(vec![prot_table.get("excluded").ok()?]))] // yikes
-    pub excluded: Vec<String>, // String is converted to Vec<String> with one element
-    #[required]
-    #[fallback(Some(vec![prot_table.get("included").ok()?]))] // yikes
-    pub included: Vec<String>, // Same as `excluded`
+    pub excluded: Vec<String>, // String is converted to Vec<String> with one element // TODO
+    pub included: Vec<String>, // Same as `excluded` // TODO
     #[default(false)]
     pub last_hour_only: bool, // Default: false
     #[default(Energy(0.0))]
