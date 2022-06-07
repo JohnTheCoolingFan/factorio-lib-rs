@@ -2545,23 +2545,31 @@ impl<'lua> PrototypeFromLua<'lua> for ElectricEnergyInterfaceVisuals {
 }
 
 /// <https://wiki.factorio.com/Prototype/ElectricPole>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(electric_pole)]
 pub struct ElectricPole {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub pictures: RotatedSprite,
     pub supply_area_distance: f64, // Max value: 64
     pub connection_points: Vec<WireConnectionPoint>,
     pub radius_visualisation_picture: Option<Sprite>,
     pub active_picture: Option<Sprite>,
+    #[default(0_f64)]
     pub maximum_wire_distance: f64, // Default: 0
+    #[default(true)]
     pub draw_copper_wires: bool, // Default: true
+    #[default(true)]
     pub draw_circuit_wires: bool, // Default: true
     pub light: Option<LightDefinition>,
+    #[default(false)]
     pub track_coverage_during_build_by_moving: bool // Default: false
 }
 
