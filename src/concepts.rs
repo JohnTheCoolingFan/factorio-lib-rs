@@ -93,7 +93,7 @@ impl fmt::Display for LocalisedString {
                 match parameter {
                     LocalisedStringEntry::String(v) => write!(f, "{}", v)?, // It's just a string or converted to string, simply write it
                     LocalisedStringEntry::LocString(mut v) => {
-                        v.set_handler(Rc::clone(&self.locale_handler)); // Pass the locale_handler reference to inner LocalisedString
+                        v.set_handler(&self.locale_handler); // Pass the locale_handler reference to inner LocalisedString
                         write!(f, "{}", v)?
                     },
                 }
@@ -160,8 +160,8 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedString {
 }
 
 impl LocalisedString {
-    pub fn set_handler(&mut self, locale_handler: Rc<Option<LocaleHandler>>) {
-        self.locale_handler = Rc::clone(&locale_handler);
+    pub fn set_handler(&mut self, locale_handler: &Rc<Option<LocaleHandler>>) {
+        self.locale_handler = Rc::clone(locale_handler);
     }
 }
 
