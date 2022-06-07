@@ -4,6 +4,7 @@ use std::iter::{Iterator, FromIterator};
 use super::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
 use strum_macros::{EnumString, AsRefStr};
 use mlua::{prelude::*, Value};
+use factorio_lib_rs_derive::prot_from_str;
 
 // ============ // Simple types // ============ //
 
@@ -33,12 +34,7 @@ pub enum ApplyRecipeTint {
     None,
 }
 
-impl<'lua> PrototypeFromLua<'lua> for ApplyRecipeTint {
-    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-        let s: String = lua.unpack(value)?;
-        s.parse().map_err(LuaError::external)
-    }
-}
+prot_from_str!(ApplyRecipeTint);
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_tint>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
@@ -51,12 +47,7 @@ pub enum ApplyTint {
     None,
 }
 
-impl<'lua> PrototypeFromLua<'lua> for ApplyTint {
-    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-        let s: String = lua.unpack(value)?;
-        s.parse().map_err(LuaError::external)
-    }
-}
+prot_from_str!(ApplyTint);
 
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet#apply_module_tint>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
@@ -69,6 +60,8 @@ pub enum ApplyModuleTint {
     Quaternary,
 }
 
+prot_from_str!(ApplyModuleTint);
+
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet#module_tint_mode>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -76,6 +69,8 @@ pub enum ModuleTintMode {
     SingleModule,
     Mix,
 }
+
+prot_from_str!(ModuleTintMode);
 
 /// <https://wiki.factorio.com/Types/LightDefinition#type>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
@@ -85,6 +80,8 @@ pub enum LightDefinitionType {
     Oriented,
 }
 
+prot_from_str!(LightDefinitionType);
+
 /// <https://wiki.factorio.com/Types/BaseAttackParameters#range_mode>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -93,6 +90,8 @@ pub enum RangeMode {
     BoundingBoxToBoundingBox,
 }
 
+prot_from_str!(RangeMode);
+
 /// <https://wiki.factorio.com/Prototype/Lamp#glow_render_mode>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -100,6 +99,8 @@ pub enum GlowRenderMode {
     Additive,
     Multiplicative,
 }
+
+prot_from_str!(GlowRenderMode);
 
 /// <https://wiki.factorio.com/Types/RenderLayer>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
@@ -150,6 +151,8 @@ pub enum RenderLayer {
     Cursor
 }
 
+prot_from_str!(RenderLayer);
+
 /// <https://wiki.factorio.com/Types/Sprite#draw_as_shadow>
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub enum DrawAs {
@@ -184,6 +187,8 @@ pub enum BlendMode {
     Overwrite
 }
 
+prot_from_str!(BlendMode);
+
 /// <https://wiki.factorio.com/Types/Animation#run_mode>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -192,6 +197,8 @@ pub enum RunMode {
     Backward,
     ForwardThenBackward
 }
+
+prot_from_str!(RunMode);
 
         // Structs
 
