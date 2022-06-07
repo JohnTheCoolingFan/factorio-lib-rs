@@ -441,10 +441,7 @@ prot_from_lua_blanket!(Factorio2DVector);
 prot_from_lua_blanket!(Factorio3DVector);
 prot_from_lua_blanket!(Position);
 prot_from_lua_blanket!(RealOrientation);
-prot_from_lua_blanket!(Energy);
-prot_from_lua_blanket!(ActivationType);
 prot_from_lua_blanket!(Direction);
-prot_from_lua_blanket!(ProductionType);
 prot_from_lua_blanket!(EffectTypeLimitation);
 #[cfg(feature = "concepts")]
 prot_from_lua_blanket!(LocalisedString);
@@ -585,7 +582,6 @@ pub struct BoolModSetting {
     pub order: Option<String>,
     #[default(false)]
     pub hidden: bool,
-    #[from_str]
     pub setting_type: ModSettingType,
     pub default_value: bool,
     #[mandatory_if(hidden)]
@@ -602,7 +598,6 @@ pub struct IntModSetting {
     pub order: Option<String>,
     #[default(false)]
     pub hidden: bool,
-    #[from_str]
     pub setting_type: ModSettingType,
     pub default_value: i64,
     pub minimum_value: Option<i64>,
@@ -620,7 +615,6 @@ pub struct DoubleModSetting {
     pub order: Option<String>,
     #[default(false)]
     pub hidden: bool,
-    #[from_str]
     pub setting_type: ModSettingType,
     pub default_value: f64,
     pub minimum_value: Option<f64>,
@@ -638,7 +632,6 @@ pub struct StringModSetting {
     pub order: Option<String>,
     #[default(false)]
     pub hidden: bool,
-    #[from_str]
     pub setting_type: ModSettingType,
     pub default_value: String,
     #[default(false)]
@@ -654,7 +647,6 @@ pub struct StringModSetting {
 pub struct AmbientSoundPrototype {
     pub name: String,
     pub sound: Sound,
-    #[from_str]
     pub track_type: TrackType,
     #[default(1.0)]
     pub weight: f64
@@ -1076,9 +1068,8 @@ pub struct DontUseEntityInEnergyProductionAchievement {
     pub included: Vec<String>, // Same as `excluded`
     #[default(false)]
     pub last_hour_only: bool, // Default: false
-    #[default("0W")]
-    #[from_str]
-    pub minimum_energy_produced: Energy // Default: 0W
+    #[default(Energy(0.0))]
+    pub minimum_energy_produced: Energy // Default: 0
 }
 
 /// <https://wiki.factorio.com/Prototype/FinishTheGameAchievement>
@@ -1216,7 +1207,6 @@ pub struct AutoplaceControl {
     pub name: String,
     #[use_self_forced]
     pub prototype_base: PrototypeBaseSpec,
-    #[from_str]
     pub category: AutoplaceControlCategory,
     #[default(true)]
     pub can_be_disabled: bool, // Default: true
@@ -1235,8 +1225,7 @@ pub struct CustomInput {
     pub alternate_key_sequence: Option<KeySequence>,
     #[default("")]
     pub linked_game_control: String, // Default: ""
-    #[from_str]
-    #[default("none")]
+    #[default(ConsumingType::None)]
     pub consumed: ConsumingType, // Default: none
     #[default(true)]
     pub enabled: bool, // Default: true
@@ -1247,8 +1236,7 @@ pub struct CustomInput {
     #[default(false)]
     pub include_selected_prototype: bool, // Default: false
     pub item_to_spawn: Option<String>, // Name of Item
-    #[from_str]
-    #[default("lua")]
+    #[default(CustomInputAction::Lua)]
     pub action: CustomInputAction // Default: "lua"
 }
 
@@ -1272,8 +1260,7 @@ pub struct Decorative {
     pub prototype_base: PrototypeBaseSpec,
     pub pictures: Vec<SpriteVariation>, // At least 1 is required
     pub collision_box: Option<BoundingBox>,
-    #[default("decorative")]
-    #[from_str]
+    #[default(RenderLayer::Decorative)]
     pub render_layer: RenderLayer, // Default: "decorative"
     #[default(false)]
     pub grows_through_rail_path: bool, // Default: false
@@ -1317,8 +1304,7 @@ pub struct EntityBase {
     selectable_in_game: bool, // Default: true
     #[default(Self::default_selection_priority(prot_table.get::<_, String>("type").ok()?))]
     selection_priority: u8, // Default: 50
-    #[default("automatic")]
-    #[from_str]
+    #[default(RemoveDecoratives::Automatic)]
     remove_decoratives: RemoveDecoratives, // Default: "automatic"
     #[default(0_f64)]
     emissions_per_second: f64, // Default: 0
@@ -1494,11 +1480,9 @@ pub struct ArtilleryFlare {
     pub pictures: Vec<AnimationVariation>,
     pub life_time: u16,
     pub shadows: Option<Vec<AnimationVariation>>,
-    #[default("object")]
-    #[from_str]
+    #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
-    #[default("lower-object")]
-    #[from_str]
+    #[default(RenderLayer::LowerObject)]
     pub render_layer_when_on_ground: RenderLayer, // Default: "lower-object"
     pub regular_trigger_effect: Option<TriggerEffect>,
     #[default(0_u32)]
@@ -1616,8 +1600,7 @@ pub struct CharacterCorpse {
     #[use_self_forced]
     pub entity_base: EntityBase,
     pub time_to_live: u32,
-    #[from_str]
-    #[default("object")]
+    #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
     //#[fallback(Some(vec![prot_table.get_prot::<_, AnimationVariation>("picture", lua, data_table).ok()?]))]
     pub pictures: Vec<AnimationVariation>, // Mandatory // picture field is converted to this
@@ -1656,23 +1639,17 @@ pub struct CorpseBase {
     pub remove_on_entity_placemen: bool, // Default: true
     #[default(true)]
     pub remove_on_tile_placement: bool, // Default: true
-    #[from_str]
-    #[default("corpse")]
+    #[default(RenderLayer::Corpse)]
     pub final_render_layer: RenderLayer, // Default: "corpse"
-    #[from_str]
-    #[default("ground-patch")]
+    #[default(RenderLayer::GroundPatch)]
     pub gound_patch_render_layer: RenderLayer, // Default: "ground-patch"
-    #[from_str]
-    #[default("object")]
+    #[default(RenderLayer::Object)]
     pub animation_render_layer: RenderLayer, // Default: "object"
-    #[from_str]
-    #[default("object")]
+    #[default(RenderLayer::Object)]
     pub splash_render_layer: RenderLayer, // Default: "object"
-    #[from_str]
-    #[default("object")]
+    #[default(RenderLayer::Object)]
     pub animation_overlay_render_layer: RenderLayer, // Default: "object"
-    #[from_str]
-    #[default("corpse")]
+    #[default(RenderLayer::Corpse)]
     pub animation_overlay_final_render_layer: RenderLayer, // Default: "corpse"
     #[default(1_u8)]
     pub shuffle_directions_at_frame: u8, // Default: 1
@@ -1746,7 +1723,6 @@ pub struct RailRemnants {
     pub entity_base: EntityBase,
     #[use_self_forced]
     pub corpse_base: CorpseBase,
-    #[from_str]
     pub bending_type: BendingType,
     pub pictures: RailPictures
 }
@@ -1800,8 +1776,7 @@ pub struct EntityWithHealthBase {
     pub create_ghost_on_death: bool, // Default: true
     #[default(false)]
     pub random_corpse_variation: bool, // Default: false
-    #[from_str]
-    #[default("lower-object")]
+    #[default(RenderLayer::LowerObject)]
     pub integration_patch_render_layer: RenderLayer, // Default: "lower-object"
     #[default(vec![])]
     pub corpse: Vec<String>, // Default: Empty // (Names) Name of Prototype/Corpse
@@ -1910,8 +1885,7 @@ pub struct ArtilleryTurret {
     pub disable_automatic_firing: bool, // Default: false
     #[default(0_u8)]
     pub base_picture_secondary_draw_order: u8, // Default: 0
-    #[from_str]
-    #[default("lower-object")]
+    #[default(RenderLayer::LowerObject)]
     pub base_picture_render_layer: RenderLayer, // Default: "lower-object"
     pub base_shift: Option<Factorio2DVector>,
     pub base_picture: Option<Animation4Way>,
@@ -1982,8 +1956,7 @@ pub struct Boiler {
     pub fire_glow_flicker_enabled: bool, // Default: false
     #[default(false)]
     pub fire_flicker_enabled: bool, // Default: false
-    #[from_str]
-    #[default("heat-water-inside")]
+    #[default(BoilerMode::HeatWaterInside)]
     pub mode: BoilerMode, // Default: "heat-water-inside"
     pub patch: Option<Sprite4Way>,
 }
@@ -2236,7 +2209,6 @@ pub struct LogisticContainer {
     pub entity_with_owner_base: EntityWithOwnerBase,
     pub inventory_size: u16,
     pub picture: Option<Sprite>,
-    #[from_str]
     pub logistic_mode: LogisticMode,
     #[default(true)]
     pub enable_inventory_bar: bool, // Default: true
@@ -2297,8 +2269,7 @@ pub struct InfinityContainer {
     pub animation: Option<Animation>,
     pub landing_location_offset: Option<Factorio2DVector>,
     pub animation_sound: Option<Sound>,
-    #[from_str]
-    #[default("none")]
+    #[default(GuiMode::None)]
     pub gui_mode: GuiMode // Default: "none"
 }
 
@@ -2501,13 +2472,11 @@ pub struct ElectricEnergyInterface {
     pub energy_production: Energy, // Default: 0
     #[default(Energy(0.0))]
     pub energy_usage: Energy, // Default: 0
-    #[from_str]
-    #[default("none")]
+    #[default(GuiMode::None)]
     pub gui_mode: GuiMode, // Default: "none"
     #[default(false)]
     pub continuous_animation: bool, // Default: false
-    #[from_str]
-    #[default("object")]
+    #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
     pub light: Option<LightDefinition>,
     #[use_self_forced]
@@ -2826,8 +2795,7 @@ pub struct HeatInterface {
     pub entity_with_owner_base: EntityWithOwnerBase,
     pub heat_buffer: HeatBuffer,
     pub picture: Option<Sprite>,
-    #[from_str]
-    #[default("all")]
+    #[default(GuiMode::All)]
     pub guid_mode: GuiMode, // Default: "all"
 }
 

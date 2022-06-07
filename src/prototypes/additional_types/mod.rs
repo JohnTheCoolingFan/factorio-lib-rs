@@ -27,6 +27,7 @@ use crate::prototypes::{GetPrototype, PrototypesErr};
 use super::{LocalisedString, PrototypeFromLua, DataTable};
 use mlua::{ToLua, Value, Lua, prelude::*, FromLua};
 use strum_macros::{EnumDiscriminants, EnumString, AsRefStr};
+use factorio_lib_rs_derive::prot_from_str;
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
 #[derive(Debug, Clone)]
@@ -273,6 +274,8 @@ pub enum DifficultySetting {
     Expensive
 }
 
+prot_from_str!(DifficultySetting);
+
 /// <https://wiki.factorio.com/Prototype/MapSettings#difficulty_settings>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -282,11 +285,7 @@ pub enum ResearchQueueSetting {
     Never
 }
 
-impl<'lua> PrototypeFromLua<'lua> for ResearchQueueSetting {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
-        lua.unpack::<String>(value)?.parse().map_err(mlua::Error::external)
-    }
-}
+prot_from_str!(ResearchQueueSetting);
 
 /// <https://wiki.factorio.com/Tutorial:Mod_settings#The_setting_type_property>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
@@ -296,6 +295,8 @@ pub enum ModSettingType {
     RuntimeGlobal,
     RuntimePerUser,
 }
+
+prot_from_str!(ModSettingType);
 
 /// <https://wiki.factorio.com/Types/MapGenPreset>
 #[derive(Debug, Clone)]
@@ -354,15 +355,7 @@ impl FromStr for MapGenSize {
     }
 }
 
-impl<'lua> PrototypeFromLua<'lua> for MapGenSize {
-    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
-        if let Value::String(s) = value {
-            s.to_str().map_err(mlua::Error::external)?.parse().map_err(mlua::Error::external)
-        } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "MapgenSize", message: Some("expected string".into()) })
-        }
-    }
-}
+prot_from_str!(MapGenSize);
 
 /// <https://lua-api.factorio.com/latest/Concepts.html#CliffPlacementSettings>
 #[derive(Debug, Clone, PrototypeFromLua)]
@@ -371,7 +364,6 @@ pub struct CliffPlacementSettings {
     #[default(10.0_f32)]
     pub cliff_elevation_0: f32, // Default 10.0
     pub cliff_elevation_interval: f32,
-    #[from_str]
     pub richness: MapGenSize
 }
 
@@ -381,7 +373,6 @@ pub struct CliffPlacementSettings {
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenPresetBasicSettings {
     // Defaults are not documented for some f'ing reason
-    #[from_str]
     pub terain_segmentation: MapGenSize, // Default is... Unknown
     pub water: MapGenSize, // Same here
     #[default(true)]
@@ -394,7 +385,6 @@ pub struct MapGenPresetBasicSettings {
     pub seed: u32,
     pub width: u32,
     pub height: u32,
-    #[from_str]
     pub starting_area: MapGenSize,
     pub peaceful_mode: bool,
     pub cliff_settings: CliffPlacementSettings
@@ -476,12 +466,9 @@ pub struct MapGenEnemyExpansion {
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenDifficultySettings {
-    #[from_str]
     pub recipe_difficulty: DifficultySetting,
-    #[from_str]
     pub technology_difficulty: DifficultySetting,
     pub technology_price_multiplier: f64,
-    #[from_str]
     pub research_queue_setting: ResearchQueueSetting
 }
 
@@ -613,9 +600,7 @@ impl MapPathFinder {
 #[derive(Debug, Clone, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct MapDifficultySettings {
-    #[from_str]
     pub recipe_difficulty: DifficultySetting,
-    #[from_str]
     pub technology_difficulty: DifficultySetting,
     #[default(1.0_f64)]
     pub technology_price_multiplier: f64, // Default: 1.0 // Must be >= 0.001 and <= 1000.0
@@ -804,11 +789,7 @@ impl FromStr for Energy {
     }
 }
 
-impl<'lua> FromLua<'lua> for Energy {
-    fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
-        lua.unpack::<String>(value)?.parse::<Self>().map_err(mlua::Error::external)
-    }
-}
+prot_from_str!(Energy);
 
 #[test]
 fn energy_parse() {
@@ -876,6 +857,8 @@ pub enum AutoplaceControlCategory {
     Enemy
 }
 
+prot_from_str!(AutoplaceControlCategory);
+
 /// <https://wiki.factorio.com/Prototype/CustomInput#consuming>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -883,6 +866,8 @@ pub enum ConsumingType {
     None,
     GameOnly
 }
+
+prot_from_str!(ConsumingType);
 
 /// <https://wiki.factorio.com/Prototype/CustomInput#action>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
@@ -894,6 +879,8 @@ pub enum CustomInputAction {
     TogglePersonalLogisticRequests,
     ToggleEquipmentMovementBonus
 }
+
+prot_from_str!(CustomInputAction);
 
 /// <https://wiki.factorio.com/Types/CollisionMask>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, Hash)]
@@ -1277,8 +1264,9 @@ impl<'lua> PrototypeFromLua<'lua> for EntityPrototypeFlags {
 /// <https://wiki.factorio.com/Types/DamagePrototype>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct DamagePrototype {
-    amount: f32,
-    r#type: String // Name of Damage type
+    pub amount: f32,
+    #[rename("type")]
+    pub r#type: String // Name of Damage type
 }
 
 /// <https://wiki.factorio.com/Types/DamageTypeFilters>
@@ -1326,6 +1314,8 @@ pub enum ForceCondition {
     NotSame
 }
 
+prot_from_str!(ForceCondition);
+
 /// <https://wiki.factorio.com/Types/AreaTriggerItem#collision_mode>
 #[derive(Debug, Clone, Copy, Eq, PartialEq, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
@@ -1333,6 +1323,8 @@ pub enum CollisionMode {
     DistanceFromCollisionBox,
     DistanceFromCenter,
 }
+
+prot_from_str!(CollisionMode);
 
 /// <https://wiki.factorio.com/Types/MinableProperties>
 #[derive(Debug, Clone, PrototypeFromLua)]
@@ -1487,6 +1479,8 @@ pub enum RemoveDecoratives {
     False,
 }
 
+prot_from_str!(RemoveDecoratives);
+
 /// <https://wiki.factorio.com/Prototype/Entity#placeable_by>
 #[derive(Debug, Clone)]
 pub struct ItemsToPlace(pub Vec<ItemToPlace>);
@@ -1551,6 +1545,8 @@ pub enum BendingType {
     Straight,
     Turn,
 }
+
+prot_from_str!(BendingType);
 
 /// <https://wiki.factorio.com/Types/ExplosionDefinition>
 #[derive(Debug, Clone, PrototypeFromLua)]
@@ -1651,7 +1647,6 @@ pub struct ElectricEnergySource {
     #[use_self_forced]
     pub base: EnergySourceBase,
     pub buffer_capacity: Option<Energy>,
-    #[from_str]
     pub usage_priority: ElectricUsagePriority,
     #[default(Energy(f64::MAX))]
     pub input_flow_limit: Energy, // Default: f64::MAX
@@ -1757,6 +1752,8 @@ pub enum ElectricUsagePriority {
     Lamp,
 }
 
+prot_from_str!(ElectricUsagePriority);
+
 /// <https://wiki.factorio.com/Types/SmokeSource>
 #[derive(Debug, Clone, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
@@ -1821,13 +1818,13 @@ pub struct FluidBox {
     #[default(1_f64)]
     pub height: f64, // Default: 1 // Must be > 0
     pub filter: Option<String>, // Name of Prototype/Fluid
-    #[default("object")]
-    #[from_str]
+    #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
     pub pipe_covers: Option<Sprite4Way>,
     pub minimum_temperature: Option<f64>,
     pub maximum_temperature: Option<f64>,
-    pub production_type: Option<ProductionType>, // Default: None
+    #[default(ProductionType::None)]
+    pub production_type: ProductionType, // Default: None
     //secondary_draw_order: u8, // Default: 1 // Converted to secondary_draw_orders // FIXME
     pub secondary_draw_orders: SecondaryDrawOrders // Default: (north = 1, east = 1, south = 1, west = 1)
 }
@@ -1847,10 +1844,9 @@ pub struct PipeConnectionDefinition {
     pub positions: Vec<Factorio2DVector>, // `position` takes priority and gets converted to this // FIXME
     #[default(0_u32)]
     pub max_underground_distance: u32, // Default: 0
-    #[default("input-output")]
+    #[default(ProductionType::InputOutput)]
     #[rename("type")]
-    #[from_str]
-    pub production_rype: ProductionType, // Default: "input-output"
+    pub production_type: ProductionType, // Default: "input-output"
 }
 
 /// <https://wiki.factorio.com/Types/Direction>
@@ -1887,16 +1883,13 @@ impl<'lua> FromLua<'lua> for Direction {
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ProductionType {
+    None,
     Input,
     InputOutput,
     Output,
 }
 
-impl<'lua> FromLua<'lua> for ProductionType {
-    fn from_lua(value: Value<'lua>, lua: &Lua) -> LuaResult<Self> {
-        lua.unpack::<String>(value)?.parse().map_err(LuaError::external)
-    }
-}
+prot_from_str!(ProductionType);
 
 /// <https://wiki.factorio.com/Types/WireConnectionPoint>
 #[derive(Debug, Clone, PrototypeFromLua)]
@@ -1917,7 +1910,6 @@ pub struct WirePosition {
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SignalIDConnector {
     #[rename("type")]
-    #[from_str]
     pub signal_type: SignalType,
     pub name: String, // Name of a circuit network signal
 }
@@ -2036,12 +2028,7 @@ pub enum LogisticMode {
     Requester,
 }
 
-impl<'lua> PrototypeFromLua<'lua> for LogisticMode {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
-        let s: String = lua.unpack(value)?;
-        s.parse().map_err(LuaError::external)
-    }
-}
+prot_from_str!(LogisticMode);
 
 /// Used in many places, specified as string
 /// <https://wiki.factorio.com/Prototype/ElectricEnergyInterface#gui_mode>
@@ -2052,6 +2039,8 @@ pub enum GuiMode {
     None,
     Admins,
 }
+
+prot_from_str!(GuiMode);
 
 // Can also be converted from array
 /// <https://wiki.factorio.com/Types/UnitSpawnDefinition>
@@ -2084,7 +2073,6 @@ pub struct AmmoType {
     pub cooldown_modifier: f64, // Default: 1
     #[default(1_f64)]
     pub consumption_modifier: f64, // Default: 1
-    #[from_str]
     pub target_type: TargetType
 }
 
@@ -2105,6 +2093,8 @@ pub enum TargetType {
     Position,
     Direction,
 }
+
+prot_from_str!(TargetType);
 
 /// <https://wiki.factorio.com/Types/CircularProjectileCreationSpecification>
 #[derive(Debug, Clone)]
@@ -2205,6 +2195,8 @@ pub enum SignalType {
     Item,
     Fluid,
 }
+
+prot_from_str!(SignalType);
 
 /// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker#instruments>
 #[derive(Debug, Clone)]
@@ -2974,3 +2966,5 @@ pub enum TrackType {
     LateGame,
     MenuTrack
 }
+
+prot_from_str!(TrackType);

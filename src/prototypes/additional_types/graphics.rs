@@ -219,7 +219,6 @@ pub struct SecondaryDrawOrders {
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct LightDefinition {
     #[rename("type")]
-    #[from_str]
     pub light_def_type: LightDefinitionType,
     // Next 2 are mandatory if type is "oriented"
     #[mandatory_if(light_def_type == LightDefinitionType::Oriented)]
@@ -454,8 +453,7 @@ pub struct AnimationSpec {
     pub filename: Option<FileName>,
     #[use_self_forced]
     pub sprite: SpriteSpecWithoutFilename, // Filename is mandatory unless `stripes` is specified
-    #[from_str]
-    #[default("forward")]
+    #[default(RunMode::Forward)]
     pub run_mode: RunMode, // Default: "forward"
     #[default(1_u32)]
     pub frame_count: u32, // Default: 1, can't be 0
@@ -535,8 +533,7 @@ pub struct Animation4Way {
 /// <https://wiki.factorio.com/Types/AnimationElement>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AnimationElement {
-    #[from_str]
-    #[default("object")]
+    #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
     pub secondary_draw_order: Option<i8>,
     #[default(true)]
@@ -1168,14 +1165,11 @@ pub struct BeaconGraphicsSet {
     pub random_animation_offset: bool, // Default: false
     #[default(false)]
     pub module_icons_suppressed: bool, // Default: false
-    #[default("object")]
-    #[from_str]
+    #[default(RenderLayer::Object)]
     pub base_layer: RenderLayer, // Default: "object"
-    #[default("object")]
-    #[from_str]
+    #[default(RenderLayer::Object)]
     pub animation_layer: RenderLayer, // Default: "object"
-    #[default("object")]
-    #[from_str]
+    #[default(RenderLayer::Object)]
     pub top_layer: RenderLayer, // Default: "object"
     #[default(1_f32)]
     pub animation_progress: f32, // Default: 1
@@ -1183,19 +1177,16 @@ pub struct BeaconGraphicsSet {
     pub min_animation_progress: f32, // Default: 0
     #[default(1000_f32)]
     pub max_animation_progress: f32, // Default: 1000
-    #[default("none")]
-    #[from_str]
+    #[default(ApplyModuleTint::None)]
     pub apply_module_tint: ApplyModuleTint, // Default: "none"
-    #[default("none")]
-    #[from_str]
+    #[default(ApplyModuleTint::None)]
     pub apply_module_tint_to_light: ApplyModuleTint, // Default: "none"
     #[default(Color(0.0, 0.0, 0.0, 1.0))]
     pub no_modules_tint: Color, //Default: no color
     pub animation_list: Option<Vec<AnimationElement>>,
     pub light: Option<LightDefinition>,
     pub module_visualisations: Option<BeaconModuleVisualizations>,
-    #[default("single-module")]
-    #[from_str]
+    #[default(ModuleTintMode::SingleModule)]
     pub module_tint_mode: ModuleTintMode // Default: "single-module"
 }
 
@@ -1221,11 +1212,9 @@ pub struct BeaconModuleVisualization {
     pub draw_as_sprite: bool, // Default: true
     #[default(0_i8)]
     pub secondary_draw_order: i8, // Default: 0
-    #[from_str]
-    #[default("none")]
+    #[default(ApplyModuleTint::None)]
     pub apply_module_tint: ApplyModuleTint, // Default: "none"
-    #[from_str]
-    #[default("object")]
+    #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
     pub pictures: Option<Vec<SpriteVariation>>
 }
@@ -1245,8 +1234,7 @@ pub struct CharacterArmorAnimation {
 /// <https://wiki.factorio.com/Types/WorkingVisualisation>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct WorkingVisualisation {
-    #[from_str]
-    #[default("object")]
+    #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
     #[default(false)]
     pub fadeout: bool, // Default: false

@@ -49,8 +49,7 @@ pub struct TriggerItem {
     #[default(CollisionMask::ALL)]
     pub collision_mask: CollisionMask, // Default: all
     pub action_delivery: Option<Vec<TriggerDelivery>>,
-    #[default("all")]
-    #[from_str]
+    #[default(ForceCondition::All)]
     pub force: ForceCondition // Default: all forces
 }
 
@@ -87,8 +86,7 @@ pub struct AreaTriggerItem {
     pub target_entities: bool, // Default: true
     #[default(true)]
     pub show_in_tooltip: bool, // Default: true
-    #[from_str]
-    #[default("distance-from-collision-box")]
+    #[default(CollisionMode::DistanceFromCollisionBox)]
     pub collision_mode: CollisionMode // Default: "distance-from-collision-box"
 }
 
@@ -662,11 +660,9 @@ pub struct DestroyDecorativesTriggerEffectItem {
     #[use_self_forced]
     pub base: TriggerEffectItem,
     pub radius: f32,
-    #[default("water-tile")]
-    #[from_str]
+    #[default(RenderLayer::WaterTile)]
     pub from_render_layer: RenderLayer, // Default: first layer
-    #[default("cursor")]
-    #[from_str]
+    #[default(RenderLayer::Cursor)]
     pub to_render_layer: RenderLayer, // Default: last layer
     #[default(false)]
     pub include_soft_decoratives: bool, // Default: false

@@ -2,8 +2,8 @@ use crate::prototypes::{PrototypeFromLua, GetPrototype};
 use super::{Factorio2DVector, RangeMode, AmmoType, CircularProjectileCreationSpecification, CircularParticleCreationSpecification};
 use super::graphics::RotatedAnimation;
 use super::sound::{LayeredSound, CyclicSound};
-use mlua::FromLua;
 use strum_macros::{EnumString, AsRefStr, EnumDiscriminants};
+use factorio_lib_rs_derive::prot_from_str;
 
 // ========== // AttackParameters // ========== //
 
@@ -46,8 +46,7 @@ pub struct ProjectileAttackParameters {
     pub rotate_penalty: f32, // Default: 0
     #[default(0_f32)]
     pub health_penalty: f32, // Default: 0
-    #[from_str]
-    #[default("center-to-center")]
+    #[default(RangeMode::CenterToCenter)]
     pub range_mode: RangeMode, // Default: "center-to-center"
     #[default(range)]
     pub min_attack_distance: f32, // Default: `range`
@@ -66,9 +65,8 @@ pub struct ProjectileAttackParameters {
     #[default(1_f64)]
     pub movement_slow_down_factor: f64, // Default: 1
     pub ammo_type: Option<AmmoType>,
-    #[from_str]
-    #[default("shoot")]
-    pub activation_type: ActivationType,
+    #[default(ActivationType::Shoot)]
+    pub activation_type: ActivationType, // Default: "shoot"
     pub sound: Option<LayeredSound>,
     pub animation: Option<RotatedAnimation>,
     pub cyclic_sound: Option<CyclicSound>,
@@ -100,8 +98,7 @@ pub struct BeamAttackParameters {
     pub rotate_penalty: f32, // Default: 0
     #[default(0_f32)]
     pub health_penalty: f32, // Default: 0
-    #[from_str]
-    #[default("center-to-center")]
+    #[default(RangeMode::CenterToCenter)]
     pub range_mode: RangeMode, // Default: "center-to-center"
     #[default(range)]
     pub min_attack_distance: f32, // Default: `range`
@@ -120,9 +117,8 @@ pub struct BeamAttackParameters {
     #[default(1_f64)]
     pub movement_slow_down_factor: f64, // Default: 1
     pub ammo_type: Option<AmmoType>,
-    #[from_str]
-    #[default("shoot")]
-    pub activation_type: ActivationType,
+    #[default(ActivationType::Shoot)]
+    pub activation_type: ActivationType, // Default: "shoot"
     pub sound: Option<LayeredSound>,
     pub animation: Option<RotatedAnimation>,
     pub cyclic_sound: Option<CyclicSound>,
@@ -149,8 +145,7 @@ pub struct StreamAttackParameters {
     pub rotate_penalty: f32, // Default: 0
     #[default(0_f32)]
     pub health_penalty: f32, // Default: 0
-    #[from_str]
-    #[default("center-to-center")]
+    #[default(RangeMode::CenterToCenter)]
     pub range_mode: RangeMode, // Default: "center-to-center"
     #[default(range)]
     pub min_attack_distance: f32, // Default: `range`
@@ -169,8 +164,7 @@ pub struct StreamAttackParameters {
     #[default(1_f64)]
     pub movement_slow_down_factor: f64, // Default: 1
     pub ammo_type: Option<AmmoType>,
-    #[from_str]
-    #[default("shoot")]
+    #[default(ActivationType::Shoot)]
     pub activation_type: ActivationType,
     pub sound: Option<LayeredSound>,
     pub animation: Option<RotatedAnimation>,
@@ -199,11 +193,7 @@ pub enum ActivationType {
     Activate,
 }
 
-impl<'lua> FromLua<'lua> for ActivationType {
-    fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::Result<Self> {
-        lua.unpack::<String>(value)?.parse().map_err(mlua::Error::external)
-    }
-}
+prot_from_str!(ActivationType);
 
 /// <https://wiki.factorio.com/Types/StreamAttackParameters#gun_center_shift>
 #[derive(Debug, Clone)]

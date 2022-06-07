@@ -762,9 +762,6 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 /// after extraction
 /// Incompatible with: `use_self`, `use_self_vec`, `use_self_forced`
 ///
-/// `#[from_str]` - convert value to string, then parse from str
-/// Incompatible with: `resource`, `use_self`, `use_self_vec`, `use_self_forced`
-///
 /// `#[use_self]` - use the table which is used for constructing current prototype for property if
 /// corresponding field does not exist in the table
 /// Incompatible with: `default`, `from_str`, `use_self_vec`, `use_self_forced`, `resource`, `mandatory_if`
@@ -796,7 +793,7 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 ///
 /// `#[post_extr_fn(path)]` - path is a path to a function that needs to be executed after
 /// field extraction and mandatory_if checks
-#[proc_macro_derive(PrototypeFromLua, attributes(default, from_str, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn, fallback, rename, required))]
+#[proc_macro_derive(PrototypeFromLua, attributes(default, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn, fallback, rename, required))]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     impl_prototype_from_lua_macro(&ast)
@@ -866,7 +863,6 @@ struct PrototypeFromLuaFieldAttrArgs {
     required: bool,
     // use_self* is incompatible with default and mandatory_if
     // Only 1 can be used:
-    use_from_str: bool,
     use_self: bool,
     use_self_vec: bool,
     use_self_forced: bool,
@@ -902,7 +898,6 @@ impl PrototypeFromLuaFieldAttrArgs {
         let oth = (
             ("default", self.default_value.is_some()),
             ("mandatory_if", self.mandatory_if.is_some()),
-            ("from_str", self.use_from_str),
             ("resource", self.is_resource),
             ("fallback", !self.fallbacks.is_empty())
         );
@@ -915,24 +910,19 @@ impl PrototypeFromLuaFieldAttrArgs {
                 ("default", self.default_value.is_some()),
                 sel.0, sel.1, sel.2
             ]),
-            ("from_str", |s, _| {s.use_from_str = true; Ok(())}, vec![
-                ("resource", self.is_resource),
-                sel.0, sel.1, sel.2
-            ]),
             ("resource", |s, _| {s.is_resource = true; Ok(())}, vec![
-                ("from_str", self.use_from_str),
                 sel.0, sel.1, sel.2
             ]),
             ("use_self", |s, _| {s.use_self = true; Ok(())}, vec![
-                oth.0, oth.1, oth.2, oth.3, oth.4,
+                oth.0, oth.1, oth.2, oth.3,
                 sel.1, sel.2
             ]),
             ("use_self_vec", |s, _| {s.use_self_vec = true; Ok(())}, vec![
-                oth.0, oth.1, oth.2, oth.3, oth.4,
+                oth.0, oth.1, oth.2, oth.3,
                 sel.0, sel.2
             ]),
             ("use_self_forced", |s, _| {s.use_self_forced = true; Ok(())}, vec![
-                oth.0, oth.1, oth.2, oth.3, oth.4,
+                oth.0, oth.1, oth.2, oth.3,
                 sel.0, sel.1
             ]),
             ("fallback", |s, a| {s.fallbacks.push(a.tokens.clone()); Ok(())}, vec![
@@ -958,7 +948,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
     let field_type = &field.ty;
     let prototype_field_attrs = PrototypeFromLuaFieldAttrArgs::from_attrs(&field.attrs)?;
     let str_field = prototype_field_attrs.rename.unwrap_or_else(|| ident.as_ref().unwrap().to_string());
-    let mut field_extr_type = if prototype_field_attrs.use_from_str || prototype_field_attrs.is_resource {
+    let mut field_extr_type = if prototype_field_attrs.is_resource {
         quote! { String }
     } else {
         quote! { #field_type }
@@ -970,15 +960,8 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
     let field_get_expr = {
         let mut get_expr = quote! { prot_table.get_prot::<_, #field_extr_type>(#str_field, lua, data_table)? #( .or_else(|| #fallbacks ) )* };
         if let Some(def_val) = &prototype_field_attrs.default_value {
-            get_expr = quote! { #get_expr.or_else(|| Some(#def_val.into())) };
-            if prototype_field_attrs.use_from_str {
-                get_expr = quote! { #get_expr.map(|s| s.parse::<#field_type>().map_err(mlua::Error::external)).transpose()? }
-            };
-            get_expr = quote! { #get_expr.unwrap() }
+            get_expr = quote! { #get_expr.or_else(|| Some(#def_val.into())).unwrap() };
         };
-        if prototype_field_attrs.default_value.is_none() && prototype_field_attrs.required {
-            get_expr = quote! { #get_expr.unwrap() }
-        }
         get_expr
     };
     let get_self = quote! {
@@ -996,8 +979,6 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
                 name.into()
             };
         }
-    } else if prototype_field_attrs.use_from_str && prototype_field_attrs.default_value.is_none() {
-        quote! { #field_get_expr.parse::<#field_type>().map_err(mlua::Error::external)?; }
     } else if prototype_field_attrs.use_self_vec {
         quote! { 
             prot_table.get_prot::<_, Option<#field_extr_type>>(#str_field, lua, data_table).transpose()
