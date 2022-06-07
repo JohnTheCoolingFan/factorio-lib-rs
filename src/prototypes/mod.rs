@@ -2613,16 +2613,23 @@ pub struct EnemySpawner {
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingRobot>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct FlyingRobotBase {
-    speed: f64,
-    max_speed: f64, // Default: max double
-    max_energy: Energy, // Default: 0
-    energy_per_move: Energy, // Default: 0
-    energy_per_tick: Energy, // Default: 0
-    min_to_charge: f32, // Default: 0.2
-    max_to_charge: f32, // Default: 0.95
-    speed_multiplier_when_out_of_energy: f32, // Default: 0
+    pub speed: f64,
+    #[default(f64::MAX)]
+    pub max_speed: f64, // Default: max double
+    #[default(Energy(0.0))]
+    pub max_energy: Energy, // Default: 0
+    #[default(Energy(0.0))]
+    pub energy_per_move: Energy, // Default: 0
+    #[default(Energy(0.0))]
+    pub energy_per_tick: Energy, // Default: 0
+    #[default(0.2_f32)]
+    pub min_to_charge: f32, // Default: 0.2
+    #[default(0.95_f32)]
+    pub max_to_charge: f32, // Default: 0.95
+    #[default(0_f32)]
+    pub speed_multiplier_when_out_of_energy: f32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingRobot>
