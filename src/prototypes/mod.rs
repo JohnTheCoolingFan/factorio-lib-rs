@@ -2574,14 +2574,18 @@ pub struct ElectricPole {
 }
 
 /// <https://wiki.factorio.com/Prototype/EnemySpawner>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(unit_spawner)]
 pub struct EnemySpawner {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub animations: Vec<AnimationVariation>,
     pub max_count_of_owned_units: u32,
     pub max_friends_around_to_spawn: u32,
@@ -2596,12 +2600,16 @@ pub struct EnemySpawner {
     pub result_units: Vec<UnitSpawnDefinition>,
     pub dying_sound: Option<Sound>,
     pub integration: Vec<SpriteVariation>,
+    #[default(0_f64)]
     pub min_darkness_to_spawn: f32, // Default: 0.0
+    #[default(1_f64)]
     pub max_darkness_to_spawn: f32, // Default: 1.0
+    #[default(true)]
     pub random_animation_offset: bool, // Default: true
+    #[default(false)]
     pub spawn_decorations_on_expansion: bool, // Default: false
     pub spawn_decoration: Vec<CreateDecorativesTriggerEffectItem>,
-    // allow_run_time_change_of_is_military_target must be false
+    // allow_run_time_change_of_is_military_target must be false // TODO
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingRobot>
