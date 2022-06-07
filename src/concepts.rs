@@ -81,7 +81,7 @@ impl<'lua> mlua::FromLua<'lua> for LocalisedStringEntry {
 #[derive(Debug, Clone)]
 pub struct LocalisedString {
     key: String,
-    parameters: Vec<LocalisedStringEntry>, /// All elements after first element
+    parameters: Vec<LocalisedStringEntry>, // All elements after first element
     locale_handler: Rc<Option<LocaleHandler>>,
 }
 
