@@ -2745,14 +2745,18 @@ pub struct LogisticRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/Gate>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(gate)]
 pub struct Gate {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub vertical_animation: Animation,
     pub horizontal_animation: Animation,
     pub vertical_rail_animation_left: Animation,
@@ -2767,7 +2771,9 @@ pub struct Gate {
     pub timeout_to_close: u32,
     pub open_sound: Sound,
     pub close_sound: Sound,
+    #[default(0_u32)]
     pub fadeout_interval: u32, // Default: 0
+    #[default(CollisionMask::from_iter(["object-layer", "item-layer", "floor-layer", "water-tile"]))]
     pub opened_collision_mask: CollisionMask // Default: ["object-layer", "item-layer", "floor-layer", "water-tile"]
 }
 
