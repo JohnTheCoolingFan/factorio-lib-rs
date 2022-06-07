@@ -2645,24 +2645,32 @@ pub trait FlyingRobot {
 }
 
 /// <https://wiki.factorio.com/Prototype/CombatRobot>
-#[derive(Debug, Clone, Prototype, FlyingRobot, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, FlyingRobot, DataTableAccessable, PrototypeFromLua)]
 #[data_table(combat_robot)]
 pub struct CombatRobot {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
-    flying_robot_base: FlyingRobotBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
+    #[use_self_forced]
+    pub flying_robot_base: FlyingRobotBase,
     pub time_to_live: u32,
     pub attack_parameters: AttackParameters,
     pub idle: RotatedAnimation,
     pub shadow_idle: RotatedAnimation,
     pub in_motion: RotatedAnimation,
     pub shadow_in_motion: RotatedAnimation,
+    #[default(0_f64)]
     pub range_from_player: f64, // Default: 0
+    #[default(0_f64)]
     pub friction: f64, // Default: 0
     pub destroy_action: Option<Trigger>,
+    #[default(false)]
     pub follows_player: bool, // Default: false
     pub light: Option<LightDefinition>
 }
