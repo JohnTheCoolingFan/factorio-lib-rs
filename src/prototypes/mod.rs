@@ -2600,9 +2600,9 @@ pub struct EnemySpawner {
     pub result_units: Vec<UnitSpawnDefinition>,
     pub dying_sound: Option<Sound>,
     pub integration: Vec<SpriteVariation>,
-    #[default(0_f64)]
+    #[default(0_f32)]
     pub min_darkness_to_spawn: f32, // Default: 0.0
-    #[default(1_f64)]
+    #[default(1_f32)]
     pub max_darkness_to_spawn: f32, // Default: 1.0
     #[default(true)]
     pub random_animation_offset: bool, // Default: true

@@ -2055,18 +2055,18 @@ pub enum GuiMode {
 
 // Can also be converted from array
 /// <https://wiki.factorio.com/Types/UnitSpawnDefinition>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct UnitSpawnDefinition {
-    unit: String, // Name of Entity
-    spawn_points: Vec<SpawnPoint> // `evolution_factor` must be ascending from entry to entry
+    pub unit: String, // Name of Entity
+    pub spawn_points: Vec<SpawnPoint> // `evolution_factor` must be ascending from entry to entry
 }
 
 // Can also be converted from array
 /// <https://wiki.factorio.com/Types/SpawnPoint>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SpawnPoint {
-    evolution_factor: f64,
-    spawn_height: f64, // Must be >= 0
+    pub evolution_factor: f64,
+    pub spawn_height: f64, // Must be >= 0 // TODO
 }
 
 /// <https://wiki.factorio.com/Types/AmmoType>
