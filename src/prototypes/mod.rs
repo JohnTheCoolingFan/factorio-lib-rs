@@ -2812,16 +2812,22 @@ pub struct Generator {
 }
 
 /// <https://wiki.factorio.com/Prototype/HeatInterface>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(heat_interface)]
 pub struct HeatInterface {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub heat_buffer: HeatBuffer,
     pub picture: Option<Sprite>,
+    #[from_str]
+    #[default("all")]
     pub guid_mode: GuiMode, // Default: "all"
 }
 

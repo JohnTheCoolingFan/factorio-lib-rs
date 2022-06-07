@@ -2169,20 +2169,24 @@ pub struct CircularParticleCreationSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/HeatBuffer>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct HeatBuffer {
-    max_temperature: f64, // Must be >= `default_temperature`
-    specific_heat: Energy,
-    max_transfer: Energy,
-    default_temperature: f64, // Default: 15
-    min_temperature_gradient: f64, // Default: 1
-    min_working_temperature: f64, // Default: 15
-    minimum_glow_temperature: f32, // Default: 1
-    pipe_covers: Option<Sprite4Way>,
-    heat_pipe_covers: Option<Sprite4Way>,
-    heat_picture: Option<Sprite4Way>,
-    heat_glow: Option<Sprite4Way>,
-    connections: Option<Vec<HeatConnection>> // 32 max
+    pub max_temperature: f64, // Must be >= `default_temperature` // TODO
+    pub specific_heat: Energy,
+    pub max_transfer: Energy,
+    #[default(15_f64)]
+    pub default_temperature: f64, // Default: 15
+    #[default(1_f64)]
+    pub min_temperature_gradient: f64, // Default: 1
+    #[default(15_f64)]
+    pub min_working_temperature: f64, // Default: 15
+    #[default(1_f32)]
+    pub minimum_glow_temperature: f32, // Default: 1
+    pub pipe_covers: Option<Sprite4Way>,
+    pub heat_pipe_covers: Option<Sprite4Way>,
+    pub heat_picture: Option<Sprite4Way>,
+    pub heat_glow: Option<Sprite4Way>,
+    pub connections: Option<Vec<HeatConnection>> // 32 max // TODO
 }
 
 /// <https://wiki.factorio.com/Types/SignalColorMapping>
