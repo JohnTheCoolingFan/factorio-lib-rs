@@ -2008,6 +2008,8 @@ pub enum BoilerMode {
     OutputToSeparatePipe,
 }
 
+prot_from_str!(BoilerMode);
+
 /// <https://wiki.factorio.com/Types/FootprintParticle>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct FootprintParticle {
