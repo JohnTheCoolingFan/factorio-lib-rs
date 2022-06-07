@@ -2832,14 +2832,18 @@ pub struct HeatInterface {
 }
 
 /// <https://wiki.factorio.com/Prototype/HeatPipe>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(heat_pipe)]
 pub struct HeatPipe {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub connection_sprites: ConnectableEntityGraphics,
     pub heat_glow_sprites: ConnectableEntityGraphics,
     pub heat_buffer: HeatBuffer
