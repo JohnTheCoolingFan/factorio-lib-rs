@@ -2850,14 +2850,18 @@ pub struct HeatPipe {
 }
 
 /// <https://wiki.factorio.com/Prototype/Inserter>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(inserter)]
 pub struct Inserter {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub extension_speed: f64,
     pub rotation_speed: f64,
     pub insert_position: Factorio2DVector,
@@ -2867,24 +2871,39 @@ pub struct Inserter {
     pub hand_open_picture: Sprite,
     pub hand_closed_picture: Sprite,
     pub energy_source: EnergySource, // Emissions are ignored
+    #[default(Energy(0.0))]
     pub energy_per_movement: Energy, // Default: 0
+    #[default(Energy(0.0))]
     pub energy_per_rotation: Energy, // Default: 0
+    #[default(false)]
     pub stack: bool, // Default: false
+    #[default(false)]
     pub allow_custom_vectors: bool, // Default: false
+    #[default(false)]
     pub allow_burner_leech: bool, // Default: false
+    #[default(true)]
     pub draw_held_item: bool, // Default: true
+    #[default(true)]
     pub use_easter_egg: bool, // Default: true
+    #[default(0_u8)]
     pub filter_count: u8, // Default: 0
     pub hand_base_shadow: Option<Sprite>,
     pub hand_open_shadow: Option<Sprite>,
     pub hand_closed_shadow: Option<Sprite>,
+    #[default(0.75_f64)]
     pub hand_size: f64, // Default: 0.75
+    #[default(0_f64)]
     pub circuit_wire_max_distance: f64, // Default: 0
+    #[default(true)]
     pub draw_copper_wires: bool, // Default: true
+    #[default(true)]
     pub draw_circuit_wires: bool, // Default: true
     pub default_stack_control_input_signal: Option<SignalIDConnector>,
+    #[default(true)]
     pub draw_inserter_arrow: bool, // Default: true
+    #[default(true)]
     pub chases_belt_items: bool, // Default: true
+    #[default(0_u32)]
     pub stack_size_bonus: u32, // Default: 0
     pub circuit_wire_connection_points: Option<Vec<WireConnectionPoint>>,
     pub circuit_connector_sprites: Option<Vec<CircuitConnectorSprites>>
