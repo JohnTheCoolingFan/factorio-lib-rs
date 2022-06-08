@@ -1917,13 +1917,13 @@ pub struct SignalIDConnector {
 /// <https://wiki.factorio.com/Types/ModuleSpecification>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ModuleSpecification {
-    module_slots: u16, // Default: 0
-    module_info_max_icons_per_row: u8, // Default: width of selection box / 0,75
-    module_info_max_icon_rows: u8, // Default: width of selection box / 1.5
-    module_info_icon_shift: Factorio2DVector, // Default: (0, 0.7)
-    module_info_icon_scale: f32, // Default: 0.5
-    module_info_separation_multiplier: f32, // Default: 1.1
-    module_info_multi_row_initial_height_modifier: f32 // Default: -0.1
+    pub module_slots: u16, // Default: 0
+    pub module_info_max_icons_per_row: u8, // Default: width of selection box / 0,75
+    pub module_info_max_icon_rows: u8, // Default: width of selection box / 1.5
+    pub module_info_icon_shift: Factorio2DVector, // Default: (0, 0.7)
+    pub module_info_icon_scale: f32, // Default: 0.5
+    pub module_info_separation_multiplier: f32, // Default: 1.1
+    pub module_info_multi_row_initial_height_modifier: f32 // Default: -0.1
 }
 
 /// <https://wiki.factorio.com/Types/EffectTypeLimitation>
