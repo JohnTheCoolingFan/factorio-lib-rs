@@ -2902,14 +2902,18 @@ pub struct Lab {
 }
 
 /// <https://wiki.factorio.com/Prototype/Lamp>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(lamp)]
 pub struct Lamp {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub picture_on: Sprite,
     pub picture_off: Sprite,
     pub energy_usage_per_tick: Energy,
@@ -2917,16 +2921,25 @@ pub struct Lamp {
     pub light: Option<LightDefinition>,
     pub light_when_colored: Option<LightDefinition>,
     pub circuit_wire_connection_point: Option<WireConnectionPoint>,
+    #[default(0_f64)]
     pub circuit_wire_max_distance: f64, // Default: 0
+    #[default(true)]
     pub draw_copper_wires: bool, // Default: true
+    #[default(true)]
     pub draw_circuit_wires: bool, // Default: true
     pub circuit_connector_sprites: Option<CircuitConnectorSprites>,
+    #[default(0_f32)]
     pub glow_size: f32, // Default: 0
+    #[default(0_f32)]
     pub glow_color_intensity: f32, // Default: 0
+    #[default(0.5_f32)]
     pub darkness_for_all_lamps_on: f32, // Default: 0.5
+    #[default(0.3_f32)]
     pub darkness_for_all_lamps_off: f32, // Default: 0.3
+    #[default(false)]
     pub always_on: bool, // Default: false
     pub signal_to_color_mapping: Option<Vec<SignalColorMapping>>,
+    #[default(GlowRenderMode::Additive)]
     pub glow_render_mode: GlowRenderMode // Default: "additive"
 }
 

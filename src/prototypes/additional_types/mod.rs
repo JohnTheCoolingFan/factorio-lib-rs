@@ -2183,8 +2183,9 @@ pub struct HeatBuffer {
 }
 
 /// <https://wiki.factorio.com/Types/SignalColorMapping>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SignalColorMapping {
+    #[rename("type")]
     r#type: SignalType,
     name: String, // Name of a signal
     color: Color
