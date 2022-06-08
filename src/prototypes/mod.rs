@@ -2872,23 +2872,31 @@ pub struct Inserter {
 }
 
 /// <https://wiki.factorio.com/Prototype/Lab>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(lab)]
 pub struct Lab {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub energy_usage: Energy,
     pub energy_source: EnergySource,
     pub on_animation: Animation,
     pub off_animation: Animation,
     pub inputs: Vec<String>, // (Names) Name of science pack items
+    #[default(1_f64)]
     pub researching_speed: f64, // Default: 1
+    #[default(EffectTypeLimitation::ALL)]
     pub allowed_effects: EffectTypeLimitation, // Default: all allowed
     pub light: Option<LightDefinition>,
+    #[default(0_f32)]
     pub base_productivity: f32, // Default: 0
+    #[default(Factorio2DVector(0.0, 0.0))]
     pub entity_info_icon_shift: Factorio2DVector, // Default: (0, 0)
     pub module_specification: Option<ModuleSpecification>
 }
