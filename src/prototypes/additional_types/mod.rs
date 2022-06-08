@@ -1936,6 +1936,7 @@ impl EffectTypeLimitation {
     pub const CONSUMPTION: Self = Self(1 << 2);
     pub const POLLUTION: Self = Self(1 << 3);
     pub const NONE: Self = Self(0);
+    pub const ALL: Self = Self((1 << 4) - 1);
 }
 
 impl<T: AsRef<str>> FromIterator<T> for EffectTypeLimitation {
