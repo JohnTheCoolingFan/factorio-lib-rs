@@ -2973,17 +2973,23 @@ pub struct LandMine {
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedContainer>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(linked_container)]
 pub struct LinkedContainer {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
-    pub inventory_size: u16, // Must be >0
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
+    pub inventory_size: u16, // Must be >0 // TODO
     pub picture: Option<Sprite>,
+    #[default(GuiMode::All)]
     pub gui_mode: GuiMode, // Default: "all"
+    #[default(false)]
     pub scale_info_icons: bool // Default: false
 }
 
