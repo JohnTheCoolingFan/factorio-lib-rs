@@ -3012,14 +3012,18 @@ pub struct Market {
 }
 
 /// <https://wiki.factorio.com/Prototype/MiningDrill>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(mining_drill)]
 pub struct MiningDrill {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub vector_to_place_result: Factorio2DVector,
     pub resource_searching_radius: f64,
     pub energy_usage: Energy,
@@ -3028,20 +3032,25 @@ pub struct MiningDrill {
     pub resource_categories: Vec<String>, // (Names) Name of resourceCategory
     pub output_fluid_box: Option<FluidBox>,
     pub input_fluid_box: Option<FluidBox>,
-    pub animations: Option<Animation4Way>, // Loaded only if `graphics_set` is not present
+    pub animations: Option<Animation4Way>, // Loaded only if `graphics_set` is not present // TODO
     pub graphics_set: Option<MiningDrillGraphicsSet>,
     pub wet_mining_graphics_set: Option<MiningDrillGraphicsSet>,
     pub base_picture: Option<Sprite4Way>,
+    #[default(EffectTypeLimitation::ALL)]
     pub allowed_effects: EffectTypeLimitation, // Default: all allowed
     pub radius_visualisation_picture: Option<Sprite>,
+    #[default(0_f64)]
     pub circuit_wire_max_distance: f64, // Default: 0
+    #[default(true)]
     pub draw_copper_wires: bool, // Default: true
+    #[default(true)]
     pub draw_circuit_wires: bool, // Default: true
+    #[default(RenderLayer::LowerObject)]
     pub base_render_layer: RenderLayer, // Default: "lower-object"
     pub base_productivity: f32, // Default: 0
     pub monitor_visualization_tint: Option<Color>,
-    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
-    pub circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory iff `circuit_wire_max_distance` > 0
+    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0 // TODO
+    pub circuit_connector_sprites: Vec<CircuitConnectorSprites>, // Mandatory iff `circuit_wire_max_distance` > 0 // TODO
     pub module_specification: Option<ModuleSpecification>
 }
 

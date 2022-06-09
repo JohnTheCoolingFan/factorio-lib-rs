@@ -1306,33 +1306,40 @@ pub struct ConnectableEntityGraphics {
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MiningDrillGraphicsSet {
-    animation: Option<Animation4Way>,
-    idle_animation: Option<Animation4Way>,
-    always_draw_idle_animation: bool, // Default: false
-    default_recipe_tint: Option<RecipeTint>,
-    working_visualisations: Option<WorkingVisualisation>,
-    /// Only loaded if `shift_animation_waypoint_stop_duration` or `shift_animation_transition_duration` is not 0
-    shift_animation_waypoints: Option<ShiftAnimationWaypoints>,
-    shift_animation_waypoint_stop_duration: u16, // Default: 0
-    shift_animation_transition_duration: u16, // Default: 0
-    status_colors: Option<StatusColors>,
-    drilling_vertical_movement_duration: u16, // Default: 0
-    animation_progress: f32, // Default: 1
-    max_animation_progress: f32, // Default: 1000
-    min_animation_progress: f32, // Default: 0
-    circuit_connector_layer: CircuitConnectorRenderLayers, // Default: all "object"
-    circuit_connector_secondary_draw_order: CircuitConnectorSecondaryDrawOrder // Default: all 100
+    pub animation: Option<Animation4Way>,
+    pub idle_animation: Option<Animation4Way>,
+    #[default(false)]
+    pub always_draw_idle_animation: bool, // Default: false
+    pub default_recipe_tint: Option<RecipeTint>,
+    pub working_visualisations: Option<WorkingVisualisation>,
+    /// Only loaded if `shift_animation_waypoint_stop_duration` or `shift_animation_transition_duration` is not 0 // TODO
+    pub shift_animation_waypoints: Option<ShiftAnimationWaypoints>,
+    #[default(0_u16)]
+    pub shift_animation_waypoint_stop_duration: u16, // Default: 0
+    #[default(0_u16)]
+    pub shift_animation_transition_duration: u16, // Default: 0
+    pub status_colors: Option<StatusColors>,
+    #[default(0_u16)]
+    pub drilling_vertical_movement_duration: u16, // Default: 0
+    #[default(1_f32)]
+    pub animation_progress: f32, // Default: 1
+    #[default(1000_f32)]
+    pub max_animation_progress: f32, // Default: 1000
+    #[default(0_f32)]
+    pub min_animation_progress: f32, // Default: 0
+    pub circuit_connector_layer: CircuitConnectorRenderLayers, // Default: all "object" // TODO: load as string
+    pub circuit_connector_secondary_draw_order: CircuitConnectorSecondaryDrawOrder // Default: all 100
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_layer>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct CircuitConnectorRenderLayers {
-    north: RenderLayer,
-    east: RenderLayer,
-    south: RenderLayer,
-    west: RenderLayer
+    pub north: RenderLayer,
+    pub east: RenderLayer,
+    pub south: RenderLayer,
+    pub west: RenderLayer
 }
 
 impl CircuitConnectorRenderLayers {
