@@ -2944,23 +2944,31 @@ pub struct Lamp {
 }
 
 /// <https://wiki.factorio.com/Prototype/LandMine>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(land_mine)]
 pub struct LandMine {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub picture_safe: Sprite,
     pub picture_set: Sprite,
     pub trigger_radius: f64,
     pub picture_set_enemy: Option<Sprite>,
+    #[default(120_u32)]
     pub timeout: u32, // Default: 120
     pub action: Option<Trigger>,
     pub ammo_category: Option<String>, // Name of AmmoCategory
+    #[default(true)]
     pub force_die_on_attack: bool, // Default: true
+    #[default(ForceCondition::Enemy)]
     pub trigger_force: ForceCondition, // Default: "enemy"
+    #[default(CollisionMask::from_iter(["item-layer", "object-layer", "player-layer", "water-tile"]))]
     pub trigger_collision_mask: CollisionMask, // Default: ["item-layer", "object-layer", "player-layer", "water-tile"]
 }
 
