@@ -103,8 +103,7 @@ impl<'lua> PrototypeFromLua<'lua> for KeySequence {
         Ok(Self(lua.unpack(value)?))
     }
 }
-// Consider adding Option<f32> as specified in https://wiki.factorio.com/Types/BoundingBox?
-// It's unused in the game, so why bother?
+
 /// <https://wiki.factorio.com/Types/BoundingBox>
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct BoundingBox(pub Position, pub Position);
