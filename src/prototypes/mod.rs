@@ -4060,18 +4060,17 @@ pub struct Wall {
     pub connected_gate_visualization: Option<Sprite>
 }
 
-//
-// STOP HERE
-//
-
 /// <https://wiki.factorio.com/Prototype/Fish>
-#[derive(Debug, Clone, Prototype, EntityWithHealth, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithHealth, DataTableAccessable, PrototypeFromLua)]
 #[data_table(fish)]
 pub struct Fish {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
     pub pictures: Vec<SpriteVariation>
 }
 
