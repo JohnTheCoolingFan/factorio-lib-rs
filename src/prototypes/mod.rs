@@ -3055,33 +3055,49 @@ pub struct MiningDrill {
 }
 
 /// <https://wiki.factorio.com/Prototype/OffshorePump>
-#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable)]
+#[derive(Debug, Clone, Prototype, EntityWithOwner, DataTableAccessable, PrototypeFromLua)]
 #[data_table(offshore_pump)]
 pub struct OffshorePump {
-    name: String,
-    prototype_base: PrototypeBaseSpec,
-    entity_base: EntityBase,
-    entity_with_health_base: EntityWithHealthBase,
-    entity_with_owner_base: EntityWithOwnerBase,
+    pub name: String,
+    #[use_self_forced]
+    pub prototype_base: PrototypeBaseSpec,
+    #[use_self_forced]
+    pub entity_base: EntityBase,
+    #[use_self_forced]
+    pub entity_with_health_base: EntityWithHealthBase,
+    #[use_self_forced]
+    pub entity_with_owner_base: EntityWithOwnerBase,
     pub fluid_box: FluidBox,
     pub pumping_speed: f32, // Must be > 0
     pub fluid: String, // Name of Fluid
+    #[mandatory_if(picture.is_none())]
     pub graphics_set: Option<OffshorePumpGraphicsSet>, // Mandatory if `picture` is not defined
     pub picture: Option<Sprite4Way>, // Deprecated
+    #[default(0.25_f32)]
     pub min_perceived_performance: f32, // Default: 0.25
+    #[default(CollisionMask::from_iter(["ground-tile"]))]
     pub fluid_box_tile_collision_test: CollisionMask, // Default: "ground-tile"
+    #[default(CollisionMask::from_iter(["water-tile"]))]
     pub adjacent_tile_collision_test: CollisionMask, // Defauylt: "water-tile"
+    #[default(CollisionMask::NONE)]
     pub adjacent_tile_collision_mask: CollisionMask, // Default: none
+    #[default(CollisionMask::NONE)]
     pub center_collision_mask: CollisionMask, // Default: none
+    #[default(BoundingBox::from(((-0.05, -0.8), (0.05, -0.7))))]
     pub adjacent_tile_collision_box: BoundingBox, // Default: ((-0.05, -0.8), (0.05, -0.7))
     pub placeable_position_visualization: Option<Sprite>,
+    #[default(false)]
     pub remove_on_tile_collision: bool, // Default: false
+    #[default(true)]
     pub always_draw_fluid: bool, // Default: true
+    #[default(0_f64)]
     pub circuit_wire_max_distance: f64, // Default: 0
+    #[default(true)]
     pub draw_copper_wires: bool, // Default: true
+    #[default(true)]
     pub draw_circuit_wires: bool, // Default: true
-    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0
-    pub circuit_connector_sprites: Vec<CircuitConnectorSprites> // Mandatory if `circuit_wire_max_distance` > 0
+    pub circuit_wire_connection_points: Vec<WireConnectionPoint>, // Mandatory if `circuit_wire_max_distance` > 0 // TODO
+    pub circuit_connector_sprites: Vec<CircuitConnectorSprites> // Mandatory if `circuit_wire_max_distance` > 0 // TODO
 }
 
 /// <https://wiki.factorio.com/Prototype/Pipe>

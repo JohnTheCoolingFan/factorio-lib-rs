@@ -946,6 +946,7 @@ impl CollisionMask {
     pub const CONSIDER_TILE_TRANSITIONS: CollisionMask = CollisionMask(1 << 56);
     pub const COLLIDING_WITH_TILES_ONLY: CollisionMask = CollisionMask(1 << 57);
     pub const ALL: CollisionMask = CollisionMask((1 << 58) - 1);
+    pub const NONE: CollisionMask = CollisionMask(0);
 }
 
 impl<T: AsRef<str>> FromIterator<T> for CollisionMask {

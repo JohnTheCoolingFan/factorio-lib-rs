@@ -1349,15 +1349,17 @@ impl CircuitConnectorRenderLayers {
 }
 
 /// <https://wiki.factorio.com/Prototype/OffshorePump#graphics_set>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PrototypeFromLua)]
 pub struct OffshorePumpGraphicsSet {
-    animation: Animation4Way,
-    base_render_layer: RenderLayer, // Default: "ground-patch"
-    underwater_layer_offset: i8, // Default: 1
-    fluid_animation: Option<Animation4Way>,
-    glass_pictures: Option<Sprite4Way>,
-    base_pictures: Option<Sprite4Way>,
-    underwater_pictures: Option<Sprite4Way>
+    pub animation: Animation4Way,
+    #[default(RenderLayer::GroundPatch)]
+    pub base_render_layer: RenderLayer, // Default: "ground-patch"
+    #[default(1_i8)]
+    pub underwater_layer_offset: i8, // Default: 1
+    pub fluid_animation: Option<Animation4Way>,
+    pub glass_pictures: Option<Sprite4Way>,
+    pub base_pictures: Option<Sprite4Way>,
+    pub underwater_pictures: Option<Sprite4Way>
 }
 
 /// <https://wiki.factorio.com/Prototype/Pipe#pictures>
