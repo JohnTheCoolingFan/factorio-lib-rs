@@ -411,8 +411,7 @@ where
         let values_arr: Vec<T> = values_arr
             .map(|v| T::prototype_from_lua(v, lua, data_table))
             .into_iter()
-            .collect::<Result<Vec<T>, LuaError>>()
-            .map_err(LuaError::external)?;
+            .collect::<Result<Vec<T>, LuaError>>()?;
         let result: [T; N] = values_arr.try_into().map_err(|v: Vec<T>| LuaError::FromLuaConversionError { from: "table", to: "Array",
             message: Some(format!("Expected table of length {}, got {}", N, v.len())) })?;
         Ok(result)
