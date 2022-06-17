@@ -547,8 +547,10 @@ pub struct ResourceRecord {
 /// Resource type with additional info if needed
 #[derive(Debug, Clone)]
 pub enum ResourceType {
-    Image(SpriteSizeType, SpriteSizeType), // x and y dimensions of an image
-    Sound // Only .ogg, .wav and .voc are accepted
+    /// x and y dimensions of an image
+    Image(SpriteSizeType, SpriteSizeType), 
+    /// Only .ogg, .wav and .voc are accepted
+    Sound
 }
 
 #[derive(Debug, Clone, Error)]
