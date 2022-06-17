@@ -110,7 +110,6 @@ pub struct BoundingBox(pub Position, pub Position);
 
 impl<'lua> PrototypeFromLua<'lua> for BoundingBox {
     fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
-        // TODO: defining with left_top and right_bottom
         let v = lua.unpack::<[Position; 2]>(value)?;
         Ok(Self(v[0], v[1]))
     }
