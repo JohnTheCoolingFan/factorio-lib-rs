@@ -2427,7 +2427,11 @@ pub struct RocketSilo {
     pub raise_rocket_sound: Option<Sound>,
     pub flying_sound: Option<Sound>,
     #[default(0_u16)]
-    pub rocket_result_inventory_size: u16 // Default: 0
+    pub rocket_result_inventory_size: u16, // Default: 0
+    #[default(30_u8)]
+    pub rocket_rising_delay: u8, // Default: 30
+    #[default(120_u8)]
+    pub launch_wait_time: u8, // Default: 120
 }
 
 /// <https://wiki.factorio.com/Prototype/Furnace>
