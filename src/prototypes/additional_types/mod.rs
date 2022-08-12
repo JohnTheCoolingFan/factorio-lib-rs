@@ -1172,7 +1172,8 @@ impl EntityPrototypeFlags {
     pub const NOT_SELECTABLE_IN_GAME: Self = Self(1 << 22);
     pub const NOT_UPGRADABLE: Self = Self(1 << 23);
     pub const NOT_IN_KILL_STATISTICS: Self = Self(1 << 24);
-    pub const ALL: Self = Self((1 << 25) - 1);
+    pub const NOT_IT_MADE_IN: Self = Self(1 << 25);
+    pub const ALL: Self = Self((1 << 26) - 1);
 }
 
 impl<T: AsRef<str>> FromIterator<T> for EntityPrototypeFlags {
@@ -1205,6 +1206,7 @@ impl<T: AsRef<str>> FromIterator<T> for EntityPrototypeFlags {
                 "not-selectable-in-game" => result |= Self::NOT_SELECTABLE_IN_GAME,
                 "not-upgradable" => result |= Self::NOT_UPGRADABLE,
                 "not-in-kill-statistics" => result |= Self::NOT_IN_KILL_STATISTICS,
+                "not-in-made-in" => result |= Self::NOT_IT_MADE_IN
                 _ => {}
             }
         }
