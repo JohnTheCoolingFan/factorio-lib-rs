@@ -1206,7 +1206,7 @@ impl<T: AsRef<str>> FromIterator<T> for EntityPrototypeFlags {
                 "not-selectable-in-game" => result |= Self::NOT_SELECTABLE_IN_GAME,
                 "not-upgradable" => result |= Self::NOT_UPGRADABLE,
                 "not-in-kill-statistics" => result |= Self::NOT_IN_KILL_STATISTICS,
-                "not-in-made-in" => result |= Self::NOT_IT_MADE_IN
+                "not-in-made-in" => result |= Self::NOT_IT_MADE_IN,
                 _ => {}
             }
         }
