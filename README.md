@@ -12,4 +12,4 @@ These features are available through corresponding feature flags, all enabled by
 
 This library is still WIP.
 
-Development status: Implementing PrototypeFromLua, improving derive macro when needed.
+Development status: restructuring, switching to serde for deserialization
