@@ -1024,6 +1024,7 @@ impl<T: AsRef<str>> FromIterator<T> for CollisionMask {
 
 impl CollisionMask {
     pub fn without_flags(&self) -> Self {
+        // FIXME: removes layer-N
         Self(self.0 & (Self::NOT_COLLIDING_WITH_ITSELF.0 - 1))
     }
 }
