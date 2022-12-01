@@ -1,13 +1,17 @@
-use strum_macros::{EnumString, AsRefStr};
+use serde::{Deserialize, Serialize};
+use strum_macros::{AsRefStr, EnumString};
 
 /// Enum for all Prototype types available in the game
-#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy, EnumString, AsRefStr, Deserialize, Serialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum PrototypeType {
     // All prototypes
     #[strum(to_string = "ambient-sound")]
+    #[serde(rename = "ambient-sound")]
     AmbientSoundPrototype,
     #[strum(to_string = "animation")]
+    #[serde(rename = "animation")]
     AnimationPrototype,
     EditorController,
     Font,
@@ -16,9 +20,11 @@ pub enum PrototypeType {
     MapSettings,
     MouseCursor,
     #[strum(to_string = "sound")]
+    #[serde(rename = "sound")]
     SoundPrototype,
     SpectatorController,
     #[strum(to_string = "sprite")]
+    #[serde(rename = "sprite")]
     SpritePrototype,
     TileEffect,
     TipsAndTricksItemCategory,
@@ -27,6 +33,7 @@ pub enum PrototypeType {
     Achievement,
     BuildEntityAchievement,
     #[strum(to_string = "combat-robot-count")]
+    #[serde(rename = "combat-robot-count")]
     CombatRobotCountAchievement,
     ConstructWithRobotsAchievement,
     DeconstructWithRobotsAchievement,
@@ -47,6 +54,7 @@ pub enum PrototypeType {
     CustomInput,
     DamageType,
     #[strum(to_string = "optimized-decorative")]
+    #[serde(rename = "optimized-decorative")]
     Decorative,
     Arrow,
     ArtilleryFlare,
@@ -55,6 +63,7 @@ pub enum PrototypeType {
     CharacterCorpse,
     Cliff,
     #[strum(to_string = "corpse")]
+    #[serde(rename = "corpse")]
     CorpsePrototype,
     RailRemnants,
     DeconstructibleTileProxy,
@@ -116,14 +125,17 @@ pub enum PrototypeType {
     TrainStop,
     LinkedBelt,
     #[strum(to_string = "loader-1x1")]
+    #[serde(rename = "loader-1x1")]
     Loader1x1,
     #[strum(to_string = "loader")]
+    #[serde(rename = "loader")]
     Loader1x2,
     Splitter,
     TransportBelt,
     UndergroundBelt,
     Tree,
     #[strum(to_string = "turret")]
+    #[serde(rename = "turret")]
     TurretPrototype,
     AmmoTurret,
     ElectricTurret,
@@ -139,17 +151,21 @@ pub enum PrototypeType {
     Explosion,
     FlameThrowerExplosion,
     #[strum(to_string = "fire")]
+    #[serde(rename = "fire")]
     FireFlame,
     #[strum(to_string = "stream")]
+    #[serde(rename = "stream")]
     FluidStream,
     FlyingText,
     #[strum(to_string = "highlight-box")]
+    #[serde(rename = "highlight-box")]
     HighlightBoxEntity,
     ItemEntity,
     ItemRequestProxy,
     ParticleSource,
     Projectile,
     #[strum(to_string = "resource")]
+    #[serde(rename = "resource")]
     ResourceEntity,
     RocketSiloRocket,
     RocketSiloRocketShadow,
@@ -172,8 +188,10 @@ pub enum PrototypeType {
     FuelCategory,
     GuiStyle,
     #[strum(to_string = "item")]
+    #[serde(rename = "item")]
     ItemPrototype,
     #[strum(to_string = "ammo")]
+    #[serde(rename = "ammo")]
     AmmoItem,
     Capsule,
     Gun,
@@ -183,8 +201,10 @@ pub enum PrototypeType {
     BlueprintBook,
     ItemWithTags,
     #[strum(to_string = "selection-tool")]
+    #[serde(rename = "selection-tool")]
     SelectionToolPrototype,
     #[strum(to_string = "blueprint")]
+    #[serde(rename = "blueprint")]
     BlueprintItem,
     CopyPasteTool,
     DeconstructionItem,
@@ -197,12 +217,15 @@ pub enum PrototypeType {
     RepairTool,
     ItemGroup,
     #[strum(to_string = "item-subgroup")]
+    #[serde(rename = "item-subgroup")]
     ItemSubGroup,
     ModuleCategory,
     #[strum(to_string = "noise-expression")]
+    #[serde(rename = "noise-expression")]
     NamedNoiseExpression,
     NoiseLayer,
     #[strum(to_string = "optimized-particle")]
+    #[serde(rename = "optimized-particle")]
     Particle,
     Recipe,
     RecipeCategory,
@@ -221,5 +244,5 @@ pub enum PrototypeType {
     BoolSetting,
     IntSetting,
     DoubleSetting,
-    StringSetting
+    StringSetting,
 }
