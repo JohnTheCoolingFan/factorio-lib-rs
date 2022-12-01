@@ -15,7 +15,7 @@ use serde::{Serialize, Deserialize};
 const MOD_DEPENDENCY_REGEX: &str = r"^(?:(?P<type>[!?~]|\(\?\)) *)?(?P<name>(?: *[a-zA-Z0-9_-]+)+(?: *$)?)(?: *(?P<version_req>[<>=]=?) *(?P<version>(?:\d+\.){1,2}\d+))?$";
 
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(try_from = "String")]
 pub struct ModDependency {
     pub dep_type: ModDependencyType,
@@ -90,7 +90,7 @@ impl TryFrom<String> for ModDependency {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModDependencyType {
     Incompatible,
     NoLoadOrder,
