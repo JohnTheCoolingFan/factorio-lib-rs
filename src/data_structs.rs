@@ -1,19 +1,22 @@
-use std::{path::PathBuf, str::FromStr, fmt::{self, Display, Formatter}};
-use semver::Version;
-use std::cmp::Ordering;
-use lexical_sort::natural_only_alnum_cmp;
 use itertools::Itertools;
+use lexical_sort::natural_only_alnum_cmp;
 use once_cell::sync::OnceCell;
 use regex::Regex;
+use semver::Version;
 use semver::VersionReq;
+use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
+use std::{
+    fmt::{self, Display, Formatter},
+    path::PathBuf,
+    str::FromStr,
+};
 use thiserror::Error;
-use serde::{Serialize, Deserialize};
 
 // Credit for the most part goes to raiguard's factorio_mod_manager
 // https://github.com/raiguard/factorio_mod_manager
 
 const MOD_DEPENDENCY_REGEX: &str = r"^(?:(?P<type>[!?~]|\(\?\)) *)?(?P<name>(?: *[a-zA-Z0-9_-]+)+(?: *$)?)(?: *(?P<version_req>[<>=]=?) *(?P<version>(?:\d+\.){1,2}\d+))?$";
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(try_from = "String")]
@@ -27,9 +30,7 @@ impl ModDependency {
     pub fn new(input: &str) -> Result<Self, ModDependencyErr> {
         static DEP_STRING_REGEX: OnceCell<Regex> = OnceCell::new();
         let captures = DEP_STRING_REGEX
-            .get_or_init(|| {
-                Regex::new(MOD_DEPENDENCY_REGEX).unwrap()
-            })
+            .get_or_init(|| Regex::new(MOD_DEPENDENCY_REGEX).unwrap())
             .captures(input)
             .ok_or_else(|| ModDependencyErr::InvalidDependencyString(input.into()))?;
 
@@ -71,13 +72,13 @@ impl ModDependency {
                         Ok(version_req) => Some(version_req),
                         Err(_) => {
                             return Err(ModDependencyErr::InvalidVersionReq(
-                                    req_match.as_str().to_string(),
+                                req_match.as_str().to_string(),
                             ))
                         }
                     }
                 }
                 _ => None,
-            }
+            },
         })
     }
 }
@@ -154,11 +155,16 @@ impl Mod {
             Some(version) => {
                 for dependency in &version.dependencies {
                     if dependency.name == dep_name {
-                        matches!(&dependency.dep_type, ModDependencyType::Optional | ModDependencyType::Required | ModDependencyType::OptionalHidden);
+                        matches!(
+                            &dependency.dep_type,
+                            ModDependencyType::Optional
+                                | ModDependencyType::Required
+                                | ModDependencyType::OptionalHidden
+                        );
                     }
                 }
                 false
-            },
+            }
             _ => false,
         }
     }
@@ -204,18 +210,22 @@ pub struct InfoJson {
     pub description: Option<String>,
     pub factorio_version: FactorioVersion,
     #[serde(default = "default_dependencies")]
-    pub dependencies: Vec<ModDependency>
+    pub dependencies: Vec<ModDependency>,
 }
 
 fn default_dependencies() -> Vec<ModDependency> {
-    vec![ModDependency{dep_type: ModDependencyType::Required, name: "base".into(), version_req: None}]
+    vec![ModDependency {
+        dep_type: ModDependencyType::Required,
+        name: "base".into(),
+        version_req: None,
+    }]
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 pub enum ModAuthor {
     Author(String),
-    Authors(Vec<String>)
+    Authors(Vec<String>),
 }
 
 #[derive(Deserialize)]
@@ -259,7 +269,7 @@ pub enum FactorioVersion {
     #[serde(rename = "1.0")]
     v1_0,
     #[serde(rename = "1.1")]
-    v1_1
+    v1_1,
 }
 
 impl FromStr for FactorioVersion {
@@ -275,7 +285,7 @@ impl FromStr for FactorioVersion {
             "0.18" => Ok(Self::v0_18),
             "1.0" => Ok(Self::v1_0),
             "1.1" => Ok(Self::v1_1),
-            _ => Err(FactorioVersionParseError(s.into()))
+            _ => Err(FactorioVersionParseError(s.into())),
         }
     }
 }
@@ -290,7 +300,7 @@ impl Display for FactorioVersion {
             Self::v0_17 => "0.17",
             Self::v0_18 => "0.18",
             Self::v1_0 => "1.0",
-            Self::v1_1 => "1.1"
+            Self::v1_1 => "1.1",
         })
     }
 }

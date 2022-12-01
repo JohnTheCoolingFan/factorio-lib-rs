@@ -2,11 +2,11 @@
 //!
 //! This module provides functions and structs to simplify interaction with Factorio Web API
 
-use strum::Display;
-use semver::Version;
 use crate::data_structs::{FactorioVersion, InfoJson};
 use const_format::concatcp;
-use serde::{Serialize, Deserialize};
+use semver::Version;
+use serde::{Deserialize, Serialize};
+use strum::Display;
 
 pub mod auth;
 pub mod mod_upload;
@@ -27,14 +27,14 @@ pub fn mod_portal_mod_info_full_url(mod_name: &str) -> String {
 pub enum PageSize {
     Number(u64),
     #[serde(rename = "max")]
-    Max
+    Max,
 }
 
 impl std::fmt::Display for PageSize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Number(n) => f.write_fmt(format_args!("{}", n)),
-            Self::Max => f.write_str("max")
+            Self::Max => f.write_str("max"),
         }
     }
 }
@@ -47,7 +47,7 @@ pub struct ModPortalModsApiRequestParameters {
     pub page: Option<u64>,
     pub page_size: Option<PageSize>,
     pub namelist: Option<Vec<String>>,
-    pub version: Option<FactorioVersion>
+    pub version: Option<FactorioVersion>,
 }
 
 impl ModPortalModsApiRequestParameters {
@@ -56,31 +56,38 @@ impl ModPortalModsApiRequestParameters {
     }
 
     pub fn hide_deprecated(&mut self, v: bool) -> &mut Self {
-        self.hide_deprecated = Some(v); self
+        self.hide_deprecated = Some(v);
+        self
     }
 
     pub fn sort(&mut self, v: ModPortalRequestSort) -> &mut Self {
-        self.sort = Some(v); self
+        self.sort = Some(v);
+        self
     }
 
     pub fn sort_order(&mut self, v: ModPortalRequestSortOrder) -> &mut Self {
-        self.sort_order = Some(v); self
+        self.sort_order = Some(v);
+        self
     }
-     
+
     pub fn page(&mut self, v: u64) -> &mut Self {
-        self.page = Some(v); self
+        self.page = Some(v);
+        self
     }
-     
+
     pub fn page_size(&mut self, v: PageSize) -> &mut Self {
-        self.page_size = Some(v); self
+        self.page_size = Some(v);
+        self
     }
-     
+
     pub fn namelist(&mut self, v: Vec<String>) -> &mut Self {
-        self.namelist = Some(v); self
+        self.namelist = Some(v);
+        self
     }
-     
+
     pub fn version(&mut self, v: FactorioVersion) -> &mut Self {
-        self.version = Some(v); self
+        self.version = Some(v);
+        self
     }
 
     fn to_query_parameters(&self) -> Vec<(String, String)> {
@@ -117,7 +124,7 @@ impl ModPortalModsApiRequestParameters {
 impl Serialize for ModPortalModsApiRequestParameters {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: serde::Serializer
+        S: serde::Serializer,
     {
         self.to_query_parameters().serialize(serializer)
     }
@@ -129,7 +136,7 @@ impl Serialize for ModPortalModsApiRequestParameters {
 pub enum ModPortalRequestSort {
     Name,
     CreatedAt,
-    UpdatedAt
+    UpdatedAt,
 }
 
 #[derive(Debug, Clone, Copy, Display, Serialize)]
@@ -139,13 +146,13 @@ pub enum ModPortalRequestSortOrder {
     Ascending,
     #[strum(serialize = "desc")]
     #[serde(rename = "desc")]
-    Descending
+    Descending,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct ModListResponse {
     pub pagination: Pagination,
-    pub results: Vec<ModListResult>
+    pub results: Vec<ModListResult>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -154,7 +161,7 @@ pub struct Pagination {
     pub links: PaginationLinks,
     pub page: u64,
     pub page_count: u64,
-    pub page_size: u64
+    pub page_size: u64,
 }
 
 // TODO: parse to url
@@ -163,7 +170,7 @@ pub struct PaginationLinks {
     pub first: String,
     pub prev: String,
     pub next: String,
-    pub last: String
+    pub last: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -174,7 +181,7 @@ pub struct ModListResult {
     pub owner: String,
     pub summary: String,
     pub title: String,
-    pub category: Option<ModTag>
+    pub category: Option<ModTag>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -185,7 +192,7 @@ pub struct ModResultShort {
     pub releases: Vec<ModRelease>,
     pub summary: String,
     pub title: String,
-    pub category: Option<ModTag>
+    pub category: Option<ModTag>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -202,7 +209,7 @@ pub struct ModResultFull {
     pub description: String,
     pub github_path: String,
     pub homepage: String,
-    pub tag: ModTag
+    pub tag: ModTag,
 }
 
 #[derive(Debug, Deserialize)]
@@ -212,7 +219,7 @@ pub struct ModRelease {
     pub info_json: InfoJson,
     pub released_at: String, // TODO: parse iso
     pub version: Version,
-    pub sha1: String
+    pub sha1: String,
 }
 
 impl ModRelease {
@@ -223,7 +230,7 @@ impl ModRelease {
 
 #[derive(Debug, Deserialize)]
 pub struct ModTag {
-    pub name: ModTagName
+    pub name: ModTagName,
 }
 
 #[derive(Debug, Deserialize)]
@@ -250,5 +257,5 @@ pub enum ModTagName {
     Defense,
     Mining,
     Info,
-    Trains
+    Trains,
 }

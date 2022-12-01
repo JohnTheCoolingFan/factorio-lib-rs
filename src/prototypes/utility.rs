@@ -1,9 +1,14 @@
+use super::additional_types::{
+    Animation, BoxSpecification, Color, DaytimeColorLookupTable, Factorio2DVector, FileName,
+    SimulationDefinition, Sound, Sprite, TriggerTargetMask,
+};
+use super::{DataTable, LocalisedString};
+use crate::prototypes::{
+    GetPrototype, Prototype, PrototypeBase, PrototypeBaseSpec, PrototypeFromLua, PrototypeType,
+};
+use factorio_lib_rs_derive::DataTableAccessable;
 use mlua::prelude::*;
 use std::collections::HashMap;
-use factorio_lib_rs_derive::DataTableAccessable;
-use crate::prototypes::{PrototypeBaseSpec, Prototype, PrototypeBase, PrototypeType, PrototypeFromLua, GetPrototype};
-use super::additional_types::{Color, Sound, DaytimeColorLookupTable, Factorio2DVector, TriggerTargetMask, FileName, SimulationDefinition, BoxSpecification, Animation, Sprite};
-use super::{LocalisedString, DataTable};
 
 /// <https://wiki.factorio.com/Prototype/UtilityConstants>
 #[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
@@ -94,64 +99,94 @@ pub struct UtilityConstants {
     pub main_menu_background_vignette_sharpness: f32,
     pub default_scorch_mark_color: Color,
     pub train_button_hovered_tint: Color,
-    pub select_group_row_count: u32, // Range: [1, 100]
-    pub select_slot_row_count: u32, // Range: [1, 100]
-    pub inventory_width: u32, // Range: [1, 100]
-    pub module_inventory_width: u32, // Range: [1, 100]
-    pub tooltip_monitor_edge_border: i32, // Must be >= 1
+    pub select_group_row_count: u32,           // Range: [1, 100]
+    pub select_slot_row_count: u32,            // Range: [1, 100]
+    pub inventory_width: u32,                  // Range: [1, 100]
+    pub module_inventory_width: u32,           // Range: [1, 100]
+    pub tooltip_monitor_edge_border: i32,      // Must be >= 1
     pub normalised_achievement_icon_size: u32, // Must be >= 1
-    pub tutorial_notice_icon_size: u32, // Must be >= 1
-    pub flying_text_ttl: u32, // Must be >= 1
+    pub tutorial_notice_icon_size: u32,        // Must be >= 1
+    pub flying_text_ttl: u32,                  // Must be >= 1
     pub bonus_gui_ordering: HashMap<String, String>,
     pub train_path_finding: UtilityConstantsTrainPathFinding,
     pub map_editor: UtilityConstantsMapEditor,
     pub color_filters: Vec<UtilityConstantColorFilter>,
     pub entity_renderer_search_box_limits: UtilityConstantsEntityRendererSearchBoxLimits,
-    pub light_renderer_search_distance_limit: u8
+    pub light_renderer_search_distance_limit: u8,
 }
 
 impl UtilityConstants {
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if let Some(v) = self.player_colors.get(0) {
             if v.name != "default" {
-                return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                    message: Some("`player_colors[0].name` must be \"default\"".into()) })
+                return Err(LuaError::FromLuaConversionError {
+                    from: "table",
+                    to: "UtilityConstants",
+                    message: Some("`player_colors[0].name` must be \"default\"".into()),
+                });
             }
         } else {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                message: Some("`player_colors[0]` must exist".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstants",
+                message: Some("`player_colors[0]` must exist".into()),
+            });
         }
         if self.tooltip_monitor_edge_border < 1 {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                message: Some("`tooltip_monitor_edge_border` must be >= 1".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstants",
+                message: Some("`tooltip_monitor_edge_border` must be >= 1".into()),
+            });
         }
         if self.normalised_achievement_icon_size < 1 {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                message: Some("`normalised_achievement_icon_size` must be >= 1".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstants",
+                message: Some("`normalised_achievement_icon_size` must be >= 1".into()),
+            });
         }
         if self.tutorial_notice_icon_size < 1 {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                message: Some("`tutorial_notice_icon_size` must be >= 1".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstants",
+                message: Some("`tutorial_notice_icon_size` must be >= 1".into()),
+            });
         }
         if self.flying_text_ttl < 1 {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                message: Some("`flying_text_ttl` must be >= 1".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstants",
+                message: Some("`flying_text_ttl` must be >= 1".into()),
+            });
         }
         if !(1..=100).contains(&self.select_group_row_count) {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                message: Some("`select_group_row_count` must be in a range [1; 100]".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstants",
+                message: Some("`select_group_row_count` must be in a range [1; 100]".into()),
+            });
         }
         if !(1..=100).contains(&self.select_slot_row_count) {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                message: Some("`select_slot_row_count` must be in a range [1; 100]".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstants",
+                message: Some("`select_slot_row_count` must be in a range [1; 100]".into()),
+            });
         }
         if !(1..=100).contains(&self.inventory_width) {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                message: Some("`inventory_width` must be in a range [1; 100]".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstants",
+                message: Some("`inventory_width` must be in a range [1; 100]".into()),
+            });
         }
         if !(1..=100).contains(&self.module_inventory_width) {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstants",
-                message: Some("`module_inventory_width` must be in a range [1; 100]".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstants",
+                message: Some("`module_inventory_width` must be in a range [1; 100]".into()),
+            });
         }
         Ok(())
     }
@@ -194,14 +229,14 @@ pub struct UtilityConstantsChart {
     pub train_current_path_outline_color: Color,
     #[default(0.6_f32)]
     pub custom_tag_scale: f32, // Default: 0.6
-    pub custom_tag_selected_overlay_tint: Color
+    pub custom_tag_selected_overlay_tint: Color,
 }
 
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct UtilityConstantsPlayerColor {
     pub name: String,
     pub player_color: Color,
-    pub chat_color: Color
+    pub chat_color: Color,
 }
 
 #[derive(Debug, Clone, PrototypeFromLua)]
@@ -218,14 +253,19 @@ pub struct UtilityConstantsTrainPathFinding {
     pub train_waiting_at_signal_penalty: u32,
     pub train_waiting_at_signal_tick_multiplier_penalty: f32, // Must be >= 0
     pub train_with_no_path_penalty: u32,
-    pub train_auto_without_schedule_penalty: u32
+    pub train_auto_without_schedule_penalty: u32,
 }
 
 impl UtilityConstantsTrainPathFinding {
     fn post_extr_fn(&self, _lua: &mlua::Lua, _data_table: &DataTable) -> LuaResult<()> {
         if self.train_waiting_at_signal_tick_multiplier_penalty < 0.0 {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstantsTrainPathFinding",
-                message: Some("`train_waiting_at_signal_tick_multiplier_penalty` must be >= 0".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstantsTrainPathFinding",
+                message: Some(
+                    "`train_waiting_at_signal_tick_multiplier_penalty` must be >= 0".into(),
+                ),
+            });
         }
         Ok(())
     }
@@ -248,42 +288,54 @@ pub struct UtilityConstantsMapEditor {
     pub tile_editor_area_selection_color: Color,
     pub decorative_editor_selection_preview_tint: Color,
     pub tile_editor_selection_preview_radius: u8,
-    pub decorative_editor_selection_preview_radius: u8
+    pub decorative_editor_selection_preview_radius: u8,
 }
 
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct UtilityConstantColorFilter {
     pub name: String,
     pub localised_name: LocalisedString,
-    pub matrix: [[f32; 4]; 4]
+    pub matrix: [[f32; 4]; 4],
 }
 
 #[derive(Debug, Clone, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct UtilityConstantsEntityRendererSearchBoxLimits {
-    pub left: u8, // Range [6, 15]
-    pub top: u8, // Range [3, 15]
-    pub right: u8, // Range [3, 15]
+    pub left: u8,   // Range [6, 15]
+    pub top: u8,    // Range [3, 15]
+    pub right: u8,  // Range [3, 15]
     pub bottom: u8, // Range [4, 15]
 }
 
 impl UtilityConstantsEntityRendererSearchBoxLimits {
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if !(6..=15).contains(&self.left) {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstantsEntityRendererSearchBoxLimits",
-                message: Some("`left` msut be in range [6; 15]".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstantsEntityRendererSearchBoxLimits",
+                message: Some("`left` msut be in range [6; 15]".into()),
+            });
         }
         if !(6..=15).contains(&self.top) {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstantsEntityRendererSearchBoxLimits",
-                message: Some("`top` msut be in range [3; 15]".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstantsEntityRendererSearchBoxLimits",
+                message: Some("`top` msut be in range [3; 15]".into()),
+            });
         }
         if !(6..=15).contains(&self.right) {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstantsEntityRendererSearchBoxLimits",
-                message: Some("`right` msut be in range [3; 15]".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstantsEntityRendererSearchBoxLimits",
+                message: Some("`right` msut be in range [3; 15]".into()),
+            });
         }
         if !(6..=15).contains(&self.bottom) {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "UtilityConstantsEntityRendererSearchBoxLimits",
-                message: Some("`bottom` msut be in range [4; 15]".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "UtilityConstantsEntityRendererSearchBoxLimits",
+                message: Some("`bottom` msut be in range [4; 15]".into()),
+            });
         }
         Ok(())
     }
@@ -356,7 +408,7 @@ pub struct UtilitySounds {
     pub confirm: Sound,
     pub undo: Sound,
     pub drop_item: Sound,
-    pub rail_plan_start: Sound
+    pub rail_plan_start: Sound,
 }
 
 /// <https://wiki.factorio.com/Prototype/UtilitySprites>
@@ -750,5 +802,5 @@ pub struct UtilitySpritesCursorBox {
     pub logistics: Vec<BoxSpecification>,
     pub pair: Vec<BoxSpecification>,
     pub train_visualization: Vec<BoxSpecification>,
-    pub blueprint_snap_rectangle: Vec<BoxSpecification>
+    pub blueprint_snap_rectangle: Vec<BoxSpecification>,
 }

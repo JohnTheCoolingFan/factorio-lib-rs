@@ -1,32 +1,55 @@
-use crate::prototypes::{PrototypeFromLua, GetPrototype};
-use super::{Factorio2DVector, RangeMode, AmmoType, CircularProjectileCreationSpecification, CircularParticleCreationSpecification};
 use super::graphics::RotatedAnimation;
-use super::sound::{LayeredSound, CyclicSound};
-use strum_macros::{EnumString, AsRefStr, EnumDiscriminants};
+use super::sound::{CyclicSound, LayeredSound};
+use super::{
+    AmmoType, CircularParticleCreationSpecification, CircularProjectileCreationSpecification,
+    Factorio2DVector, RangeMode,
+};
+use crate::prototypes::{GetPrototype, PrototypeFromLua};
 use factorio_lib_rs_derive::prot_from_str;
+use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
 // ========== // AttackParameters // ========== //
 
 /// <https://wiki.factorio.com/Types/AttackParameters>
 #[derive(Debug, Clone, EnumDiscriminants)]
-#[strum_discriminants(derive(EnumString), strum(serialize_all="kebab-case"))]
+#[strum_discriminants(derive(EnumString), strum(serialize_all = "kebab-case"))]
 pub enum AttackParameters {
     // Depends on `type` key
     Projectile(ProjectileAttackParameters), // "projectile"
-    Beam(BeamAttackParameters), // "beam"
-    Stream(StreamAttackParameters) // "stream"
+    Beam(BeamAttackParameters),             // "beam"
+    Stream(StreamAttackParameters),         // "stream"
 }
 
 impl<'lua> PrototypeFromLua<'lua> for AttackParameters {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::prototypes::DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(
+        value: mlua::Value<'lua>,
+        lua: &'lua mlua::Lua,
+        data_table: &mut crate::prototypes::DataTable,
+    ) -> mlua::Result<Self> {
         if let mlua::Value::Table(table) = &value {
-            Ok(match table.get::<_, String>("type")?.parse().map_err(mlua::Error::external)? {
-                AttackParametersDiscriminants::Projectile => AttackParameters::Projectile(ProjectileAttackParameters::prototype_from_lua(value, lua, data_table)?),
-                AttackParametersDiscriminants::Beam => AttackParameters::Beam(BeamAttackParameters::prototype_from_lua(value, lua, data_table)?),
-                AttackParametersDiscriminants::Stream => AttackParameters::Stream(StreamAttackParameters::prototype_from_lua(value, lua, data_table)?),
-            })
+            Ok(
+                match table
+                    .get::<_, String>("type")?
+                    .parse()
+                    .map_err(mlua::Error::external)?
+                {
+                    AttackParametersDiscriminants::Projectile => AttackParameters::Projectile(
+                        ProjectileAttackParameters::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                    AttackParametersDiscriminants::Beam => AttackParameters::Beam(
+                        BeamAttackParameters::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                    AttackParametersDiscriminants::Stream => AttackParameters::Stream(
+                        StreamAttackParameters::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                },
+            )
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "AttackParameters", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "AttackParameters",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -127,7 +150,7 @@ pub struct BeamAttackParameters {
     pub ammo_categories: Option<Vec<String>>, // (Names) Name of AmmoCategory
     #[default(0_u32)]
     pub source_direction_count: u32, // Default: 0
-    pub source_offset: Option<Factorio2DVector>
+    pub source_offset: Option<Factorio2DVector>,
 }
 
 /// <https://wiki.factorio.com/Types/StreamAttackParameters>
@@ -178,7 +201,7 @@ pub struct StreamAttackParameters {
     pub gun_barrel_length: f32, // Default: 0
     pub projectile_creation_parameters: Option<CircularProjectileCreationSpecification>,
     pub gun_center_shift: Option<GunCenterShift>,
-    pub fluids: Vec<StreamAttackFluid>
+    pub fluids: Vec<StreamAttackFluid>,
 }
 
 // =============== // Other // ================ //
@@ -201,23 +224,41 @@ pub struct GunCenterShift {
     pub north: Factorio2DVector,
     pub east: Factorio2DVector,
     pub south: Factorio2DVector,
-    pub west: Factorio2DVector
+    pub west: Factorio2DVector,
 }
 
 impl<'lua> PrototypeFromLua<'lua> for GunCenterShift {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut crate::prototypes::DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(
+        value: mlua::Value<'lua>,
+        lua: &'lua mlua::Lua,
+        _data_table: &mut crate::prototypes::DataTable,
+    ) -> mlua::Result<Self> {
         if let mlua::Value::Table(t) = &value {
             if let Some(north) = t.get::<_, Option<Factorio2DVector>>("north")? {
                 let east = t.get::<_, Factorio2DVector>("east")?;
                 let south = t.get::<_, Factorio2DVector>("south")?;
                 let west = t.get::<_, Factorio2DVector>("west")?;
-                Ok(Self{north, east, south, west})
+                Ok(Self {
+                    north,
+                    east,
+                    south,
+                    west,
+                })
             } else {
                 let vector = lua.unpack::<Factorio2DVector>(value)?;
-                Ok(Self{north: vector, east: vector, south: vector, west: vector})
+                Ok(Self {
+                    north: vector,
+                    east: vector,
+                    south: vector,
+                    west: vector,
+                })
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "GunCenterShift", message: Some("Expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "GunCenterShift",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }

@@ -2,21 +2,34 @@
 //!
 //! This module provides an easy interface to upload mods to a mod portal
 
+use reqwest::{Body, Client, StatusCode};
+use serde::Deserialize;
 use std::fmt::Display;
-use reqwest::{Client, StatusCode, Body};
 use strum::Display;
 use thiserror::Error;
-use serde::Deserialize;
 
 pub const INIT_UPLOAD_URL: &str = "https://mods.factorio.com/api/v2/mods/releases/init_upload";
 
-pub async fn upload_mod(client: &Client, api_key: &str, mod_name: &str, file: impl Into<Body>) -> Result<(), ModUploadError> {
-    let response =  client.post(INIT_UPLOAD_URL).bearer_auth(api_key).body(mod_name.to_string()).send().await?;
+pub async fn upload_mod(
+    client: &Client,
+    api_key: &str,
+    mod_name: &str,
+    file: impl Into<Body>,
+) -> Result<(), ModUploadError> {
+    let response = client
+        .post(INIT_UPLOAD_URL)
+        .bearer_auth(api_key)
+        .body(mod_name.to_string())
+        .send()
+        .await?;
     if response.status() == StatusCode::OK {
         let data = response.json::<ModUploadInitResponse>().await?;
         let upload_response = client.post(data.upload_url).body(file).send().await?;
         if upload_response.status() != StatusCode::OK {
-            Err(upload_response.json::<ModUploadErrorResponse>().await?.into())
+            Err(upload_response
+                .json::<ModUploadErrorResponse>()
+                .await?
+                .into())
         } else {
             Ok(())
         }
@@ -33,12 +46,16 @@ pub struct ModUploadInitResponse {
 #[derive(Debug, Error, Deserialize)]
 pub struct ModUploadErrorResponse {
     pub error: ModUploadErrorKind,
-    pub message: String
+    pub message: String,
 }
 
 impl Display for ModUploadErrorResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Failed to upload with error `{}`, message: {}", self.error, self.message)
+        write!(
+            f,
+            "Failed to upload with error `{}`, message: {}",
+            self.error, self.message
+        )
     }
 }
 
@@ -51,7 +68,7 @@ pub enum ModUploadErrorKind {
     Unknown,
     InvalidModRelease,
     InvalidModUpload,
-    UnknownMod
+    UnknownMod,
 }
 
 #[derive(Debug, Error)]
@@ -59,7 +76,7 @@ pub enum ModUploadError {
     #[error("{0}")]
     Upload(ModUploadErrorResponse),
     #[error("Client error: {0}")]
-    Client(reqwest::Error)
+    Client(reqwest::Error),
 }
 
 impl From<reqwest::Error> for ModUploadError {

@@ -1,10 +1,10 @@
+use crate::prototypes::{DataTable, DataTableAccessable, Prototype, PrototypeType, PrototypesErr};
 use factorio_lib_rs_derive::abstract_prototype_get;
-use crate::prototypes::{PrototypeType, DataTable, DataTableAccessable, PrototypesErr, Prototype};
 
 #[derive(Debug, Clone)]
 pub struct AbstractEntity {
     pub name: String,
-    pub prototype_type: PrototypeType
+    pub prototype_type: PrototypeType,
 }
 
 impl Prototype for AbstractEntity {
@@ -23,7 +23,7 @@ impl DataTableAccessable for AbstractEntity {
     }
 
     fn find_cloned(data_table: &DataTable, name: &str) -> Result<Self, PrototypesErr> {
-        // TODO 
+        // TODO
         abstract_prototype_get!(arrow, artillery_flare)
     }
 

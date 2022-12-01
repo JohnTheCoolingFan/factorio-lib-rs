@@ -1,7 +1,7 @@
 use super::AttackParameters;
+use crate::prototypes::{DataTable, GetPrototype, PrototypeFromLua};
+use mlua::{prelude::LuaResult, Lua, Value};
 use strum::{EnumDiscriminants, EnumString};
-use mlua::{prelude::LuaResult, Value, Lua};
-use crate::prototypes::{DataTable, PrototypeFromLua, GetPrototype};
 
 /// <https://wiki.factorio.com/Types/CapsuleAction>
 #[derive(Debug, Clone, EnumDiscriminants)]
@@ -11,21 +11,45 @@ pub enum CapsuleAction {
     EquipmentRemote(ActivateEquipmentCapsuleAction),
     UseOnSelf(UseOnSelfCapsuleAction),
     ArtilleryRemote(ArtilleryRemoteCapsuleAction),
-    DestroyCliffs(DestroyCliffsCapsuleAction)
+    DestroyCliffs(DestroyCliffsCapsuleAction),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for CapsuleAction {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(table) = &value {
-            Ok(match table.get::<_, String>("type")?.parse().map_err(mlua::Error::external)? {
-                CapsuleActionDiscriminants::Throw => CapsuleAction::Throw(ThrowCapsuleAction::prototype_from_lua(value, lua, data_table)?),
-                CapsuleActionDiscriminants::EquipmentRemote => CapsuleAction::EquipmentRemote(ActivateEquipmentCapsuleAction::prototype_from_lua(value, lua, data_table)?),
-                CapsuleActionDiscriminants::UseOnSelf => CapsuleAction::UseOnSelf(UseOnSelfCapsuleAction::prototype_from_lua(value, lua, data_table)?),
-                CapsuleActionDiscriminants::ArtilleryRemote => CapsuleAction::ArtilleryRemote(ArtilleryRemoteCapsuleAction::prototype_from_lua(value, lua, data_table)?),
-                CapsuleActionDiscriminants::DestroyCliffs => CapsuleAction::DestroyCliffs(DestroyCliffsCapsuleAction::prototype_from_lua(value, lua, data_table)?),
-            })
+            Ok(
+                match table
+                    .get::<_, String>("type")?
+                    .parse()
+                    .map_err(mlua::Error::external)?
+                {
+                    CapsuleActionDiscriminants::Throw => CapsuleAction::Throw(
+                        ThrowCapsuleAction::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                    CapsuleActionDiscriminants::EquipmentRemote => CapsuleAction::EquipmentRemote(
+                        ActivateEquipmentCapsuleAction::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                    CapsuleActionDiscriminants::UseOnSelf => CapsuleAction::UseOnSelf(
+                        UseOnSelfCapsuleAction::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                    CapsuleActionDiscriminants::ArtilleryRemote => CapsuleAction::ArtilleryRemote(
+                        ArtilleryRemoteCapsuleAction::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                    CapsuleActionDiscriminants::DestroyCliffs => CapsuleAction::DestroyCliffs(
+                        DestroyCliffsCapsuleAction::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                },
+            )
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "CapsuleAction", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "CapsuleAction",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -35,7 +59,7 @@ impl<'lua> PrototypeFromLua<'lua> for CapsuleAction {
 pub struct ThrowCapsuleAction {
     pub attack_parameters: AttackParameters,
     #[default(true)]
-    pub uses_stack: bool // Default: true
+    pub uses_stack: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Types/ActivateEquipmentCapsuleAction>
@@ -49,7 +73,7 @@ pub struct ActivateEquipmentCapsuleAction {
 pub struct UseOnSelfCapsuleAction {
     pub attack_parameters: AttackParameters,
     #[default(true)]
-    pub uses_stack: bool // Default: true
+    pub uses_stack: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Types/ArtilleryRemoteCapsuleAction>
@@ -57,7 +81,7 @@ pub struct UseOnSelfCapsuleAction {
 pub struct ArtilleryRemoteCapsuleAction {
     pub flare: String, // Name of ArtilleryFlare prototype
     #[default(true)]
-    pub play_sound_on_failure: bool // Default: true
+    pub play_sound_on_failure: bool, // Default: true
 }
 
 /// <https://wiki.factorio.com/Types/DestroyCliffsCapsuleAction>
@@ -70,5 +94,5 @@ pub struct DestroyCliffsCapsuleAction {
     #[default(true)]
     pub play_sound_on_failure: bool, // Default: true
     #[default(true)]
-    pub uses_stack: bool // Default: true
+    pub uses_stack: bool, // Default: true
 }

@@ -1,6 +1,6 @@
-use mlua::{prelude::*, Lua};
-use crate::prototypes::{GetPrototype, DataTable};
+use crate::prototypes::{DataTable, GetPrototype};
 use factorio_lib_rs_derive::PrototypeFromLua;
+use mlua::{prelude::*, Lua};
 
 use super::FileName;
 
@@ -8,7 +8,7 @@ use super::FileName;
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct LayeredSound {
     #[use_self_vec]
-    pub layers: Vec<Sound>
+    pub layers: Vec<Sound>,
 }
 
 /// <https://wiki.factorio.com/Types/Sound>
@@ -20,7 +20,7 @@ pub struct Sound {
     #[default(1.0)]
     pub audible_distance_modifier: f64,
     #[use_self_vec]
-    pub variations: Vec<SoundVariation> // If variations table not present, use the same table, but construct single variation.
+    pub variations: Vec<SoundVariation>, // If variations table not present, use the same table, but construct single variation.
 }
 
 /// <https://wiki.factorio.com/Types/Sound#aggregation>
@@ -31,7 +31,7 @@ pub struct SoundAggregation {
     pub progress_threshold: f32,
     pub remove: bool,
     #[default(false)]
-    pub count_already_playing: bool
+    pub count_already_playing: bool,
 }
 
 /// <https://wiki.factorio.com/Types/Sound#variations>
@@ -45,14 +45,18 @@ pub struct SoundVariation {
     pub preload: Option<bool>, // Strange that this doesn't have a default
     pub speed: Option<f32>,
     pub min_speed: Option<f32>, // >= 1/64, Ignored if speed is present
-    pub max_speed: Option<f32>  // Mandatory if min_speed is present, >= min_speed
+    pub max_speed: Option<f32>, // Mandatory if min_speed is present, >= min_speed
 }
 
 impl SoundVariation {
     fn post_extr_fn(&mut self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if let Some(speed) = self.speed {
             if speed < (1.0 / 64.0) {
-                return Err(mlua::Error::FromLuaConversionError { from: "table", to: "Sound.variations", message: Some("`speed` must be >= 1/64".into()) })
+                return Err(mlua::Error::FromLuaConversionError {
+                    from: "table",
+                    to: "Sound.variations",
+                    message: Some("`speed` must be >= 1/64".into()),
+                });
             };
             self.min_speed = self.speed;
             self.max_speed = self.speed;
@@ -60,14 +64,22 @@ impl SoundVariation {
             self.speed = Some(1.0);
             if let Some(min_speed) = self.min_speed {
                 if min_speed < (1.0 / 64.0) {
-                    return Err(mlua::Error::FromLuaConversionError { from: "table", to: "Sound.variations", message: Some("`min_speed` must be >= 1/64".into()) })
+                    return Err(mlua::Error::FromLuaConversionError {
+                        from: "table",
+                        to: "Sound.variations",
+                        message: Some("`min_speed` must be >= 1/64".into()),
+                    });
                 }
             } else {
                 self.min_speed = Some(1.0)
             }
             if let Some(max_speed) = self.max_speed {
                 if max_speed < self.min_speed.unwrap() {
-                    return Err(mlua::Error::FromLuaConversionError { from: "table", to: "Sound.variations", message: Some("`max_speed` must be >= `min_speed`".into()) })
+                    return Err(mlua::Error::FromLuaConversionError {
+                        from: "table",
+                        to: "Sound.variations",
+                        message: Some("`max_speed` must be >= `min_speed`".into()),
+                    });
                 }
             } else {
                 self.max_speed = self.min_speed
@@ -113,7 +125,7 @@ pub struct WorkingSound {
 pub struct InterruptibleSound {
     pub sound: Sound,
     #[default(0_u32)]
-    pub fade_ticks: u32 // Default: 0
+    pub fade_ticks: u32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/CyclicSound>
@@ -121,7 +133,7 @@ pub struct InterruptibleSound {
 pub struct CyclicSound {
     pub begin_sound: Option<Sound>,
     pub middle_sound: Option<Sound>,
-    pub end_sound: Option<Sound>
+    pub end_sound: Option<Sound>,
 }
 
 /// <https://wiki.factorio.com/Prototype/Tile#build_sound>
@@ -130,5 +142,5 @@ pub struct TileBuildSound {
     #[use_self]
     pub small: Sound,
     pub medium: Option<Sound>,
-    pub large: Option<Sound>
+    pub large: Option<Sound>,
 }

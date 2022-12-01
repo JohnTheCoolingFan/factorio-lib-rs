@@ -1,10 +1,13 @@
-use super::{GetPrototype, PrototypeFromLua, DataTable};
-use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign, BitXor, BitXorAssign};
-use std::iter::{Iterator, FromIterator};
-use super::{Factorio2DVector, Color, FileName, BoundingBox, RealOrientation, CreateParticleTriggerEffectItem};
-use strum_macros::{EnumString, AsRefStr};
-use mlua::{prelude::*, Value};
+use super::{
+    BoundingBox, Color, CreateParticleTriggerEffectItem, Factorio2DVector, FileName,
+    RealOrientation,
+};
+use super::{DataTable, GetPrototype, PrototypeFromLua};
 use factorio_lib_rs_derive::prot_from_str;
+use mlua::{prelude::*, Value};
+use std::iter::{FromIterator, Iterator};
+use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
+use strum_macros::{AsRefStr, EnumString};
 
 // ============ // Simple types // ============ //
 
@@ -21,7 +24,7 @@ pub struct SpriteSize(pub i16, pub i16);
 pub type SpriteSizeType = i16;
 
 // =========== // General types // ============ //
-        // Enums with FromStr
+// Enums with FromStr
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_recipe_tint>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
@@ -148,7 +151,7 @@ pub enum RenderLayer {
     HigherSelectionBox,
     CollisionSelectionBox,
     Arrow,
-    Cursor
+    Cursor,
 }
 
 prot_from_str!(RenderLayer);
@@ -159,7 +162,7 @@ pub enum DrawAs {
     DrawAsShadow,
     DrawAsGlow,
     DrawAsLight,
-    None
+    None,
 }
 
 impl DrawAs {
@@ -184,7 +187,7 @@ pub enum BlendMode {
     Additive,
     AdditiveSoft,
     Multiplicative,
-    Overwrite
+    Overwrite,
 }
 
 prot_from_str!(BlendMode);
@@ -195,12 +198,12 @@ prot_from_str!(BlendMode);
 pub enum RunMode {
     Forward,
     Backward,
-    ForwardThenBackward
+    ForwardThenBackward,
 }
 
 prot_from_str!(RunMode);
 
-        // Structs
+// Structs
 
 /// <https://wiki.factorio.com/Types/FluidBox#secondary_draw_orders>
 #[derive(Debug, Clone, Eq, PartialEq, Copy, PrototypeFromLua)]
@@ -212,7 +215,7 @@ pub struct SecondaryDrawOrders {
     #[default(1)]
     pub south: i8,
     #[default(1)]
-    pub west: i8
+    pub west: i8,
 }
 
 /// <https://wiki.factorio.com/Types/LightDefinition>
@@ -235,7 +238,7 @@ pub struct LightDefinition {
     #[default(Color(0.0, 0.0, 0.0, 0.0))]
     pub color: Color, // Default: no color
     #[default(0.0_f32)]
-    pub minimum_darkness: f32 // Default: 0
+    pub minimum_darkness: f32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/LightFlickeringDefinition>
@@ -256,7 +259,7 @@ pub struct LightFlickeringDefinition {
     #[default(0.5)]
     pub light_intensity_to_size_coefficient: f32, // Default: 0.5
     #[default(Color::new_rgb(1.0, 1.0, 1.0))]
-    pub color: Color // Default: (1, 1, 1) (White)
+    pub color: Color, // Default: (1, 1, 1) (White)
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#default_recipe_tint>
@@ -270,7 +273,7 @@ pub struct RecipeTint {
     #[default(Color(1.0, 1.0, 1.0, 1.0))]
     pub tertiary: Color,
     #[default(Color(1.0, 1.0, 1.0, 1.0))]
-    pub quaternary: Color
+    pub quaternary: Color,
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#shift_animation_waypoints>
@@ -279,7 +282,7 @@ pub struct ShiftAnimationWaypoints {
     pub north: Option<Vec<Factorio2DVector>>,
     pub east: Option<Vec<Factorio2DVector>>,
     pub south: Option<Vec<Factorio2DVector>>,
-    pub west: Option<Vec<Factorio2DVector>>
+    pub west: Option<Vec<Factorio2DVector>>,
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#status_colors>
@@ -309,17 +312,26 @@ pub struct CircuitConnectorSecondaryDrawOrder {
     pub north: i8,
     pub east: i8,
     pub south: i8,
-    pub west: i8
+    pub west: i8,
 }
 
 impl CircuitConnectorSecondaryDrawOrder {
     pub fn new(draw_order: i8) -> Self {
-        Self{north: draw_order, east: draw_order, south: draw_order, west: draw_order}
+        Self {
+            north: draw_order,
+            east: draw_order,
+            south: draw_order,
+            west: draw_order,
+        }
     }
 }
 
 impl<'lua> PrototypeFromLua<'lua> for CircuitConnectorSecondaryDrawOrder {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(
+        value: mlua::Value<'lua>,
+        lua: &'lua mlua::Lua,
+        _data_table: &mut DataTable,
+    ) -> mlua::Result<Self> {
         if let Ok(num) = lua.unpack::<Option<i8>>(value.clone()) {
             Ok(Self::new(num.unwrap_or(100)))
         } else if let mlua::Value::Table(table) = &value {
@@ -327,10 +339,18 @@ impl<'lua> PrototypeFromLua<'lua> for CircuitConnectorSecondaryDrawOrder {
             let east = table.get::<_, Option<i8>>("east")?.unwrap_or(100);
             let south = table.get::<_, Option<i8>>("south")?.unwrap_or(100);
             let west = table.get::<_, Option<i8>>("west")?.unwrap_or(100);
-            Ok(Self{north, east, south, west})
+            Ok(Self {
+                north,
+                east,
+                south,
+                west,
+            })
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "MiningDrillGraphicsSet.circuit_connector_secondary_draw_order",
-            message: Some("Expected integer or table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "MiningDrillGraphicsSet.circuit_connector_secondary_draw_order",
+                message: Some("Expected integer or table".into()),
+            })
         }
     }
 }
@@ -347,14 +367,22 @@ pub struct RadiusVisualizationSpecification {
     #[default(true)]
     pub draw_in_cursor: bool, // Default: true
     #[default(true)]
-    pub draw_on_selection: bool // Default: true
+    pub draw_on_selection: bool, // Default: true
 }
 
 impl RadiusVisualizationSpecification {
-    fn post_extr_fn(&mut self, _lua: &mlua::Lua, _data_table: &DataTable) -> mlua::prelude::LuaResult<()> {
+    fn post_extr_fn(
+        &mut self,
+        _lua: &mlua::Lua,
+        _data_table: &DataTable,
+    ) -> mlua::prelude::LuaResult<()> {
         if self.distance.is_sign_negative() {
-            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "RadiusVisualizationSpecification",
-                message: Some("`distance` must be positive (>= 0)".into()) }) }
+            return Err(mlua::Error::FromLuaConversionError {
+                from: "table",
+                to: "RadiusVisualizationSpecification",
+                message: Some("`distance` must be positive (>= 0)".into()),
+            });
+        }
         Ok(())
     }
 }
@@ -389,7 +417,7 @@ impl Dice {
 #[derive(Debug, Clone)]
 pub enum Animation {
     Layers(Vec<Animation>),
-    Single(Box<AnimationBase>)
+    Single(Box<AnimationBase>),
 }
 
 impl Animation {
@@ -399,33 +427,51 @@ impl Animation {
                 let mut flag = false;
                 for layer in layers {
                     flag |= layer.check_stripes()
-                };
+                }
                 flag
-            },
-            Self::Single(ab) => {
-                ab.check_stripes()
             }
+            Self::Single(ab) => ab.check_stripes(),
         }
     }
 }
 
 impl<'lua> PrototypeFromLua<'lua> for Animation {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(
+        value: mlua::Value<'lua>,
+        lua: &'lua mlua::Lua,
+        data_table: &mut DataTable,
+    ) -> mlua::Result<Self> {
         let type_name = &value.type_name();
         if let mlua::Value::Table(p_table) = value {
             let layers = p_table.get::<_, Option<Vec<mlua::Value>>>("layers")?;
             let result = if let Some(actual_layers) = layers {
-                Self::Layers(actual_layers.into_iter().map(|v| Self::prototype_from_lua(v, lua, data_table)).collect::<mlua::Result<Vec<Self>>>()?)
+                Self::Layers(
+                    actual_layers
+                        .into_iter()
+                        .map(|v| Self::prototype_from_lua(v, lua, data_table))
+                        .collect::<mlua::Result<Vec<Self>>>()?,
+                )
             } else {
-                Self::Single(Box::new(AnimationBase::prototype_from_lua(p_table.to_lua(lua)?, lua, data_table)?))
+                Self::Single(Box::new(AnimationBase::prototype_from_lua(
+                    p_table.to_lua(lua)?,
+                    lua,
+                    data_table,
+                )?))
             };
             if result.check_stripes() {
-                return Err(mlua::Error::FromLuaConversionError { from: type_name, to: "Animation",
-                message: Some("`height_in_frames` in stripes is mandatory".into()) })
+                return Err(mlua::Error::FromLuaConversionError {
+                    from: type_name,
+                    to: "Animation",
+                    message: Some("`height_in_frames` in stripes is mandatory".into()),
+                });
             };
             Ok(result)
         } else {
-            Err(mlua::Error::FromLuaConversionError{from:type_name, to: "Animation", message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError {
+                from: type_name,
+                to: "Animation",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -440,7 +486,13 @@ pub struct AnimationBase {
 
 impl AnimationBase {
     fn check_stripes(&self) -> bool {
-        self.regular.check_stripes() || { if let Some(ans) = &self.hr_version { ans.check_stripes() } else { false } }
+        self.regular.check_stripes() || {
+            if let Some(ans) = &self.hr_version {
+                ans.check_stripes()
+            } else {
+                false
+            }
+        }
     }
 }
 
@@ -466,16 +518,20 @@ pub struct AnimationSpec {
     #[default(1_u8)]
     pub repeat_count: u8, // Default: 1, can't be 0
     pub frame_sequence: Option<AnimationFrameSequence>,
-    pub stripes: Option<Vec<Stripe>>
+    pub stripes: Option<Vec<Stripe>>,
 }
 
 impl AnimationSpec {
     // TODO: clarify the required image sizes for stripes
-    fn register_resources(&self, _lua: &mlua::Lua, _data_table: &mut DataTable) -> mlua::prelude::LuaResult<()> {
+    fn register_resources(
+        &self,
+        _lua: &mlua::Lua,
+        _data_table: &mut DataTable,
+    ) -> mlua::prelude::LuaResult<()> {
         todo!() // TODO
-        // List of things to do:
-        // Rename this function to a more fitting name
-        // check data: `frame_count`, `repeat_count`
+                // List of things to do:
+                // Rename this function to a more fitting name
+                // check data: `frame_count`, `repeat_count`
     }
 
     fn check_stripes(&self) -> bool {
@@ -498,7 +554,7 @@ pub struct Stripe {
     #[default(0_u32)]
     pub x: u32, // Default: 0
     #[default(0_u32)]
-    pub y: u32 // Default: 0
+    pub y: u32, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/AnimationVariations>
@@ -544,7 +600,7 @@ pub struct AnimationElement {
     pub apply_tint: bool, // Default: false
     #[default(true)]
     pub always_draw: bool, // Default: true
-    pub animation: Animation
+    pub animation: Animation,
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimation>
@@ -552,7 +608,7 @@ pub struct AnimationElement {
 pub struct RotatedAnimation {
     #[use_self_forced]
     pub regular: RotatedAnimationSpec,
-    pub hr_version: Option<RotatedAnimationSpec>
+    pub hr_version: Option<RotatedAnimationSpec>,
 }
 
 // A: "Are you sure this will work?"; Me: "I have no idea!"
@@ -574,7 +630,7 @@ pub struct RotatedAnimationSpec {
     #[default(true)]
     pub apply_projection: bool, // Default: true
     #[use_self_forced] // TODO
-    pub animation: AnimationVariation
+    pub animation: AnimationVariation,
 }
 
 /// <https://wiki.factorio.com/Types/RotatedAnimationVariations>
@@ -584,23 +640,34 @@ pub type RotatedAnimationVariations = Vec<RotatedAnimationVariation>;
 #[derive(Debug, Clone)]
 pub enum RotatedAnimationVariation {
     Layers(Vec<RotatedAnimationVariation>),
-    Single(Box<RotatedAnimation>)
+    Single(Box<RotatedAnimation>),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for RotatedAnimationVariation {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(
+        value: mlua::Value<'lua>,
+        lua: &'lua mlua::Lua,
+        data_table: &mut DataTable,
+    ) -> mlua::Result<Self> {
         let type_name = value.type_name();
         if let Value::Table(t) = value {
             if t.get::<_, Option<String>>("direction_count")?.is_some() {
-                Ok(Self::Single(Box::new(RotatedAnimation::prototype_from_lua(t.to_lua(lua)?, lua, data_table)?)))
+                Ok(Self::Single(Box::new(
+                    RotatedAnimation::prototype_from_lua(t.to_lua(lua)?, lua, data_table)?,
+                )))
             } else {
-                Ok(Self::Layers(t
-                        .sequence_values::<Value>()
+                Ok(Self::Layers(
+                    t.sequence_values::<Value>()
                         .map(|v| RotatedAnimationVariation::prototype_from_lua(v?, lua, data_table))
-                        .collect::<LuaResult<Vec<RotatedAnimationVariation>>>()?))
+                        .collect::<LuaResult<Vec<RotatedAnimationVariation>>>()?,
+                ))
             }
         } else {
-            Err(LuaError::FromLuaConversionError { from: type_name, to: "RotatedAnimationVariation", message: Some("expected table".into()) })
+            Err(LuaError::FromLuaConversionError {
+                from: type_name,
+                to: "RotatedAnimationVariation",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -612,7 +679,7 @@ pub struct RotatedAnimation4Way {
     east: RotatedAnimation,
     // Next 2 are optional, north and west are used if these are not present
     south: RotatedAnimation,
-    west: RotatedAnimation
+    west: RotatedAnimation,
 }
 
 /// <https://wiki.factorio.com/Prototype/Beam#light_animations>
@@ -622,7 +689,7 @@ pub struct LightAnimations {
     pub ending: Option<Animation>,
     pub head: Option<Animation>,
     pub tail: Option<Animation>,
-    pub body: Option<Vec<AnimationVariation>>
+    pub body: Option<Vec<AnimationVariation>>,
 }
 
 // ============== // Sprites // ==============  //
@@ -631,7 +698,7 @@ pub struct LightAnimations {
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct Sprite {
     #[use_self_vec]
-    pub layers: Vec<SpriteLayer>
+    pub layers: Vec<SpriteLayer>,
 }
 
 /// <https://wiki.factorio.com/Types/Sprite>
@@ -639,7 +706,7 @@ pub struct Sprite {
 pub struct SpriteLayer {
     #[use_self_forced]
     pub regular: SpriteSpec,
-    pub hr_version: Option<SpriteSpec>
+    pub hr_version: Option<SpriteSpec>,
 }
 
 /// <https://wiki.factorio.com/Types/Sprite>
@@ -652,7 +719,7 @@ pub struct SpriteSpec {
 
 #[derive(Debug, Clone)]
 pub struct SpriteSpecWithoutFilename {
-    pub dice: Option<Dice>, // AKA slice // _y and _x are converted into this
+    pub dice: Option<Dice>,       // AKA slice // _y and _x are converted into this
     pub priority: SpritePriority, // Default: "medium"
     pub flags: Option<SpriteFlags>,
     pub size: SpriteSize,
@@ -663,30 +730,40 @@ pub struct SpriteSpecWithoutFilename {
     // Automatically converted to position
     // x
     // y
-    pub shift: Factorio2DVector, // (0, 0) by default
-    pub scale: f64, // 1 by default,
-    pub draw_as: DrawAs, // all false by default
-    pub mipmap_count: u8, // Default: 0
-    pub apply_runtime_tint: bool, // Default: false
-    pub tint: Color, // Default: (1, 1, 1, 1) (white)
-    pub blend_mode: BlendMode, // Default: "normal"
+    pub shift: Factorio2DVector,    // (0, 0) by default
+    pub scale: f64,                 // 1 by default,
+    pub draw_as: DrawAs,            // all false by default
+    pub mipmap_count: u8,           // Default: 0
+    pub apply_runtime_tint: bool,   // Default: false
+    pub tint: Color,                // Default: (1, 1, 1, 1) (white)
+    pub blend_mode: BlendMode,      // Default: "normal"
     pub load_in_minimal_mode: bool, //Default: false
-    pub premul_alpha: bool, // Default: true
-    pub generate_sfd: bool // Default: false // Only used by sprites in UtilitySprites with "icon" flag
+    pub premul_alpha: bool,         // Default: true
+    pub generate_sfd: bool, // Default: false // Only used by sprites in UtilitySprites with "icon" flag
 }
 
 // TODO: do this with a macro
 
 impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(
+        value: mlua::Value<'lua>,
+        lua: &'lua mlua::Lua,
+        _data_table: &mut DataTable,
+    ) -> mlua::Result<Self> {
         if let mlua::Value::Table(p_table) = value {
             let dice: Option<Dice> = {
-                let dice_gen_opt: Option<i16> = p_table.get::<_, Option<i16>>("dice")?.or_else(|| p_table.get("slice").ok());
+                let dice_gen_opt: Option<i16> = p_table
+                    .get::<_, Option<i16>>("dice")?
+                    .or_else(|| p_table.get("slice").ok());
                 if let Some(dice_gen) = dice_gen_opt {
                     Some(Dice::new(dice_gen))
                 } else {
-                    let x: Option<i16> = p_table.get::<_, Option<i16>>("dice_x")?.or_else(|| p_table.get("slice_x").ok());
-                    let y: Option<i16> = p_table.get::<_, Option<i16>>("dice_y")?.or_else(|| p_table.get("slice_y").ok());
+                    let x: Option<i16> = p_table
+                        .get::<_, Option<i16>>("dice_x")?
+                        .or_else(|| p_table.get("slice_x").ok());
+                    let y: Option<i16> = p_table
+                        .get::<_, Option<i16>>("dice_y")?
+                        .or_else(|| p_table.get("slice_y").ok());
                     if let (Some(ax), Some(ay)) = (x, y) {
                         Some(Dice(ax, ay))
                     } else {
@@ -694,27 +771,41 @@ impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
                     }
                 }
             };
-            let priority: SpritePriority = p_table.get::<_, Option<String>>("priority")?.unwrap_or_else(|| "medium".into()).parse().map_err(
-                |_| mlua::Error::FromLuaConversionError{from: "String", to: "SpritePriority", message: Some("invalid value".into())}
-                )?;
-            let flags = p_table.get::<_, Option<Vec<String>>>("flags")?.map(SpriteFlags::from_iter);
+            let priority: SpritePriority = p_table
+                .get::<_, Option<String>>("priority")?
+                .unwrap_or_else(|| "medium".into())
+                .parse()
+                .map_err(|_| mlua::Error::FromLuaConversionError {
+                    from: "String",
+                    to: "SpritePriority",
+                    message: Some("invalid value".into()),
+                })?;
+            let flags = p_table
+                .get::<_, Option<Vec<String>>>("flags")?
+                .map(SpriteFlags::from_iter);
             let size = {
-                let error = Err(mlua::Error::FromLuaConversionError{from: "integer", to: "SpriteSizeType", message: Some("value must be in range 0-8192".into())});
+                let error = Err(mlua::Error::FromLuaConversionError {
+                    from: "integer",
+                    to: "SpriteSizeType",
+                    message: Some("value must be in range 0-8192".into()),
+                });
                 if let Some(s_value) = p_table.get::<_, Option<mlua::Value>>("size")? {
                     match lua.unpack::<i16>(s_value.clone()) {
                         Ok(size) => {
                             if (0..=8192_i16).contains(&size) {
                                 SpriteSize(size, size)
                             } else {
-                                return error
+                                return error;
                             }
-                        },
+                        }
                         _ => {
                             let size = lua.unpack::<[i16; 2]>(s_value)?;
-                            if (0..=8192_i16).contains(&size[0]) && (0..=8192_i16).contains(&size[1]) {
+                            if (0..=8192_i16).contains(&size[0])
+                                && (0..=8192_i16).contains(&size[1])
+                            {
                                 SpriteSize(size[0], size[1])
                             } else {
-                                return error
+                                return error;
                             }
                         }
                     }
@@ -724,7 +815,7 @@ impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
                     if (0..=8192_i16).contains(&width) && (0..=8192_i16).contains(&height) {
                         SpriteSize(width, height)
                     } else {
-                        return error
+                        return error;
                     }
                 }
             };
@@ -734,26 +825,53 @@ impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
                 if x != 0 || y != 0 {
                     Some(SpritePosition(x, y))
                 } else {
-                    p_table.get::<_, Option<[SpriteSizeType; 2]>>("position")?.map(|pos| SpritePosition(pos[0], pos[1]))
+                    p_table
+                        .get::<_, Option<[SpriteSizeType; 2]>>("position")?
+                        .map(|pos| SpritePosition(pos[0], pos[1]))
                 }
             };
-            let shift = p_table.get::<_, Option<Factorio2DVector>>("shift")?.unwrap_or(Factorio2DVector(0.0, 0.0));
+            let shift = p_table
+                .get::<_, Option<Factorio2DVector>>("shift")?
+                .unwrap_or(Factorio2DVector(0.0, 0.0));
             let scale = p_table.get::<_, Option<f64>>("scale")?.unwrap_or(1.0);
             let draw_as = {
-                let draw_as_shadow = p_table.get::<_, Option<bool>>("draw_as_shadow")?.unwrap_or(false);
-                let draw_as_glow = p_table.get::<_, Option<bool>>("draw_as_glow")?.unwrap_or(false);
-                let draw_as_light = p_table.get::<_, Option<bool>>("draw_as_light")?.unwrap_or(false);
+                let draw_as_shadow = p_table
+                    .get::<_, Option<bool>>("draw_as_shadow")?
+                    .unwrap_or(false);
+                let draw_as_glow = p_table
+                    .get::<_, Option<bool>>("draw_as_glow")?
+                    .unwrap_or(false);
+                let draw_as_light = p_table
+                    .get::<_, Option<bool>>("draw_as_light")?
+                    .unwrap_or(false);
                 DrawAs::new(draw_as_shadow, draw_as_glow, draw_as_light)
             };
             let mipmap_count = p_table.get::<_, Option<u8>>("mipmap_count")?.unwrap_or(0);
-            let apply_runtime_tint = p_table.get::<_, Option<bool>>("apply_runtime_tint")?.unwrap_or(false);
-            let tint = p_table.get::<_, Option<Color>>("tint")?.unwrap_or(Color(1.0, 1.0, 1.0, 1.0));
-            let blend_mode: BlendMode = p_table.get::<_, Option<String>>("blend_mode")?.unwrap_or_else(|| "normal".into()).parse()
-                .map_err(|_| mlua::Error::FromLuaConversionError{from: "string", to: "BlendMode", message: Some("Invalid variant".into())})?;
-            let load_in_minimal_mode = p_table.get::<_, Option<bool>>("load_in_minimal_mode")?.unwrap_or(false);
-            let premul_alpha = p_table.get::<_, Option<bool>>("premul_alpha")?.unwrap_or(true);
-            let generate_sfd = p_table.get::<_, Option<bool>>("generate_sfd")?.unwrap_or(false);
-            Ok(Self{
+            let apply_runtime_tint = p_table
+                .get::<_, Option<bool>>("apply_runtime_tint")?
+                .unwrap_or(false);
+            let tint = p_table
+                .get::<_, Option<Color>>("tint")?
+                .unwrap_or(Color(1.0, 1.0, 1.0, 1.0));
+            let blend_mode: BlendMode = p_table
+                .get::<_, Option<String>>("blend_mode")?
+                .unwrap_or_else(|| "normal".into())
+                .parse()
+                .map_err(|_| mlua::Error::FromLuaConversionError {
+                    from: "string",
+                    to: "BlendMode",
+                    message: Some("Invalid variant".into()),
+                })?;
+            let load_in_minimal_mode = p_table
+                .get::<_, Option<bool>>("load_in_minimal_mode")?
+                .unwrap_or(false);
+            let premul_alpha = p_table
+                .get::<_, Option<bool>>("premul_alpha")?
+                .unwrap_or(true);
+            let generate_sfd = p_table
+                .get::<_, Option<bool>>("generate_sfd")?
+                .unwrap_or(false);
+            Ok(Self {
                 dice,
                 priority,
                 flags,
@@ -768,10 +886,14 @@ impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
                 blend_mode,
                 load_in_minimal_mode,
                 premul_alpha,
-                generate_sfd
+                generate_sfd,
             })
         } else {
-            Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: "SpriteSpec", message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "SpriteSpec",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -781,17 +903,25 @@ impl<'lua> PrototypeFromLua<'lua> for SpriteSpecWithoutFilename {
 pub struct SpriteNWaySheet {
     pub sprite: SpriteSpec,
     pub frames: u32, // 4 or 8
-
 }
 
 impl SpriteNWaySheet {
-    fn new<'lua>(value: mlua::Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable, frames: u32) -> LuaResult<Self> {
+    fn new<'lua>(
+        value: mlua::Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+        frames: u32,
+    ) -> LuaResult<Self> {
         if let mlua::Value::Table(t) = &value {
             let frames = t.get::<_, Option<u32>>("frames")?.unwrap_or(frames);
             let sprite = SpriteSpec::prototype_from_lua(value, lua, data_table)?;
-            Ok(Self{sprite, frames})
+            Ok(Self { sprite, frames })
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "SpriteNWaySheet", message: Some("Expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "SpriteNWaySheet",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -801,20 +931,33 @@ impl SpriteNWaySheet {
 pub struct Sprite4Way(pub DirectionalSprite);
 
 impl<'lua> PrototypeFromLua<'lua> for Sprite4Way {
-    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: LuaValue<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let LuaValue::Table(t) = &value {
             if let Some(sheets) = t.get::<_, Option<Vec<Value>>>("sheets")? {
-                let sheets = sheets.into_iter().map(|v| SpriteNWaySheet::new(v, lua, data_table, 4)).collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
+                let sheets = sheets
+                    .into_iter()
+                    .map(|v| SpriteNWaySheet::new(v, lua, data_table, 4))
+                    .collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
                 Ok(Self(sheets.into()))
             } else if let Some(sheet) = t.get::<_, Option<Value>>("sheet")? {
                 let sheets = vec![SpriteNWaySheet::new(sheet, lua, data_table, 4)?];
                 Ok(Self(sheets.into()))
             } else {
-                Ok(Self(DirectionalSprite::Directions(SpriteDirections::prototype_from_lua(value, lua, data_table)?)))
+                Ok(Self(DirectionalSprite::Directions(
+                    SpriteDirections::prototype_from_lua(value, lua, data_table)?,
+                )))
             }
         } else {
-            Err(LuaError::FromLuaConversionError { from: type_name, to: "Sprite8Way", message: Some("expected table".into()) })
+            Err(LuaError::FromLuaConversionError {
+                from: type_name,
+                to: "Sprite8Way",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -824,20 +967,33 @@ impl<'lua> PrototypeFromLua<'lua> for Sprite4Way {
 pub struct Sprite8Way(pub DirectionalSprite);
 
 impl<'lua> PrototypeFromLua<'lua> for Sprite8Way {
-    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: LuaValue<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let LuaValue::Table(t) = &value {
             if let Some(sheets) = t.get::<_, Option<Vec<Value>>>("sheets")? {
-                let sheets = sheets.into_iter().map(|v| SpriteNWaySheet::new(v, lua, data_table, 8)).collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
+                let sheets = sheets
+                    .into_iter()
+                    .map(|v| SpriteNWaySheet::new(v, lua, data_table, 8))
+                    .collect::<LuaResult<Vec<SpriteNWaySheet>>>()?;
                 Ok(Self(sheets.into()))
             } else if let Some(sheet) = t.get::<_, Option<Value>>("sheet")? {
                 let sheets = vec![SpriteNWaySheet::new(sheet, lua, data_table, 8)?];
                 Ok(Self(sheets.into()))
             } else {
-                Ok(Self(DirectionalSprite::Directions(SpriteDirections::prototype_from_lua(value, lua, data_table)?)))
+                Ok(Self(DirectionalSprite::Directions(
+                    SpriteDirections::prototype_from_lua(value, lua, data_table)?,
+                )))
             }
         } else {
-            Err(LuaError::FromLuaConversionError { from: type_name, to: "Sprite8Way", message: Some("expected table".into()) })
+            Err(LuaError::FromLuaConversionError {
+                from: type_name,
+                to: "Sprite8Way",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -845,7 +1001,7 @@ impl<'lua> PrototypeFromLua<'lua> for Sprite8Way {
 #[derive(Debug, Clone)]
 pub enum DirectionalSprite {
     Sheets(Vec<SpriteNWaySheet>),
-    Directions(SpriteDirections)
+    Directions(SpriteDirections),
 }
 
 impl From<Vec<SpriteNWaySheet>> for DirectionalSprite {
@@ -870,7 +1026,7 @@ pub struct SpriteDirections {
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RotatedSprite {
     #[use_self_vec]
-    pub layers: Vec<RotatedSpriteLayer>
+    pub layers: Vec<RotatedSpriteLayer>,
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite>
@@ -878,14 +1034,14 @@ pub struct RotatedSprite {
 pub struct RotatedSpriteLayer {
     #[use_self_forced]
     pub regular: RotatedSpriteSpec,
-    pub hr_version: Option<RotatedSpriteSpec>
+    pub hr_version: Option<RotatedSpriteSpec>,
 }
 
 /// <https://wiki.factorio.com/Types/RotatedSprite>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct RotatedSpriteSpec {
     pub sprites: Vec<SpriteSpec>, // If `filenames` is set, copy all properties to each object for each filename // FIXME
-    pub direction_count: u16
+    pub direction_count: u16,
 }
 
 /// <https://wiki.factorio.com/Types/SpriteVariations>
@@ -895,7 +1051,7 @@ pub type SpriteVariations = Vec<SpriteVariation>;
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SpriteVariation {
     #[use_self_vec]
-    pub layers: Vec<SpriteVariationLayer>
+    pub layers: Vec<SpriteVariationLayer>,
 }
 
 /// <https://wiki.factorio.com/Types/SpriteVariations>
@@ -903,7 +1059,7 @@ pub struct SpriteVariation {
 pub struct SpriteVariationLayer {
     #[use_self_forced]
     pub regular: SpriteVariationSpec,
-    pub hr_version: Option<SpriteVariationSpec>
+    pub hr_version: Option<SpriteVariationSpec>,
 }
 
 /// Extension of SpriteSpec, ignores dice and slice
@@ -917,7 +1073,7 @@ pub struct SpriteVariationSpec {
     #[default(1_u32)]
     pub repeat_count: u32, // Default: 1
     #[default(variation_count)]
-    pub line_length: u32 // Default: value of `variation_count`
+    pub line_length: u32, // Default: value of `variation_count`
 }
 
 /// <https://wiki.factorio.com/Types/SpriteFlags>
@@ -974,58 +1130,71 @@ impl<T: AsRef<str>> FromIterator<T> for SpriteFlags {
                 "alpha-mask" => result |= SpriteFlags::ALPHA_MASK,
                 "no-scale" => result |= SpriteFlags::NO_SCALE,
                 "mask" => result |= SpriteFlags::MASK | SpriteFlags::GROUP_NONE,
-                "icon" => result |= SpriteFlags::ICON |
-                    SpriteFlags::NO_CROP |
-                    SpriteFlags::NO_SCALE |
-                    SpriteFlags::MIPMAP |
-                    SpriteFlags::LINEAR_MINIFICATION |
-                    SpriteFlags::LINEAR_MAGNIFICATION |
-                    SpriteFlags::LINEAR_MIP_LEVEL |
-                    SpriteFlags::NOT_COMPRESSED |
-                    SpriteFlags::GROUP_ICON,
-                "gui" => result |= SpriteFlags::GUI |
-                    SpriteFlags::NO_CROP |
-                    SpriteFlags::NO_SCALE |
-                    SpriteFlags::MIPMAP |
-                    SpriteFlags::LINEAR_MINIFICATION |
-                    SpriteFlags::LINEAR_MAGNIFICATION |
-                    SpriteFlags::LINEAR_MIP_LEVEL |
-                    SpriteFlags::NOT_COMPRESSED |
-                    SpriteFlags::GROUP_GUI,
-                "gui-icon" => result |= SpriteFlags::GUI_ICON |
-                    SpriteFlags::NO_CROP |
-                    SpriteFlags::NO_SCALE |
-                    SpriteFlags::MIPMAP |
-                    SpriteFlags::LINEAR_MINIFICATION |
-                    SpriteFlags::LINEAR_MAGNIFICATION |
-                    SpriteFlags::NOT_COMPRESSED |
-                    SpriteFlags::GROUP_ICON,
-                "light" => result |= SpriteFlags::LIGHT |
-                    SpriteFlags::MIPMAP |
-                    SpriteFlags::LINEAR_MIP_LEVEL |
-                    SpriteFlags::LINEAR_MINIFICATION |
-                    SpriteFlags::LINEAR_MAGNIFICATION |
-                    SpriteFlags::GROUP_NONE,
-                "terrain" => result |= SpriteFlags::TERRAIN |
-                    SpriteFlags::MIPMAP |
-                    SpriteFlags::LINEAR_MIP_LEVEL |
-                    SpriteFlags::LINEAR_MINIFICATION |
-                    SpriteFlags::NO_CROP |
-                    SpriteFlags::GROUP_TERRAIN,
-                "terrain-effect-map" => result |= SpriteFlags::TERRAIN_EFFECT_MAP |
-                    SpriteFlags::MIPMAP |
-                    SpriteFlags::LINEAR_MIP_LEVEL |
-                    SpriteFlags::LINEAR_MINIFICATION |
-                    SpriteFlags::NO_CROP |
-                    SpriteFlags::GROUP_TERRAIN_EFFECT_MAP,
+                "icon" => {
+                    result |= SpriteFlags::ICON
+                        | SpriteFlags::NO_CROP
+                        | SpriteFlags::NO_SCALE
+                        | SpriteFlags::MIPMAP
+                        | SpriteFlags::LINEAR_MINIFICATION
+                        | SpriteFlags::LINEAR_MAGNIFICATION
+                        | SpriteFlags::LINEAR_MIP_LEVEL
+                        | SpriteFlags::NOT_COMPRESSED
+                        | SpriteFlags::GROUP_ICON
+                }
+                "gui" => {
+                    result |= SpriteFlags::GUI
+                        | SpriteFlags::NO_CROP
+                        | SpriteFlags::NO_SCALE
+                        | SpriteFlags::MIPMAP
+                        | SpriteFlags::LINEAR_MINIFICATION
+                        | SpriteFlags::LINEAR_MAGNIFICATION
+                        | SpriteFlags::LINEAR_MIP_LEVEL
+                        | SpriteFlags::NOT_COMPRESSED
+                        | SpriteFlags::GROUP_GUI
+                }
+                "gui-icon" => {
+                    result |= SpriteFlags::GUI_ICON
+                        | SpriteFlags::NO_CROP
+                        | SpriteFlags::NO_SCALE
+                        | SpriteFlags::MIPMAP
+                        | SpriteFlags::LINEAR_MINIFICATION
+                        | SpriteFlags::LINEAR_MAGNIFICATION
+                        | SpriteFlags::NOT_COMPRESSED
+                        | SpriteFlags::GROUP_ICON
+                }
+                "light" => {
+                    result |= SpriteFlags::LIGHT
+                        | SpriteFlags::MIPMAP
+                        | SpriteFlags::LINEAR_MIP_LEVEL
+                        | SpriteFlags::LINEAR_MINIFICATION
+                        | SpriteFlags::LINEAR_MAGNIFICATION
+                        | SpriteFlags::GROUP_NONE
+                }
+                "terrain" => {
+                    result |= SpriteFlags::TERRAIN
+                        | SpriteFlags::MIPMAP
+                        | SpriteFlags::LINEAR_MIP_LEVEL
+                        | SpriteFlags::LINEAR_MINIFICATION
+                        | SpriteFlags::NO_CROP
+                        | SpriteFlags::GROUP_TERRAIN
+                }
+                "terrain-effect-map" => {
+                    result |= SpriteFlags::TERRAIN_EFFECT_MAP
+                        | SpriteFlags::MIPMAP
+                        | SpriteFlags::LINEAR_MIP_LEVEL
+                        | SpriteFlags::LINEAR_MINIFICATION
+                        | SpriteFlags::NO_CROP
+                        | SpriteFlags::GROUP_TERRAIN_EFFECT_MAP
+                }
                 "shadow" => result |= SpriteFlags::SHADOW,
-                "smoke" => result |= SpriteFlags::SMOKE |
-                    SpriteFlags::MIPMAP |
-                    SpriteFlags::LINEAR_MINIFICATION |
-                    SpriteFlags::LINEAR_MAGNIFICATION |
-                    SpriteFlags::GROUP_SMOKE,
-                "decal" => result |= SpriteFlags::DECAL |
-                    SpriteFlags::GROUP_DECAL,
+                "smoke" => {
+                    result |= SpriteFlags::SMOKE
+                        | SpriteFlags::MIPMAP
+                        | SpriteFlags::LINEAR_MINIFICATION
+                        | SpriteFlags::LINEAR_MAGNIFICATION
+                        | SpriteFlags::GROUP_SMOKE
+                }
+                "decal" => result |= SpriteFlags::DECAL | SpriteFlags::GROUP_DECAL,
                 "low-object" => result |= SpriteFlags::LOW_OBJECT,
                 "trilinear-filtering" => result |= SpriteFlags::TRILINEAR_FILTERING,
                 /*
@@ -1097,7 +1266,7 @@ pub enum SpritePriority {
     Medium,
     Low,
     VeryLow,
-    NoAtlas
+    NoAtlas,
 }
 
 // ===== // Graphics Sets and Pictures // ===== //
@@ -1119,7 +1288,7 @@ pub struct RailPictures {
     pub curved_rail_horizontal_right_top: RailPieceLayers,
     pub curved_rail_horizontal_right_bottom: RailPieceLayers,
     pub curved_rail_horizontal_left_bottom: RailPieceLayers,
-    pub rail_endings: Sprite8Way
+    pub rail_endings: Sprite8Way,
 }
 
 /// <https://wiki.factorio.com/Types/RailPieceLayers>
@@ -1128,7 +1297,7 @@ pub struct RailPieceLayers {
     // TODO: checks
     pub metals: Vec<SpriteVariation>,
     pub backplayes: Vec<SpriteVariation>, // Must have same number of variations as `metals`
-    pub ties: Vec<SpriteVariation>, // Must have between 1 and 4 items
+    pub ties: Vec<SpriteVariation>,       // Must have between 1 and 4 items
     pub stone_path: Vec<SpriteVariation>, // Must have between 1 and 4 items
     pub stone_path_background: Option<Vec<SpriteVariation>>,
     pub segment_visualisation_middle: Option<Sprite>,
@@ -1151,7 +1320,7 @@ pub struct CircuitConnectorSprites {
     pub wire_pins_shadow: Option<Sprite>,
     pub led_blue_off: Option<Sprite>,
     pub blue_led_light_offset: Option<Factorio2DVector>,
-    pub red_green_led_light_offset: Option<Factorio2DVector>
+    pub red_green_led_light_offset: Option<Factorio2DVector>,
 }
 
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet>
@@ -1187,7 +1356,7 @@ pub struct BeaconGraphicsSet {
     pub light: Option<LightDefinition>,
     pub module_visualisations: Option<BeaconModuleVisualizations>,
     #[default(ModuleTintMode::SingleModule)]
-    pub module_tint_mode: ModuleTintMode // Default: "single-module"
+    pub module_tint_mode: ModuleTintMode, // Default: "single-module"
 }
 
 /// <https://wiki.factorio.com/Types/BeaconModuleVisualizations>
@@ -1198,7 +1367,7 @@ pub struct BeaconModuleVisualizations {
     pub use_for_empty_slots: bool, // Default: false
     #[default(0_i32)]
     pub tier_offset: i32, // Default: 0
-    pub slots: Option<Vec<Vec<BeaconModuleVisualization>>>
+    pub slots: Option<Vec<Vec<BeaconModuleVisualization>>>,
 }
 
 /// <https://wiki.factorio.com/Types/BeaconModuleVisualization>
@@ -1216,7 +1385,7 @@ pub struct BeaconModuleVisualization {
     pub apply_module_tint: ApplyModuleTint, // Default: "none"
     #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
-    pub pictures: Option<Vec<SpriteVariation>>
+    pub pictures: Option<Vec<SpriteVariation>>,
 }
 
 /// <https://wiki.factorio.com/Types/CharacterArmorAnimation>
@@ -1278,7 +1447,11 @@ pub enum WorkingVisualisationEffect {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for WorkingVisualisationEffect {
-    fn prototype_from_lua(value: LuaValue<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: LuaValue<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let s: String = lua.unpack(value)?;
         s.parse().map_err(LuaError::external)
     }
@@ -1330,7 +1503,7 @@ pub struct MiningDrillGraphicsSet {
     #[default(0_f32)]
     pub min_animation_progress: f32, // Default: 0
     pub circuit_connector_layer: CircuitConnectorRenderLayers, // Default: all "object" // TODO: load as string
-    pub circuit_connector_secondary_draw_order: CircuitConnectorSecondaryDrawOrder // Default: all 100
+    pub circuit_connector_secondary_draw_order: CircuitConnectorSecondaryDrawOrder, // Default: all 100
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_layer>
@@ -1339,12 +1512,17 @@ pub struct CircuitConnectorRenderLayers {
     pub north: RenderLayer,
     pub east: RenderLayer,
     pub south: RenderLayer,
-    pub west: RenderLayer
+    pub west: RenderLayer,
 }
 
 impl CircuitConnectorRenderLayers {
     pub fn new(render_layer: RenderLayer) -> Self {
-        Self{north: render_layer, east: render_layer, south: render_layer, west: render_layer}
+        Self {
+            north: render_layer,
+            east: render_layer,
+            south: render_layer,
+            west: render_layer,
+        }
     }
 }
 
@@ -1359,7 +1537,7 @@ pub struct OffshorePumpGraphicsSet {
     pub fluid_animation: Option<Animation4Way>,
     pub glass_pictures: Option<Sprite4Way>,
     pub base_pictures: Option<Sprite4Way>,
-    pub underwater_pictures: Option<Sprite4Way>
+    pub underwater_pictures: Option<Sprite4Way>,
 }
 
 /// <https://wiki.factorio.com/Prototype/Pipe#pictures>
@@ -1389,8 +1567,7 @@ pub struct PipePictures {
     low_temperature_flow: Sprite,
     middle_temperature_flow: Sprite,
     high_temperature_flow: Sprite,
-    gas_flow: Animation
-
+    gas_flow: Animation,
 }
 
 /// <https://wiki.factorio.com/Prototype/PipeToGround#pictures>
@@ -1399,14 +1576,14 @@ pub struct PipeToGroundPictures {
     down: Sprite,
     up: Sprite,
     left: Sprite,
-    ritgh: Sprite
+    ritgh: Sprite,
 }
 
 /// <https://wiki.factorio.com/Prototype/Pump#fluid_wagon_connector_graphics>
 #[derive(Debug, Clone)]
 pub struct PumpConnectorGraphicsFluidWagon {
     load_animations: PumpConnectorGraphics,
-    unload_animations: PumpConnectorGraphics
+    unload_animations: PumpConnectorGraphics,
 }
 
 /// <https://wiki.factorio.com/Types/PumpConnectorGraphics>
@@ -1433,7 +1610,7 @@ pub struct PumpConnectorGraphicsMapping {
 pub enum SimpleEntityVisuals {
     Pictures(SpriteVariations),
     Picture(Sprite),
-    Animations(AnimationVariations)
+    Animations(AnimationVariations),
 }
 
 /// <https://wiki.factorio.com/Prototype/SimpleEntityWithOwner#pictures>
@@ -1441,7 +1618,7 @@ pub enum SimpleEntityVisuals {
 pub enum SimpleEntityWithOwnerVisuals {
     Pictires(SpriteVariations),
     Pictire(Sprite4Way),
-    Animations(AnimationVariations)
+    Animations(AnimationVariations),
 }
 
 /// <https://wiki.factorio.com/Types/SpiderLegGraphicsSet>
@@ -1455,7 +1632,7 @@ pub struct SpiderLegGraphicsSet {
     upper_part_shadow: Option<SpiderLegPart>,
     lower_part_shadow: Option<SpiderLegPart>,
     upper_part_water_reflection: Option<SpiderLegPart>,
-    lower_part_water_reflection: Option<SpiderLegPart>
+    lower_part_water_reflection: Option<SpiderLegPart>,
 }
 
 /// <https://wiki.factorio.com/Types/SpiderLegPart>
@@ -1464,10 +1641,10 @@ pub struct SpiderLegPart {
     top_end: Option<Sprite>,
     middle: Option<Sprite>,
     bottom_end: Option<Sprite>,
-    middle_offset_from_top: f32, // Default: 0
+    middle_offset_from_top: f32,    // Default: 0
     middle_offset_from_bottom: f32, // Default: 0
-    top_end_length: f32, // Default: 0
-    bottom_end_length: f32 // Default: 0
+    top_end_length: f32,            // Default: 0
+    bottom_end_length: f32,         // Default: 0
 }
 
 /// <https://wiki.factorio.com/Prototype/StorageTank#pictures>
@@ -1477,7 +1654,7 @@ pub struct StorageTankPictures {
     window_background: Sprite,
     fluid_background: Sprite,
     flow_sprite: Sprite,
-    gas_flow: Animation
+    gas_flow: Animation,
 }
 
 /// <https://wiki.factorio.com/Prototype/TrainStop#light1>
@@ -1485,7 +1662,7 @@ pub struct StorageTankPictures {
 pub struct TrainStopLight {
     sprite: Sprite4Way,
     red_picture: Sprite4Way,
-    light: LightDefinition
+    light: LightDefinition,
 }
 
 /// <https://wiki.factorio.com/Prototype/TrainStop#drawing_boxes>
@@ -1494,25 +1671,25 @@ pub struct TrainStopDrawingBoxes {
     north: BoundingBox,
     east: BoundingBox,
     south: BoundingBox,
-    west: BoundingBox
+    west: BoundingBox,
 }
 
 /// <https://wiki.factorio.com/Prototype/TransportBeltConnectable#belt_animation_set>
 #[derive(Debug, Clone)]
 pub struct BeltAnimationSet {
     animation_set: RotatedAnimation,
-    east_index: u8, // Default: 1
-    west_index: u8, // Default: 2
-    north_index: u8, // Default: 3
-    south_index: u8, // Default: 4
+    east_index: u8,           // Default: 1
+    west_index: u8,           // Default: 2
+    north_index: u8,          // Default: 3
+    south_index: u8,          // Default: 4
     starting_south_index: u8, // Default: 13
-    ending_south_index: u8, // Default: 14
-    starting_west_index: u8, // Default: 15
-    ending_west_index: u8, // Default: 16
+    ending_south_index: u8,   // Default: 14
+    starting_west_index: u8,  // Default: 15
+    ending_west_index: u8,    // Default: 16
     starting_north_index: u8, // Default: 17
-    ending_north_index: u8, // Default: 18
-    starting_east_index: u8, // Default: 19
-    ending_east_index: u8, // Default: 20
+    ending_north_index: u8,   // Default: 18
+    starting_east_index: u8,  // Default: 19
+    ending_east_index: u8,    // Default: 20
     ending_patch: Option<Sprite4Way>,
     ends_with_stopper: bool, // Default: false
 }
@@ -1538,7 +1715,7 @@ pub struct BeltStructure {
     direction_in: Sprite4Way,
     direction_out: Sprite4Way,
     back_patch: Option<Sprite4Way>,
-    front_patch: Option<Sprite4Way>
+    front_patch: Option<Sprite4Way>,
 }
 
 /// <https://wiki.factorio.com/Prototype/LinkedBelt#structure>
@@ -1546,7 +1723,7 @@ pub struct BeltStructure {
 pub struct BeltStructureWithSideLoading {
     base_structure: BeltStructure,
     direction_in_side_loading: Option<Sprite4Way>,
-    direction_out_side_loading: Option<Sprite4Way>
+    direction_out_side_loading: Option<Sprite4Way>,
 }
 
 /// <https://wiki.factorio.com/Types/TransportBeltConnectorFrame>
@@ -1575,7 +1752,7 @@ pub struct TransportBeltConnectorFrame {
     frame_main_scanner_nw_ne: Animation,
     frame_main_scanner_sw_se: Animation,
     frame_back_patch: Option<SpriteVariations>,
-    frame_front_patch: Option<SpriteVariations>
+    frame_front_patch: Option<SpriteVariations>,
 }
 
 /// <https://wiki.factorio.com/Prototype/TransportBelt#belt_animation_set>
@@ -1595,14 +1772,14 @@ pub struct BeltAnimationSetIndexes {
 #[derive(Debug, Clone)]
 pub enum TreeVisuals {
     Pictures(TreePictures),
-    Variations(Vec<TreePrototypeVariation>) // Non-empty array
+    Variations(Vec<TreePrototypeVariation>), // Non-empty array
 }
 
 /// <https://wiki.factorio.com/Prototype/Tree#pictures>
 #[derive(Debug, Clone)]
 pub struct TreePictures {
     pictures: SpriteVariations,
-    color: Vec<Color>
+    color: Vec<Color>,
 }
 
 /// <https://wiki.factorio.com/Prototype/Tree#variations>
@@ -1616,7 +1793,7 @@ pub struct TreePrototypeVariation {
     disable_shadow_distortion_beginning_at_frame: u32, // Default: shadow.frame_count - 1
     normal: Option<Animation>,
     overlay: Option<Animation>,
-    water_reflection: Option<WaterReflectionDefinition>
+    water_reflection: Option<WaterReflectionDefinition>,
 }
 
 /// <https://wiki.factorio.com/Types/SpiderVehicleGraphicsSet>
@@ -1627,7 +1804,7 @@ pub struct SpiderVehicleGraphicsSet {
     animation: Option<RotatedAnimation>,
     shadow_animation: Option<RotatedAnimation>,
     base_render_layer: RenderLayer, // Default: "higher-object-under"
-    render_layer: RenderLayer, // Default: "wires-above"
+    render_layer: RenderLayer,      // Default: "wires-above"
     autopilot_destination_visualisation_render_layer: RenderLayer, // Default: "object"
     light: Option<LightDefinition>,
     eye_light: Option<LightDefinition>,
@@ -1637,7 +1814,7 @@ pub struct SpiderVehicleGraphicsSet {
     autopilot_destination_queue_visualisation: Option<Animation>,
     autopilot_path_visualisation_line_width: f32, // Default: 0.125
     autopilot_path_visualisation_on_map_line_width: f32, // Default: 2.0
-    light_positions: Vec<Vec<Factorio2DVector>>
+    light_positions: Vec<Vec<Factorio2DVector>>,
 }
 
 /// <https://wiki.factorio.com/Prototype/Wall#pictures>
@@ -1653,5 +1830,5 @@ pub struct WallPictures {
     ending_left: SpriteVariations,
     filling: Option<SpriteVariations>,
     water_connection_patch: Option<Sprite4Way>,
-    gate_connection_patch: Option<Sprite4Way>
+    gate_connection_patch: Option<Sprite4Way>,
 }

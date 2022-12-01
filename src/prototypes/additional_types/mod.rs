@@ -18,16 +18,16 @@ pub use tile_transitions::*;
 pub use tip_trigger::*;
 pub use trigger::*;
 
+use super::{DataTable, LocalisedString, PrototypeFromLua};
+use crate::prototypes::{GetPrototype, PrototypesErr};
+use factorio_lib_rs_derive::prot_from_str;
+use mlua::{prelude::*, FromLua, Lua, ToLua, Value};
+use std::collections::HashMap;
 use std::convert::From;
 use std::iter::FromIterator;
-use std::collections::HashMap;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use std::str::FromStr;
-use crate::prototypes::{GetPrototype, PrototypesErr};
-use super::{LocalisedString, PrototypeFromLua, DataTable};
-use mlua::{ToLua, Value, Lua, prelude::*, FromLua};
-use strum_macros::{EnumDiscriminants, EnumString, AsRefStr};
-use factorio_lib_rs_derive::prot_from_str;
+use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
 /// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
 #[derive(Debug, Clone)]
@@ -46,7 +46,11 @@ impl From<&str> for FileName {
 }
 
 impl<'lua> PrototypeFromLua<'lua> for FileName {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let string = String::from_lua(value, lua)?;
         Ok(Self(string))
     }
@@ -67,10 +71,18 @@ impl<'lua> FromLua<'lua> for Factorio2DVector {
             if let (Ok(x), Ok(y)) = (v_table.get::<_, f32>(1), v_table.get::<_, f32>(2)) {
                 Ok(Self(x, y))
             } else {
-                Err(mlua::Error::FromLuaConversionError{from: "table", to: "Factorio2DVector", message: Some("Expected table".into())})
+                Err(mlua::Error::FromLuaConversionError {
+                    from: "table",
+                    to: "Factorio2DVector",
+                    message: Some("Expected table".into()),
+                })
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio2DVector", message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError {
+                from: lua_value.type_name(),
+                to: "Factorio2DVector",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -82,13 +94,25 @@ pub struct Factorio3DVector(pub f32, pub f32, pub f32);
 impl<'lua> FromLua<'lua> for Factorio3DVector {
     fn from_lua(lua_value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
         if let mlua::Value::Table(v_table) = lua_value {
-            if let (Ok(x), Ok(y), Ok(z)) = (v_table.get::<_, f32>(1), v_table.get::<_, f32>(2), v_table.get::<_, f32>(3)) {
+            if let (Ok(x), Ok(y), Ok(z)) = (
+                v_table.get::<_, f32>(1),
+                v_table.get::<_, f32>(2),
+                v_table.get::<_, f32>(3),
+            ) {
                 Ok(Self(x, y, z))
             } else {
-                Err(mlua::Error::FromLuaConversionError{from: "table", to: "Factorio3DVector", message: Some("Expected table".into())})
+                Err(mlua::Error::FromLuaConversionError {
+                    from: "table",
+                    to: "Factorio3DVector",
+                    message: Some("Expected table".into()),
+                })
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError{from: lua_value.type_name(), to: "Factorio3DVector", message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError {
+                from: lua_value.type_name(),
+                to: "Factorio3DVector",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -99,7 +123,11 @@ impl<'lua> FromLua<'lua> for Factorio3DVector {
 pub struct KeySequence(pub String);
 
 impl<'lua> PrototypeFromLua<'lua> for KeySequence {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         Ok(Self(lua.unpack(value)?))
     }
 }
@@ -109,7 +137,11 @@ impl<'lua> PrototypeFromLua<'lua> for KeySequence {
 pub struct BoundingBox(pub Position, pub Position);
 
 impl<'lua> PrototypeFromLua<'lua> for BoundingBox {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let v = lua.unpack::<[Position; 2]>(value)?;
         Ok(Self(v[0], v[1]))
     }
@@ -142,10 +174,10 @@ impl BoundingBox {
     pub fn larger_than(&self, rhs: &Self) -> bool {
         let lhs: ((f32, f32), (f32, f32)) = self.into();
         let rhs: ((f32, f32), (f32, f32)) = rhs.into();
-        let lhs_width = (lhs.0.0 - lhs.1.0).abs();
-        let lhs_height = (lhs.0.1 - lhs.1.1).abs();
-        let rhs_width = (rhs.0.0 - rhs.1.0).abs();
-        let rhs_height = (rhs.0.1 - rhs.1.1).abs();
+        let lhs_width = (lhs.0 .0 - lhs.1 .0).abs();
+        let lhs_height = (lhs.0 .1 - lhs.1 .1).abs();
+        let rhs_width = (rhs.0 .0 - rhs.1 .0).abs();
+        let rhs_height = (rhs.0 .1 - rhs.1 .1).abs();
         lhs_width >= rhs_width && lhs_height >= rhs_height
     }
 }
@@ -170,7 +202,11 @@ impl<'lua> FromLua<'lua> for RealOrientation {
         if (0.0..1.0).contains(&v) {
             Ok(Self(v))
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "RealOrientation", message: Some("value must be in a range [0.0; 1.0)".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: type_name,
+                to: "RealOrientation",
+                message: Some("value must be in a range [0.0; 1.0)".into()),
+            })
         }
     }
 }
@@ -183,15 +219,29 @@ impl<'lua> FromLua<'lua> for Position {
     fn from_lua(value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let mlua::Value::Table(p_table) = value {
-            if let Some(pos) = p_table.get::<_, Option<f32>>("x")?.zip(p_table.get::<_, Option<f32>>("y")?) {
+            if let Some(pos) = p_table
+                .get::<_, Option<f32>>("x")?
+                .zip(p_table.get::<_, Option<f32>>("y")?)
+            {
                 Ok(Self::from(pos))
-            } else if let Some(pos) = p_table.get::<isize, Option<f32>>(1)?.zip(p_table.get::<isize, Option<f32>>(2)?) {
+            } else if let Some(pos) = p_table
+                .get::<isize, Option<f32>>(1)?
+                .zip(p_table.get::<isize, Option<f32>>(2)?)
+            {
                 Ok(Self::from(pos))
             } else {
-                Err(mlua::Error::FromLuaConversionError { from: type_name, to: "Position", message: Some("Expected x and y keys or an array".into()) })
+                Err(mlua::Error::FromLuaConversionError {
+                    from: type_name,
+                    to: "Position",
+                    message: Some("Expected x and y keys or an array".into()),
+                })
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "Potision", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: type_name,
+                to: "Potision",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -229,7 +279,8 @@ impl Color {
         Self(r, g, b, a)
     }
 
-    pub fn new_rgb(r: f32, g: f32, b: f32) -> Self { // r, g, b default is 0
+    pub fn new_rgb(r: f32, g: f32, b: f32) -> Self {
+        // r, g, b default is 0
         Self(r, g, b, 1.0)
     }
 }
@@ -254,13 +305,21 @@ impl<'lua> FromLua<'lua> for Color {
                         Ok(Self::new_rgb(red, grn, blu))
                     }
                 } else {
-                    Err(mlua::Error::FromLuaConversionError{from: "table", to: "Color", message: Some("Expected 3 or 4 items in array".into())})
+                    Err(mlua::Error::FromLuaConversionError {
+                        from: "table",
+                        to: "Color",
+                        message: Some("Expected 3 or 4 items in array".into()),
+                    })
                 }
             } else {
                 Ok(Self::new_rgba_opt(r, g, b, a))
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: "Color", message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "Color",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -270,7 +329,7 @@ impl<'lua> FromLua<'lua> for Color {
 #[strum(serialize_all = "kebab-case")]
 pub enum DifficultySetting {
     Normal,
-    Expensive
+    Expensive,
 }
 
 prot_from_str!(DifficultySetting);
@@ -281,7 +340,7 @@ prot_from_str!(DifficultySetting);
 pub enum ResearchQueueSetting {
     AfterVictory,
     Always,
-    Never
+    Never,
 }
 
 prot_from_str!(ResearchQueueSetting);
@@ -302,19 +361,33 @@ prot_from_str!(ModSettingType);
 pub enum MapGenPreset {
     // Decided by `default` field
     Default(MapGenPresetDefault),
-    NonDefault(Box<MapGenPresetNonDefault>)
+    NonDefault(Box<MapGenPresetNonDefault>),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for MapGenPreset {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let mlua::Value::Table(p_table) = &value {
-             if p_table.get::<_, bool>("default")? {
-                 Ok(Self::Default(MapGenPresetDefault::prototype_from_lua(value.clone(), lua, data_table)?))
-             } else {
-                 Ok(Self::NonDefault(Box::new(MapGenPresetNonDefault::prototype_from_lua(value.clone(), lua, data_table)?)))
-             }
+            if p_table.get::<_, bool>("default")? {
+                Ok(Self::Default(MapGenPresetDefault::prototype_from_lua(
+                    value.clone(),
+                    lua,
+                    data_table,
+                )?))
+            } else {
+                Ok(Self::NonDefault(Box::new(
+                    MapGenPresetNonDefault::prototype_from_lua(value.clone(), lua, data_table)?,
+                )))
+            }
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "MapGenPreset", message: Some("Expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "MapGenPreset",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -322,7 +395,7 @@ impl<'lua> PrototypeFromLua<'lua> for MapGenPreset {
 /// <https://wiki.factorio.com/Types/MapGenPreset#default>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapGenPresetDefault {
-    order: String
+    order: String,
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#default>
@@ -331,7 +404,7 @@ pub struct MapGenPresetNonDefault {
     order: String,
     // Should these be optional or just have defaults? TODO
     basic_settings: Option<MapGenPresetBasicSettings>,
-    advanced_settings: Option<MapGenPresetAdvancedSettings>
+    advanced_settings: Option<MapGenPresetAdvancedSettings>,
 }
 
 /// <https://wiki.factorio.com/Types/MapGenSize>
@@ -349,7 +422,7 @@ impl FromStr for MapGenSize {
             "normal" | "medium" | "regular" => Ok(Self(1.0)),
             "high" | "big" | "good" => Ok(Self((2.0_f64).sqrt())),
             "very-high" | "very-big" | "very-good" => Ok(Self(2.0)),
-            _ => Err(PrototypesErr::InvalidTypeStr("MapGenSize".into(), s.into()))
+            _ => Err(PrototypesErr::InvalidTypeStr("MapGenSize".into(), s.into())),
         }
     }
 }
@@ -363,7 +436,7 @@ pub struct CliffPlacementSettings {
     #[default(10.0_f32)]
     pub cliff_elevation_0: f32, // Default 10.0
     pub cliff_elevation_interval: f32,
-    pub richness: MapGenSize
+    pub richness: MapGenSize,
 }
 
 // TODO: defaults
@@ -373,7 +446,7 @@ pub struct CliffPlacementSettings {
 pub struct MapGenPresetBasicSettings {
     // Defaults are not documented for some f'ing reason
     pub terain_segmentation: MapGenSize, // Default is... Unknown
-    pub water: MapGenSize, // Same here
+    pub water: MapGenSize,               // Same here
     #[default(true)]
     pub default_enable_all_autoplace_controls: bool, // Default: true
     pub autoplace_controls: HashMap<String, AutoplaceSetting>, // key is AutoplaceControl name
@@ -386,7 +459,7 @@ pub struct MapGenPresetBasicSettings {
     pub height: u32,
     pub starting_area: MapGenSize,
     pub peaceful_mode: bool,
-    pub cliff_settings: CliffPlacementSettings
+    pub cliff_settings: CliffPlacementSettings,
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
@@ -394,7 +467,7 @@ pub struct MapGenPresetBasicSettings {
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct AutoplaceSettings {
     pub treat_missing_as_default: bool, // Doesn't look like it's optional or has a default...
-    pub settings: HashMap<String, AutoplaceSetting>
+    pub settings: HashMap<String, AutoplaceSetting>,
 }
 
 /// <https://lua-api.factorio.com/latest/Concepts.html#AutoplaceSetting>
@@ -402,7 +475,7 @@ pub struct AutoplaceSettings {
 pub struct AutoplaceSetting {
     pub frequency: Option<MapGenSize>,
     pub size: Option<MapGenSize>,
-    pub richness: Option<MapGenSize>
+    pub richness: Option<MapGenSize>,
 }
 
 // About defaults, quote: «All key/value pairs are optional, if not set they will just use the
@@ -414,7 +487,7 @@ pub struct MapGenPresetAdvancedSettings {
     pub pollution: MapGenPollution,
     pub enemy_evolution: MapGenEnemyEvolution,
     pub enemy_expansion: MapGenEnemyExpansion,
-    pub difficulty_settings: MapGenDifficultySettings
+    pub difficulty_settings: MapGenDifficultySettings,
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
@@ -423,19 +496,27 @@ pub struct MapGenPresetAdvancedSettings {
 pub struct MapGenPollution {
     pub enabled: bool,
     pub diffusion_ratio: f64, // Must be <= 0.25
-    pub ageing: f64, // Must be >= 0.5
+    pub ageing: f64,          // Must be >= 0.5
     pub enemy_attack_pollution_consumption_modifier: f64,
     pub min_pollution_to_damage_trees: f64,
-    pub pollution_restored_per_tree_damage: f64
+    pub pollution_restored_per_tree_damage: f64,
 }
 
 impl MapGenPollution {
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if self.diffusion_ratio > 0.25 {
-            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "MapGenPollution", message: Some("diffusion_ratio must be <= 0.25".into()) })
+            return Err(mlua::Error::FromLuaConversionError {
+                from: "table",
+                to: "MapGenPollution",
+                message: Some("diffusion_ratio must be <= 0.25".into()),
+            });
         }
         if self.ageing < 0.25 {
-            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "MapGenPollution", message: Some("ageing must be >= 0.25".into()) })
+            return Err(mlua::Error::FromLuaConversionError {
+                from: "table",
+                to: "MapGenPollution",
+                message: Some("ageing must be >= 0.25".into()),
+            });
         }
         Ok(())
     }
@@ -447,7 +528,7 @@ pub struct MapGenEnemyEvolution {
     pub enabled: bool,
     pub time_factor: f64,
     pub destroy_factor: f64,
-    pub pollution_factor: f64
+    pub pollution_factor: f64,
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
@@ -459,7 +540,7 @@ pub struct MapGenEnemyExpansion {
     pub settler_group_min_size: f64,
     pub settler_group_max_size: f64,
     pub max_expansion_cooldown: f64,
-    pub min_expansion_cooldown: f64
+    pub min_expansion_cooldown: f64,
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
@@ -468,7 +549,7 @@ pub struct MapGenDifficultySettings {
     pub recipe_difficulty: DifficultySetting,
     pub technology_difficulty: DifficultySetting,
     pub technology_price_multiplier: f64,
-    pub research_queue_setting: ResearchQueueSetting
+    pub research_queue_setting: ResearchQueueSetting,
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#pollution>
@@ -485,14 +566,14 @@ pub struct MapPollutionSettings {
     pub pollution_restored_per_tree_damage: f64,
     pub pollution_per_tree_damage: f64,
     pub max_pollution_to_restore_trees: f64,
-    pub enemy_attack_pollution_consumption_modifier: f64
+    pub enemy_attack_pollution_consumption_modifier: f64,
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#steering>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct MapSteering {
     pub default: MapSteeringSettings,
-    pub moving: MapSteeringSettings
+    pub moving: MapSteeringSettings,
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#steering>
@@ -501,7 +582,7 @@ pub struct MapSteeringSettings {
     pub radius: f64,
     pub separation_factor: f64,
     pub separation_force: f64,
-    pub force_unit_fuzzy_goto_behavior: bool
+    pub force_unit_fuzzy_goto_behavior: bool,
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#enemy_evolution>
@@ -510,7 +591,7 @@ pub struct MapEnemyEvolution {
     pub enabled: bool,
     pub time_factor: f64,
     pub destroy_factor: f64,
-    pub pollution_factor: f64
+    pub pollution_factor: f64,
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#enemy_expansion>
@@ -528,7 +609,7 @@ pub struct MapEnemyExpansion {
     pub settler_group_min_size: u32,
     pub settler_group_max_size: u32,
     pub min_expansion_cooldown: u32,
-    pub max_expansion_cooldown: u32
+    pub max_expansion_cooldown: u32,
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#unit_group>
@@ -546,7 +627,7 @@ pub struct MapUnitGroup {
     pub member_disown_distance: f64,
     pub tick_tolerance_when_member_arrives: u32,
     pub max_gathering_unit_groups: u32,
-    pub max_unit_group_size: u32
+    pub max_unit_group_size: u32,
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#path_finder>
@@ -583,13 +664,17 @@ pub struct MapPathFinder {
     pub min_steps_to_check_path_find_termination: u32,
     pub start_to_goal_cost_multiplier_to_terminate_path_find: f64,
     pub overload_levels: Vec<u32>,
-    pub overload_multipliers: Vec<f64>
+    pub overload_multipliers: Vec<f64>,
 }
 
 impl MapPathFinder {
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if self.fwd2bwd_ratio < 2 {
-            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "MapSettings.path_finder", message: Some("`fwd2bwd_ratio should not be less than 2`".into()) })
+            return Err(mlua::Error::FromLuaConversionError {
+                from: "table",
+                to: "MapSettings.path_finder",
+                message: Some("`fwd2bwd_ratio should not be less than 2`".into()),
+            });
         }
         Ok(())
     }
@@ -603,13 +688,19 @@ pub struct MapDifficultySettings {
     pub technology_difficulty: DifficultySetting,
     #[default(1.0_f64)]
     pub technology_price_multiplier: f64, // Default: 1.0 // Must be >= 0.001 and <= 1000.0
-    pub research_queue_setting: Option<ResearchQueueSetting>
+    pub research_queue_setting: Option<ResearchQueueSetting>,
 }
 
 impl MapDifficultySettings {
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if self.technology_price_multiplier < 0.001 || self.technology_price_multiplier > 1000.0 {
-            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "MapSettings.difficulty_settings", message: Some("`technology_price_multiplier` should be in a range [0.001, 1000.0]".into()) })
+            return Err(mlua::Error::FromLuaConversionError {
+                from: "table",
+                to: "MapSettings.difficulty_settings",
+                message: Some(
+                    "`technology_price_multiplier` should be in a range [0.001, 1000.0]".into(),
+                ),
+            });
         }
         Ok(())
     }
@@ -619,19 +710,31 @@ impl MapDifficultySettings {
 #[derive(Debug, Clone)]
 pub enum MouseCursorType {
     SystemCursor(SystemCursor),
-    CustomCursor(CustomCursor)
+    CustomCursor(CustomCursor),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for MouseCursorType {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(table) = &value {
             if let Some(s) = table.get::<_, Option<String>>("system_cursor")? {
-                Ok(Self::SystemCursor(s.parse().map_err(mlua::Error::external)?))
+                Ok(Self::SystemCursor(
+                    s.parse().map_err(mlua::Error::external)?,
+                ))
             } else {
-                Ok(Self::CustomCursor(CustomCursor::prototype_from_lua(value, lua, data_table)?))
+                Ok(Self::CustomCursor(CustomCursor::prototype_from_lua(
+                    value, lua, data_table,
+                )?))
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "MouseCursor", message: Some("Expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "MouseCursor",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -646,7 +749,7 @@ pub enum SystemCursor {
     WaitArrow,
     SizeAll,
     No,
-    Hand
+    Hand,
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
@@ -654,7 +757,7 @@ pub enum SystemCursor {
 pub struct CustomCursor {
     pub filename: FileName,
     pub hot_pixel_x: i16,
-    pub hot_pixel_y: i16
+    pub hot_pixel_y: i16,
 }
 
 // Make different constructors for variants with different field names, like `icon_tintable` in https://wiki.factorio.com/Prototype/ItemWithEntityData
@@ -662,19 +765,31 @@ pub struct CustomCursor {
 #[derive(Debug, Clone)]
 pub enum IconSpecification {
     Icon(IconSpec),
-    Icons(IconsSpec)
+    Icons(IconsSpec),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for IconSpecification {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(table) = &value {
             if table.contains_key("icons")? {
-                Ok(Self::Icons(IconsSpec::prototype_from_lua(value, lua, data_table)?))
+                Ok(Self::Icons(IconsSpec::prototype_from_lua(
+                    value, lua, data_table,
+                )?))
             } else {
-                Ok(Self::Icon(IconSpec::prototype_from_lua(value, lua, data_table)?))
+                Ok(Self::Icon(IconSpec::prototype_from_lua(
+                    value, lua, data_table,
+                )?))
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError{from: value.type_name(), to: "Iconspecification", message: Some("Expected table".into())})
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "Iconspecification",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -685,7 +800,7 @@ pub struct IconSpec {
     pub icon: FileName,
     pub icon_size: i16,
     #[default(0)]
-    pub icon_mipmaps: u8 // Default: 0
+    pub icon_mipmaps: u8, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/IconSpecification#Prototype_properties:_Option_1>
@@ -693,11 +808,15 @@ pub struct IconSpec {
 pub struct IconsSpec {
     pub icons: Vec<IconData>,
     // icon_size omitted here, it will be copied to each IconData
-    pub icon_mipmaps: u8 // Default: 0
+    pub icon_mipmaps: u8, // Default: 0
 }
 
 impl<'lua> PrototypeFromLua<'lua> for IconsSpec {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(table) = &value {
             let mut icons: Vec<IconData> = table.get_prot("icons", lua, data_table)?;
             let icon_mipmaps = table.get::<_, Option<u8>>("icon_mipmaps")?.unwrap_or(0);
@@ -711,10 +830,19 @@ impl<'lua> PrototypeFromLua<'lua> for IconsSpec {
                     icon.icon_size = Some(icon_size)
                 }
             };
-            Ok(Self{icons, icon_mipmaps})
+            Ok(Self {
+                icons,
+                icon_mipmaps,
+            })
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "IconsSpec",
-            message: Some("expected table. If you see this error message, something has gone VERY wrong".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "IconsSpec",
+                message: Some(
+                    "expected table. If you see this error message, something has gone VERY wrong"
+                        .into(),
+                ),
+            })
         }
     }
 }
@@ -731,7 +859,7 @@ pub struct IconData {
     #[default(1.0)]
     pub scale: f64, // Default: 1
     #[default(0)]
-    pub icon_mipmaps: u8 // Default: 0
+    pub icon_mipmaps: u8, // Default: 0
 }
 
 // TODO: fmt::Display
@@ -752,7 +880,7 @@ impl Energy {
             'E' => Some(1e18),
             'Z' => Some(1e21),
             'Y' => Some(1e24),
-            _ => None
+            _ => None,
         }
     }
 
@@ -766,7 +894,7 @@ impl Energy {
         chars.next_back()?;
         let second_last_char = chars.next_back()?;
         // Panics if split is on UTF-8 boundary
-        Some(s.split_at(s.len() - 2 + (second_last_char.is_ascii_digit() as usize))) 
+        Some(s.split_at(s.len() - 2 + (second_last_char.is_ascii_digit() as usize)))
     }
 }
 
@@ -776,7 +904,11 @@ impl FromStr for Energy {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.ends_with('W') || s.ends_with('J') {
             let (num, suffix) = Self::split_num_and_suffix(s).ok_or_else(|| Self::err_fn(s))?;
-            let multiplier = suffix.chars().next().and_then(Self::get_multiplier).ok_or_else(|| Self::err_fn(s))?;
+            let multiplier = suffix
+                .chars()
+                .next()
+                .and_then(Self::get_multiplier)
+                .ok_or_else(|| Self::err_fn(s))?;
             let mut value = num.parse::<f64>().map_err(|_| Self::err_fn(s))?;
             if s.ends_with('W') {
                 value /= 60.0
@@ -806,22 +938,33 @@ fn energy_parse() {
 #[derive(Debug, Clone)]
 pub enum ProductType {
     Item(String),
-    Fluid(String)
+    Fluid(String),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for ProductType {
-    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        _lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(table) = &value {
             if let Some(name) = table.get::<_, Option<String>>("item_product")? {
                 Ok(Self::Item(name))
             } else if let Some(name) = table.get::<_, Option<String>>("fluid_product")? {
                 Ok(Self::Fluid(name))
             } else {
-                Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ProductType",
-                message: Some("`item_product` or `fluid_product` must be defined".into()) })
+                Err(mlua::Error::FromLuaConversionError {
+                    from: value.type_name(),
+                    to: "ProductType",
+                    message: Some("`item_product` or `fluid_product` must be defined".into()),
+                })
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ProductType", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "ProductType",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -830,19 +973,34 @@ impl<'lua> PrototypeFromLua<'lua> for ProductType {
 #[derive(Debug, Clone)]
 pub enum ResearchTarget {
     All,
-    Technology(String)
+    Technology(String),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for ResearchTarget {
-    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        _lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(table) = &value {
-            if table.get::<_, Option<bool>>("research_all")?.unwrap_or(false) {
+            if table
+                .get::<_, Option<bool>>("research_all")?
+                .unwrap_or(false)
+            {
                 Ok(Self::All)
             } else {
-                Ok(Self::Technology(table.get::<_, Option<String>>("technology")?.unwrap_or_else(|| String::from(""))))
+                Ok(Self::Technology(
+                    table
+                        .get::<_, Option<String>>("technology")?
+                        .unwrap_or_else(|| String::from("")),
+                ))
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ResearchTarget", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "ResearchTarget",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -853,7 +1011,7 @@ impl<'lua> PrototypeFromLua<'lua> for ResearchTarget {
 pub enum AutoplaceControlCategory {
     Resource,
     Terrain,
-    Enemy
+    Enemy,
 }
 
 prot_from_str!(AutoplaceControlCategory);
@@ -863,7 +1021,7 @@ prot_from_str!(AutoplaceControlCategory);
 #[strum(serialize_all = "kebab-case")]
 pub enum ConsumingType {
     None,
-    GameOnly
+    GameOnly,
 }
 
 prot_from_str!(ConsumingType);
@@ -876,7 +1034,7 @@ pub enum CustomInputAction {
     SpawnItem,
     TogglePersonalRoboport,
     TogglePersonalLogisticRequests,
-    ToggleEquipmentMovementBonus
+    ToggleEquipmentMovementBonus,
 }
 
 prot_from_str!(CustomInputAction);
@@ -1032,64 +1190,180 @@ impl CollisionMask {
 impl<'lua> ToLua<'lua> for CollisionMask {
     fn to_lua(self, lua: &'lua Lua) -> LuaResult<Value<'lua>> {
         let mut result: HashMap<String, bool> = HashMap::new();
-        if (self & Self::GROUND_TILE).0 > 0 { result.insert("ground-tile".into(), true); };
-        if (self & Self::WATER_TILE).0 > 0 { result.insert("water-tile".into(), true); };
-        if (self & Self::RESOURCE_LAYER).0 > 0 { result.insert("resource-layer".into(), true); };
-        if (self & Self::DOODAD_LAYER).0 > 0 { result.insert("doodad-layer".into(), true); };
-        if (self & Self::FLOOR_LAYER).0 > 0 { result.insert("floor-layer".into(), true); };
-        if (self & Self::ITEM_LAYER).0 > 0 { result.insert("item-layer".into(), true); };
-        if (self & Self::GHOST_LAYER).0 > 0 { result.insert("ghost-layer".into(), true); };
-        if (self & Self::OBJECT_LAYER).0 > 0 { result.insert("object-layer".into(), true); };
-        if (self & Self::PLAYER_LAYER).0 > 0 { result.insert("player-layer".into(), true); };
-        if (self & Self::TRAIN_LAYER).0 > 0 { result.insert("train-layer".into(), true); };
-        if (self & Self::RAIL_LAYER).0 > 0 { result.insert("rail-layer".into(), true); };
-        if (self & Self::TRANSPORT_BELT_LAYER).0 > 0 { result.insert("transport-belt-layer".into(), true); };
-        if (self & Self::NOT_COLLIDING_WITH_ITSELF).0 > 0 { result.insert("not-colliding-with-itself".into(), true); };
-        if (self & Self::CONSIDER_TILE_TRANSITIONS).0 > 0 { result.insert("consider-tile-transitions".into(), true); };
-        if (self & Self::COLLIDING_WITH_TILES_ONLY).0 > 0 { result.insert("colliding-with-tiles-only".into(), true); };
-        if (self & Self::LAYER_13).0 > 0 { result.insert("layer-13".into(), true); };
-        if (self & Self::LAYER_14).0 > 0 { result.insert("layer-14".into(), true); };
-        if (self & Self::LAYER_15).0 > 0 { result.insert("layer-15".into(), true); };
-        if (self & Self::LAYER_16).0 > 0 { result.insert("layer-16".into(), true); };
-        if (self & Self::LAYER_17).0 > 0 { result.insert("layer-17".into(), true); };
-        if (self & Self::LAYER_18).0 > 0 { result.insert("layer-18".into(), true); };
-        if (self & Self::LAYER_19).0 > 0 { result.insert("layer-19".into(), true); };
-        if (self & Self::LAYER_20).0 > 0 { result.insert("layer-20".into(), true); };
-        if (self & Self::LAYER_21).0 > 0 { result.insert("layer-21".into(), true); };
-        if (self & Self::LAYER_22).0 > 0 { result.insert("layer-22".into(), true); };
-        if (self & Self::LAYER_23).0 > 0 { result.insert("layer-23".into(), true); };
-        if (self & Self::LAYER_24).0 > 0 { result.insert("layer-24".into(), true); };
-        if (self & Self::LAYER_25).0 > 0 { result.insert("layer-25".into(), true); };
-        if (self & Self::LAYER_26).0 > 0 { result.insert("layer-26".into(), true); };
-        if (self & Self::LAYER_27).0 > 0 { result.insert("layer-27".into(), true); };
-        if (self & Self::LAYER_28).0 > 0 { result.insert("layer-28".into(), true); };
-        if (self & Self::LAYER_29).0 > 0 { result.insert("layer-29".into(), true); };
-        if (self & Self::LAYER_30).0 > 0 { result.insert("layer-30".into(), true); };
-        if (self & Self::LAYER_31).0 > 0 { result.insert("layer-31".into(), true); };
-        if (self & Self::LAYER_32).0 > 0 { result.insert("layer-32".into(), true); };
-        if (self & Self::LAYER_33).0 > 0 { result.insert("layer-33".into(), true); };
-        if (self & Self::LAYER_34).0 > 0 { result.insert("layer-34".into(), true); };
-        if (self & Self::LAYER_35).0 > 0 { result.insert("layer-35".into(), true); };
-        if (self & Self::LAYER_36).0 > 0 { result.insert("layer-36".into(), true); };
-        if (self & Self::LAYER_37).0 > 0 { result.insert("layer-37".into(), true); };
-        if (self & Self::LAYER_38).0 > 0 { result.insert("layer-38".into(), true); };
-        if (self & Self::LAYER_39).0 > 0 { result.insert("layer-39".into(), true); };
-        if (self & Self::LAYER_40).0 > 0 { result.insert("layer-40".into(), true); };
-        if (self & Self::LAYER_41).0 > 0 { result.insert("layer-41".into(), true); };
-        if (self & Self::LAYER_42).0 > 0 { result.insert("layer-42".into(), true); };
-        if (self & Self::LAYER_43).0 > 0 { result.insert("layer-43".into(), true); };
-        if (self & Self::LAYER_44).0 > 0 { result.insert("layer-44".into(), true); };
-        if (self & Self::LAYER_45).0 > 0 { result.insert("layer-45".into(), true); };
-        if (self & Self::LAYER_46).0 > 0 { result.insert("layer-46".into(), true); };
-        if (self & Self::LAYER_47).0 > 0 { result.insert("layer-47".into(), true); };
-        if (self & Self::LAYER_48).0 > 0 { result.insert("layer-48".into(), true); };
-        if (self & Self::LAYER_49).0 > 0 { result.insert("layer-49".into(), true); };
-        if (self & Self::LAYER_50).0 > 0 { result.insert("layer-50".into(), true); };
-        if (self & Self::LAYER_51).0 > 0 { result.insert("layer-51".into(), true); };
-        if (self & Self::LAYER_52).0 > 0 { result.insert("layer-52".into(), true); };
-        if (self & Self::LAYER_53).0 > 0 { result.insert("layer-53".into(), true); };
-        if (self & Self::LAYER_54).0 > 0 { result.insert("layer-54".into(), true); };
-        if (self & Self::LAYER_55).0 > 0 { result.insert("layer-55".into(), true); };
+        if (self & Self::GROUND_TILE).0 > 0 {
+            result.insert("ground-tile".into(), true);
+        };
+        if (self & Self::WATER_TILE).0 > 0 {
+            result.insert("water-tile".into(), true);
+        };
+        if (self & Self::RESOURCE_LAYER).0 > 0 {
+            result.insert("resource-layer".into(), true);
+        };
+        if (self & Self::DOODAD_LAYER).0 > 0 {
+            result.insert("doodad-layer".into(), true);
+        };
+        if (self & Self::FLOOR_LAYER).0 > 0 {
+            result.insert("floor-layer".into(), true);
+        };
+        if (self & Self::ITEM_LAYER).0 > 0 {
+            result.insert("item-layer".into(), true);
+        };
+        if (self & Self::GHOST_LAYER).0 > 0 {
+            result.insert("ghost-layer".into(), true);
+        };
+        if (self & Self::OBJECT_LAYER).0 > 0 {
+            result.insert("object-layer".into(), true);
+        };
+        if (self & Self::PLAYER_LAYER).0 > 0 {
+            result.insert("player-layer".into(), true);
+        };
+        if (self & Self::TRAIN_LAYER).0 > 0 {
+            result.insert("train-layer".into(), true);
+        };
+        if (self & Self::RAIL_LAYER).0 > 0 {
+            result.insert("rail-layer".into(), true);
+        };
+        if (self & Self::TRANSPORT_BELT_LAYER).0 > 0 {
+            result.insert("transport-belt-layer".into(), true);
+        };
+        if (self & Self::NOT_COLLIDING_WITH_ITSELF).0 > 0 {
+            result.insert("not-colliding-with-itself".into(), true);
+        };
+        if (self & Self::CONSIDER_TILE_TRANSITIONS).0 > 0 {
+            result.insert("consider-tile-transitions".into(), true);
+        };
+        if (self & Self::COLLIDING_WITH_TILES_ONLY).0 > 0 {
+            result.insert("colliding-with-tiles-only".into(), true);
+        };
+        if (self & Self::LAYER_13).0 > 0 {
+            result.insert("layer-13".into(), true);
+        };
+        if (self & Self::LAYER_14).0 > 0 {
+            result.insert("layer-14".into(), true);
+        };
+        if (self & Self::LAYER_15).0 > 0 {
+            result.insert("layer-15".into(), true);
+        };
+        if (self & Self::LAYER_16).0 > 0 {
+            result.insert("layer-16".into(), true);
+        };
+        if (self & Self::LAYER_17).0 > 0 {
+            result.insert("layer-17".into(), true);
+        };
+        if (self & Self::LAYER_18).0 > 0 {
+            result.insert("layer-18".into(), true);
+        };
+        if (self & Self::LAYER_19).0 > 0 {
+            result.insert("layer-19".into(), true);
+        };
+        if (self & Self::LAYER_20).0 > 0 {
+            result.insert("layer-20".into(), true);
+        };
+        if (self & Self::LAYER_21).0 > 0 {
+            result.insert("layer-21".into(), true);
+        };
+        if (self & Self::LAYER_22).0 > 0 {
+            result.insert("layer-22".into(), true);
+        };
+        if (self & Self::LAYER_23).0 > 0 {
+            result.insert("layer-23".into(), true);
+        };
+        if (self & Self::LAYER_24).0 > 0 {
+            result.insert("layer-24".into(), true);
+        };
+        if (self & Self::LAYER_25).0 > 0 {
+            result.insert("layer-25".into(), true);
+        };
+        if (self & Self::LAYER_26).0 > 0 {
+            result.insert("layer-26".into(), true);
+        };
+        if (self & Self::LAYER_27).0 > 0 {
+            result.insert("layer-27".into(), true);
+        };
+        if (self & Self::LAYER_28).0 > 0 {
+            result.insert("layer-28".into(), true);
+        };
+        if (self & Self::LAYER_29).0 > 0 {
+            result.insert("layer-29".into(), true);
+        };
+        if (self & Self::LAYER_30).0 > 0 {
+            result.insert("layer-30".into(), true);
+        };
+        if (self & Self::LAYER_31).0 > 0 {
+            result.insert("layer-31".into(), true);
+        };
+        if (self & Self::LAYER_32).0 > 0 {
+            result.insert("layer-32".into(), true);
+        };
+        if (self & Self::LAYER_33).0 > 0 {
+            result.insert("layer-33".into(), true);
+        };
+        if (self & Self::LAYER_34).0 > 0 {
+            result.insert("layer-34".into(), true);
+        };
+        if (self & Self::LAYER_35).0 > 0 {
+            result.insert("layer-35".into(), true);
+        };
+        if (self & Self::LAYER_36).0 > 0 {
+            result.insert("layer-36".into(), true);
+        };
+        if (self & Self::LAYER_37).0 > 0 {
+            result.insert("layer-37".into(), true);
+        };
+        if (self & Self::LAYER_38).0 > 0 {
+            result.insert("layer-38".into(), true);
+        };
+        if (self & Self::LAYER_39).0 > 0 {
+            result.insert("layer-39".into(), true);
+        };
+        if (self & Self::LAYER_40).0 > 0 {
+            result.insert("layer-40".into(), true);
+        };
+        if (self & Self::LAYER_41).0 > 0 {
+            result.insert("layer-41".into(), true);
+        };
+        if (self & Self::LAYER_42).0 > 0 {
+            result.insert("layer-42".into(), true);
+        };
+        if (self & Self::LAYER_43).0 > 0 {
+            result.insert("layer-43".into(), true);
+        };
+        if (self & Self::LAYER_44).0 > 0 {
+            result.insert("layer-44".into(), true);
+        };
+        if (self & Self::LAYER_45).0 > 0 {
+            result.insert("layer-45".into(), true);
+        };
+        if (self & Self::LAYER_46).0 > 0 {
+            result.insert("layer-46".into(), true);
+        };
+        if (self & Self::LAYER_47).0 > 0 {
+            result.insert("layer-47".into(), true);
+        };
+        if (self & Self::LAYER_48).0 > 0 {
+            result.insert("layer-48".into(), true);
+        };
+        if (self & Self::LAYER_49).0 > 0 {
+            result.insert("layer-49".into(), true);
+        };
+        if (self & Self::LAYER_50).0 > 0 {
+            result.insert("layer-50".into(), true);
+        };
+        if (self & Self::LAYER_51).0 > 0 {
+            result.insert("layer-51".into(), true);
+        };
+        if (self & Self::LAYER_52).0 > 0 {
+            result.insert("layer-52".into(), true);
+        };
+        if (self & Self::LAYER_53).0 > 0 {
+            result.insert("layer-53".into(), true);
+        };
+        if (self & Self::LAYER_54).0 > 0 {
+            result.insert("layer-54".into(), true);
+        };
+        if (self & Self::LAYER_55).0 > 0 {
+            result.insert("layer-55".into(), true);
+        };
         result.to_lua(lua)
     }
 }
@@ -1104,7 +1378,7 @@ impl BitAnd for CollisionMask {
 
 impl BitAndAssign for CollisionMask {
     fn bitand_assign(&mut self, rhs: Self) {
-       *self = CollisionMask(self.0 & rhs.0)
+        *self = CollisionMask(self.0 & rhs.0)
     }
 }
 
@@ -1118,7 +1392,7 @@ impl BitOr for CollisionMask {
 
 impl BitOrAssign for CollisionMask {
     fn bitor_assign(&mut self, rhs: Self) {
-       *self = CollisionMask(self.0 | rhs.0)
+        *self = CollisionMask(self.0 | rhs.0)
     }
 }
 
@@ -1132,12 +1406,16 @@ impl BitXor for CollisionMask {
 
 impl BitXorAssign for CollisionMask {
     fn bitxor_assign(&mut self, rhs: Self) {
-       *self = CollisionMask(self.0 ^ rhs.0)
+        *self = CollisionMask(self.0 ^ rhs.0)
     }
 }
 
 impl<'lua> PrototypeFromLua<'lua> for CollisionMask {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let str_array = lua.unpack::<Vec<String>>(value)?;
         Ok(Self::from_iter(str_array))
     }
@@ -1190,7 +1468,9 @@ impl<T: AsRef<str>> FromIterator<T> for EntityPrototypeFlags {
                 "player-creation" => result |= Self::PLAYER_CREATION,
                 "building-direction-8-way" => result |= Self::BUILDING_DIRECTION_8_WAY,
                 "filter-directions" => result |= Self::FILTER_DIRECTIONS,
-                "fast-replaceable-no-build-while-moving" => result |= Self::FAST_REPLACEABLE_NO_BUILD_WHILE_MOVING,
+                "fast-replaceable-no-build-while-moving" => {
+                    result |= Self::FAST_REPLACEABLE_NO_BUILD_WHILE_MOVING
+                }
                 "breaths-air" => result |= Self::BREATHS_AIR,
                 "not-repairable" => result |= Self::NOT_REPAIRABLE,
                 "not-on-map" => result |= Self::NOT_ON_MAP,
@@ -1198,7 +1478,9 @@ impl<T: AsRef<str>> FromIterator<T> for EntityPrototypeFlags {
                 "not-deconstructable" => result |= Self::NOT_DECONSTRUCTABLE,
                 "hidden" => result |= Self::HIDDEN,
                 "hide-alt-info" => result |= Self::HIDE_ALT_INFO,
-                "fast-replaceable-no-cross-type-while-moving" => result |= Self::FAST_REPLACEABLE_NO_CROSS_TYPE_WHILE_MOVING,
+                "fast-replaceable-no-cross-type-while-moving" => {
+                    result |= Self::FAST_REPLACEABLE_NO_CROSS_TYPE_WHILE_MOVING
+                }
                 "no-gap-fill-while-building" => result |= Self::NO_GAR_FILL_WHILE_BUILDING,
                 "not-flammable" => result |= Self::NOT_FLAMMABLE,
                 "no-automated-item-removal" => result |= Self::NO_AUTOMATED_ITEM_REMOVAL,
@@ -1225,7 +1507,7 @@ impl BitAnd for EntityPrototypeFlags {
 
 impl BitAndAssign for EntityPrototypeFlags {
     fn bitand_assign(&mut self, rhs: Self) {
-       *self = EntityPrototypeFlags(self.0 & rhs.0)
+        *self = EntityPrototypeFlags(self.0 & rhs.0)
     }
 }
 
@@ -1239,7 +1521,7 @@ impl BitOr for EntityPrototypeFlags {
 
 impl BitOrAssign for EntityPrototypeFlags {
     fn bitor_assign(&mut self, rhs: Self) {
-       *self = EntityPrototypeFlags(self.0 | rhs.0)
+        *self = EntityPrototypeFlags(self.0 | rhs.0)
     }
 }
 
@@ -1253,12 +1535,16 @@ impl BitXor for EntityPrototypeFlags {
 
 impl BitXorAssign for EntityPrototypeFlags {
     fn bitxor_assign(&mut self, rhs: Self) {
-       *self = EntityPrototypeFlags(self.0 ^ rhs.0)
+        *self = EntityPrototypeFlags(self.0 ^ rhs.0)
     }
 }
 
 impl<'lua> PrototypeFromLua<'lua> for EntityPrototypeFlags {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let flag_arr = lua.unpack::<Vec<String>>(value)?;
         Ok(Self::from_iter(flag_arr))
     }
@@ -1269,37 +1555,60 @@ impl<'lua> PrototypeFromLua<'lua> for EntityPrototypeFlags {
 pub struct DamagePrototype {
     pub amount: f32,
     #[rename("type")]
-    pub r#type: String // Name of Damage type
+    pub r#type: String, // Name of Damage type
 }
 
 /// <https://wiki.factorio.com/Types/DamageTypeFilters>
 #[derive(Debug, Clone)]
 pub struct DamageTypeFilters {
     types: Vec<String>, // If String, converted to Vec<String> with one element // Name of DamageType prototype
-    whitelist: bool // Default: false
+    whitelist: bool,    // Default: false
 }
 
 impl<'lua> PrototypeFromLua<'lua> for DamageTypeFilters {
-    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        _lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let type_name = value.type_name();
         match value {
-            mlua::Value::String(s) => Ok(Self{types: vec![s.to_str()?.to_string()], whitelist: false}),
+            mlua::Value::String(s) => Ok(Self {
+                types: vec![s.to_str()?.to_string()],
+                whitelist: false,
+            }),
             mlua::Value::Table(t) => {
                 if let Some(v) = t.get::<_, Option<mlua::Value>>("types")? {
                     let types = match v {
                         mlua::Value::String(s) => vec![s.to_str()?.to_string()],
-                        mlua::Value::Table(t) => t.sequence_values::<String>().collect::<LuaResult<Vec<String>>>()?,
-                        _ => return Err(mlua::Error::FromLuaConversionError { from: v.type_name(), to: "DamageTypeFilters.types", message: Some("Expected table or a string".into()) })
+                        mlua::Value::Table(t) => t
+                            .sequence_values::<String>()
+                            .collect::<LuaResult<Vec<String>>>()?,
+                        _ => {
+                            return Err(mlua::Error::FromLuaConversionError {
+                                from: v.type_name(),
+                                to: "DamageTypeFilters.types",
+                                message: Some("Expected table or a string".into()),
+                            })
+                        }
                     };
                     let whitelist = t.get::<_, Option<bool>>("whitelist")?.unwrap_or(false);
-                    Ok(Self{types, whitelist})
+                    Ok(Self { types, whitelist })
                 } else {
-                    let types = t.sequence_values::<String>().collect::<LuaResult<Vec<String>>>()?;
-                    Ok(Self{types, whitelist: false})
+                    let types = t
+                        .sequence_values::<String>()
+                        .collect::<LuaResult<Vec<String>>>()?;
+                    Ok(Self {
+                        types,
+                        whitelist: false,
+                    })
                 }
             }
-            _ => Err(mlua::Error::FromLuaConversionError { from: type_name, to: "DamageTypeFilters",
-            message: Some("expected either a string, a table or an array".into()) })
+            _ => Err(mlua::Error::FromLuaConversionError {
+                from: type_name,
+                to: "DamageTypeFilters",
+                message: Some("expected either a string, a table or an array".into()),
+            }),
         }
     }
 }
@@ -1314,7 +1623,7 @@ pub enum ForceCondition {
     Friend,
     NotFriend,
     Same,
-    NotSame
+    NotSame,
 }
 
 prot_from_str!(ForceCondition);
@@ -1338,12 +1647,12 @@ pub struct MinableProperties {
     #[default(0_f64)]
     pub fluid_amount: f64, // Default: 0
     pub mining_particle: Option<String>, // Name of Prototype/Particle
-    pub required_fluid: Option<String>, // Name of Prototype/Fluid
+    pub required_fluid: Option<String>,  // Name of Prototype/Fluid
     // Converted to results item
     // if results are present, these are ignored
     //result: String,
     //count: u16, // Default: 1
-    pub mining_trigger: Option<Trigger>
+    pub mining_trigger: Option<Trigger>,
 }
 
 /// <https://wiki.factorio.com/Types/ProductPrototype>
@@ -1352,27 +1661,48 @@ pub enum ProductPrototype {
     /// type = "item" // Default
     Item(ItemProductPrototype),
     /// type = "fluid"
-    Fluid(FluidProductPrototype)
+    Fluid(FluidProductPrototype),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for ProductPrototype {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let mlua::Value::Table(table) = &value {
-            if table.get::<_, Option<f64>>("mining_time")?.is_some() { // this means that we are in MinableProperties definition
+            if table.get::<_, Option<f64>>("mining_time")?.is_some() {
+                // this means that we are in MinableProperties definition
                 let name = table.get::<_, String>("result")?;
                 let amount = table.get::<_, Option<u16>>("count")?.unwrap_or(1);
-                Ok(Self::Item(ItemProductPrototype::name_and_amount(name, amount)))
+                Ok(Self::Item(ItemProductPrototype::name_and_amount(
+                    name, amount,
+                )))
             } else if let Some(pp_type) = table.get::<_, Option<String>>("type")? {
                 match pp_type.as_ref() {
-                    "item" => Ok(Self::Item(ItemProductPrototype::prototype_from_lua(value, lua, data_table)?)),
-                    "fluid" => Ok(Self::Fluid(FluidProductPrototype::prototype_from_lua(value, lua, data_table)?)),
-                    _ => Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ProductPrototype", message: Some("Invalid `type`".into()) })
+                    "item" => Ok(Self::Item(ItemProductPrototype::prototype_from_lua(
+                        value, lua, data_table,
+                    )?)),
+                    "fluid" => Ok(Self::Fluid(FluidProductPrototype::prototype_from_lua(
+                        value, lua, data_table,
+                    )?)),
+                    _ => Err(mlua::Error::FromLuaConversionError {
+                        from: value.type_name(),
+                        to: "ProductPrototype",
+                        message: Some("Invalid `type`".into()),
+                    }),
                 }
             } else {
-                Ok(Self::Item(ItemProductPrototype::from_sequence(value, lua, data_table)?))
+                Ok(Self::Item(ItemProductPrototype::from_sequence(
+                    value, lua, data_table,
+                )?))
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ProductPrototype", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "ProductPrototype",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -1399,7 +1729,11 @@ pub struct ItemProductPrototype {
 impl ItemProductPrototype {
     fn post_extr_fn(&mut self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if self.probability < 0.0 || self.probability > 1.0 {
-            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "ItemProductPrototype", message: Some("`probability` must be in a range of [0; 1]".into()) })
+            return Err(mlua::Error::FromLuaConversionError {
+                from: "table",
+                to: "ItemProductPrototype",
+                message: Some("`probability` must be in a range of [0; 1]".into()),
+            });
         }
         if let Some(amount_min) = self.amount_min {
             if let Some(amount_max) = self.amount_max {
@@ -1413,18 +1747,34 @@ impl ItemProductPrototype {
 }
 
 impl<'lua> ItemProductPrototype {
-    fn from_sequence(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn from_sequence(
+        value: Value<'lua>,
+        _lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(t) = &value {
             let name = t.get::<_, String>(1)?;
             let amount = t.get::<_, u16>(2)?;
             Ok(Self::name_and_amount(name, amount))
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "ItemProductPrototype", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "ItemProductPrototype",
+                message: Some("expected table".into()),
+            })
         }
     }
 
     fn name_and_amount(name: String, amount: u16) -> Self {
-        Self{name, amount: Some(amount), show_details_in_recipe_tooltip: true, probability: 1.0, amount_min: None, amount_max: None, catalyst_amount: 0}
+        Self {
+            name,
+            amount: Some(amount),
+            show_details_in_recipe_tooltip: true,
+            probability: 1.0,
+            amount_min: None,
+            amount_max: None,
+            catalyst_amount: 0,
+        }
     }
 }
 
@@ -1452,16 +1802,28 @@ pub struct FluidProductPrototype {
 impl FluidProductPrototype {
     fn post_extr_fn(&mut self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if self.probability < 0.0 || self.probability > 1.0 {
-            return Err(mlua::Error::FromLuaConversionError { from: "table", to: "FluidProductPrototype", message: Some("`probability` must be in a range of [0; 1]".into()) })
+            return Err(mlua::Error::FromLuaConversionError {
+                from: "table",
+                to: "FluidProductPrototype",
+                message: Some("`probability` must be in a range of [0; 1]".into()),
+            });
         }
         if let Some(amount) = self.amount {
             if amount.is_sign_negative() {
-                return Err(mlua::Error::FromLuaConversionError { from: "table", to: "FluidProductPrototype", message: Some("`amount` can't be negative".into()) })
+                return Err(mlua::Error::FromLuaConversionError {
+                    from: "table",
+                    to: "FluidProductPrototype",
+                    message: Some("`amount` can't be negative".into()),
+                });
             }
         }
         if let Some(amount_min) = self.amount_min {
             if amount_min.is_sign_negative() {
-                return Err(mlua::Error::FromLuaConversionError { from: "table", to: "FluidProductPrototype", message: Some("`amount_min` can't be negative".into()) })
+                return Err(mlua::Error::FromLuaConversionError {
+                    from: "table",
+                    to: "FluidProductPrototype",
+                    message: Some("`amount_min` can't be negative".into()),
+                });
             }
             if let Some(amount_max) = self.amount_max {
                 if amount_max < amount_min {
@@ -1489,14 +1851,22 @@ prot_from_str!(RemoveDecoratives);
 pub struct ItemsToPlace(pub Vec<ItemToPlace>);
 
 impl<'lua> PrototypeFromLua<'lua> for ItemsToPlace {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let Ok(v) = ItemToPlace::prototype_from_lua(value.clone(), lua, data_table) {
             Ok(Self(vec![v]))
         } else if let Ok(v) = <Vec<ItemToPlace>>::prototype_from_lua(value, lua, data_table) {
             Ok(Self(v))
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "ItemsToPlace", message: Some("expected ItemToPlace or array of ItemToPlace".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: type_name,
+                to: "ItemsToPlace",
+                message: Some("expected ItemToPlace or array of ItemToPlace".into()),
+            })
         }
     }
 }
@@ -1505,7 +1875,7 @@ impl<'lua> PrototypeFromLua<'lua> for ItemsToPlace {
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ItemToPlace {
     pub item: String, // Name of Item
-    pub count: u32 // Can't be larger than the stack size of the item
+    pub count: u32,   // Can't be larger than the stack size of the item
 }
 
 /// <https://wiki.factorio.com/Prototype/Cliff#orientations>
@@ -1538,7 +1908,7 @@ pub struct OrientedCliffPrototypes {
 pub struct OrientedCliffPrototype {
     pub collision_bounding_box: BoundingBox,
     pub pictures: Vec<SpriteVariation>,
-    pub fill_volume: u32
+    pub fill_volume: u32,
 }
 
 /// <https://wiki.factorio.com/Prototype/RailRemnants#bending_type>
@@ -1555,7 +1925,7 @@ prot_from_str!(BendingType);
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ExplosionDefinition {
     pub name: String, // Name of Prototype/Entity
-    pub offset: Option<Factorio2DVector>
+    pub offset: Option<Factorio2DVector>,
 }
 
 /// <https://wiki.factorio.com/Types/Resistances>
@@ -1585,7 +1955,11 @@ pub struct Loot {
 impl Loot {
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if self.count_max <= 0.0 {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "Loot", message: Some("`count_max` must be > 0".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "Loot",
+                message: Some("`count_max` must be > 0".into()),
+            });
         }
         Ok(())
     }
@@ -1625,21 +1999,43 @@ pub enum EnergySource {
     /// <https://wiki.factorio.com/Types/EnergySource#Fluid_energy_source>
     Fluid(Box<FluidEnergySource>),
     /// <https://wiki.factorio.com/Types/EnergySource#Void_energy_source>
-    Void
+    Void,
 }
 
 impl<'lua> PrototypeFromLua<'lua> for EnergySource {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(t) = &value {
-            Ok(match t.get::<_, String>("type")?.parse::<EnergySourceDiscriminants>().map_err(LuaError::external)? {
-                EnergySourceDiscriminants::Electric => Self::Electric(ElectricEnergySource::prototype_from_lua(value, lua, data_table)?),
-                EnergySourceDiscriminants::Burner => Self::Burner(BurnerEnergySource::prototype_from_lua(value, lua, data_table)?),
-                EnergySourceDiscriminants::Heat => Self::Heat(Box::new(HeatEnergySource::prototype_from_lua(value, lua, data_table)?)),
-                EnergySourceDiscriminants::Fluid => Self::Fluid(Box::new(FluidEnergySource::prototype_from_lua(value, lua, data_table)?)),
-                EnergySourceDiscriminants::Void => Self::Void
-            })
+            Ok(
+                match t
+                    .get::<_, String>("type")?
+                    .parse::<EnergySourceDiscriminants>()
+                    .map_err(LuaError::external)?
+                {
+                    EnergySourceDiscriminants::Electric => Self::Electric(
+                        ElectricEnergySource::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                    EnergySourceDiscriminants::Burner => Self::Burner(
+                        BurnerEnergySource::prototype_from_lua(value, lua, data_table)?,
+                    ),
+                    EnergySourceDiscriminants::Heat => Self::Heat(Box::new(
+                        HeatEnergySource::prototype_from_lua(value, lua, data_table)?,
+                    )),
+                    EnergySourceDiscriminants::Fluid => Self::Fluid(Box::new(
+                        FluidEnergySource::prototype_from_lua(value, lua, data_table)?,
+                    )),
+                    EnergySourceDiscriminants::Void => Self::Void,
+                },
+            )
         } else {
-            Err(LuaError::FromLuaConversionError { from: value.type_name(), to: "EnergySource", message: Some("Expected table".into()) })
+            Err(LuaError::FromLuaConversionError {
+                from: value.type_name(),
+                to: "EnergySource",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -1655,7 +2051,7 @@ pub struct ElectricEnergySource {
     pub input_flow_limit: Energy, // Default: f64::MAX
     #[default(Energy(f64::MAX))]
     pub output_flow_limit: Energy, // Default: f64::MAX
-    pub drain: Option<Energy>
+    pub drain: Option<Energy>,
 }
 
 /// <https://wiki.factorio.com/Types/EnergySource#Burner>
@@ -1695,24 +2091,40 @@ pub struct HeatEnergySource {
     pub heat_pipe_covers: Option<Sprite4Way>,
     pub heat_picture: Option<Sprite4Way>,
     pub heat_glow: Option<Sprite4Way>,
-    pub connections: Option<Vec<HeatConnection>> // Up to 32 connections
+    pub connections: Option<Vec<HeatConnection>>, // Up to 32 connections
 }
 
 impl HeatEnergySource {
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if self.max_temperature < self.default_temperature {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "HeatEnergySource",
-                message: Some("`max_temperature` must be >= `default_temperature`".into()) }) }
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "HeatEnergySource",
+                message: Some("`max_temperature` must be >= `default_temperature`".into()),
+            });
+        }
         if self.min_working_temperature < self.default_temperature {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "HeatEnergySource",
-                message: Some("`min_working_temperature` must be >= `default_temperature`".into()) }) }
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "HeatEnergySource",
+                message: Some("`min_working_temperature` must be >= `default_temperature`".into()),
+            });
+        }
         if self.min_working_temperature > self.max_temperature {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "HeatEnergySource",
-                message: Some("`min_working_temperature` must be <= `max_temperature`".into()) }) }
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "HeatEnergySource",
+                message: Some("`min_working_temperature` must be <= `max_temperature`".into()),
+            });
+        }
         if let Some(connections) = &self.connections {
             if connections.len() > 32 {
-                return Err(LuaError::FromLuaConversionError { from: "table", to: "HeatEnergySource",
-                    message: Some("`connections` amount must be <= 32".into()) }) }
+                return Err(LuaError::FromLuaConversionError {
+                    from: "table",
+                    to: "HeatEnergySource",
+                    message: Some("`connections` amount must be <= 32".into()),
+                });
+            }
         }
         Ok(())
     }
@@ -1761,7 +2173,7 @@ prot_from_str!(ElectricUsagePriority);
 #[derive(Debug, Clone, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct SmokeSource {
-    pub name: String, // Name of Prototype/TrivialSmoke
+    pub name: String,   // Name of Prototype/TrivialSmoke
     pub frequency: f64, // Can't be negative, NaN or infinite
     #[default(0_f64)]
     pub offset: f64, // Default: 0
@@ -1790,13 +2202,20 @@ pub struct SmokeSource {
     #[default(0_f32)]
     pub starting_vertical_speed_deviation: f32, // Default: 0
     #[default(0.965_f32)]
-    pub vertical_speed_slowdown: f32 // Default: 0.965
+    pub vertical_speed_slowdown: f32, // Default: 0.965
 }
 
 impl SmokeSource {
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
-        if self.frequency.is_sign_negative() || self.frequency.is_nan() || self.frequency.is_infinite() {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "SmokeSource", message: Some("`frequency` can't be negative, NaN or infinite".into()) })
+        if self.frequency.is_sign_negative()
+            || self.frequency.is_nan()
+            || self.frequency.is_infinite()
+        {
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "SmokeSource",
+                message: Some("`frequency` can't be negative, NaN or infinite".into()),
+            });
         }
         Ok(())
     }
@@ -1806,7 +2225,7 @@ impl SmokeSource {
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct HeatConnection {
     pub position: Position,
-    pub direction: Direction
+    pub direction: Direction,
 }
 
 /// <https://wiki.factorio.com/Types/FluidBox>
@@ -1815,12 +2234,12 @@ pub struct HeatConnection {
 pub struct FluidBox {
     pub pipe_connections: Vec<PipeConnectionDefinition>, // Max: 256
     #[default(1_f64)]
-    pub base_area: f64, // Default: 1 // Must be > 0
+    pub base_area: f64,            // Default: 1 // Must be > 0
     #[default(0_f64)]
-    pub base_level: f64, // Default: 0
+    pub base_level: f64,           // Default: 0
     #[default(1_f64)]
-    pub height: f64, // Default: 1 // Must be > 0
-    pub filter: Option<String>, // Name of Prototype/Fluid
+    pub height: f64,               // Default: 1 // Must be > 0
+    pub filter: Option<String>,                          // Name of Prototype/Fluid
     #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
     pub pipe_covers: Option<Sprite4Way>,
@@ -1829,13 +2248,17 @@ pub struct FluidBox {
     #[default(ProductionType::None)]
     pub production_type: ProductionType, // Default: None
     //secondary_draw_order: u8, // Default: 1 // Converted to secondary_draw_orders // FIXME
-    pub secondary_draw_orders: SecondaryDrawOrders // Default: (north = 1, east = 1, south = 1, west = 1)
+    pub secondary_draw_orders: SecondaryDrawOrders, // Default: (north = 1, east = 1, south = 1, west = 1)
 }
 
 impl FluidBox {
     fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
         if self.pipe_connections.len() > 255 {
-            return Err(LuaError::FromLuaConversionError { from: "table", to: "FluidBox", message: Some("no more than 255 `pipe_connections` are allowed".into()) })
+            return Err(LuaError::FromLuaConversionError {
+                from: "table",
+                to: "FluidBox",
+                message: Some("no more than 255 `pipe_connections` are allowed".into()),
+            });
         }
         Ok(())
     }
@@ -1863,7 +2286,7 @@ pub enum Direction {
     South = 4,
     Southwest = 5,
     West = 6,
-    Northwest = 7
+    Northwest = 7,
 }
 
 impl<'lua> FromLua<'lua> for Direction {
@@ -1877,7 +2300,13 @@ impl<'lua> FromLua<'lua> for Direction {
             5 => Self::Southwest,
             6 => Self::West,
             7 => Self::Northwest,
-            _ => return Err(LuaError::FromLuaConversionError { from: "u8", to: "Direction", message: Some("Value must be in range [0; 7]".into()) })
+            _ => {
+                return Err(LuaError::FromLuaConversionError {
+                    from: "u8",
+                    to: "Direction",
+                    message: Some("Value must be in range [0; 7]".into()),
+                })
+            }
         })
     }
 }
@@ -1898,7 +2327,7 @@ prot_from_str!(ProductionType);
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct WireConnectionPoint {
     pub wire: WirePosition,
-    pub shadow: WirePosition
+    pub shadow: WirePosition,
 }
 
 /// <https://wiki.factorio.com/Types/WirePosition>
@@ -1906,7 +2335,7 @@ pub struct WireConnectionPoint {
 pub struct WirePosition {
     pub copper: Option<Factorio2DVector>,
     pub red: Option<Factorio2DVector>,
-    pub green: Option<Factorio2DVector>
+    pub green: Option<Factorio2DVector>,
 }
 
 /// <https://wiki.factorio.com/Types/SignalIDConnector>
@@ -1920,13 +2349,13 @@ pub struct SignalIDConnector {
 /// <https://wiki.factorio.com/Types/ModuleSpecification>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct ModuleSpecification {
-    pub module_slots: u16, // Default: 0
+    pub module_slots: u16,                                  // Default: 0
     pub module_info_max_icons_per_row: u8, // Default: width of selection box / 0,75
-    pub module_info_max_icon_rows: u8, // Default: width of selection box / 1.5
+    pub module_info_max_icon_rows: u8,     // Default: width of selection box / 1.5
     pub module_info_icon_shift: Factorio2DVector, // Default: (0, 0.7)
-    pub module_info_icon_scale: f32, // Default: 0.5
+    pub module_info_icon_scale: f32,       // Default: 0.5
     pub module_info_separation_multiplier: f32, // Default: 1.1
-    pub module_info_multi_row_initial_height_modifier: f32 // Default: -0.1
+    pub module_info_multi_row_initial_height_modifier: f32, // Default: -0.1
 }
 
 /// <https://wiki.factorio.com/Types/EffectTypeLimitation>
@@ -2017,7 +2446,7 @@ prot_from_str!(BoilerMode);
 /// <https://wiki.factorio.com/Types/FootprintParticle>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct FootprintParticle {
-    pub tiles: Vec<String>, // (Names) Name of a tile
+    pub tiles: Vec<String>,            // (Names) Name of a tile
     pub particle_name: Option<String>, // Name of a particle
     #[default(false)]
     pub use_as_default: bool, // Default: false
@@ -2052,8 +2481,8 @@ prot_from_str!(GuiMode);
 /// <https://wiki.factorio.com/Types/UnitSpawnDefinition>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct UnitSpawnDefinition {
-    pub unit: String, // Name of Entity
-    pub spawn_points: Vec<SpawnPoint> // `evolution_factor` must be ascending from entry to entry
+    pub unit: String,                  // Name of Entity
+    pub spawn_points: Vec<SpawnPoint>, // `evolution_factor` must be ascending from entry to entry
 }
 
 // Can also be converted from array
@@ -2079,7 +2508,7 @@ pub struct AmmoType {
     pub cooldown_modifier: f64, // Default: 1
     #[default(1_f64)]
     pub consumption_modifier: f64, // Default: 1
-    pub target_type: TargetType
+    pub target_type: TargetType,
 }
 
 impl AmmoType {
@@ -2104,15 +2533,25 @@ prot_from_str!(TargetType);
 
 /// <https://wiki.factorio.com/Types/CircularProjectileCreationSpecification>
 #[derive(Debug, Clone)]
-pub struct CircularProjectileCreationSpecification(pub Vec<CircularProjectileCreationSpecificationItem>);
+pub struct CircularProjectileCreationSpecification(
+    pub Vec<CircularProjectileCreationSpecificationItem>,
+);
 
 impl<'lua> PrototypeFromLua<'lua> for CircularProjectileCreationSpecification {
-    fn prototype_from_lua(value: Value<'lua>, _lua: &'lua Lua, _data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        _lua: &'lua Lua,
+        _data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         let type_name = value.type_name();
         if let Value::Table(t) = value {
             Ok(Self(t.sequence_values().collect::<LuaResult<_>>()?))
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "CircularProjectileCreationSpecification", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: type_name,
+                to: "CircularProjectileCreationSpecification",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -2127,7 +2566,11 @@ impl<'lua> FromLua<'lua> for CircularProjectileCreationSpecificationItem {
             let vector: Factorio2DVector = t.get(2)?;
             Ok(Self(orientation, vector))
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "CircularProjectileCreationSpecification item", message: Some("expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "CircularProjectileCreationSpecification item",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -2161,7 +2604,7 @@ pub struct CircularParticleCreationSpecification {
     pub creation_distance: f64,
     #[default(0_f64)]
     pub creation_distance_orientation: f64,
-    pub use_source_position: Option<bool>
+    pub use_source_position: Option<bool>,
 }
 
 /// <https://wiki.factorio.com/Types/HeatBuffer>
@@ -2182,7 +2625,7 @@ pub struct HeatBuffer {
     pub heat_pipe_covers: Option<Sprite4Way>,
     pub heat_picture: Option<Sprite4Way>,
     pub heat_glow: Option<Sprite4Way>,
-    pub connections: Option<Vec<HeatConnection>> // 32 max // TODO
+    pub connections: Option<Vec<HeatConnection>>, // 32 max // TODO
 }
 
 /// <https://wiki.factorio.com/Types/SignalColorMapping>
@@ -2191,7 +2634,7 @@ pub struct SignalColorMapping {
     #[rename("type")]
     r#type: SignalType,
     name: String, // Name of a signal
-    color: Color
+    color: Color,
 }
 
 /// <https://wiki.factorio.com/Types/SignalColorMapping#type>
@@ -2209,14 +2652,14 @@ prot_from_str!(SignalType);
 #[derive(Debug, Clone)]
 pub struct Instrument {
     name: String,
-    notes: Vec<Note>
+    notes: Vec<Note>,
 }
 
 /// <https://wiki.factorio.com/Prototype/ProgrammableSpeaker#instruments>
 #[derive(Debug, Clone)]
 pub struct Note {
     name: String,
-    sound: Sound
+    sound: Sound,
 }
 
 /// <https://wiki.factorio.com/Types/AnimatedVector>
@@ -2224,14 +2667,14 @@ pub struct Note {
 pub struct AnimatedVector {
     rotations: Vec<AnimatedVectorRotation>,
     //render_layer: Option<RenderLayer>, // Just copied over to all rotations
-    direction_shift: Option<AnimatedVectorDirectionShift>
+    direction_shift: Option<AnimatedVectorDirectionShift>,
 }
 
 /// <https://wiki.factorio.com/Types/AnimatedVector#rotations>
 #[derive(Debug, Clone)]
 pub struct AnimatedVectorRotation {
     frames: Vec<Factorio2DVector>, // Sizes of all arrays must be the same
-    render_layer: RenderLayer
+    render_layer: RenderLayer,
 }
 
 /// <https://wiki.factorio.com/Types/AnimatedVector#direction_shift>
@@ -2240,16 +2683,16 @@ pub struct AnimatedVectorDirectionShift {
     north: Option<Factorio2DVector>,
     east: Option<Factorio2DVector>,
     south: Option<Factorio2DVector>,
-    west: Option<Factorio2DVector>
+    west: Option<Factorio2DVector>,
 }
 
 /// <https://wiki.factorio.com/Types/UnitAISettings>
 #[derive(Debug, Clone)]
 pub struct UnitAISettings {
-    destroy_when_commands_fail: bool, // Default: false
+    destroy_when_commands_fail: bool,  // Default: false
     allow_try_return_to_spawner: bool, // Default: false
-    do_separation: bool, // Default: true
-    path_resolution_modifier: i8, // Default: 0 // Must be between -8 and 8
+    do_separation: bool,               // Default: true
+    path_resolution_modifier: i8,      // Default: 0 // Must be between -8 and 8
 }
 
 /// <https://wiki.factorio.com/Prototype/Unit#alternative_attacking_frame_sequence>
@@ -2265,14 +2708,14 @@ pub struct UnitAlternativeAttackingFrameSequence {
     attacking_animation_speed: f32,
     cooldown_animation_speed: f32,
     prepared_animation_speed: f32,
-    back_to_walk_animation_speed: f32
+    back_to_walk_animation_speed: f32,
 }
 
 /// <https://wiki.factorio.com/Types/SpiderEnginePrototype>
 #[derive(Debug, Clone)]
 pub struct SpiderEnginePrototype {
     military_target: bool, // Converted from Option<String>. if Some(_), set to true. If None, set to false
-    legs: Vec<SpiderLegSpecification> // Single leg is converted to Vec with one leg
+    legs: Vec<SpiderLegSpecification>, // Single leg is converted to Vec with one leg
 }
 
 /// <https://wiki.factorio.com/Types/SpiderLegSpecification>
@@ -2282,14 +2725,14 @@ pub struct SpiderLegSpecification {
     mount_position: Factorio2DVector,
     ground_position: Factorio2DVector,
     blocking_legs: Vec<u32>,
-    leg_hit_the_ground_trigger: Option<TriggerEffect>
+    leg_hit_the_ground_trigger: Option<TriggerEffect>,
 }
 
 /// <https://wiki.factorio.com/Prototype/FireFlame#burnt_patch_alpha_variations>
 #[derive(Debug, Clone)]
 pub struct FireFlameBurntPatchAlphaVariation {
     tile: String, // Name of a tile
-    alpha: f32
+    alpha: f32,
 }
 
 /// <https://wiki.factorio.com/Prototype/FlyingText>
@@ -2321,7 +2764,7 @@ pub struct EquipmentShape {
     width: u32,
     height: u32,
     shape_type: EquipmentShapeType,
-    points: Option<EquipmentShapePoints> // Mandatory if type is manual
+    points: Option<EquipmentShapePoints>, // Mandatory if type is manual
 }
 
 /// <https://wiki.factorio.com/Types/EquipmentShape#type>
@@ -2344,11 +2787,19 @@ pub type DaytimeColorLookupTable = Vec<DaytimeColorLookupTableItem>;
 pub struct DaytimeColorLookupTableItem(pub f64, pub ColorLookupTable);
 
 impl<'lua> PrototypeFromLua<'lua> for DaytimeColorLookupTableItem {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(t) = &value {
             Ok(Self(t.get(1_isize)?, t.get_prot(2, lua, data_table)?))
         } else {
-            Err(LuaError::FromLuaConversionError{ from: value.type_name(), to: "DaytimeColorLookupTable item", message: Some("expected table".into())})
+            Err(LuaError::FromLuaConversionError {
+                from: value.type_name(),
+                to: "DaytimeColorLookupTable item",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -2357,11 +2808,15 @@ impl<'lua> PrototypeFromLua<'lua> for DaytimeColorLookupTableItem {
 #[derive(Debug, Clone)]
 pub enum ColorLookupTable {
     Identity,
-    Filename(FileName)
+    Filename(FileName),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for ColorLookupTable {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::String(s) = &value {
             let s = s.to_str()?;
             if s == "identity" {
@@ -2370,7 +2825,11 @@ impl<'lua> PrototypeFromLua<'lua> for ColorLookupTable {
                 Ok(Self::Filename(s.into()))
             }
         } else {
-            Err(LuaError::FromLuaConversionError { from: value.type_name(), to: "ColorLookupTable", message: Some("expected string".into()) })
+            Err(LuaError::FromLuaConversionError {
+                from: value.type_name(),
+                to: "ColorLookupTable",
+                message: Some("expected string".into()),
+            })
         }
     }
 }
@@ -2380,7 +2839,7 @@ impl<'lua> PrototypeFromLua<'lua> for ColorLookupTable {
 pub struct PlaceAsTile {
     result: String, // Name of Tile
     condition: CollisionMask,
-    condition_size: i32
+    condition_size: i32,
 }
 
 /// <https://wiki.factorio.com/Types/ItemPrototypeFlags>
@@ -2467,7 +2926,7 @@ impl BitXorAssign for ItemPrototypeFlags {
 #[derive(Debug, Clone)]
 pub struct AmmoItemAmmoType {
     ammo_type: AmmoType,
-    source_type: AmmoSourceType
+    source_type: AmmoSourceType,
 }
 
 /// <https://wiki.factorio.com/Types/AmmoSourceType>
@@ -2528,7 +2987,8 @@ impl SelectionMode {
 
 impl<T: AsRef<str>> FromIterator<T> for SelectionMode {
     fn from_iter<I: IntoIterator<Item = T>>(in_arr: I) -> Self {
-        let mut result = Self(0);        for item in in_arr {
+        let mut result = Self(0);
+        for item in in_arr {
             match item.as_ref() {
                 "blueprint" => result |= Self::BLUEPRINT,
                 "deconstruct" => result |= Self::DECONSTRUCT,
@@ -2603,7 +3063,7 @@ pub struct Effect {
     consumption: EffectSpec,
     speed: EffectSpec,
     productivity: EffectSpec,
-    pollution: EffectSpec
+    pollution: EffectSpec,
 }
 
 /// <https://wiki.factorio.com/Types/Effect#consumption>
@@ -2620,37 +3080,38 @@ pub struct RecipeData {
     ingredients: Vec<IngredientPrototype>, // Max amount is 65535 // can be empty // Duplicates are not allowed
     results: Vec<ProductPrototype>, // `result` and `result_count` are converted to this // Duplicate entries not allowed // Takes priority over `result`
     // result_count: u32 // Default: 1
-    energy_required: f64, // Default: 0.5
-    emissions_multiplier: f64, // Default: 1
+    energy_required: f64,            // Default: 0.5
+    emissions_multiplier: f64,       // Default: 1
     requester_paste_multiplier: u32, // Default: 30
-    overload_multiplier: u32, // Default: 0
-    allow_inserter_overload: bool, // Default: true
-    enabled: bool, // Default: true
-    hidden: bool, // default: false
-    hide_from_stats: bool, // Default: false
+    overload_multiplier: u32,        // Default: 0
+    allow_inserter_overload: bool,   // Default: true
+    enabled: bool,                   // Default: true
+    hidden: bool,                    // default: false
+    hide_from_stats: bool,           // Default: false
     hide_from_player_crafting: bool, // Default: false
-    allow_decomposition: bool, // Default: true
-    allow_as_intermediate: bool, // Default: true
-    allow_intermediates: bool, // Default: true
-    always_show_made_in: bool, // Default: false
-    show_amount_in_title: bool, // Default: true
-    always_show_products: bool, // Default: false
-    unlock_results: bool, // Default: true
-    main_product: Option<String> // Name (not prototype reference) of recipe from `results`
+    allow_decomposition: bool,       // Default: true
+    allow_as_intermediate: bool,     // Default: true
+    allow_intermediates: bool,       // Default: true
+    always_show_made_in: bool,       // Default: false
+    show_amount_in_title: bool,      // Default: true
+    always_show_products: bool,      // Default: false
+    unlock_results: bool,            // Default: true
+    main_product: Option<String>,    // Name (not prototype reference) of recipe from `results`
 }
 
 /// <https://wiki.factorio.com/Types/IngredientPrototype>
 #[derive(Debug, Clone)]
-pub enum IngredientPrototype { // Determined by type
+pub enum IngredientPrototype {
+    // Determined by type
     Item(ItemIngredientPrototype),
-    Fluid(FluidIngredientPrototype)
+    Fluid(FluidIngredientPrototype),
 }
 
 /// <https://wiki.factorio.com/Types/ItemIngredientPrototype>
 #[derive(Debug, Clone)]
 pub struct ItemIngredientPrototype {
-    name: String, // Name of Item // Also index 1
-    amount: u16, // Also index 2
+    name: String,         // Name of Item // Also index 1
+    amount: u16,          // Also index 2
     catalyst_amount: u16, // Default: 0
 }
 
@@ -2663,7 +3124,7 @@ pub struct FluidIngredientPrototype {
     minimum_temperature: Option<f64>,
     maximum_temperature: Option<f64>,
     catalyst_amount: f64, // Default: 0
-    fluidbox_index: u32, // Default: 0
+    fluidbox_index: u32,  // Default: 0
 }
 
 /// <https://wiki.factorio.com/Prototype/Shortcut#action>
@@ -2695,15 +3156,15 @@ pub enum ShortcutStyle {
 /// <https://wiki.factorio.com/Prototype/Technology#Technology_data>
 #[derive(Debug, Clone)]
 pub struct TechnologyData {
-    upgrade: bool, // Default: false
-    enabled: bool, // Default: true
-    hidden: bool, // Default: false
-    visible_when_disabled: bool, // Default: false
+    upgrade: bool,                     // Default: false
+    enabled: bool,                     // Default: true
+    hidden: bool,                      // Default: false
+    visible_when_disabled: bool,       // Default: false
     ignore_tech_cost_multiplier: bool, // Default: false
     unit: TechnologyUnit,
     max_level: TechnologyMaxLevel,
     prerequisites: Vec<String>, // (Names) Name of Technology
-    effects: Vec<ModifierPrototype>
+    effects: Vec<ModifierPrototype>,
 }
 
 /// <https://wiki.factorio.com/Prototype/Technology#unit>
@@ -2720,7 +3181,7 @@ pub struct TechnologyUnit {
 #[derive(Debug, Clone)]
 pub enum TechnologyMaxLevel {
     Level(u32),
-    Infinite // "infinite"
+    Infinite, // "infinite"
 }
 
 /// <https://wiki.factorio.com/Types/ModifierPrototype>
@@ -2730,7 +3191,7 @@ pub struct ModifierPrototype {
     body: ModifierPrototypeBody,
     icon: IconSpecification,
     infer_icon: Option<bool>,
-    use_icon_overlay_constant: Option<bool> // This is stupid
+    use_icon_overlay_constant: Option<bool>, // This is stupid
 }
 
 /// <https://wiki.factorio.com/Types/ModifierPrototype>
@@ -2792,59 +3253,59 @@ pub enum ModifierPrototypeBody {
     Bool(BoolModifierPrototype),
     /// Variant for the types:
     /// "nothing"
-    Mothing(NothingModifierPrototype)
+    Mothing(NothingModifierPrototype),
 }
 
 /// <https://wiki.factorio.com/Types/SimpleModifierPrototype>
 #[derive(Debug, Clone)]
 pub struct SimpleModifierPrototype {
-    modifier: f64
+    modifier: f64,
 }
 
 /// <https://wiki.factorio.com/Types/TurretAttackModifierPrototype>
 #[derive(Debug, Clone)]
 pub struct TurretAttackModifierPrototype {
     turret_id: String, // Name of Entity
-    modifier: f64
+    modifier: f64,
 }
 
 /// <https://wiki.factorio.com/Types/AmmoDamageModifierPrototype>
 #[derive(Debug, Clone)]
 pub struct AmmoDamageModifierPrototype {
     ammo_category: String, // Name of AmmoCategory
-    modifier: f64
+    modifier: f64,
 }
 
 /// <https://wiki.factorio.com/Types/GiveItemModifierPrototype>
 #[derive(Debug, Clone)]
 pub struct GiveItemModifierPrototype {
-    item: String, // Name of Item
-    count: ItemCountType // Default: 1 // Must be > 0
+    item: String,         // Name of Item
+    count: ItemCountType, // Default: 1 // Must be > 0
 }
 
 /// <https://wiki.factorio.com/Types/GunSpeedModifierPrototype>
 #[derive(Debug, Clone)]
 pub struct GunSpeedModifierPrototype {
     ammo_category: String, // Name of AmmoCategory
-    modifier: f64
+    modifier: f64,
 }
 
 /// <https://wiki.factorio.com/Types/UnlockRecipeModifierPrototype>
 #[derive(Debug, Clone)]
 pub struct UnlockRecipeModifierPrototype {
-    recipe: String // Name of the recipe
+    recipe: String, // Name of the recipe
 }
 
 /// <https://wiki.factorio.com/Types/BoolModifierPrototype>
 #[derive(Debug, Clone)]
 pub struct BoolModifierPrototype {
-    modifier: bool
+    modifier: bool,
 }
 
 /// <https://wiki.factorio.com/Types/NothingModifierPrototype>
 #[derive(Debug, Clone)]
 pub struct NothingModifierPrototype {
-    effect_description: LocalisedString
+    effect_description: LocalisedString,
 }
 
 /// <https://wiki.factorio.com/Types/ModifierPrototype#type>
@@ -2935,11 +3396,15 @@ pub enum TipStatus {
 #[derive(Debug, Clone)]
 pub struct BoxSpecification {
     pub sprite: Sprite,
-    pub dimension_spec: BoxSpecificationDimensionSpec
+    pub dimension_spec: BoxSpecificationDimensionSpec,
 }
 
 impl<'lua> PrototypeFromLua<'lua> for BoxSpecification {
-    fn prototype_from_lua(value: Value<'lua>, lua: &'lua Lua, data_table: &mut DataTable) -> LuaResult<Self> {
+    fn prototype_from_lua(
+        value: Value<'lua>,
+        lua: &'lua Lua,
+        data_table: &mut DataTable,
+    ) -> LuaResult<Self> {
         if let Value::Table(t) = &value {
             let sprite = t.get_prot::<_, Sprite>("sprite", lua, data_table)?;
             let is_whole_box: bool = t.get("is_whole_box")?;
@@ -2951,9 +3416,16 @@ impl<'lua> PrototypeFromLua<'lua> for BoxSpecification {
                 let max_side_length: f64 = t.get("max_side_length")?;
                 BoxSpecificationDimensionSpec::NotWholeBox(max_side_length)
             };
-            Ok(Self{sprite, dimension_spec})
+            Ok(Self {
+                sprite,
+                dimension_spec,
+            })
         } else {
-            Err(LuaError::FromLuaConversionError { from: value.type_name(), to: "BoxSpecification", message: Some("expected table".into()) })
+            Err(LuaError::FromLuaConversionError {
+                from: value.type_name(),
+                to: "BoxSpecification",
+                message: Some("expected table".into()),
+            })
         }
     }
 }
@@ -2961,7 +3433,7 @@ impl<'lua> PrototypeFromLua<'lua> for BoxSpecification {
 #[derive(Debug, Clone)]
 pub enum BoxSpecificationDimensionSpec {
     WholeBox(f64, f64), // `is_whole_box` = true; `side_length` and `side_height`
-    NotWholeBox(f64), // `is_whole_box` = false (Default); `max_side_length`
+    NotWholeBox(f64),   // `is_whole_box` = false (Default); `max_side_length`
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
@@ -2971,7 +3443,7 @@ pub enum TrackType {
     MainTrack,
     Interlude,
     LateGame,
-    MenuTrack
+    MenuTrack,
 }
 
 prot_from_str!(TrackType);

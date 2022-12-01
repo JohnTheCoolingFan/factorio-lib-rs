@@ -3,11 +3,14 @@
 extern crate proc_macro;
 
 use core::fmt::Display;
+use core::iter::Iterator;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{self, Attribute, Ident, LitStr, Result, parse_macro_input, punctuated::Punctuated, Token, DeriveInput};
 use syn::spanned::Spanned;
-use core::iter::Iterator;
+use syn::{
+    self, parse_macro_input, punctuated::Punctuated, Attribute, DeriveInput, Ident, LitStr, Result,
+    Token,
+};
 
 #[proc_macro_derive(Prototype, attributes(ptype))]
 pub fn prototype_macro_derive(input: TokenStream) -> TokenStream {
@@ -733,7 +736,9 @@ fn impl_data_table_accessable_macro(ast: &syn::DeriveInput) -> TokenStream {
     let mut attrs = attrs
         .iter()
         .filter(|attr| attr.path.is_ident("data_table"))
-        .map(|attr| parse_data_table_attribute(attr).expect("failed to parse data_table attribute"));
+        .map(|attr| {
+            parse_data_table_attribute(attr).expect("failed to parse data_table attribute")
+        });
     let attr = attrs.next().unwrap();
     let gen = quote! {
         impl crate::prototypes::DataTableAccessable for #name {
@@ -783,7 +788,7 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 /// `#[default()]`, but applied before it and can return None. Can be used multiple times.
 /// Use only on Option<>
 /// Incompatible with: `use_self`, `use_self_vec`, `use_self_forced`
-/// 
+///
 /// `#[required]` - use only with fallback. Yes, this is still a hack but a better one.
 ///
 /// `#[rename(str)]` - str is a string supposed to be used for extracting field from table in case
@@ -793,7 +798,21 @@ fn parse_data_table_attribute(attr: &Attribute) -> Result<Ident> {
 ///
 /// `#[post_extr_fn(path)]` - path is a path to a function that needs to be executed after
 /// field extraction and mandatory_if checks
-#[proc_macro_derive(PrototypeFromLua, attributes(default, use_self, use_self_vec, use_self_forced, resource, mandatory_if, post_extr_fn, fallback, rename, required))]
+#[proc_macro_derive(
+    PrototypeFromLua,
+    attributes(
+        default,
+        use_self,
+        use_self_vec,
+        use_self_forced,
+        resource,
+        mandatory_if,
+        post_extr_fn,
+        fallback,
+        rename,
+        required
+    )
+)]
 pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     impl_prototype_from_lua_macro(&ast)
@@ -802,20 +821,30 @@ pub fn prototype_from_lua_macro_derive(input: TokenStream) -> TokenStream {
 fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let str_name = name.to_string();
-    let data = { match &ast.data {
-        syn::Data::Struct(d) => d,
-        _ => panic!("expected struct")
-    }};
-    let fields = { match &data.fields {
-        syn::Fields::Named(f) => f.named.iter(),
-        _ => panic!("expected named fields")
-    }};
-    let (parsed_fields, mut mandatory_exprs): (Vec<proc_macro2::TokenStream>, Vec<Option<proc_macro2::TokenStream>>) = fields
+    let data = {
+        match &ast.data {
+            syn::Data::Struct(d) => d,
+            _ => panic!("expected struct"),
+        }
+    };
+    let fields = {
+        match &data.fields {
+            syn::Fields::Named(f) => f.named.iter(),
+            _ => panic!("expected named fields"),
+        }
+    };
+    let (parsed_fields, mut mandatory_exprs): (
+        Vec<proc_macro2::TokenStream>,
+        Vec<Option<proc_macro2::TokenStream>>,
+    ) = fields
         .clone()
         .map(|f| prot_from_lua_field(f).unwrap())
         .unzip();
     mandatory_exprs.retain(|mex| mex.is_some());
-    let mandatory_exprs: Vec<proc_macro2::TokenStream> = mandatory_exprs.into_iter().map(|mex| mex.unwrap()).collect();
+    let mandatory_exprs: Vec<proc_macro2::TokenStream> = mandatory_exprs
+        .into_iter()
+        .map(|mex| mex.unwrap())
+        .collect();
     let field_names = fields.map(|f| &f.ident);
     let post_extr_fn: Option<syn::Path> = {
         let mut result = None;
@@ -831,7 +860,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
             #pef(&mut result, lua, data_table)?;
         }
     } else {
-        quote! { }
+        quote! {}
     };
     let gen = quote! {
         impl<'lua> crate::prototypes::PrototypeFromLua<'lua> for #name {
@@ -857,7 +886,7 @@ fn impl_prototype_from_lua_macro(ast: &syn::DeriveInput) -> TokenStream {
 #[derive(Default)]
 struct PrototypeFromLuaFieldAttrArgs {
     default_value: Option<proc_macro2::TokenStream>, // Incompatible with: use_self, use_self_vec
-    mandatory_if: Option<proc_macro2::TokenStream>,  // Incompatible with: default, use_self, use_self_vec
+    mandatory_if: Option<proc_macro2::TokenStream>, // Incompatible with: default, use_self, use_self_vec
     fallbacks: Vec<proc_macro2::TokenStream>,
     rename: Option<String>,
     required: bool,
@@ -866,7 +895,7 @@ struct PrototypeFromLuaFieldAttrArgs {
     use_self: bool,
     use_self_vec: bool,
     use_self_forced: bool,
-    is_resource: bool
+    is_resource: bool,
 }
 
 impl PrototypeFromLuaFieldAttrArgs {
@@ -888,72 +917,146 @@ impl PrototypeFromLuaFieldAttrArgs {
     }
 
     // This is horrifyingly inefficient, yet better than what was before
-    fn compat_check_matrix<'a, 'b>(&'a self) -> Vec<(&'b str, fn(&mut Self, &Attribute) -> Result<()>, Vec<(&'b str, bool)>)> {
+    fn compat_check_matrix<'a, 'b>(
+        &'a self,
+    ) -> Vec<(
+        &'b str,
+        fn(&mut Self, &Attribute) -> Result<()>,
+        Vec<(&'b str, bool)>,
+    )> {
         // These names don't make sense because they are not supposed to
         let sel = (
             ("use_self", self.use_self),
             ("use_self_vec", self.use_self_vec),
-            ("use_self_forced", self.use_self_forced)
+            ("use_self_forced", self.use_self_forced),
         );
         let oth = (
             ("default", self.default_value.is_some()),
             ("mandatory_if", self.mandatory_if.is_some()),
             ("resource", self.is_resource),
-            ("fallback", !self.fallbacks.is_empty())
+            ("fallback", !self.fallbacks.is_empty()),
         );
         vec![
-            ("default", |s, a| {s.default_value = Some(a.tokens.clone()); Ok(())}, vec![
-                ("mandatory_if", self.mandatory_if.is_some()),
-                sel.0, sel.1, sel.2
-            ]),
-            ("mandatory_if", |s, a| {s.mandatory_if = Some(a.tokens.clone()); Ok(())}, vec![
-                ("default", self.default_value.is_some()),
-                sel.0, sel.1, sel.2
-            ]),
-            ("resource", |s, _| {s.is_resource = true; Ok(())}, vec![
-                sel.0, sel.1, sel.2
-            ]),
-            ("use_self", |s, _| {s.use_self = true; Ok(())}, vec![
-                oth.0, oth.1, oth.2, oth.3,
-                sel.1, sel.2
-            ]),
-            ("use_self_vec", |s, _| {s.use_self_vec = true; Ok(())}, vec![
-                oth.0, oth.1, oth.2, oth.3,
-                sel.0, sel.2
-            ]),
-            ("use_self_forced", |s, _| {s.use_self_forced = true; Ok(())}, vec![
-                oth.0, oth.1, oth.2, oth.3,
-                sel.0, sel.1
-            ]),
-            ("fallback", |s, a| {s.fallbacks.push(a.tokens.clone()); Ok(())}, vec![
-                sel.0, sel.1, sel.2
-            ]),
-            ("rename", |s, a| {s.rename = Some(a.parse_args::<LitStr>()?.value()); Ok(())}, vec![]),
-            ("required", |s, _| {s.required = true; Ok(())}, vec![])
+            (
+                "default",
+                |s, a| {
+                    s.default_value = Some(a.tokens.clone());
+                    Ok(())
+                },
+                vec![
+                    ("mandatory_if", self.mandatory_if.is_some()),
+                    sel.0,
+                    sel.1,
+                    sel.2,
+                ],
+            ),
+            (
+                "mandatory_if",
+                |s, a| {
+                    s.mandatory_if = Some(a.tokens.clone());
+                    Ok(())
+                },
+                vec![
+                    ("default", self.default_value.is_some()),
+                    sel.0,
+                    sel.1,
+                    sel.2,
+                ],
+            ),
+            (
+                "resource",
+                |s, _| {
+                    s.is_resource = true;
+                    Ok(())
+                },
+                vec![sel.0, sel.1, sel.2],
+            ),
+            (
+                "use_self",
+                |s, _| {
+                    s.use_self = true;
+                    Ok(())
+                },
+                vec![oth.0, oth.1, oth.2, oth.3, sel.1, sel.2],
+            ),
+            (
+                "use_self_vec",
+                |s, _| {
+                    s.use_self_vec = true;
+                    Ok(())
+                },
+                vec![oth.0, oth.1, oth.2, oth.3, sel.0, sel.2],
+            ),
+            (
+                "use_self_forced",
+                |s, _| {
+                    s.use_self_forced = true;
+                    Ok(())
+                },
+                vec![oth.0, oth.1, oth.2, oth.3, sel.0, sel.1],
+            ),
+            (
+                "fallback",
+                |s, a| {
+                    s.fallbacks.push(a.tokens.clone());
+                    Ok(())
+                },
+                vec![sel.0, sel.1, sel.2],
+            ),
+            (
+                "rename",
+                |s, a| {
+                    s.rename = Some(a.parse_args::<LitStr>()?.value());
+                    Ok(())
+                },
+                vec![],
+            ),
+            (
+                "required",
+                |s, _| {
+                    s.required = true;
+                    Ok(())
+                },
+                vec![],
+            ),
         ]
     }
 
-    fn check_compat(&self, name: &str, incompats: &Vec<(&str, bool)>, attr: &Attribute) -> Result<()> {
+    fn check_compat(
+        &self,
+        name: &str,
+        incompats: &Vec<(&str, bool)>,
+        attr: &Attribute,
+    ) -> Result<()> {
         for incompat in incompats {
             if incompat.1 {
-                return Self::attr_error(attr, format!("`{}` is incompatible with `{}`", name, incompat.0))
+                return Self::attr_error(
+                    attr,
+                    format!("`{}` is incompatible with `{}`", name, incompat.0),
+                );
             }
         }
         Ok(())
     }
 }
 
-fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, Option<proc_macro2::TokenStream>)> { // First is get_expr, second is mandatory_if
+fn prot_from_lua_field(
+    field: &syn::Field,
+) -> Result<(proc_macro2::TokenStream, Option<proc_macro2::TokenStream>)> {
+    // First is get_expr, second is mandatory_if
     let ident = &field.ident;
     let field_type = &field.ty;
     let prototype_field_attrs = PrototypeFromLuaFieldAttrArgs::from_attrs(&field.attrs)?;
-    let str_field = prototype_field_attrs.rename.unwrap_or_else(|| ident.as_ref().unwrap().to_string());
+    let str_field = prototype_field_attrs
+        .rename
+        .unwrap_or_else(|| ident.as_ref().unwrap().to_string());
     let mut field_extr_type = if prototype_field_attrs.is_resource {
         quote! { String }
     } else {
         quote! { #field_type }
     };
-    if prototype_field_attrs.default_value.is_some() || !prototype_field_attrs.fallbacks.is_empty() {
+    if prototype_field_attrs.default_value.is_some() || !prototype_field_attrs.fallbacks.is_empty()
+    {
         field_extr_type = quote! { Option<#field_extr_type> };
     }
     let fallbacks = &prototype_field_attrs.fallbacks;
@@ -980,7 +1083,7 @@ fn prot_from_lua_field(field: &syn::Field) -> Result<(proc_macro2::TokenStream, 
             };
         }
     } else if prototype_field_attrs.use_self_vec {
-        quote! { 
+        quote! {
             prot_table.get_prot::<_, Option<#field_extr_type>>(#str_field, lua, data_table).transpose()
                 .unwrap_or_else(|| Ok(Vec::from([#get_self?])))?;
         }

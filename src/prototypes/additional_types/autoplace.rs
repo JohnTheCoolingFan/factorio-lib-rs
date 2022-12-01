@@ -1,7 +1,7 @@
 use mlua::ToLua;
-use strum::IntoEnumIterator;
 use std::convert::AsRef;
-use strum::{EnumDiscriminants, EnumString, AsRefStr, EnumIter};
+use strum::IntoEnumIterator;
+use strum::{AsRefStr, EnumDiscriminants, EnumIter, EnumString};
 
 use crate::prototypes::{GetPrototype, PrototypeFromLua};
 
@@ -30,18 +30,26 @@ pub struct AutoplaceSpecification {
 #[derive(Debug, Clone)]
 pub enum TileRestriction {
     Single(String),
-    OnTransitions([String; 2])
+    OnTransitions([String; 2]),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for TileRestriction {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, _data_table: &mut crate::prototypes::DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(
+        value: mlua::Value<'lua>,
+        lua: &'lua mlua::Lua,
+        _data_table: &mut crate::prototypes::DataTable,
+    ) -> mlua::Result<Self> {
         let type_name = value.type_name();
         if let Some(s) = lua.unpack::<Option<String>>(value.clone())? {
             Ok(Self::Single(s))
         } else if let Some(v) = lua.unpack::<Option<[String; 2]>>(value)? {
             Ok(Self::OnTransitions(v))
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: type_name, to: "AutoplaceSpecification.tile_restriction", message: Some("Expected eitehr a string or an array of two strings".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: type_name,
+                to: "AutoplaceSpecification.tile_restriction",
+                message: Some("Expected eitehr a string or an array of two strings".into()),
+            })
         }
     }
 }
@@ -52,19 +60,33 @@ pub enum AutoplaceSpecificationBase {
     /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
     Expression(ExpressionBasedAutoplaceSpecification),
     /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
-    Peak(PeakBasedAutoplaceSpecification)
+    Peak(PeakBasedAutoplaceSpecification),
 }
 
 impl<'lua> PrototypeFromLua<'lua> for AutoplaceSpecificationBase {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::prototypes::DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(
+        value: mlua::Value<'lua>,
+        lua: &'lua mlua::Lua,
+        data_table: &mut crate::prototypes::DataTable,
+    ) -> mlua::Result<Self> {
         if let mlua::Value::Table(t) = &value {
             if t.contains_key("probability_expression")? {
-                Ok(Self::Expression(ExpressionBasedAutoplaceSpecification::prototype_from_lua(value, lua, data_table)?))
+                Ok(Self::Expression(
+                    ExpressionBasedAutoplaceSpecification::prototype_from_lua(
+                        value, lua, data_table,
+                    )?,
+                ))
             } else {
-                Ok(Self::Peak(PeakBasedAutoplaceSpecification::prototype_from_lua(value, lua, data_table)?))
+                Ok(Self::Peak(
+                    PeakBasedAutoplaceSpecification::prototype_from_lua(value, lua, data_table)?,
+                ))
             }
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "AutoplaceSpecification", message: Some("Expected table".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "AutoplaceSpecification",
+                message: Some("Expected table".into()),
+            })
         }
     }
 }
@@ -74,7 +96,7 @@ impl<'lua> PrototypeFromLua<'lua> for AutoplaceSpecificationBase {
 pub struct ExpressionBasedAutoplaceSpecification {
     pub probability_expression: NoiseExpression,
     #[default(probability_expression.clone())]
-    pub richness_expression: NoiseExpression
+    pub richness_expression: NoiseExpression,
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
@@ -122,49 +144,79 @@ pub struct AutoplacePeak {
     #[default(1)]
     pub noise_scale: f64, // Default: 1
     #[use_self_forced]
-    pub dimensions: Dimensions // Default: empty // Only one of each type
+    pub dimensions: Dimensions, // Default: empty // Only one of each type
 }
 
 #[derive(Debug, Clone)]
 pub struct Dimensions(Vec<Dimension>);
 
 impl<'lua> PrototypeFromLua<'lua> for Dimensions {
-    fn prototype_from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua, data_table: &mut crate::prototypes::DataTable) -> mlua::Result<Self> {
+    fn prototype_from_lua(
+        value: mlua::Value<'lua>,
+        lua: &'lua mlua::Lua,
+        data_table: &mut crate::prototypes::DataTable,
+    ) -> mlua::Result<Self> {
         if let mlua::Value::Table(table) = &value {
             let mut result = Vec::new();
             for dimension in DimensionDiscriminants::iter() {
                 let dim_table = lua.create_table()?;
-                if let Some(optimal) = table.get::<_, Option<f64>>(format!("{}_optimal", dimension.as_ref()))? {
-                    dim_table.set("optimal", optimal)?; }
-                if let Some(range) = table.get::<_, Option<f64>>(format!("{}_range", dimension.as_ref()))? {
-                    dim_table.set("range", range)?; }
-                if let Some(max_range) = table.get::<_, Option<f64>>(format!("{}_max_range", dimension.as_ref()))? {
-                    dim_table.set("max_range", max_range)?; }
-                if let Some(top_property_limit) = table.get::<_, Option<f64>>(format!("{}_top_property_limit", dimension.as_ref()))? {
-                    dim_table.set("top_property_limit", top_property_limit)?; }
-                if let Ok(dimension_val) = DimensionSpec::prototype_from_lua(dim_table.to_lua(lua)?, lua, data_table) {
+                if let Some(optimal) =
+                    table.get::<_, Option<f64>>(format!("{}_optimal", dimension.as_ref()))?
+                {
+                    dim_table.set("optimal", optimal)?;
+                }
+                if let Some(range) =
+                    table.get::<_, Option<f64>>(format!("{}_range", dimension.as_ref()))?
+                {
+                    dim_table.set("range", range)?;
+                }
+                if let Some(max_range) =
+                    table.get::<_, Option<f64>>(format!("{}_max_range", dimension.as_ref()))?
+                {
+                    dim_table.set("max_range", max_range)?;
+                }
+                if let Some(top_property_limit) = table
+                    .get::<_, Option<f64>>(format!("{}_top_property_limit", dimension.as_ref()))?
+                {
+                    dim_table.set("top_property_limit", top_property_limit)?;
+                }
+                if let Ok(dimension_val) =
+                    DimensionSpec::prototype_from_lua(dim_table.to_lua(lua)?, lua, data_table)
+                {
                     result.push(match dimension {
-                        DimensionDiscriminants::StartingAreaWeight => Dimension::StartingAreaWeight(dimension_val),
+                        DimensionDiscriminants::StartingAreaWeight => {
+                            Dimension::StartingAreaWeight(dimension_val)
+                        }
                         DimensionDiscriminants::Elevation => Dimension::Elevation(dimension_val),
                         DimensionDiscriminants::Water => Dimension::Water(dimension_val),
-                        DimensionDiscriminants::Temperature => Dimension::Temperature(dimension_val),
+                        DimensionDiscriminants::Temperature => {
+                            Dimension::Temperature(dimension_val)
+                        }
                         DimensionDiscriminants::Aux => Dimension::Aux(dimension_val),
-                        DimensionDiscriminants::TierFromStart => Dimension::TierFromStart(dimension_val),
+                        DimensionDiscriminants::TierFromStart => {
+                            Dimension::TierFromStart(dimension_val)
+                        }
                         DimensionDiscriminants::Distance => Dimension::Distance(dimension_val),
                     })
                 }
             }
             Ok(Self(result))
         } else {
-            Err(mlua::Error::FromLuaConversionError { from: value.type_name(), to: "Dimensions",
-            message: Some("expected table. You shouldn't be able to get this error".into()) })
+            Err(mlua::Error::FromLuaConversionError {
+                from: value.type_name(),
+                to: "Dimensions",
+                message: Some("expected table. You shouldn't be able to get this error".into()),
+            })
         }
     }
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Dimensions>
 #[derive(Debug, Clone, EnumDiscriminants)]
-#[strum_discriminants(derive(EnumString, AsRefStr, EnumIter), strum(serialize_all="snake_case"))]
+#[strum_discriminants(
+    derive(EnumString, AsRefStr, EnumIter),
+    strum(serialize_all = "snake_case")
+)]
 pub enum Dimension {
     StartingAreaWeight(DimensionSpec),
     Elevation(DimensionSpec),
