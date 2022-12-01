@@ -1450,7 +1450,7 @@ impl<'lua> PrototypeFromLua<'lua> for WorkingVisualisationEffect {
     fn prototype_from_lua(
         value: LuaValue<'lua>,
         lua: &'lua Lua,
-        data_table: &mut DataTable,
+        _data_table: &mut DataTable,
     ) -> LuaResult<Self> {
         let s: String = lua.unpack(value)?;
         s.parse().map_err(LuaError::external)

@@ -133,7 +133,7 @@ impl<'lua> PrototypeFromLua<'lua> for KeySequence {
 }
 
 /// <https://wiki.factorio.com/Types/BoundingBox>
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BoundingBox(pub Position, pub Position);
 
 impl<'lua> PrototypeFromLua<'lua> for BoundingBox {
@@ -212,7 +212,7 @@ impl<'lua> FromLua<'lua> for RealOrientation {
 }
 
 /// Can be constructed from an array or table with x and y values <https://wiki.factorio.com/Types/Position>
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Position(pub i32, pub i32);
 
 impl<'lua> FromLua<'lua> for Position {
@@ -2814,8 +2814,8 @@ pub enum ColorLookupTable {
 impl<'lua> PrototypeFromLua<'lua> for ColorLookupTable {
     fn prototype_from_lua(
         value: Value<'lua>,
-        lua: &'lua Lua,
-        data_table: &mut DataTable,
+        _lua: &'lua Lua,
+        _data_table: &mut DataTable,
     ) -> LuaResult<Self> {
         if let Value::String(s) = &value {
             let s = s.to_str()?;
