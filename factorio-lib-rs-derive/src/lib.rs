@@ -59,7 +59,7 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
 
                 $( #[$other_field_attrs:meta] )*
                 $other_field_pub:vis
-                $other_field_name:ident : $other_field_type )* $(,)?
+                $other_field_name:ident : $other_field_type;ty )* $(,)?
             }
         ) => (
             impl #trait_name for $name {
