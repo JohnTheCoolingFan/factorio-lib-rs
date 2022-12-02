@@ -2,6 +2,7 @@
 
 extern crate proc_macro;
 
+use heck::AsSnakeCase;
 use core::fmt::Display;
 use core::iter::Iterator;
 use proc_macro::TokenStream;
@@ -21,6 +22,7 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
     let struct_name = &input.ident;
     let trait_name = format_ident!("{}", trait_name_str, span = input.ident.span());
     let trait_name__ = format_ident!("{}__", trait_name);
+    let parent_field_name = format_ident!("{}", AsSnakeCase(trait_name_str).to_string(), span = input.ident.span());
 
     let each_field_name = input
         .fields
@@ -59,22 +61,19 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
             $( #[$attrs:meta] )*
             $pub:vis
             struct $name:ident {
-                $( #[$parent_attrs:meta] )*
-                $parent_pub:vis
-                $parent:ident : $parent_type:ty $(,
-
+                $(
                 $( #[$other_field_attrs:meta] )*
                 $other_field_pub:vis
-                $other_field_name:ident : $other_field_type:ty )* $(,)?
+                $other_field_name:ident : $other_field_type:ty, )* $(,)?
             }
         ) => (
             impl #trait_name for $name {
                 #(
                     fn #each_field_name(&self) -> &#each_field_type {
-                        &self.$parent.#each_field_name()
+                        &self.#parent_field_name.#each_field_name()
                     }
                     fn #each_field_set_name(&mut self, value: #each_field_type) {
-                        self.$parent.#each_field_set_name(value)
+                        self.#parent_field_name.#each_field_set_name(value)
                     }
                 )*
             }
