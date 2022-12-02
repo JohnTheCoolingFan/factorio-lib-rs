@@ -12,7 +12,7 @@ use syn::{
     LitStr, Result, Token,
 };
 
-// Thanks to Yand!rs for this macro
+// Thanks to Yand!rs from Rust Community Discord server for this macro
 #[proc_macro_derive(Base)]
 pub fn base_macro_derive(input: TokenStream) -> TokenStream {
     let input: ItemStruct = parse_macro_input!(input);
