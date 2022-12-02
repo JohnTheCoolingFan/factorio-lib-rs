@@ -20,6 +20,7 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
     let trait_name_str = struct_name_str.trim_end_matches("Base").trim_end_matches("Spec");
     let struct_name = &input.ident;
     let trait_name = format_ident!("{}", trait_name_str, span = input.ident.span());
+    let trait_name__ = format_ident!("{}__", trait_name);
 
     let each_field_name = input
         .fields
@@ -54,8 +55,8 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
         }
 
         // Generate a declarative derive macro
-        macro_rules! #trait_name {(
-            $( #[attrs:meta] )*
+        macro_rules! #trait_name__ {(
+            $( #[$attrs:meta] )*
             $pub:vis
             struct $name:ident {
                 $( #[$parent_attrs:meta] )*
@@ -78,6 +79,7 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
                 )*
             }
         )}
+        pub(crate) use #trait_name__ as #trait_name;
     )
     .into()
 }
