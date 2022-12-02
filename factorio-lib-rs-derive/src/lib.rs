@@ -17,7 +17,7 @@ use syn::{
 pub fn base_macro_derive(input: TokenStream) -> TokenStream {
     let input: ItemStruct = parse_macro_input!(input);
     let struct_name_str = input.ident.to_string();
-    let trait_name_str = struct_name_str.trim_end_matches("Spec");
+    let trait_name_str = struct_name_str.trim_end_matches("Base").trim_end_matches("Spec");
     let struct_name = &input.ident;
     let trait_name = format_ident!("{}", trait_name_str, span = input.ident.span());
 
@@ -33,6 +33,8 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
     let each_field_type = input.fields.iter().map(|f| &f.ty).collect::<Vec<_>>();
 
     quote!(
+        impl Base for #struct_name {}
+
         pub trait #trait_name {
             #(
                 fn #each_field_name(&self) -> &#each_field_type;
@@ -44,6 +46,9 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
             #(
                 fn #each_field_name(&self) -> &#each_field_type {
                     &self.#each_field_name
+                }
+                fn #each_field_set_name(&mut self, value: #each_field_type) {
+                    self.#each_field_set_name(value)
                 }
             )*
         }
@@ -59,7 +64,7 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
 
                 $( #[$other_field_attrs:meta] )*
                 $other_field_pub:vis
-                $other_field_name:ident : $other_field_type;ty )* $(,)?
+                $other_field_name:ident : $other_field_type:ty )* $(,)?
             }
         ) => (
             impl #trait_name for $name {
