@@ -5,6 +5,9 @@
 //!
 //! Modules are gated behind features with corresponding names, which are all enabled by default.
 
+#[macro_use]
+extern crate macro_rules_attribute;
+
 // If concepts are disabled, LocalisedString can't be used...
 #[cfg(feature = "concepts")]
 pub mod concepts;
