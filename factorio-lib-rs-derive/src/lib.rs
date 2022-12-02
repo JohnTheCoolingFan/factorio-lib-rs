@@ -68,7 +68,7 @@ pub fn base_macro_derive(input: TokenStream) -> TokenStream {
                         &self.$parent.#each_field_name()
                     }
                     fn #each_field_set_name(&mut self, value: #each_field_type) {
-                        self.&parent.#each_field_set_name(value)
+                        self.$parent.#each_field_set_name(value)
                     }
                 )*
             }
