@@ -5,12 +5,77 @@ extern crate proc_macro;
 use core::fmt::Display;
 use core::iter::Iterator;
 use proc_macro::TokenStream;
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::spanned::Spanned;
 use syn::{
-    self, parse_macro_input, punctuated::Punctuated, Attribute, DeriveInput, Ident, LitStr, Result,
-    Token,
+    self, parse_macro_input, punctuated::Punctuated, Attribute, DeriveInput, Ident, ItemStruct,
+    LitStr, Result, Token,
 };
+
+// Thanks to Yand!rs for this macro
+#[proc_macro_derive(Base)]
+pub fn base_macro_derive(input: TokenStream) -> TokenStream {
+    let input: ItemStruct = parse_macro_input!(input);
+    let struct_name_str = input.ident.to_string();
+    let trait_name_str = struct_name_str.trim_end_matches("Spec");
+    let struct_name = &input.ident;
+    let trait_name = format_ident!("{}", trait_name_str, span = input.ident.span());
+
+    let each_field_name = input
+        .fields
+        .iter()
+        .map(|f| f.ident.as_ref().unwrap())
+        .collect::<Vec<_>>();
+    let each_field_set_name = each_field_name
+        .iter()
+        .map(|f| format_ident!("set_{}", f))
+        .collect::<Vec<_>>();
+    let each_field_type = input.fields.iter().map(|f| &f.ty).collect::<Vec<_>>();
+
+    quote!(
+        pub trait #trait_name {
+            #(
+                fn #each_field_name(&self) -> &#each_field_type;
+                fn #each_field_set_name(&mut self, value: #each_field_type);
+            )*
+        }
+
+        impl #trait_name for #struct_name {
+            #(
+                fn #each_field_name(&self) -> &#each_field_type {
+                    &self.#each_field_name
+                }
+            )*
+        }
+
+        // Generate a declarative derive macro
+        macro_rules! #trait_name {(
+            $( #[attrs:meta] )*
+            $pub:vis
+            struct $name:ident {
+                $( #[$parent_attrs:meta] )*
+                $parent_pub:vis
+                $parent:ident : $parent_type:ty $(,
+
+                $( #[$other_field_attrs:meta] )*
+                $other_field_pub:vis
+                $other_field_name:ident : $other_field_type )* $(,)?
+            }
+        ) => (
+            impl #trait_name for $name {
+                #(
+                    fn #each_field_name(&self) -> &#each_field_type {
+                        &self.$parent.#each_field_name()
+                    }
+                    fn #each_field_set_name(&mut self, value: #each_field_type) {
+                        self.&parent.#each_field_set_name(value)
+                    }
+                )*
+            }
+        )}
+    )
+    .into()
+}
 
 #[proc_macro_derive(Prototype, attributes(ptype))]
 pub fn prototype_macro_derive(input: TokenStream) -> TokenStream {
