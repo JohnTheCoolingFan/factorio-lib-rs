@@ -16,6 +16,8 @@ impl Prototype for AbstractEntity {
     }
 }
 
+// Executes get() on every specified prototype category, returning the first match. Errors if no
+// prototypes with this name found  in corresponding category.
 macro_rules! abstract_prototype_get {(
     $data_table:ident, $name:ident,
     $( $ptype:ident $(,)? )*
