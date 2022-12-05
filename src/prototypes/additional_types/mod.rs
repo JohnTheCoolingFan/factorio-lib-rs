@@ -18,7 +18,7 @@ pub use tile_transitions::*;
 pub use tip_trigger::*;
 pub use trigger::*;
 
-use super::{DataTable, LocalisedString, PrototypeFromLua};
+use super::{Base, DataTable, LocalisedString, PrototypeFromLua};
 use crate::prototypes::{GetPrototype, PrototypesErr};
 use factorio_lib_rs_derive::prot_from_str;
 use mlua::{prelude::*, FromLua, Lua, ToLua, Value};

@@ -11,7 +11,7 @@ use mlua::prelude::*;
 use std::collections::HashMap;
 
 /// <https://wiki.factorio.com/Prototype/UtilityConstants>
-#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, PrototypeFromLua)]
 #[data_table(utility_constants)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct UtilityConstants {
@@ -342,7 +342,7 @@ impl UtilityConstantsEntityRendererSearchBoxLimits {
 }
 
 /// <https://wiki.factorio.com/Prototype/UtilitySounds>
-#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, PrototypeFromLua)]
 #[data_table(utility_sounds)]
 pub struct UtilitySounds {
     pub name: String,
@@ -412,7 +412,7 @@ pub struct UtilitySounds {
 }
 
 /// <https://wiki.factorio.com/Prototype/UtilitySprites>
-#[derive(Debug, Clone, Prototype, PrototypeBase, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, PrototypeFromLua)]
 #[data_table(utility_sprites)]
 pub struct UtilitySprites {
     // Only one instance allowed

@@ -1,13 +1,10 @@
 use super::graphics::RenderLayer;
 use super::sound::Sound;
 use super::{
-    BoundingBox, CollisionMask, CollisionMode, DamagePrototype, DamageTypeFilters,
+    Base, BoundingBox, CollisionMask, CollisionMode, DamagePrototype, DamageTypeFilters,
     EntityPrototypeFlags, Factorio2DVector, ForceCondition,
 };
 use crate::prototypes::{DataTable, GetPrototype, PrototypeFromLua};
-use factorio_lib_rs_derive::{
-    CreateEntityTriggerEffectItemBase, TriggerEffectItemBase, TriggerItemBase,
-};
 use std::cmp;
 use strum::{EnumDiscriminants, EnumString};
 
@@ -61,8 +58,8 @@ impl<'lua> PrototypeFromLua<'lua> for Trigger {
 }
 
 /// <https://wiki.factorio.com/Types/TriggerItem>
-#[derive(Debug, Clone, PrototypeFromLua)]
-pub struct TriggerItem {
+#[derive(Debug, Clone, PrototypeFromLua, Base)]
+pub struct TriggerItemBase {
     #[default(EntityPrototypeFlags::ALL)]
     pub entity_flags: EntityPrototypeFlags, // Default: all flags
     #[default(false)]
@@ -80,32 +77,20 @@ pub struct TriggerItem {
     pub force: ForceCondition, // Default: all forces
 }
 
-/// <https://wiki.factorio.com/Types/TriggerItem>
-pub trait TriggerItemBase {
-    fn entity_flags(&self) -> EntityPrototypeFlags; // Default: all flags
-    fn ignore_collision_condition(&self) -> bool; // Default: false
-    fn trigger_target_mask(&self) -> &TriggerTargetMask; // Default: all flags
-    fn repeat_count(&self) -> u32; // Default: 1
-    fn probability(&self) -> f32; // Default: 1
-    fn collision_mask(&self) -> CollisionMask; // Default: all
-    fn action_delivery(&self) -> &Option<Vec<TriggerDelivery>>;
-    fn force(&self) -> ForceCondition; // Default: all forces
-}
-
 /// <https://wiki.factorio.com/Types/DirectTriggerItem>
-#[derive(Debug, Clone, TriggerItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerItem!, PrototypeFromLua)]
 pub struct DirectTriggerItem {
     #[use_self_forced]
-    pub base: TriggerItem,
+    pub trigger_item: TriggerItemBase,
     #[default(false)]
     pub filter_enabled: bool, // Default: false
 }
 
 /// <https://wiki.factorio.com/Types/AreaTriggerItem>
-#[derive(Debug, Clone, TriggerItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerItem!, PrototypeFromLua)]
 pub struct AreaTriggerItem {
     #[use_self_forced]
-    pub base: TriggerItem,
+    pub trigger_item: TriggerItemBase,
     pub radius: f64,
     #[default(false)]
     pub trigger_from_target: bool, // Default: false
@@ -118,21 +103,21 @@ pub struct AreaTriggerItem {
 }
 
 /// <https://wiki.factorio.com/Types/LineTriggerItem>
-#[derive(Debug, Clone, TriggerItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerItem!, PrototypeFromLua)]
 pub struct LineTriggerItem {
     #[use_self_forced]
-    pub base: TriggerItem,
+    pub trigger_item: TriggerItemBase,
     pub range: f64,
     pub width: f64,
     pub range_effects: Option<TriggerEffect>,
 }
 
 /// <https://wiki.factorio.com/Types/ClusterTriggerItem>
-#[derive(Debug, Clone, TriggerItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerItem!, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct ClusterTriggerItem {
     #[use_self_forced]
-    pub base: TriggerItem,
+    pub trigger_item: TriggerItemBase,
     pub cluster_count: f64, // Must be at least 2
     pub distance: f32,
     #[default(0_f32)]
@@ -464,8 +449,8 @@ impl<'lua> PrototypeFromLua<'lua> for TriggerEffect {
 }
 
 /// <https://wiki.factorio.com/Types/TriggerEffectItem>
-#[derive(Debug, Clone, PrototypeFromLua)]
-pub struct TriggerEffectItem {
+#[derive(Debug, Clone, PrototypeFromLua, Base)]
+pub struct TriggerEffectItemBase {
     #[default(1_u16)]
     pub repeat_count: u16, // Default: 1
     #[default(1_u16)]
@@ -480,21 +465,11 @@ pub struct TriggerEffectItem {
     pub damage_type_filters: Option<DamageTypeFilters>,
 }
 
-/// <https://wiki.factorio.com/Types/TriggerEffectItem>
-pub trait TriggerEffectItemBase {
-    fn repeat_count(&self) -> u16;
-    fn repeat_count_deviation(&self) -> u16;
-    fn probability(&self) -> f32;
-    fn affects_target(&self) -> bool;
-    fn show_in_tooltip(&self) -> bool;
-    fn damage_type_filters(&self) -> &Option<DamageTypeFilters>;
-}
-
 /// <https://wiki.factorio.com/Types/DamageTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct DamageTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub damage: DamagePrototype,
     #[default(true)]
     pub apply_damage_to_trees: bool, // Default: true
@@ -511,8 +486,8 @@ pub struct DamageTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateEntityTriggerEffectItem>
-#[derive(Debug, Clone, PrototypeFromLua)]
-pub struct CreateEntityTriggerEffect {
+#[derive(Debug, Clone, PrototypeFromLua, Base)]
+pub struct CreateEntityTriggerEffectBase {
     pub entity_name: String, // Entity name
     pub offset_deviation: Option<BoundingBox>,
     #[default(false)]
@@ -526,36 +501,21 @@ pub struct CreateEntityTriggerEffect {
 }
 
 /// <https://wiki.factorio.com/Types/CreateEntityTriggerEffectItem>
-pub trait CreateEntityTriggerEffectItemBase {
-    fn entity_name(&self) -> &String;
-    fn offset_deviation(&self) -> &Option<BoundingBox>;
-    fn trigger_created_entity(&self) -> bool;
-    fn check_buildability(&self) -> bool;
-    //fn show_in_tooltip(&self) -> bool;
-    fn tile_collision_mask(&self) -> &Option<CollisionMask>;
-    fn offsets(&self) -> &Option<Vec<Factorio2DVector>>;
-}
-
-/// <https://wiki.factorio.com/Types/CreateEntityTriggerEffectItem>
-#[derive(
-    Debug, Clone, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase, PrototypeFromLua,
-)]
+#[derive(Debug, Clone, TriggerEffectItem!, CreateEntityTriggerEffect!, PrototypeFromLua)]
 pub struct CreateEntityTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     #[use_self_forced]
-    pub create_entity_base: CreateEntityTriggerEffect,
+    pub create_entity_trigger_effect: CreateEntityTriggerEffectBase,
 }
 
 /// <https://wiki.factorio.com/Types/CreateExplosionTriggerEffectItem>
-#[derive(
-    Debug, Clone, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase, PrototypeFromLua,
-)]
+#[derive( Debug, Clone, TriggerEffectItem!, CreateEntityTriggerEffect!, PrototypeFromLua)]
 pub struct CreateExplosionTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     #[use_self_forced]
-    pub create_entity_base: CreateEntityTriggerEffect,
+    pub create_entity_trigger_effect: CreateEntityTriggerEffectBase,
     #[default(-1_f32)]
     pub max_movement_distance: f32, // Default: -1
     #[default(0_f32)]
@@ -567,27 +527,23 @@ pub struct CreateExplosionTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateFireTriggerEffectItem>
-#[derive(
-    Debug, Clone, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase, PrototypeFromLua,
-)]
+#[derive(Debug, Clone, TriggerEffectItem!, CreateEntityTriggerEffect!, PrototypeFromLua)]
 pub struct CreateFireTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     #[use_self_forced]
-    pub create_entity_base: CreateEntityTriggerEffect,
+    pub create_entity_trigger_effect: CreateEntityTriggerEffectBase,
     #[default(u8::MAX)]
     pub initial_ground_flame_count: u8, // Default: u8::MAX
 }
 
 /// <https://wiki.factorio.com/Types/CreateSmokeTriggerEffectItem>
-#[derive(
-    Debug, Clone, TriggerEffectItemBase, CreateEntityTriggerEffectItemBase, PrototypeFromLua,
-)]
+#[derive(Debug, Clone, TriggerEffectItem!, CreateEntityTriggerEffect!, PrototypeFromLua)]
 pub struct CreateSmokeTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     #[use_self_forced]
-    pub create_entity_base: CreateEntityTriggerEffect,
+    pub create_entity_trigger_effect: CreateEntityTriggerEffectBase,
     #[default(0_f32)]
     pub initial_height: f32, // Default: 0
     pub speed: Option<Factorio2DVector>,
@@ -610,10 +566,10 @@ pub struct CreateSmokeTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateTrivialSmokeEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct CreateTrivialSmokeEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub smoke_name: String, // Name of TrivialSmoke prototype
     pub offset_deviation: Option<BoundingBox>,
     pub offsets: Option<Vec<Factorio2DVector>>,
@@ -642,11 +598,11 @@ pub struct CreateTrivialSmokeEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateParticleTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct CreateParticleTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub particle_name: String, // Name of Particle prototype
     pub initial_height: f32,
     pub offset_deviation: Option<BoundingBox>,
@@ -689,10 +645,10 @@ impl CreateParticleTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateStickerTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct CreateStickerTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub stricker: String, // Name of Sticker prototype
     // show_in_tooltip: Default: false // Override in constructor
     #[default(false)]
@@ -700,11 +656,11 @@ pub struct CreateStickerTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CreateDecorativesTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct CreateDecorativesTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub decorative: String, // name of Decorative prototype
     pub spawn_max: u16,
     pub spawn_min_radius: f32,
@@ -737,19 +693,19 @@ impl CreateDecorativesTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/NestedTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct NestedTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub action: Trigger,
 }
 
 /// <https://wiki.factorio.com/Types/PlaySoundTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 #[post_extr_fn(Self::post_extr_fn)]
 pub struct PlaySoundTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub sound: Sound,
     // Negative values are silently clamped to 0
     #[default(0_f32)]
@@ -787,53 +743,53 @@ impl PlaySoundTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/PushBackTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct PushBackTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub distance: f32,
 }
 
 /// <https://wiki.factorio.com/Types/DestroyCliffsTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct DestroyCliffsTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub radius: f32,
     pub explosion: Option<String>, // Name of an entity
 }
 
 /// <https://wiki.factorio.com/Types/ShowExplosionOnChartTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct ShowExplosionOnChartTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub scale: f32,
 }
 
 /// <https://wiki.factorio.com/Types/InsertItemTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct InsertItemTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub item: String, // Name of an item
     #[default(1_u32)]
     pub count: u32, // Default: 1
 }
 
 /// <https://wiki.factorio.com/Types/ScriptTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct ScriptTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub effect_id: String,
 }
 
 /// <https://wiki.factorio.com/Types/SetTileTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct SetTileTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub tile_name: String, // Name of a prototype
     pub radius: f32,
     #[default(false)]
@@ -843,18 +799,18 @@ pub struct SetTileTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/InvokeTileEffectTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct InvokeTileEffectTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub tile_collision_mask: Option<CollisionMask>,
 }
 
 /// <https://wiki.factorio.com/Types/DestroyDecorativesTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct DestroyDecorativesTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub radius: f32,
     #[default(RenderLayer::WaterTile)]
     pub from_render_layer: RenderLayer, // Default: first layer
@@ -871,10 +827,10 @@ pub struct DestroyDecorativesTriggerEffectItem {
 }
 
 /// <https://wiki.factorio.com/Types/CameraEffectTriggerEffectItem>
-#[derive(Debug, Clone, TriggerEffectItemBase, PrototypeFromLua)]
+#[derive(Debug, Clone, TriggerEffectItem!, PrototypeFromLua)]
 pub struct CameraEffectTriggerEffectItem {
     #[use_self_forced]
-    pub base: TriggerEffectItem,
+    pub trigger_effect_item: TriggerEffectItemBase,
     pub effect: String,
     pub duration: u8,
     #[default(0_u8)]
