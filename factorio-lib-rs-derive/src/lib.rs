@@ -2,27 +2,30 @@
 
 extern crate proc_macro;
 
-use heck::AsSnakeCase;
 use core::fmt::Display;
 use core::iter::Iterator;
+use heck::AsSnakeCase;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::spanned::Spanned;
-use syn::{
-    self, parse_macro_input, punctuated::Punctuated, Attribute, DeriveInput, Ident, ItemStruct,
-    LitStr, Result, Token,
-};
+use syn::{self, parse_macro_input, Attribute, DeriveInput, Ident, ItemStruct, LitStr, Result};
 
 // Thanks to Yand!rs from Rust Community Discord server for this macro
 #[proc_macro_derive(Base)]
 pub fn base_macro_derive(input: TokenStream) -> TokenStream {
     let input: ItemStruct = parse_macro_input!(input);
     let struct_name_str = input.ident.to_string();
-    let trait_name_str = struct_name_str.trim_end_matches("Base").trim_end_matches("Spec");
+    let trait_name_str = struct_name_str
+        .trim_end_matches("Base")
+        .trim_end_matches("Spec");
     let struct_name = &input.ident;
     let trait_name = format_ident!("{}", trait_name_str, span = input.ident.span());
     let trait_name__ = format_ident!("{}__", trait_name);
-    let parent_field_name = format_ident!("{}", AsSnakeCase(trait_name_str).to_string(), span = input.ident.span());
+    let parent_field_name = format_ident!(
+        "{}",
+        AsSnakeCase(trait_name_str).to_string(),
+        span = input.ident.span()
+    );
 
     let each_field_name = input
         .fields
