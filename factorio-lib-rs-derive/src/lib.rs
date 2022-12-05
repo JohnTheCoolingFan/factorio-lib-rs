@@ -335,6 +335,12 @@ struct PrototypeFromLuaFieldAttrArgs {
     is_resource: bool,
 }
 
+type CompatCheckMatrix<'b> = Vec<(
+    &'b str,
+    fn(&mut PrototypeFromLuaFieldAttrArgs, &Attribute) -> Result<()>,
+    Vec<(&'b str, bool)>,
+)>;
+
 impl PrototypeFromLuaFieldAttrArgs {
     fn from_attrs(attrs: &[Attribute]) -> Result<Self> {
         let mut result = Self::default();
@@ -354,13 +360,7 @@ impl PrototypeFromLuaFieldAttrArgs {
     }
 
     // This is horrifyingly inefficient, yet better than what was before
-    fn compat_check_matrix<'a, 'b>(
-        &'a self,
-    ) -> Vec<(
-        &'b str,
-        fn(&mut Self, &Attribute) -> Result<()>,
-        Vec<(&'b str, bool)>,
-    )> {
+    fn compat_check_matrix<'a, 'b>(&'a self) -> CompatCheckMatrix<'b> {
         // These names don't make sense because they are not supposed to
         let sel = (
             ("use_self", self.use_self),
