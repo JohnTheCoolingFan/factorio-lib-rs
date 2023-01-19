@@ -8,6 +8,8 @@
 #[macro_use]
 extern crate macro_rules_attribute;
 
+// TODO: transcode lua data to json
+
 // If concepts are disabled, LocalisedString can't be used...
 #[cfg(feature = "concepts")]
 pub mod concepts;
