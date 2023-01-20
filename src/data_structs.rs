@@ -6,6 +6,8 @@ use semver::Version;
 use semver::VersionReq;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
+use std::ffi::OsStr;
+use std::fs::DirEntry;
 use std::{
     fmt::{self, Display, Formatter},
     path::PathBuf,
@@ -170,9 +172,42 @@ impl Mod {
     }
 }
 
+#[derive(Debug)]
+pub enum ModStructure {
+    Directory,
+    Symlink,
+    Zip,
+}
+
+impl ModStructure {
+    pub fn parse(entry: &DirEntry) -> Result<Self, ModDataErr> {
+        let path = entry.path();
+        let extension = path.extension();
+
+        if extension.is_some() && extension.unwrap() == OsStr::new("zip") {
+            return Ok(ModStructure::Zip);
+        } else {
+            let file_type = entry.file_type().map_err(|_| ModDataErr::FilesystemError)?;
+            if file_type.is_symlink() {
+                return Ok(ModStructure::Symlink);
+            } else {
+                let mut path = entry.path();
+                path.push("info.json");
+                if path.exists() {
+                    return Ok(ModStructure::Directory);
+                }
+            }
+        }
+
+        Err(ModDataErr::InvalidModStructure)
+    }
+}
+
 // Struct for Mod version (or file, terminology isn't perfect)
 #[derive(Debug)]
 pub struct ModVersion {
+    pub entry: DirEntry,
+    pub structure: ModStructure,
     pub dependencies: Vec<ModDependency>,
     pub version: Version,
 }
