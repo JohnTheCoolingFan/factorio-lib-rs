@@ -1585,7 +1585,6 @@ impl EntityBase {
     }
 }
 
-
 /// <https://wiki.factorio.com/Prototype/Arrow>
 #[derive(Debug, Clone, Prototype, Entity!, DataTableAccessable, PrototypeFromLua)]
 #[data_table(arrow)]
@@ -3709,7 +3708,7 @@ pub struct TurretBase {
     attack_target_mask: Option<TriggerTargetMask>, // Default: all
     ignore_target_mask: Option<TriggerTargetMask>, // Default: no
     shoot_in_prepare_state: bool,                  // Default: false
-    turret_has_direction: bool,               // Default: false
+    turret_has_direction: bool,                    // Default: false
     random_animation_offset: bool,                 // Default: false
     secondary_animation: bool,                     // Default: false
     attack_from_start_frame: bool,                 // Default: false
