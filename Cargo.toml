@@ -4,17 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["prototypes", "concepts", "data_structs", "webapi", "data_exporter"]
+default = ["prototypes", "concepts", "data_structs", "webapi"]
 prototypes = ["factorio-lib-rs-derive", "macro_rules_attribute", "strum", "strum_macros", "lua", "serde"]
 concepts = ["rust-ini"]
 data_structs = ["lexical-sort", "serde", "semver", "itertools", "regex", "once_cell", "strum", "strum_macros"]
 webapi = ["data_structs", "const_format", "reqwest", "tokio"]
 lua = ["mlua"]
-data_exporter = ["prototypes", "serde-transcode", "serde_json"]
-
-[[bin]]
-name = "data_export"
-required-features = ["data_exporter"]
 
 [dependencies]
 # Non-optional
