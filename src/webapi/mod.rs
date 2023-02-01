@@ -15,7 +15,7 @@ pub const MOD_PORTAL_URL: &str = "https://mods.factorio.com";
 pub const MOD_PORTAL_MODS_API_URL: &str = concatcp!(MOD_PORTAL_URL, "/api/mods");
 
 pub fn mod_portal_mod_info_url(mod_name: &str) -> String {
-    format!("{}/{}", MOD_PORTAL_MODS_API_URL, mod_name)
+    format!("{MOD_PORTAL_MODS_API_URL}/{mod_name}")
 }
 
 pub fn mod_portal_mod_info_full_url(mod_name: &str) -> String {
@@ -33,7 +33,7 @@ pub enum PageSize {
 impl std::fmt::Display for PageSize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Number(n) => f.write_fmt(format_args!("{}", n)),
+            Self::Number(n) => f.write_fmt(format_args!("{n}")),
             Self::Max => f.write_str("max"),
         }
     }
