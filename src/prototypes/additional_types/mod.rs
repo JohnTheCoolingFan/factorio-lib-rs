@@ -11,6 +11,7 @@ mod trigger;
 pub use attack_parameters::*;
 pub use autoplace::*;
 pub use capsule_action::*;
+use fixed::types::I24F8;
 pub use graphics::*;
 pub use sound::*;
 pub use style_specification::*;
@@ -213,7 +214,7 @@ impl<'lua> FromLua<'lua> for RealOrientation {
 
 /// Can be constructed from an array or table with x and y values <https://wiki.factorio.com/Types/Position>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Position(pub i32, pub i32);
+pub struct Position(I24F8, I24F8);
 
 impl<'lua> FromLua<'lua> for Position {
     fn from_lua(value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
@@ -249,16 +250,14 @@ impl<'lua> FromLua<'lua> for Position {
 impl From<(f32, f32)> for Position {
     fn from(v: (f32, f32)) -> Self {
         let (x, y) = v;
-        let (x, y) = ((x * 256.0).round() as i32, (y * 256.0).round() as i32);
+        let (x, y) = (I24F8::from_num(x), I24F8::from_num(y));
         Self(x, y)
     }
 }
 
 impl From<Position> for (f32, f32) {
     fn from(p: Position) -> Self {
-        let (x, y) = (p.0, p.1);
-        let (x, y) = ((x as f32) / 256.0, (y as f32) / 256.0);
-        (x, y)
+        (p.0.to_num(), p.1.to_num())
     }
 }
 
