@@ -1,3 +1,6 @@
+[workspace]
+members = ["factorio-lib-rs-derive"]
+
 [package]
 name = "factorio-lib-rs"
 version = "0.1.0"
