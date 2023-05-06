@@ -18,7 +18,7 @@ lua = ["mlua"]
 # Non-optional
 thiserror = "1.0"
 # Optional
-fixed = { version = "1.23", optional = true}
+fixed = { version = "1.23", features = ["serde"], optional = true }
 mlua = { version = "0.8.0", package = "factorio-mlua", features = ["serialize", "lua-factorio"], optional = true }
 factorio-lib-rs-derive = { path = "./factorio-lib-rs-derive", version = "0.1", optional = true }
 strum = { version = "0.24", features = ["derive"], optional = true }
