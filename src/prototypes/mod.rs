@@ -5388,6 +5388,6 @@ pub enum PrototypesErr {
     FieldRequired(String),
     #[error("`DataTableAccessable::find()` is not available on Abstract types, use `DataTableAccessable::find_cloned()`")]
     AbstractFind,
-    #[error("`dataTableAccessable::extend()` is not available for Abstract types")]
+    #[error("`DataTableAccessable::extend()` is not available for Abstract types")]
     AbstractExtend,
 }
