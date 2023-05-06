@@ -8,15 +8,17 @@ use crate::prototypes::{
 };
 use factorio_lib_rs_derive::DataTableAccessable;
 use mlua::prelude::*;
+use serde::Deserialize;
 use std::collections::HashMap;
+use std::fmt::Display;
+use thiserror::Error;
 
 /// <https://wiki.factorio.com/Prototype/UtilityConstants>
-#[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, Deserialize)]
 #[data_table(utility_constants)]
-#[post_extr_fn(Self::post_extr_fn)]
+#[serde(try_from = "UtilityConstantsIntermediate")]
 pub struct UtilityConstants {
     pub name: String,
-    #[use_self_forced]
     pub prototype_base: PrototypeBaseSpec,
     pub entity_button_background_color: Color,
     pub building_buildable_too_far_tint: Color,
@@ -115,84 +117,384 @@ pub struct UtilityConstants {
     pub light_renderer_search_distance_limit: u8,
 }
 
-impl UtilityConstants {
-    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
-        if let Some(v) = self.player_colors.get(0) {
+#[derive(Deserialize)]
+struct UtilityConstantsIntermediate {
+    name: String,
+    #[serde(flatten)]
+    prototype_base: PrototypeBaseSpec,
+    entity_button_background_color: Color,
+    building_buildable_too_far_tint: Color,
+    building_buildable_tint: Color,
+    building_not_buildable_tint: Color,
+    building_ignorable_tint: Color,
+    building_no_tint: Color,
+    ghost_tint: Color,
+    tile_ghost_tint: Color,
+    equipment_default_background_color: Color,
+    equipment_default_background_border_color: Color,
+    equipment_default_grabbed_background_color: Color,
+    turret_range_visualization_color: Color,
+    capsule_range_visualization_color: Color,
+    artillery_range_visualization_color: Color,
+    train_no_path_color: Color,
+    train_destination_full_color: Color,
+    chart: UtilityConstantsChart,
+    default_player_force_color: Color,
+    item_outline_radiusdefault_enemy_force_color: Color,
+    default_other_force_color: Color,
+    deconstruct_mark_tint: Color,
+    rail_planner_count_button_color: Color,
+    count_button_size: i32,
+    zoom_to_world_can_use_nightvision: bool,
+    zoom_to_world_effect_strength: f32,
+    max_terrain_building_size: u8,
+    small_area_size: f32,
+    medium_area_size: f32,
+    small_blueprint_area_size: f32,
+    medium_blueprint_area_size: f32,
+    enabled_recipe_slot_tint: Color,
+    disabled_recipe_slot_tint: Color,
+    disabled_recipe_slot_background_tint: Color,
+    forced_enabled_recipe_slot_background_tint: Color,
+    rail_segment_colors: Vec<Color>,
+    player_colors: Vec<UtilityConstantsPlayerColor>, // item with `name` == default must exist and be the first item in array
+    server_command_console_chat_color: Color,
+    script_command_console_chat_color: Color,
+    default_alert_icon_scale: f32,
+    default_alert_icon_shift_by_type: Option<HashMap<String, Factorio2DVector>>,
+    default_alert_icon_scale_by_type: Option<HashMap<String, f32>>,
+    daytime_color_lookup: DaytimeColorLookupTable,
+    zoom_to_world_daytime_color_lookup: DaytimeColorLookupTable,
+    checkerboard_white: Color,
+    checkerboard_black: Color,
+    item_outline_color: Color,
+    item_outline_radius: f32,
+    item_outline_inset: f32,
+    item_outline_sharpness: f32,
+    filter_outline_color: Color,
+    icon_shadow_radius: f32,
+    icon_shadow_inset: f32,
+    icon_shadow_sharpness: f32,
+    icon_shadow_color: Color,
+    clipboard_history_size: u32,
+    recipe_step_limit: u32,
+    manual_rail_building_reach_modifier: f64,
+    train_temporary_stop_wait_time: u32,
+    train_time_wait_condition_default: u32,
+    train_inactivity_wait_condition_default: u32,
+    default_trigger_target_mask_by_type: Option<HashMap<String, TriggerTargetMask>>,
+    unit_group_pathfind_resolution: i8,
+    unit_group_max_pursue_distance: f64,
+    dynamic_recipe_overload_factor: f64,
+    minimum_recipe_overload_multiplier: u32,
+    maximum_recipe_overload_multiplier: u32,
+    tree_leaf_distortion_strength_far: Factorio2DVector,
+    tree_leaf_distortion_distortion_far: Factorio2DVector,
+    tree_leaf_distortion_speed_far: Factorio2DVector,
+    tree_leaf_distortion_strength_near: Factorio2DVector,
+    tree_leaf_distortion_distortion_near: Factorio2DVector,
+    tree_leaf_distortion_speed_near: Factorio2DVector,
+    tree_shadow_roughness: f32,
+    tree_shadow_speed: f32,
+    missing_preview_sprite_location: FileName,
+    main_menu_background_image_location: FileName,
+    main_menu_simulations: HashMap<String, SimulationDefinition>,
+    main_menu_background_vignette_intensity: f32,
+    main_menu_background_vignette_sharpness: f32,
+    default_scorch_mark_color: Color,
+    train_button_hovered_tint: Color,
+    select_group_row_count: u32,           // Range: [1, 100]
+    select_slot_row_count: u32,            // Range: [1, 100]
+    inventory_width: u32,                  // Range: [1, 100]
+    module_inventory_width: u32,           // Range: [1, 100]
+    tooltip_monitor_edge_border: i32,      // Must be >= 1
+    normalised_achievement_icon_size: u32, // Must be >= 1
+    tutorial_notice_icon_size: u32,        // Must be >= 1
+    flying_text_ttl: u32,                  // Must be >= 1
+    bonus_gui_ordering: HashMap<String, String>,
+    train_path_finding: UtilityConstantsTrainPathFinding,
+    map_editor: UtilityConstantsMapEditor,
+    color_filters: Vec<UtilityConstantColorFilter>,
+    entity_renderer_search_box_limits: UtilityConstantsEntityRendererSearchBoxLimits,
+    light_renderer_search_distance_limit: u8,
+}
+
+#[derive(Debug, Clone, Error)]
+pub enum UtilityConstantsCheckError {
+    #[error("`player_colors[0].name` must be \"default\", got \"{0}\"")]
+    InvalidFirstPlayerColorName(String),
+    #[error("`player_colors[0]` must exist")]
+    FirstPlayerColorDoesntExist,
+    #[error("`tooltip_monitor_edge_border` must be >= 1, got {0}")]
+    TooltipMonitorEdgeBorder(i32),
+    #[error("`normalised_achievement_icon_size` must be >= 1, got {0}")]
+    NormalisedAchievementIconSize(u32),
+    #[error("`tutorial_notice_icon_size` must be >= 1, got {0}")]
+    TutorialNoticeIconSize(u32),
+    #[error("`flying_text_ttl` must be >= 1, got {0}")]
+    FlyingtextTtl(u32),
+    #[error("`select_group_row_count` must be in a range [1; 100], got {0}")]
+    SelectGroupRowCount(u32),
+    #[error("`select_slot_row_count` must be in a range [1; 100], got {0}")]
+    SelectSlotRowCount(u32),
+    #[error("`inventory_width` must be in a range [1; 100], for {0}")]
+    InventoryWidth(u32),
+    #[error("`module_inventory_width` must be in a range [1; 100], got {0}")]
+    ModuleInventoryWidth(u32),
+}
+
+impl TryFrom<UtilityConstantsIntermediate> for UtilityConstants {
+    type Error = UtilityConstantsCheckError;
+
+    fn try_from(value: UtilityConstantsIntermediate) -> Result<Self, Self::Error> {
+        let UtilityConstantsIntermediate {
+            name,
+            prototype_base,
+            entity_button_background_color,
+            building_buildable_too_far_tint,
+            building_buildable_tint,
+            building_not_buildable_tint,
+            building_ignorable_tint,
+            building_no_tint,
+            ghost_tint,
+            tile_ghost_tint,
+            equipment_default_background_color,
+            equipment_default_background_border_color,
+            equipment_default_grabbed_background_color,
+            turret_range_visualization_color,
+            capsule_range_visualization_color,
+            artillery_range_visualization_color,
+            train_no_path_color,
+            train_destination_full_color,
+            chart,
+            default_player_force_color,
+            item_outline_radiusdefault_enemy_force_color,
+            default_other_force_color,
+            deconstruct_mark_tint,
+            rail_planner_count_button_color,
+            count_button_size,
+            zoom_to_world_can_use_nightvision,
+            zoom_to_world_effect_strength,
+            max_terrain_building_size,
+            small_area_size,
+            medium_area_size,
+            small_blueprint_area_size,
+            medium_blueprint_area_size,
+            enabled_recipe_slot_tint,
+            disabled_recipe_slot_tint,
+            disabled_recipe_slot_background_tint,
+            forced_enabled_recipe_slot_background_tint,
+            rail_segment_colors,
+            player_colors,
+            server_command_console_chat_color,
+            script_command_console_chat_color,
+            default_alert_icon_scale,
+            default_alert_icon_shift_by_type,
+            default_alert_icon_scale_by_type,
+            daytime_color_lookup,
+            zoom_to_world_daytime_color_lookup,
+            checkerboard_white,
+            checkerboard_black,
+            item_outline_color,
+            item_outline_radius,
+            item_outline_inset,
+            item_outline_sharpness,
+            filter_outline_color,
+            icon_shadow_radius,
+            icon_shadow_inset,
+            icon_shadow_sharpness,
+            icon_shadow_color,
+            clipboard_history_size,
+            recipe_step_limit,
+            manual_rail_building_reach_modifier,
+            train_temporary_stop_wait_time,
+            train_time_wait_condition_default,
+            train_inactivity_wait_condition_default,
+            default_trigger_target_mask_by_type,
+            unit_group_pathfind_resolution,
+            unit_group_max_pursue_distance,
+            dynamic_recipe_overload_factor,
+            minimum_recipe_overload_multiplier,
+            maximum_recipe_overload_multiplier,
+            tree_leaf_distortion_strength_far,
+            tree_leaf_distortion_distortion_far,
+            tree_leaf_distortion_speed_far,
+            tree_leaf_distortion_strength_near,
+            tree_leaf_distortion_distortion_near,
+            tree_leaf_distortion_speed_near,
+            tree_shadow_roughness,
+            tree_shadow_speed,
+            missing_preview_sprite_location,
+            main_menu_background_image_location,
+            main_menu_simulations,
+            main_menu_background_vignette_intensity,
+            main_menu_background_vignette_sharpness,
+            default_scorch_mark_color,
+            train_button_hovered_tint,
+            select_group_row_count,
+            select_slot_row_count,
+            inventory_width,
+            module_inventory_width,
+            tooltip_monitor_edge_border,
+            normalised_achievement_icon_size,
+            tutorial_notice_icon_size,
+            flying_text_ttl,
+            bonus_gui_ordering,
+            train_path_finding,
+            map_editor,
+            color_filters,
+            entity_renderer_search_box_limits,
+            light_renderer_search_distance_limit,
+        } = value;
+
+        if let Some(v) = player_colors.get(0) {
             if v.name != "default" {
-                return Err(LuaError::FromLuaConversionError {
-                    from: "table",
-                    to: "UtilityConstants",
-                    message: Some("`player_colors[0].name` must be \"default\"".into()),
-                });
+                return Err(UtilityConstantsCheckError::InvalidFirstPlayerColorName(
+                    v.name,
+                ));
             }
         } else {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstants",
-                message: Some("`player_colors[0]` must exist".into()),
-            });
+            return Err(UtilityConstantsCheckError::FirstPlayerColorDoesntExist);
         }
-        if self.tooltip_monitor_edge_border < 1 {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstants",
-                message: Some("`tooltip_monitor_edge_border` must be >= 1".into()),
-            });
+        if tooltip_monitor_edge_border < 1 {
+            return Err(UtilityConstantsCheckError::TooltipMonitorEdgeBorder(
+                tooltip_monitor_edge_border,
+            ));
         }
-        if self.normalised_achievement_icon_size < 1 {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstants",
-                message: Some("`normalised_achievement_icon_size` must be >= 1".into()),
-            });
+        if normalised_achievement_icon_size < 1 {
+            return Err(UtilityConstantsCheckError::NormalisedAchievementIconSize(
+                normalised_achievement_icon_size,
+            ));
         }
-        if self.tutorial_notice_icon_size < 1 {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstants",
-                message: Some("`tutorial_notice_icon_size` must be >= 1".into()),
-            });
+        if tutorial_notice_icon_size < 1 {
+            return Err(UtilityConstantsCheckError::TutorialNoticeIconSize(
+                tutorial_notice_icon_size,
+            ));
         }
-        if self.flying_text_ttl < 1 {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstants",
-                message: Some("`flying_text_ttl` must be >= 1".into()),
-            });
+        if flying_text_ttl < 1 {
+            return Err(UtilityConstantsCheckError::FlyingtextTtl(flying_text_ttl));
         }
-        if !(1..=100).contains(&self.select_group_row_count) {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstants",
-                message: Some("`select_group_row_count` must be in a range [1; 100]".into()),
-            });
+        if !(1..=100).contains(&select_group_row_count) {
+            return Err(UtilityConstantsCheckError::SelectGroupRowCount(
+                select_group_row_count,
+            ));
         }
-        if !(1..=100).contains(&self.select_slot_row_count) {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstants",
-                message: Some("`select_slot_row_count` must be in a range [1; 100]".into()),
-            });
+        if !(1..=100).contains(&select_slot_row_count) {
+            return Err(UtilityConstantsCheckError::SelectSlotRowCount(
+                select_slot_row_count,
+            ));
         }
-        if !(1..=100).contains(&self.inventory_width) {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstants",
-                message: Some("`inventory_width` must be in a range [1; 100]".into()),
-            });
+        if !(1..=100).contains(&inventory_width) {
+            return Err(UtilityConstantsCheckError::InventoryWidth(inventory_width));
         }
-        if !(1..=100).contains(&self.module_inventory_width) {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstants",
-                message: Some("`module_inventory_width` must be in a range [1; 100]".into()),
-            });
+        if !(1..=100).contains(&module_inventory_width) {
+            return Err(UtilityConstantsCheckError::ModuleInventoryWidth(
+                module_inventory_width,
+            ));
         }
-        Ok(())
+        Ok(Self {
+            name,
+            prototype_base,
+            entity_button_background_color,
+            building_buildable_too_far_tint,
+            building_buildable_tint,
+            building_not_buildable_tint,
+            building_ignorable_tint,
+            building_no_tint,
+            ghost_tint,
+            tile_ghost_tint,
+            equipment_default_background_color,
+            equipment_default_background_border_color,
+            equipment_default_grabbed_background_color,
+            turret_range_visualization_color,
+            capsule_range_visualization_color,
+            artillery_range_visualization_color,
+            train_no_path_color,
+            train_destination_full_color,
+            chart,
+            default_player_force_color,
+            item_outline_radiusdefault_enemy_force_color,
+            default_other_force_color,
+            deconstruct_mark_tint,
+            rail_planner_count_button_color,
+            count_button_size,
+            zoom_to_world_can_use_nightvision,
+            zoom_to_world_effect_strength,
+            max_terrain_building_size,
+            small_area_size,
+            medium_area_size,
+            small_blueprint_area_size,
+            medium_blueprint_area_size,
+            enabled_recipe_slot_tint,
+            disabled_recipe_slot_tint,
+            disabled_recipe_slot_background_tint,
+            forced_enabled_recipe_slot_background_tint,
+            rail_segment_colors,
+            player_colors,
+            server_command_console_chat_color,
+            script_command_console_chat_color,
+            default_alert_icon_scale,
+            default_alert_icon_shift_by_type,
+            default_alert_icon_scale_by_type,
+            daytime_color_lookup,
+            zoom_to_world_daytime_color_lookup,
+            checkerboard_white,
+            checkerboard_black,
+            item_outline_color,
+            item_outline_radius,
+            item_outline_inset,
+            item_outline_sharpness,
+            filter_outline_color,
+            icon_shadow_radius,
+            icon_shadow_inset,
+            icon_shadow_sharpness,
+            icon_shadow_color,
+            clipboard_history_size,
+            recipe_step_limit,
+            manual_rail_building_reach_modifier,
+            train_temporary_stop_wait_time,
+            train_time_wait_condition_default,
+            train_inactivity_wait_condition_default,
+            default_trigger_target_mask_by_type,
+            unit_group_pathfind_resolution,
+            unit_group_max_pursue_distance,
+            dynamic_recipe_overload_factor,
+            minimum_recipe_overload_multiplier,
+            maximum_recipe_overload_multiplier,
+            tree_leaf_distortion_strength_far,
+            tree_leaf_distortion_distortion_far,
+            tree_leaf_distortion_speed_far,
+            tree_leaf_distortion_strength_near,
+            tree_leaf_distortion_distortion_near,
+            tree_leaf_distortion_speed_near,
+            tree_shadow_roughness,
+            tree_shadow_speed,
+            missing_preview_sprite_location,
+            main_menu_background_image_location,
+            main_menu_simulations,
+            main_menu_background_vignette_intensity,
+            main_menu_background_vignette_sharpness,
+            default_scorch_mark_color,
+            train_button_hovered_tint,
+            select_group_row_count,
+            select_slot_row_count,
+            inventory_width,
+            module_inventory_width,
+            tooltip_monitor_edge_border,
+            normalised_achievement_icon_size,
+            tutorial_notice_icon_size,
+            flying_text_ttl,
+            bonus_gui_ordering,
+            train_path_finding,
+            map_editor,
+            color_filters,
+            entity_renderer_search_box_limits,
+            light_renderer_search_distance_limit,
+        })
     }
 }
 
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct UtilityConstantsChart {
     pub electric_lines_color: Color,
     pub electric_lines_color_switch_enabled: Color,
@@ -227,20 +529,24 @@ pub struct UtilityConstantsChart {
     pub train_path_color: Color,
     pub train_preview_path_outline_color: Color,
     pub train_current_path_outline_color: Color,
-    #[default(0.6_f32)]
+    #[serde(default = "default_0_6_f32")]
     pub custom_tag_scale: f32, // Default: 0.6
     pub custom_tag_selected_overlay_tint: Color,
 }
 
-#[derive(Debug, Clone, PrototypeFromLua)]
+fn default_0_6_f32() -> f32 {
+    0.6
+}
+
+#[derive(Debug, Clone, Deserialize)]
 pub struct UtilityConstantsPlayerColor {
     pub name: String,
     pub player_color: Color,
     pub chat_color: Color,
 }
 
-#[derive(Debug, Clone, PrototypeFromLua)]
-#[post_extr_fn(Self::post_extr_fn)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(try_from = "UtilityConstantsTrainPathFindingIntermediate")]
 pub struct UtilityConstantsTrainPathFinding {
     pub train_stop_penalty: u32,
     pub stopped_manually_controlled_train_penalty: u32,
@@ -256,22 +562,77 @@ pub struct UtilityConstantsTrainPathFinding {
     pub train_auto_without_schedule_penalty: u32,
 }
 
-impl UtilityConstantsTrainPathFinding {
-    fn post_extr_fn(&self, _lua: &mlua::Lua, _data_table: &DataTable) -> LuaResult<()> {
-        if self.train_waiting_at_signal_tick_multiplier_penalty < 0.0 {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstantsTrainPathFinding",
-                message: Some(
-                    "`train_waiting_at_signal_tick_multiplier_penalty` must be >= 0".into(),
-                ),
-            });
-        }
-        Ok(())
+#[derive(Deserialize)]
+struct UtilityConstantsTrainPathFindingIntermediate {
+    train_stop_penalty: u32,
+    stopped_manually_controlled_train_penalty: u32,
+    stopped_manually_controlled_train_without_passenger_penalty: u32,
+    signal_reserved_by_circuit_network_penalty: u32,
+    train_in_station_penalty: u32,
+    train_in_station_with_no_other_valid_stops_in_schedule: u32,
+    train_arriving_to_station_penalty: u32,
+    train_arriving_to_signal_penalty: u32,
+    train_waiting_at_signal_penalty: u32,
+    train_waiting_at_signal_tick_multiplier_penalty: f32, // Must be >= 0
+    train_with_no_path_penalty: u32,
+    train_auto_without_schedule_penalty: u32,
+}
+
+#[derive(Debug, Clone, Copy, Error)]
+pub struct UtilityConstansTrainPathFindingCheckError(f32);
+
+impl Display for UtilityConstansTrainPathFindingCheckError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "`train_waiting_at_signal_tick_multiplier_penalty` must be >= 0, got {}",
+            self.0
+        )
     }
 }
 
-#[derive(Debug, Clone, PrototypeFromLua)]
+impl TryFrom<UtilityConstantsTrainPathFindingIntermediate> for UtilityConstantsTrainPathFinding {
+    type Error = UtilityConstansTrainPathFindingCheckError;
+
+    fn try_from(value: UtilityConstantsTrainPathFindingIntermediate) -> Result<Self, Self::Error> {
+        let UtilityConstantsTrainPathFindingIntermediate {
+            train_stop_penalty,
+            stopped_manually_controlled_train_penalty,
+            stopped_manually_controlled_train_without_passenger_penalty,
+            signal_reserved_by_circuit_network_penalty,
+            train_in_station_penalty,
+            train_in_station_with_no_other_valid_stops_in_schedule,
+            train_arriving_to_station_penalty,
+            train_arriving_to_signal_penalty,
+            train_waiting_at_signal_penalty,
+            train_waiting_at_signal_tick_multiplier_penalty,
+            train_with_no_path_penalty,
+            train_auto_without_schedule_penalty,
+        } = value;
+
+        if train_waiting_at_signal_tick_multiplier_penalty < 0.0 {
+            return Err(UtilityConstansTrainPathFindingCheckError(
+                train_waiting_at_signal_tick_multiplier_penalty,
+            ));
+        }
+        Ok(Self {
+            train_stop_penalty,
+            stopped_manually_controlled_train_penalty,
+            stopped_manually_controlled_train_without_passenger_penalty,
+            signal_reserved_by_circuit_network_penalty,
+            train_in_station_penalty,
+            train_in_station_with_no_other_valid_stops_in_schedule,
+            train_arriving_to_station_penalty,
+            train_arriving_to_signal_penalty,
+            train_waiting_at_signal_penalty,
+            train_waiting_at_signal_tick_multiplier_penalty,
+            train_with_no_path_penalty,
+            train_auto_without_schedule_penalty,
+        })
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
 pub struct UtilityConstantsMapEditor {
     pub clone_editor_copy_source_color: Color,
     pub clone_editor_copy_destination_allowed_color: Color,
@@ -291,15 +652,15 @@ pub struct UtilityConstantsMapEditor {
     pub decorative_editor_selection_preview_radius: u8,
 }
 
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct UtilityConstantColorFilter {
     pub name: String,
     pub localised_name: LocalisedString,
     pub matrix: [[f32; 4]; 4],
 }
 
-#[derive(Debug, Clone, PrototypeFromLua)]
-#[post_extr_fn(Self::post_extr_fn)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(try_from = "UtilityConstantsEntityRendererSearchBoxLimitsIntermediate")]
 pub struct UtilityConstantsEntityRendererSearchBoxLimits {
     pub left: u8,   // Range [6, 15]
     pub top: u8,    // Range [3, 15]
@@ -307,46 +668,68 @@ pub struct UtilityConstantsEntityRendererSearchBoxLimits {
     pub bottom: u8, // Range [4, 15]
 }
 
-impl UtilityConstantsEntityRendererSearchBoxLimits {
-    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
-        if !(6..=15).contains(&self.left) {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstantsEntityRendererSearchBoxLimits",
-                message: Some("`left` msut be in range [6; 15]".into()),
-            });
+#[derive(Deserialize)]
+struct UtilityConstantsEntityRendererSearchBoxLimitsIntermediate {
+    left: u8,   // Range [6, 15]
+    top: u8,    // Range [3, 15]
+    right: u8,  // Range [3, 15]
+    bottom: u8, // Range [4, 15]
+}
+
+#[derive(Debug, Clone, Copy, Error)]
+pub enum UtilityConstantsEntityRendererSearchBoxLimitsCheckError {
+    #[error("`left` must be in range [6; 15], got {0}")]
+    Left(u8),
+    #[error("`top` must be in range [3; 15], got {0}")]
+    Top(u8),
+    #[error("`right` must be in range [3; 15], got {0}")]
+    Right(u8),
+    #[error("`bottom` must be in range [4; 15], got {0}")]
+    Bottom(u8),
+}
+
+impl TryFrom<UtilityConstantsEntityRendererSearchBoxLimitsIntermediate>
+    for UtilityConstantsEntityRendererSearchBoxLimits
+{
+    type Error = UtilityConstantsEntityRendererSearchBoxLimitsCheckError;
+
+    fn try_from(
+        value: UtilityConstantsEntityRendererSearchBoxLimitsIntermediate,
+    ) -> Result<Self, Self::Error> {
+        let UtilityConstantsEntityRendererSearchBoxLimitsIntermediate {
+            left,
+            top,
+            right,
+            bottom,
+        } = value;
+
+        if !(6..=15).contains(&left) {
+            return Err(UtilityConstantsEntityRendererSearchBoxLimitsCheckError::Left(left));
         }
-        if !(6..=15).contains(&self.top) {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstantsEntityRendererSearchBoxLimits",
-                message: Some("`top` msut be in range [3; 15]".into()),
-            });
+        if !(6..=15).contains(&top) {
+            return Err(UtilityConstantsEntityRendererSearchBoxLimitsCheckError::Top(top));
         }
-        if !(6..=15).contains(&self.right) {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstantsEntityRendererSearchBoxLimits",
-                message: Some("`right` msut be in range [3; 15]".into()),
-            });
+        if !(6..=15).contains(&right) {
+            return Err(UtilityConstantsEntityRendererSearchBoxLimitsCheckError::Right(right));
         }
-        if !(6..=15).contains(&self.bottom) {
-            return Err(LuaError::FromLuaConversionError {
-                from: "table",
-                to: "UtilityConstantsEntityRendererSearchBoxLimits",
-                message: Some("`bottom` msut be in range [4; 15]".into()),
-            });
+        if !(6..=15).contains(&bottom) {
+            return Err(UtilityConstantsEntityRendererSearchBoxLimitsCheckError::Bottom(bottom));
         }
-        Ok(())
+        Ok(Self {
+            left,
+            top,
+            right,
+            bottom,
+        })
     }
 }
 
 /// <https://wiki.factorio.com/Prototype/UtilitySounds>
-#[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, Deserialize)]
 #[data_table(utility_sounds)]
 pub struct UtilitySounds {
     pub name: String,
-    #[use_self_forced]
+    #[serde(flatten)]
     pub prototype_base: PrototypeBaseSpec,
     pub gui_click: Sound,
     pub list_box_click: Sound,
@@ -412,12 +795,12 @@ pub struct UtilitySounds {
 }
 
 /// <https://wiki.factorio.com/Prototype/UtilitySprites>
-#[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, PrototypeFromLua)]
+#[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, Deserialize)]
 #[data_table(utility_sprites)]
 pub struct UtilitySprites {
     // Only one instance allowed
     pub name: String,
-    #[use_self_forced]
+    #[serde(flatten)]
     pub prototype_base: PrototypeBaseSpec,
     pub cursor_box: UtilitySpritesCursorBox,
     pub clouds: Animation,
@@ -793,7 +1176,7 @@ pub struct UtilitySprites {
     pub character_logistic_requests_modifier_constant: Option<Sprite>,
 }
 
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct UtilitySpritesCursorBox {
     pub regular: Vec<BoxSpecification>,
     pub not_allowed: Vec<BoxSpecification>,
