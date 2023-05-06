@@ -20,7 +20,7 @@ thiserror = "1.0"
 # Optional
 fixed = { version = "1.23", optional = true}
 mlua = { version = "0.8.0", package = "factorio-mlua", features = ["serialize", "lua-factorio"], optional = true }
-factorio-lib-rs-derive = { path = "./factorio-lib-rs-derive", optional = true }
+factorio-lib-rs-derive = { path = "./factorio-lib-rs-derive", version = "0.1", optional = true }
 strum = { version = "0.24", features = ["derive"], optional = true }
 strum_macros = { version = "0.24", optional = true }
 rust-ini = { version = "0.18", optional = true }
