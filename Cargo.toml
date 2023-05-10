@@ -8,7 +8,7 @@ edition = "2021"
 
 [features]
 default = ["prototypes", "concepts", "data_structs", "webapi"]
-prototypes = ["factorio-lib-rs-derive", "macro_rules_attribute", "strum", "strum_macros", "lua", "serde", "fixed"]
+prototypes = ["factorio-lib-rs-derive", "macro_rules_attribute", "strum", "strum_macros", "lua", "serde", "fixed", "serde_with"]
 concepts = ["rust-ini"]
 data_structs = ["lexical-sort", "serde", "semver", "itertools", "regex", "once_cell", "strum", "strum_macros"]
 webapi = ["data_structs", "const_format", "reqwest", "tokio"]
@@ -36,3 +36,4 @@ tokio = { version = "1.17", optional = true, features = ["fs"] }
 macro_rules_attribute = { version = "0.1", optional = true }
 serde-transcode = { version = "1.1", optional = true }
 serde_json = { version = "1.0", optional = true }
+serde_with = { version = "3.0", optional = true}
