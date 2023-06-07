@@ -1,37 +1,37 @@
-pub fn default_i128<const V: i128>() -> i128 {
+pub const fn default_i128<const V: i128>() -> i128 {
     V
 }
-pub fn default_i64<const V: i64>() -> i64 {
+pub const fn default_i64<const V: i64>() -> i64 {
     V
 }
-pub fn default_i32<const V: i32>() -> i32 {
+pub const fn default_i32<const V: i32>() -> i32 {
     V
 }
-pub fn default_i16<const V: i16>() -> i16 {
+pub const fn default_i16<const V: i16>() -> i16 {
     V
 }
-pub fn default_i8<const V: i8>() -> i8 {
+pub const fn default_i8<const V: i8>() -> i8 {
     V
 }
-pub fn default_u128<const V: u128>() -> u128 {
+pub const fn default_u128<const V: u128>() -> u128 {
     V
 }
-pub fn default_u64<const V: u64>() -> u64 {
+pub const fn default_u64<const V: u64>() -> u64 {
     V
 }
-pub fn default_u32<const V: u32>() -> u32 {
+pub const fn default_u32<const V: u32>() -> u32 {
     V
 }
-pub fn default_u16<const V: u16>() -> u16 {
+pub const fn default_u16<const V: u16>() -> u16 {
     V
 }
-pub fn default_u8<const V: u8>() -> u8 {
+pub const fn default_u8<const V: u8>() -> u8 {
     V
 }
-pub fn default_bool<const V: bool>() -> bool {
+pub const fn default_bool<const V: bool>() -> bool {
     V
 }
-pub fn default_char<const V: char>() -> char {
+pub const fn default_char<const V: char>() -> char {
     V
 }
 pub fn default_from_i128<T: From<i128>, const V: i128>() -> T {
