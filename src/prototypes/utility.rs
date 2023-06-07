@@ -2,12 +2,9 @@ use super::additional_types::{
     Animation, BoxSpecification, Color, DaytimeColorLookupTable, Factorio2DVector, FileName,
     SimulationDefinition, Sound, Sprite, TriggerTargetMask,
 };
-use super::{DataTable, LocalisedString};
-use crate::prototypes::{
-    GetPrototype, Prototype, PrototypeBase, PrototypeBaseSpec, PrototypeFromLua, PrototypeType,
-};
+use super::LocalisedString;
+use crate::prototypes::{Prototype, PrototypeBase, PrototypeBaseSpec, PrototypeType};
 use factorio_lib_rs_derive::DataTableAccessable;
-use mlua::prelude::*;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fmt::Display;
