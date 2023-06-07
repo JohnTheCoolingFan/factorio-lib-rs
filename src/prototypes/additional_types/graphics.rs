@@ -14,12 +14,15 @@ use strum_macros::{AsRefStr, EnumString};
 /// List of 1-based frame indices into the spreadsheet
 /// <https://wiki.factorio.com/Types/AnimationFrameSequence>
 pub type AnimationFrameSequence = Vec<u16>;
+
 /// <https://wiki.factorio.com/Types/Sprite#position>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SpritePosition(pub i16, pub i16);
+
 /// Width and Height <https://wiki.factorio.com/Types/Sprite#width>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SpriteSize(pub i16, pub i16);
+
 /// <https://wiki.factorio.com/Types/SpriteSizeType>
 pub type SpriteSizeType = i16;
 
