@@ -1,6 +1,6 @@
 use crate::util::defaults::*;
 use serde::Deserialize;
-use serde_with::{serde_as, DeserializeAs};
+use serde_with::serde_as;
 use thiserror::Error;
 
 use super::FileName;
