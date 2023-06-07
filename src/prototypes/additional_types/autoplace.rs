@@ -1,4 +1,7 @@
+use crate::util::defaults::*;
 use mlua::ToLua;
+use serde::Deserialize;
+use std::collections::HashMap;
 use std::convert::AsRef;
 use strum::IntoEnumIterator;
 use strum::{AsRefStr, EnumDiscriminants, EnumIter, EnumString};
@@ -8,54 +11,39 @@ use crate::prototypes::{GetPrototype, PrototypeFromLua};
 pub type NoiseExpression = String;
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct AutoplaceSpecification {
-    #[default("")]
+    #[serde(default)]
     pub control: String, // Default: "" // id of autoplace control
-    #[default(true)]
+    #[serde(default = "default_bool::<true>")]
     pub default_enabled: bool, // Default: true
-    #[default("neutral")]
+    #[serde(default = "default_string_neutral")]
     pub force: String, // Default: "neutral"
-    #[default("")]
+    #[serde(default)]
     pub order: String, // Default: ""
-    #[default(1_u32)]
+    #[serde(default = "default_u32::<1>")]
     pub placement_density: u32, // Default: 1
-    #[default(vec![])]
-    pub tile_restriction: Vec<TileRestriction>, // Default: empty // Official docs are not clear about what this actually is, assuming it's a list of String
-    #[use_self_forced]
+    #[serde(default)]
+    pub tile_restriction: Vec<TileRestriction>, // Default: empty
+    #[serde(flatten)]
     pub base: AutoplaceSpecificationBase,
 }
 
+fn default_string_neutral() -> String {
+    "neutral".into()
+}
+
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#tile_restriction>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
 pub enum TileRestriction {
     Single(String),
     OnTransitions([String; 2]),
 }
 
-impl<'lua> PrototypeFromLua<'lua> for TileRestriction {
-    fn prototype_from_lua(
-        value: mlua::Value<'lua>,
-        lua: &'lua mlua::Lua,
-        _data_table: &mut crate::prototypes::DataTable,
-    ) -> mlua::Result<Self> {
-        let type_name = value.type_name();
-        if let Some(s) = lua.unpack::<Option<String>>(value.clone())? {
-            Ok(Self::Single(s))
-        } else if let Some(v) = lua.unpack::<Option<[String; 2]>>(value)? {
-            Ok(Self::OnTransitions(v))
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: type_name,
-                to: "AutoplaceSpecification.tile_restriction",
-                message: Some("Expected eitehr a string or an array of two strings".into()),
-            })
-        }
-    }
-}
-
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#General_properties>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
 pub enum AutoplaceSpecificationBase {
     /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
     Expression(ExpressionBasedAutoplaceSpecification),
@@ -63,90 +51,102 @@ pub enum AutoplaceSpecificationBase {
     Peak(PeakBasedAutoplaceSpecification),
 }
 
-impl<'lua> PrototypeFromLua<'lua> for AutoplaceSpecificationBase {
-    fn prototype_from_lua(
-        value: mlua::Value<'lua>,
-        lua: &'lua mlua::Lua,
-        data_table: &mut crate::prototypes::DataTable,
-    ) -> mlua::Result<Self> {
-        if let mlua::Value::Table(t) = &value {
-            if t.contains_key("probability_expression")? {
-                Ok(Self::Expression(
-                    ExpressionBasedAutoplaceSpecification::prototype_from_lua(
-                        value, lua, data_table,
-                    )?,
-                ))
-            } else {
-                Ok(Self::Peak(
-                    PeakBasedAutoplaceSpecification::prototype_from_lua(value, lua, data_table)?,
-                ))
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: value.type_name(),
-                to: "AutoplaceSpecification",
-                message: Some("Expected table".into()),
-            })
+/// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Expression-based_AutoplaceSpecifications>
+#[derive(Debug, Clone, Deserialize)]
+#[serde(from = "ExpressionBasedAutoplaceSpecificationIntermediate")]
+pub struct ExpressionBasedAutoplaceSpecification {
+    pub probability_expression: NoiseExpression,
+    pub richness_expression: NoiseExpression,
+}
+
+#[derive(Deserialize)]
+struct ExpressionBasedAutoplaceSpecificationIntermediate {
+    pub probability_expression: NoiseExpression,
+    pub richness_expression: Option<NoiseExpression>,
+}
+
+impl From<ExpressionBasedAutoplaceSpecificationIntermediate>
+    for ExpressionBasedAutoplaceSpecification
+{
+    fn from(value: ExpressionBasedAutoplaceSpecificationIntermediate) -> Self {
+        Self {
+            probability_expression: value.probability_expression,
+            richness_expression: value
+                .richness_expression
+                .unwrap_or_else(|| value.probability_expression.clone()),
         }
     }
 }
 
 /// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
-#[derive(Debug, Clone, PrototypeFromLua)]
-pub struct ExpressionBasedAutoplaceSpecification {
-    pub probability_expression: NoiseExpression,
-    #[default(probability_expression.clone())]
-    pub richness_expression: NoiseExpression,
-}
-
-/// <https://wiki.factorio.com/Types/AutoplaceSpecification#Properties_for_Peak-based_AutoplaceSpecifications>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct PeakBasedAutoplaceSpecification {
-    #[default(0_f64)]
+    #[serde(default)]
     pub sharpness: f64, // Default: 0
-    #[default(1_f64)]
+    #[serde(default = "default_from_i8::<f64, 1>")]
     pub max_probability: f64, // Default: 1
-    #[default(0_f64)]
+    #[serde(default)]
     pub richness_base: f64, // Default: 0
-    #[default(0_f64)]
+    #[serde(default)]
     pub richness_multiplier: f64, // Default: 0
-    #[default(0_f64)]
+    #[serde(default)]
     pub richness_multiplier_distance_bonus: f64, // Default: 0
-    #[default(0_f64)]
+    #[serde(default)]
     pub random_probability_penalty: f64, // Default: 0
-    #[use_self_vec]
-    pub peaks: Vec<AutoplacePeak>, // If not specified, interpret specification as peak
-    #[default(0_f64)] // FIXME
+    #[serde(flatten)]
+    pub peaks: AutoplacePeaks, // If not specified, interpret specification as peak
+    #[serde(default)] // FIXME
     pub coverage: f64, // Default: calculated from existing peaks // What
-    #[default(0_u32)]
+    #[serde(default)]
     pub starting_area_amount: u32, // Default: 0
-    #[default(10_f64)]
+    #[serde(default = "default_from_i8::<f64, 10>")]
     pub starting_area_size: f64, // Default: 10
 }
 
-/// <https://wiki.factorio.com/Types/AutoplaceSpecification#Autoplace_peaks>
-#[derive(Debug, Clone, PrototypeFromLua)]
-pub struct AutoplacePeak {
-    #[default(1.0_f64)]
-    pub influence: f64, // Default: 1
-    #[default(f64::MIN)]
-    pub min_influence: f64, // Default: f64::MIN
-    #[default(f64::MAX)]
-    pub max_influence: f64, // Default: f64::MAX
-    #[default(0)]
-    pub richness_influence: f64, // Default: 0
-    #[default("")]
-    pub noise_layer: String, // Default: ""
-    #[default(0.5_f64)]
-    pub noise_persistence: f64, // Default: 0.5
-    #[default(0)]
-    pub noise_octaves_difference: f64, // Default: 0
-    #[default(1)]
-    pub noise_scale: f64, // Default: 1
-    #[use_self_forced]
-    pub dimensions: Dimensions, // Default: empty // Only one of each type
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
+pub enum AutoplacePeaks {
+    Single(AutoplacePeak),
+    Multiple { peaks: Vec<AutoplacePeak> },
 }
 
+/// <https://wiki.factorio.com/Types/AutoplaceSpecification#Autoplace_peaks>
+#[derive(Debug, Clone, Deserialize)]
+pub struct AutoplacePeak {
+    #[serde(default = "default_from_i8::<f64, 1>")]
+    pub influence: f64, // Default: 1
+    #[serde(default = "default_f64_min")]
+    pub min_influence: f64, // Default: f64::MIN
+    #[serde(default = "default_f64_max")]
+    pub max_influence: f64, // Default: f64::MAX
+    #[serde(default)]
+    pub richness_influence: f64, // Default: 0
+    #[serde(default)]
+    pub noise_layer: String, // Default: ""
+    #[serde(default = "default_f64_0_5")]
+    pub noise_persistence: f64, // Default: 0.5
+    #[serde(default)]
+    pub noise_octaves_difference: f64, // Default: 0
+    #[serde(default = "default_from_i8::<f64, 1>")]
+    pub noise_scale: f64, // Default: 1
+    #[serde(flatten)]
+    // TODO pub dimensions: Dimensions, // Default: empty // Only one of each type
+    pub dimensions: HashMap<String, f64>,
+}
+
+const fn default_f64_min() -> f64 {
+    f64::MIN
+}
+
+const fn default_f64_max() -> f64 {
+    f64::MAX
+}
+
+const fn default_f64_0_5() -> f64 {
+    0.5
+}
+
+// TODO: https://wiki.factorio.com/Types/AutoplaceSpecification#Dimensions
 #[derive(Debug, Clone)]
 pub struct Dimensions(Vec<Dimension>);
 
