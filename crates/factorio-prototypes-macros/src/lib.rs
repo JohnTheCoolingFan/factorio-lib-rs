@@ -2,13 +2,15 @@
 
 extern crate proc_macro;
 
-use core::fmt::Display;
-use core::iter::Iterator;
+use core::{fmt::Display, iter::Iterator};
+
 use heck::AsSnakeCase;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
-use syn::spanned::Spanned;
-use syn::{self, parse_macro_input, Attribute, DeriveInput, Ident, ItemStruct, LitStr, Result};
+use syn::{
+    self, parse_macro_input, spanned::Spanned, Attribute, DeriveInput, Ident, ItemStruct, LitStr,
+    Result,
+};
 
 // Thanks to Yand!rs from Rust Community Discord server for this macro
 #[proc_macro_derive(Base)]
@@ -360,7 +362,7 @@ impl PrototypeFromLuaFieldAttrArgs {
     }
 
     // This is horrifyingly inefficient, yet better than what was before
-    fn compat_check_matrix<'a, 'b>(&'a self) -> CompatCheckMatrix<'b> {
+    fn compat_check_matrix<'b>(&self) -> CompatCheckMatrix<'b> {
         // These names don't make sense because they are not supposed to
         let sel = (
             ("use_self", self.use_self),

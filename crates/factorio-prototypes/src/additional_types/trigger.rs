@@ -10,6 +10,7 @@ use strum::{EnumDiscriminants, EnumString};
 
 // ============== // Trigger // =============== //
 
+// Reminder: check the wiki again to see if anything changed
 /// <https://wiki.factorio.com/Types/Trigger>
 #[derive(Debug, Clone, EnumDiscriminants)]
 #[strum_discriminants(derive(EnumString), strum(serialize_all = "kebab-case"))]

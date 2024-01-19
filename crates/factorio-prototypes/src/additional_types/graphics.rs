@@ -3,8 +3,10 @@ use super::{
     RealOrientation,
 };
 use super::{DataTable, GetPrototype, PrototypeFromLua};
+use crate::util::defaults::*;
 use factorio_lib_rs_derive::prot_from_str;
 use mlua::{prelude::*, Value};
+use serde::Deserialize;
 use std::iter::{FromIterator, Iterator};
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
 use strum_macros::{AsRefStr, EnumString};
@@ -16,11 +18,11 @@ use strum_macros::{AsRefStr, EnumString};
 pub type AnimationFrameSequence = Vec<u16>;
 
 /// <https://wiki.factorio.com/Types/Sprite#position>
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 pub struct SpritePosition(pub i16, pub i16);
 
 /// Width and Height <https://wiki.factorio.com/Types/Sprite#width>
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 pub struct SpriteSize(pub i16, pub i16);
 
 /// <https://wiki.factorio.com/Types/SpriteSizeType>
@@ -30,8 +32,9 @@ pub type SpriteSizeType = i16;
 // Enums with FromStr
 
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_recipe_tint>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum ApplyRecipeTint {
     Primary,
     Secondary,
@@ -40,11 +43,10 @@ pub enum ApplyRecipeTint {
     None,
 }
 
-prot_from_str!(ApplyRecipeTint);
-
 /// <https://wiki.factorio.com/Types/WorkingVisualisation#apply_tint>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum ApplyTint {
     ResourceColor,
     InputFluidBaseColor,
@@ -53,11 +55,10 @@ pub enum ApplyTint {
     None,
 }
 
-prot_from_str!(ApplyTint);
-
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet#apply_module_tint>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum ApplyModuleTint {
     None,
     Primary,
@@ -66,51 +67,46 @@ pub enum ApplyModuleTint {
     Quaternary,
 }
 
-prot_from_str!(ApplyModuleTint);
-
 /// <https://wiki.factorio.com/Types/BeaconGraphicsSet#module_tint_mode>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum ModuleTintMode {
     SingleModule,
     Mix,
 }
 
-prot_from_str!(ModuleTintMode);
-
 /// <https://wiki.factorio.com/Types/LightDefinition#type>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum LightDefinitionType {
     Basic,
     Oriented,
 }
 
-prot_from_str!(LightDefinitionType);
-
 /// <https://wiki.factorio.com/Types/BaseAttackParameters#range_mode>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum RangeMode {
     CenterToCenter,
     BoundingBoxToBoundingBox,
 }
 
-prot_from_str!(RangeMode);
-
 /// <https://wiki.factorio.com/Prototype/Lamp#glow_render_mode>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum GlowRenderMode {
     Additive,
     Multiplicative,
 }
 
-prot_from_str!(GlowRenderMode);
-
 /// <https://wiki.factorio.com/Types/RenderLayer>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum RenderLayer {
     WaterTile,
     GroundTile,
@@ -157,10 +153,9 @@ pub enum RenderLayer {
     Cursor,
 }
 
-prot_from_str!(RenderLayer);
-
 /// <https://wiki.factorio.com/Types/Sprite#draw_as_shadow>
-#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Deserialize)]
+#[serde(from = "DrawAsIntermediate")]
 pub enum DrawAs {
     DrawAsShadow,
     DrawAsGlow,
@@ -182,9 +177,33 @@ impl DrawAs {
     }
 }
 
+#[derive(Deserialize)]
+struct DrawAsIntermediate {
+    draw_as_shadow: Option<bool>,
+    draw_as_glow: Option<bool>,
+    draw_as_light: Option<bool>,
+}
+
+impl From<DrawAsIntermediate> for DrawAs {
+    fn from(value: DrawAsIntermediate) -> Self {
+        let DrawAsIntermediate {
+            draw_as_shadow,
+            draw_as_glow,
+            draw_as_light,
+        } = value;
+
+        Self::new(
+            draw_as_shadow.unwrap_or(false),
+            draw_as_glow.unwrap_or(false),
+            draw_as_light.unwrap_or(false),
+        )
+    }
+}
+
 /// <https://wiki.factorio.com/Types/Sprite#blend_mode>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum BlendMode {
     Normal,
     Additive,
@@ -193,94 +212,132 @@ pub enum BlendMode {
     Overwrite,
 }
 
-prot_from_str!(BlendMode);
-
 /// <https://wiki.factorio.com/Types/Animation#run_mode>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum RunMode {
     Forward,
     Backward,
     ForwardThenBackward,
 }
 
-prot_from_str!(RunMode);
-
 // Structs
 
 /// <https://wiki.factorio.com/Types/FluidBox#secondary_draw_orders>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, PrototypeFromLua)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Deserialize)]
 pub struct SecondaryDrawOrders {
-    #[default(1)]
+    #[serde(default = "default_i8::<1>")]
     pub north: i8,
-    #[default(1)]
+    #[serde(default = "default_i8::<1>")]
     pub east: i8,
-    #[default(1)]
+    #[serde(default = "default_i8::<1>")]
     pub south: i8,
-    #[default(1)]
+    #[serde(default = "default_i8::<1>")]
     pub west: i8,
 }
 
 /// <https://wiki.factorio.com/Types/LightDefinition>
-#[derive(Debug, Clone, PrototypeFromLua)]
-pub struct LightDefinition {
-    #[rename("type")]
-    pub light_def_type: LightDefinitionType,
-    // Next 2 are mandatory if type is "oriented"
-    #[mandatory_if(light_def_type == LightDefinitionType::Oriented)]
-    pub picture: Option<Sprite>,
-    #[mandatory_if(light_def_type == LightDefinitionType::Oriented)]
-    pub rotation_shift: Option<f32>,
-    pub intensity: f32,
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
+pub enum LightDefinition {
+    Single(LightDefinitionProperties),
+    Multiple(Vec<LightDefinitionProperties>),
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
+pub enum LightDefinitionProperties {
+    Basic(BasicLightDefinition),
+    Oriented(OrientedLightDefinition),
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct BasicLightDefinition {
+    pub intensity: f32, // Range [0, 1]
     pub size: f32,
-    #[default(0.0_f32)]
-    pub source_orientation_offset: f32, // Default: 0
-    #[default(false)]
-    pub add_perspective: bool, // Default: false
-    pub shift: Option<Factorio2DVector>,
-    #[default(Color(0.0, 0.0, 0.0, 0.0))]
-    pub color: Color, // Default: no color
-    #[default(0.0_f32)]
-    pub minimum_darkness: f32, // Default: 0
+    #[serde(default)]
+    pub source_orientation_offset: RealOrientation,
+    #[serde(default)]
+    pub add_perspective: bool,
+    #[serde(default)]
+    pub color: Color,
+    #[serde(default)]
+    pub minimum_darkness: f32,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct OrientedLightDefinition {
+    #[serde(flatten)]
+    pub base: BasicLightDefinition,
+    picture: Sprite,
+    rotation_shift: Option<RealOrientation>,
 }
 
 /// <https://wiki.factorio.com/Types/LightFlickeringDefinition>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, PrototypeFromLua, Deserialize)]
 pub struct LightFlickeringDefinition {
-    #[default(0.2)]
-    pub minimum_intensity: f32, // Default: 0.2
-    #[default(0.8)]
-    pub maximum_intensity: f32, // Default: 0.8
-    #[default(0.3)]
+    #[serde(default = "default_f32_0_2")]
+    pub minimum_intensity: f32, // Default: 0.2 // range [0, 1]
+    #[serde(default = "default_f32_0_8")]
+    pub maximum_intensity: f32, // Default: 0.8 // range [0, 1]
+    #[serde(default = "default_f32_0_3")]
     pub derivation_change_frequency: f32, // Default: 0.3
-    #[default(0.06)]
+    #[serde(default = "default_f32_0_06")]
     pub derivation_change_deviation: f32, // Default: 0.06
-    #[default(0.02)]
+    #[serde(default = "default_f32_0_02")]
     pub border_fix_speed: f32, // Default: 0.02
-    #[default(0.5)]
+    #[serde(default = "default_f32_0_5")]
     pub minimum_light_size: f32, // Default: 0.5
-    #[default(0.5)]
+    #[serde(default = "default_f32_0_5")]
     pub light_intensity_to_size_coefficient: f32, // Default: 0.5
-    #[default(Color::new_rgb(1.0, 1.0, 1.0))]
+    #[serde(default = "default_color_white")]
     pub color: Color, // Default: (1, 1, 1) (White)
 }
 
+const fn default_f32_0_2() -> f32 {
+    0.2
+}
+const fn default_f32_0_8() -> f32 {
+    0.8
+}
+const fn default_f32_0_3() -> f32 {
+    0.3
+}
+const fn default_f32_0_06() -> f32 {
+    0.06
+}
+const fn default_f32_0_02() -> f32 {
+    0.02
+}
+const fn default_f32_0_5() -> f32 {
+    0.5
+}
+const fn default_color_white() -> Color {
+    Color {
+        r: 1.0,
+        g: 1.0,
+        b: 1.0,
+        a: 1.0,
+    }
+}
+
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#default_recipe_tint>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct RecipeTint {
     // All default to (1, 1, 1, 1), except special cases
-    #[default(Color(1.0, 1.0, 1.0, 1.0))]
+    #[serde(default = "default_color_white")]
     pub primary: Color,
-    #[default(Color(1.0, 1.0, 1.0, 1.0))]
+    #[serde(default = "default_color_white")]
     pub secondary: Color,
-    #[default(Color(1.0, 1.0, 1.0, 1.0))]
+    #[serde(default = "default_color_white")]
     pub tertiary: Color,
-    #[default(Color(1.0, 1.0, 1.0, 1.0))]
+    #[serde(default = "default_color_white")]
     pub quaternary: Color,
 }
 
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#shift_animation_waypoints>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct ShiftAnimationWaypoints {
     pub north: Option<Vec<Factorio2DVector>>,
     pub east: Option<Vec<Factorio2DVector>>,
@@ -288,6 +345,7 @@ pub struct ShiftAnimationWaypoints {
     pub west: Option<Vec<Factorio2DVector>>,
 }
 
+// TODO
 /// <https://wiki.factorio.com/Prototype/CraftingMachine#status_colors>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct StatusColors {
@@ -310,7 +368,8 @@ pub struct StatusColors {
 }
 
 /// <https://wiki.factorio.com/Types/MiningDrillGraphicsSet#circuit_connector_secondary_draw_order>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(from = "CircuitConnectorSecondaryDrawOrderIntermediate")]
 pub struct CircuitConnectorSecondaryDrawOrder {
     pub north: i8,
     pub east: i8,
@@ -329,35 +388,42 @@ impl CircuitConnectorSecondaryDrawOrder {
     }
 }
 
-impl<'lua> PrototypeFromLua<'lua> for CircuitConnectorSecondaryDrawOrder {
-    fn prototype_from_lua(
-        value: mlua::Value<'lua>,
-        lua: &'lua mlua::Lua,
-        _data_table: &mut DataTable,
-    ) -> mlua::Result<Self> {
-        if let Ok(num) = lua.unpack::<Option<i8>>(value.clone()) {
-            Ok(Self::new(num.unwrap_or(100)))
-        } else if let mlua::Value::Table(table) = &value {
-            let north = table.get::<_, Option<i8>>("north")?.unwrap_or(100);
-            let east = table.get::<_, Option<i8>>("east")?.unwrap_or(100);
-            let south = table.get::<_, Option<i8>>("south")?.unwrap_or(100);
-            let west = table.get::<_, Option<i8>>("west")?.unwrap_or(100);
-            Ok(Self {
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum CircuitConnectorSecondaryDrawOrderIntermediate {
+    SingleNumber(i8),
+    Table {
+        #[serde(default = "default_i8::<100>")]
+        north: i8,
+        #[serde(default = "default_i8::<100>")]
+        east: i8,
+        #[serde(default = "default_i8::<100>")]
+        south: i8,
+        #[serde(default = "default_i8::<100>")]
+        west: i8,
+    },
+}
+
+impl From<CircuitConnectorSecondaryDrawOrderIntermediate> for CircuitConnectorSecondaryDrawOrder {
+    fn from(value: CircuitConnectorSecondaryDrawOrderIntermediate) -> Self {
+        match value {
+            CircuitConnectorSecondaryDrawOrderIntermediate::SingleNumber(n) => Self::new(n),
+            CircuitConnectorSecondaryDrawOrderIntermediate::Table {
                 north,
                 east,
                 south,
                 west,
-            })
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: value.type_name(),
-                to: "MiningDrillGraphicsSet.circuit_connector_secondary_draw_order",
-                message: Some("Expected integer or table".into()),
-            })
+            } => Self {
+                north,
+                east,
+                south,
+                west,
+            },
         }
     }
 }
 
+// TODO
 /// <https://wiki.factorio.com/Prototype/Entity#radius_visualisation_specification>
 /// <https://wiki.factorio.com/Types/RadiusVisualisationSpecification>
 #[derive(Debug, Clone, PrototypeFromLua)]
@@ -391,12 +457,12 @@ impl RadiusVisualizationSpecification {
 }
 
 /// <https://wiki.factorio.com/Types/WaterReflectionDefinition>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct WaterReflectionDefinition {
     pictures: Option<Vec<SpriteVariation>>,
-    #[default(false)]
+    #[serde(default)]
     orientation_to_variation: bool, // default: false
-    #[default(false)]
+    #[serde(default)]
     rotate: bool, // Default: false
 }
 
@@ -412,6 +478,33 @@ impl Dice {
     pub fn new_xy(x: i16, y: i16) -> Self {
         Self(x, y)
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(untagged)]
+pub enum SliceOrDice {
+    Square(SliceOrDiceSquare),
+    Rectangular(SliceOrDiceNonSquare),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum SliceOrDiceSquare {
+    Slice(SpriteSizeType),
+    Dice(SpriteSizeType),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(untagged)]
+pub enum SliceOrDiceNonSquare {
+    Slice {
+        slice_x: SpriteSizeType,
+        slice_y: SpriteSizeType,
+    },
+    Dice {
+        dice_x: SpriteSizeType,
+        dice_y: SpriteSizeType,
+    },
 }
 
 // ============= // Animations // ============= //
@@ -722,8 +815,8 @@ pub struct SpriteSpec {
 
 #[derive(Debug, Clone)]
 pub struct SpriteSpecWithoutFilename {
-    pub dice: Option<Dice>,       // AKA slice // _y and _x are converted into this
-    pub priority: SpritePriority, // Default: "medium"
+    pub dice: Option<SliceOrDice>, // AKA slice // _y and _x are converted into this
+    pub priority: SpritePriority,  // Default: "medium"
     pub flags: Option<SpriteFlags>,
     pub size: SpriteSize,
     // Automatically converted to size

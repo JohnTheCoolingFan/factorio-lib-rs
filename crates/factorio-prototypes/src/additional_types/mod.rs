@@ -11,49 +11,93 @@ mod trigger;
 pub use attack_parameters::*;
 pub use autoplace::*;
 pub use capsule_action::*;
-use fixed::types::I24F8;
 pub use graphics::*;
+use serde::de::{self, Visitor};
+use serde_with::serde_as;
 pub use sound::*;
 pub use style_specification::*;
+use thiserror::Error;
 pub use tile_transitions::*;
 pub use tip_trigger::*;
 pub use trigger::*;
 
 use super::{Base, DataTable, LocalisedString, PrototypeFromLua};
 use crate::prototypes::{GetPrototype, PrototypesErr};
+use crate::util::fixed_serde;
 use factorio_lib_rs_derive::prot_from_str;
+use fixed::types::I24F8;
 use mlua::{prelude::*, FromLua, Lua, ToLua, Value};
+use serde::{Deserialize, Deserializer};
 use std::collections::HashMap;
 use std::convert::From;
+use std::ffi::OsStr;
+use std::fmt::{self, Display};
 use std::iter::FromIterator;
+use std::marker::PhantomData;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
+use std::path::Path;
 use std::str::FromStr;
 use strum_macros::{AsRefStr, EnumDiscriminants, EnumString};
 
-/// May be made into struct in the future <https://wiki.factorio.com/Types/FileName>
-#[derive(Debug, Clone)]
-pub struct FileName(String);
+/// <https://wiki.factorio.com/Types/FileName>
+#[derive(Debug, Clone, Deserialize)]
+#[serde(transparent)]
+pub struct FileName<FT: FileType = ImageFileType> {
+    pub name: String,
+    phantom: PhantomData<FT>,
+}
 
-impl From<String> for FileName {
-    fn from(s: String) -> Self {
-        Self(s)
+pub trait FileType: Copy {
+    fn validate_extension(ext: &str) -> bool;
+    fn validate_extension_osstr(ext: &OsStr) -> bool {
+        ext.to_str()
+            .map(|extstr| Self::validate_extension(extstr))
+            .unwrap_or(false)
+    }
+    fn validate_path(path: &Path) -> Option<bool> {
+        Some(Self::validate_extension_osstr(path.extension()?))
+    }
+    fn validate_filename_osstr(filename: &OsStr) -> Option<bool> {
+        Self::validate_filename(filename.to_str()?)
+    }
+    fn validate_filename(filename: &str) -> Option<bool> {
+        Some(Self::validate_extension(filename.rsplit_once('.')?.1))
     }
 }
 
-impl From<&str> for FileName {
-    fn from(s: &str) -> Self {
-        Self(s.into())
+#[derive(Debug, Clone, Copy)]
+pub struct SoundFileType;
+
+impl FileType for SoundFileType {
+    fn validate_extension(ext: &str) -> bool {
+        matches!(ext, "ogg" | "wav" | "voc")
     }
 }
 
-impl<'lua> PrototypeFromLua<'lua> for FileName {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        lua: &'lua Lua,
-        _data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        let string = String::from_lua(value, lua)?;
-        Ok(Self(string))
+#[derive(Debug, Clone, Copy)]
+pub struct ImageFileType;
+
+impl FileType for ImageFileType {
+    fn validate_extension(ext: &str) -> bool {
+        matches!(ext, "png")
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct SaveFileType;
+
+impl FileType for SaveFileType {
+    fn validate_extension(ext: &str) -> bool {
+        matches!(ext, "zip")
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ScriptFileType;
+
+impl FileType for ScriptFileType {
+    fn validate_extension(ext: &str) -> bool {
+        matches!(ext, "lua")
     }
 }
 
@@ -63,90 +107,22 @@ pub type ItemStackIndex = u16;
 pub type ItemCountType = u32;
 // Type derived from Factorio3DVector definition (https://wiki.factorio.com/Types/Vector3D)
 /// 2D Vector defined by Factorio <https://wiki.factorio.com/Types/vector>
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Default)]
 pub struct Factorio2DVector(pub f32, pub f32);
 
-impl<'lua> FromLua<'lua> for Factorio2DVector {
-    fn from_lua(lua_value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
-        if let mlua::Value::Table(v_table) = lua_value {
-            if let (Ok(x), Ok(y)) = (v_table.get::<_, f32>(1), v_table.get::<_, f32>(2)) {
-                Ok(Self(x, y))
-            } else {
-                Err(mlua::Error::FromLuaConversionError {
-                    from: "table",
-                    to: "Factorio2DVector",
-                    message: Some("Expected table".into()),
-                })
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: lua_value.type_name(),
-                to: "Factorio2DVector",
-                message: Some("Expected table".into()),
-            })
-        }
-    }
-}
-
 /// 3D Vector defined by Factorio <https://wiki.factorio.com/Types/Vector3D>
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Default)]
 pub struct Factorio3DVector(pub f32, pub f32, pub f32);
-
-impl<'lua> FromLua<'lua> for Factorio3DVector {
-    fn from_lua(lua_value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
-        if let mlua::Value::Table(v_table) = lua_value {
-            if let (Ok(x), Ok(y), Ok(z)) = (
-                v_table.get::<_, f32>(1),
-                v_table.get::<_, f32>(2),
-                v_table.get::<_, f32>(3),
-            ) {
-                Ok(Self(x, y, z))
-            } else {
-                Err(mlua::Error::FromLuaConversionError {
-                    from: "table",
-                    to: "Factorio3DVector",
-                    message: Some("Expected table".into()),
-                })
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: lua_value.type_name(),
-                to: "Factorio3DVector",
-                message: Some("Expected table".into()),
-            })
-        }
-    }
-}
 
 // Parser and checker maybe?
 /// Keyboard keys sequence <https://wiki.factorio.com/Prototype/CustomInput#key_sequence>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(transparent)]
 pub struct KeySequence(pub String);
 
-impl<'lua> PrototypeFromLua<'lua> for KeySequence {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        lua: &'lua Lua,
-        _data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        Ok(Self(lua.unpack(value)?))
-    }
-}
-
 /// <https://wiki.factorio.com/Types/BoundingBox>
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Default)]
 pub struct BoundingBox(pub Position, pub Position);
-
-impl<'lua> PrototypeFromLua<'lua> for BoundingBox {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        lua: &'lua Lua,
-        _data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        let v = lua.unpack::<[Position; 2]>(value)?;
-        Ok(Self(v[0], v[1]))
-    }
-}
 
 impl From<((f32, f32), (f32, f32))> for BoundingBox {
     fn from(bb: ((f32, f32), (f32, f32))) -> Self {
@@ -193,56 +169,55 @@ fn boundingbox_comparison() {
 }
 
 /// Value range: [0.0; 1.0) <https://wiki.factorio.com/Types/RealOrientation>
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Default)]
+#[serde(try_from = "f32")]
 pub struct RealOrientation(pub f32);
 
-impl<'lua> FromLua<'lua> for RealOrientation {
-    fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> LuaResult<Self> {
-        let type_name = value.type_name();
-        let v: f32 = lua.unpack(value)?;
-        if (0.0..1.0).contains(&v) {
-            Ok(Self(v))
+#[derive(Debug, Clone, Copy, Error)]
+pub struct RealOrientationCheckError(f32);
+
+impl Display for RealOrientationCheckError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "value must be in a range [0.0; 1.0), got {}", self.0)
+    }
+}
+
+impl TryFrom<f32> for RealOrientation {
+    type Error = RealOrientationCheckError;
+
+    fn try_from(value: f32) -> Result<Self, Self::Error> {
+        if (0.0..1.0).contains(&value) {
+            Ok(Self(value))
         } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: type_name,
-                to: "RealOrientation",
-                message: Some("value must be in a range [0.0; 1.0)".into()),
-            })
+            Err(RealOrientationCheckError(value))
         }
     }
 }
 
 /// Can be constructed from an array or table with x and y values <https://wiki.factorio.com/Types/Position>
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Default)]
+#[serde(from = "PositionVariants")]
 pub struct Position(I24F8, I24F8);
 
-impl<'lua> FromLua<'lua> for Position {
-    fn from_lua(value: Value<'lua>, _lua: &'lua Lua) -> LuaResult<Self> {
-        let type_name = value.type_name();
-        if let mlua::Value::Table(p_table) = value {
-            if let Some(pos) = p_table
-                .get::<_, Option<f32>>("x")?
-                .zip(p_table.get::<_, Option<f32>>("y")?)
-            {
-                Ok(Self::from(pos))
-            } else if let Some(pos) = p_table
-                .get::<isize, Option<f32>>(1)?
-                .zip(p_table.get::<isize, Option<f32>>(2)?)
-            {
-                Ok(Self::from(pos))
-            } else {
-                Err(mlua::Error::FromLuaConversionError {
-                    from: type_name,
-                    to: "Position",
-                    message: Some("Expected x and y keys or an array".into()),
-                })
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: type_name,
-                to: "Potision",
-                message: Some("expected table".into()),
-            })
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum PositionVariants {
+    Sequence(
+        #[serde(with = "fixed_serde::as_f32")] I24F8,
+        #[serde(with = "fixed_serde::as_f32")] I24F8,
+    ),
+    Table {
+        #[serde(with = "fixed_serde::as_f32")]
+        x: I24F8,
+        #[serde(with = "fixed_serde::as_f32")]
+        y: I24F8,
+    },
+}
+
+impl From<PositionVariants> for Position {
+    fn from(value: PositionVariants) -> Self {
+        match value {
+            PositionVariants::Sequence(x, y) | PositionVariants::Table { x, y } => Self(x, y),
         }
     }
 }
@@ -262,12 +237,54 @@ impl From<Position> for (f32, f32) {
 }
 
 /// Any of the color components are optional <https://wiki.factorio.com/Types/Color>
-#[derive(Debug, Clone, PartialEq)]
-pub struct Color(pub f32, pub f32, pub f32, pub f32);
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(from = "ColorVariants")]
+pub struct Color {
+    pub r: f32,
+    pub g: f32,
+    pub b: f32,
+    pub a: f32,
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Self {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+            a: 1.0,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum ColorVariants {
+    Sequence(f32, f32, f32, #[serde(default = "default_alpha")] f32),
+    Table {
+        r: Option<f32>,
+        g: Option<f32>,
+        b: Option<f32>,
+        a: Option<f32>,
+    },
+}
+
+impl From<ColorVariants> for Color {
+    fn from(value: ColorVariants) -> Self {
+        match value {
+            ColorVariants::Sequence(r, g, b, a) => Self::new_rgba(r, g, b, a),
+            ColorVariants::Table { r, g, b, a } => Self::new_rgba_opt(r, g, b, a),
+        }
+    }
+}
+
+fn default_alpha() -> f32 {
+    1.0
+}
 
 impl Color {
     pub fn new_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
-        Self(r, g, b, a)
+        Self { r, g, b, a }
     }
 
     pub fn new_rgba_opt(r: Option<f32>, g: Option<f32>, b: Option<f32>, a: Option<f32>) -> Self {
@@ -275,130 +292,83 @@ impl Color {
         let g = g.unwrap_or(0.0_f32);
         let b = b.unwrap_or(0.0_f32);
         let a = a.unwrap_or(1.0_f32);
-        Self(r, g, b, a)
+        Self { r, g, b, a }
     }
 
     pub fn new_rgb(r: f32, g: f32, b: f32) -> Self {
         // r, g, b default is 0
-        Self(r, g, b, 1.0)
-    }
-}
-
-impl<'lua> FromLua<'lua> for Color {
-    fn from_lua(value: Value<'lua>, _: &'lua Lua) -> LuaResult<Self> {
-        if let Value::Table(table) = value {
-            let r: Option<f32> = table.get("r")?;
-            let g: Option<f32> = table.get("g")?;
-            let b: Option<f32> = table.get("b")?;
-            let a: Option<f32> = table.get("a")?;
-            if r.is_none() && g.is_none() && b.is_none() && a.is_none() {
-                let mut seq = table.sequence_values::<f32>();
-                let r = seq.next().transpose()?;
-                let g = seq.next().transpose()?;
-                let b = seq.next().transpose()?;
-                let a = seq.next().transpose()?;
-                if let (Some(red), Some(grn), Some(blu)) = (r, g, b) {
-                    if let Some(alp) = a {
-                        Ok(Self::new_rgba(red, grn, blu, alp))
-                    } else {
-                        Ok(Self::new_rgb(red, grn, blu))
-                    }
-                } else {
-                    Err(mlua::Error::FromLuaConversionError {
-                        from: "table",
-                        to: "Color",
-                        message: Some("Expected 3 or 4 items in array".into()),
-                    })
-                }
-            } else {
-                Ok(Self::new_rgba_opt(r, g, b, a))
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: value.type_name(),
-                to: "Color",
-                message: Some("Expected table".into()),
-            })
-        }
+        Self { r, g, b, a: 1.0 }
     }
 }
 
 /// <https://lua-api.factorio.com/latest/defines.html#defines.difficulty_settings>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum DifficultySetting {
     Normal,
     Expensive,
 }
 
-prot_from_str!(DifficultySetting);
-
 /// <https://wiki.factorio.com/Prototype/MapSettings#difficulty_settings>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum ResearchQueueSetting {
     AfterVictory,
     Always,
     Never,
 }
 
-prot_from_str!(ResearchQueueSetting);
-
 /// <https://wiki.factorio.com/Tutorial:Mod_settings#The_setting_type_property>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum ModSettingType {
     Startup,
     RuntimeGlobal,
     RuntimePerUser,
 }
 
-prot_from_str!(ModSettingType);
-
 /// <https://wiki.factorio.com/Types/MapGenPreset>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(from = "MapGenPresetIntermediate")]
 pub enum MapGenPreset {
     // Decided by `default` field
     Default(MapGenPresetDefault),
     NonDefault(Box<MapGenPresetNonDefault>),
 }
 
-impl<'lua> PrototypeFromLua<'lua> for MapGenPreset {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        lua: &'lua Lua,
-        data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        if let mlua::Value::Table(p_table) = &value {
-            if p_table.get::<_, bool>("default")? {
-                Ok(Self::Default(MapGenPresetDefault::prototype_from_lua(
-                    value.clone(),
-                    lua,
-                    data_table,
-                )?))
-            } else {
-                Ok(Self::NonDefault(Box::new(
-                    MapGenPresetNonDefault::prototype_from_lua(value.clone(), lua, data_table)?,
-                )))
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: value.type_name(),
-                to: "MapGenPreset",
-                message: Some("Expected table".into()),
-            })
+#[derive(Deserialize)]
+struct MapGenPresetIntermediate {
+    #[serde(default = "default_true")]
+    default: bool,
+    order: String,
+    basic_settings: Option<MapGenPresetBasicSettings>,
+    advanced_settings: Option<MapGenPresetAdvancedSettings>,
+}
+
+impl From<MapGenPresetIntermediate> for MapGenPreset {
+    fn from(value: MapGenPresetIntermediate) -> Self {
+        match value.default {
+            true => Self::Default(MapGenPresetDefault { order: value.order }),
+            false => Self::NonDefault(Box::new(MapGenPresetNonDefault {
+                order: value.order,
+                basic_settings: value.basic_settings,
+                advanced_settings: value.advanced_settings,
+            })),
         }
     }
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#default>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone)]
 pub struct MapGenPresetDefault {
     order: String,
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#default>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone)]
 pub struct MapGenPresetNonDefault {
     order: String,
     // Should these be optional or just have defaults? TODO
@@ -407,46 +377,77 @@ pub struct MapGenPresetNonDefault {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenSize>
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-pub struct MapGenSize(pub f64); // Exact type is unknown, so slap an f64
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Deserialize)]
+#[serde(from = "MapGenSizeVariants")]
+pub struct MapGenSize(pub f64); // Exact type is unknown, so slap a f64
 
-impl FromStr for MapGenSize {
-    type Err = PrototypesErr;
+#[derive(Debug, Clone, Copy, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum MapGenSizeVariants {
+    None,
+    VeryLow,
+    VerySmall,
+    VeryPoor,
+    Low,
+    Small,
+    Poor,
+    Normal,
+    Medium,
+    Regular,
+    High,
+    Big,
+    Good,
+    VeryHigh,
+    VeryBig,
+    VeryGood,
+}
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "none" => Ok(Self(0.0)),
-            "very-low" | "very-small" | "very-poor" => Ok(Self(0.5)),
-            "low" | "small" | "poor" => Ok(Self(1.0 / (2.0_f64).sqrt())),
-            "normal" | "medium" | "regular" => Ok(Self(1.0)),
-            "high" | "big" | "good" => Ok(Self((2.0_f64).sqrt())),
-            "very-high" | "very-big" | "very-good" => Ok(Self(2.0)),
-            _ => Err(PrototypesErr::InvalidTypeStr("MapGenSize".into(), s.into())),
+impl From<MapGenSizeVariants> for MapGenSize {
+    fn from(value: MapGenSizeVariants) -> Self {
+        match value {
+            MapGenSizeVariants::None => Self(0.0),
+            MapGenSizeVariants::VeryLow
+            | MapGenSizeVariants::VerySmall
+            | MapGenSizeVariants::VeryPoor => Self(0.5),
+            MapGenSizeVariants::Low | MapGenSizeVariants::Small | MapGenSizeVariants::Poor => {
+                Self(1.0 / (2.0_f64).sqrt())
+            }
+            MapGenSizeVariants::Normal
+            | MapGenSizeVariants::Medium
+            | MapGenSizeVariants::Regular => Self(1.0),
+            MapGenSizeVariants::High | MapGenSizeVariants::Big | MapGenSizeVariants::Good => {
+                Self((2.0_f64).sqrt())
+            }
+            MapGenSizeVariants::VeryHigh
+            | MapGenSizeVariants::VeryBig
+            | MapGenSizeVariants::VeryGood => Self(2.0),
         }
     }
 }
 
-prot_from_str!(MapGenSize);
-
 /// <https://lua-api.factorio.com/latest/Concepts.html#CliffPlacementSettings>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct CliffPlacementSettings {
     pub name: String, // Name of the cliff prototype
-    #[default(10.0_f32)]
+    #[serde(default = "default_10_0_f32")]
     pub cliff_elevation_0: f32, // Default 10.0
     pub cliff_elevation_interval: f32,
     pub richness: MapGenSize,
 }
 
+fn default_10_0_f32() -> f32 {
+    10.0
+}
+
 // TODO: defaults
 // Quote: «All key/value pairs are optional. If not set they will just use the default values.»
 /// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapGenPresetBasicSettings {
     // Defaults are not documented for some f'ing reason
     pub terain_segmentation: MapGenSize, // Default is... Unknown
     pub water: MapGenSize,               // Same here
-    #[default(true)]
+    #[serde(default = "default_true")]
     pub default_enable_all_autoplace_controls: bool, // Default: true
     pub autoplace_controls: HashMap<String, AutoplaceSetting>, // key is AutoplaceControl name
     // Quote: «Each setting in this table maps the string type to the settings for that type. Valid types are "entity", "tile" and "decorative".»
@@ -461,16 +462,20 @@ pub struct MapGenPresetBasicSettings {
     pub cliff_settings: CliffPlacementSettings,
 }
 
+fn default_true() -> bool {
+    true
+}
+
 /// <https://wiki.factorio.com/Types/MapGenPreset#basic_settings>
 /// <https://lua-api.factorio.com/latest/Concepts.html#AutoplaceSettings>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct AutoplaceSettings {
     pub treat_missing_as_default: bool, // Doesn't look like it's optional or has a default...
     pub settings: HashMap<String, AutoplaceSetting>,
 }
 
 /// <https://lua-api.factorio.com/latest/Concepts.html#AutoplaceSetting>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct AutoplaceSetting {
     pub frequency: Option<MapGenSize>,
     pub size: Option<MapGenSize>,
@@ -480,7 +485,7 @@ pub struct AutoplaceSetting {
 // About defaults, quote: «All key/value pairs are optional, if not set they will just use the
 // existing values.»
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapGenPresetAdvancedSettings {
     // Defaults are not documented too
     pub pollution: MapGenPollution,
@@ -490,8 +495,8 @@ pub struct MapGenPresetAdvancedSettings {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone, PrototypeFromLua)]
-#[post_extr_fn(Self::post_extr_fn)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(try_from = "MapGenPollutionIntermediate")]
 pub struct MapGenPollution {
     pub enabled: bool,
     pub diffusion_ratio: f64, // Must be <= 0.25
@@ -501,28 +506,56 @@ pub struct MapGenPollution {
     pub pollution_restored_per_tree_damage: f64,
 }
 
-impl MapGenPollution {
-    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
-        if self.diffusion_ratio > 0.25 {
-            return Err(mlua::Error::FromLuaConversionError {
-                from: "table",
-                to: "MapGenPollution",
-                message: Some("diffusion_ratio must be <= 0.25".into()),
-            });
+#[derive(Deserialize)]
+struct MapGenPollutionIntermediate {
+    pub enabled: bool,
+    pub diffusion_ratio: f64, // Must be <= 0.25
+    pub ageing: f64,          // Must be >= 0.5
+    pub enemy_attack_pollution_consumption_modifier: f64,
+    pub min_pollution_to_damage_trees: f64,
+    pub pollution_restored_per_tree_damage: f64,
+}
+
+#[derive(Debug, Clone, Copy, Error)]
+enum MapGenPollutionCheckError {
+    #[error("diffusion_ratio must be <= 0.25, got {0}")]
+    DiffusionRatio(f64),
+    #[error("ageing must be >= 0.25, got {0}")]
+    Ageing(f64),
+}
+
+impl TryFrom<MapGenPollutionIntermediate> for MapGenPollution {
+    type Error = MapGenPollutionCheckError;
+
+    fn try_from(value: MapGenPollutionIntermediate) -> Result<Self, Self::Error> {
+        let MapGenPollutionIntermediate {
+            enabled,
+            diffusion_ratio,
+            ageing,
+            enemy_attack_pollution_consumption_modifier,
+            min_pollution_to_damage_trees,
+            pollution_restored_per_tree_damage,
+        } = value;
+
+        if diffusion_ratio > 0.25 {
+            return Err(MapGenPollutionCheckError::DiffusionRatio(diffusion_ratio));
         }
-        if self.ageing < 0.25 {
-            return Err(mlua::Error::FromLuaConversionError {
-                from: "table",
-                to: "MapGenPollution",
-                message: Some("ageing must be >= 0.25".into()),
-            });
+        if ageing < 0.25 {
+            return Err(MapGenPollutionCheckError::Ageing(ageing));
         }
-        Ok(())
+        Ok(Self {
+            enabled,
+            diffusion_ratio,
+            ageing,
+            enemy_attack_pollution_consumption_modifier,
+            min_pollution_to_damage_trees,
+            pollution_restored_per_tree_damage,
+        })
     }
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapGenEnemyEvolution {
     pub enabled: bool,
     pub time_factor: f64,
@@ -531,10 +564,10 @@ pub struct MapGenEnemyEvolution {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapGenEnemyExpansion {
     pub enabled: bool,
-    // Oddly satisfying how lines strings line up
+    // Oddly satisfying how field names line up
     pub max_expansion_distance: f64,
     pub settler_group_min_size: f64,
     pub settler_group_max_size: f64,
@@ -543,7 +576,7 @@ pub struct MapGenEnemyExpansion {
 }
 
 /// <https://wiki.factorio.com/Types/MapGenPreset#advanced_settings>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapGenDifficultySettings {
     pub recipe_difficulty: DifficultySetting,
     pub technology_difficulty: DifficultySetting,
@@ -552,7 +585,7 @@ pub struct MapGenDifficultySettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#pollution>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapPollutionSettings {
     pub enabled: bool,
     pub diffusion_ratio: f64,
@@ -569,14 +602,14 @@ pub struct MapPollutionSettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#steering>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapSteering {
     pub default: MapSteeringSettings,
     pub moving: MapSteeringSettings,
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#steering>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapSteeringSettings {
     pub radius: f64,
     pub separation_factor: f64,
@@ -585,7 +618,7 @@ pub struct MapSteeringSettings {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#enemy_evolution>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapEnemyEvolution {
     pub enabled: bool,
     pub time_factor: f64,
@@ -594,7 +627,7 @@ pub struct MapEnemyEvolution {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#enemy_expansion>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapEnemyExpansion {
     pub enabled: bool,
     pub max_expansion_distance: u32,
@@ -612,7 +645,7 @@ pub struct MapEnemyExpansion {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#unit_group>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapUnitGroup {
     pub min_group_gathering_time: u32,
     pub max_group_gathering_time: u32,
@@ -630,9 +663,9 @@ pub struct MapUnitGroup {
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#path_finder>
-#[derive(Debug, Clone, PrototypeFromLua)]
-#[post_extr_fn(Self::post_extr_fn)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MapPathFinder {
+    #[serde(deserialize_with = "fwd2bwd_ratio_deser_check")]
     pub fwd2bwd_ratio: u32,
     pub goal_pressure_ratio: f64,
     pub use_path_cache: bool,
@@ -666,81 +699,87 @@ pub struct MapPathFinder {
     pub overload_multipliers: Vec<f64>,
 }
 
-impl MapPathFinder {
-    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
-        if self.fwd2bwd_ratio < 2 {
-            return Err(mlua::Error::FromLuaConversionError {
-                from: "table",
-                to: "MapSettings.path_finder",
-                message: Some("`fwd2bwd_ratio should not be less than 2`".into()),
-            });
-        }
-        Ok(())
+fn fwd2bwd_ratio_deser_check<'de, D>(deser: D) -> Result<u32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let result = u32::deserialize(deser)?;
+    if result < 2 {
+        Err(de::Error::custom(format!(
+            "`fwd2bwd_ratio` must not be less than 2, got {result}"
+        )))
+    } else {
+        Ok(result)
     }
 }
 
 /// <https://wiki.factorio.com/Prototype/MapSettings#difficulty_settings>
-#[derive(Debug, Clone, PrototypeFromLua)]
-#[post_extr_fn(Self::post_extr_fn)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(try_from = "MapDifficultySettingsIntermediate")]
 pub struct MapDifficultySettings {
     pub recipe_difficulty: DifficultySetting,
     pub technology_difficulty: DifficultySetting,
-    #[default(1.0_f64)]
     pub technology_price_multiplier: f64, // Default: 1.0 // Must be >= 0.001 and <= 1000.0
     pub research_queue_setting: Option<ResearchQueueSetting>,
 }
 
-impl MapDifficultySettings {
-    fn post_extr_fn(&self, _lua: &Lua, _data_table: &DataTable) -> LuaResult<()> {
-        if self.technology_price_multiplier < 0.001 || self.technology_price_multiplier > 1000.0 {
-            return Err(mlua::Error::FromLuaConversionError {
-                from: "table",
-                to: "MapSettings.difficulty_settings",
-                message: Some(
-                    "`technology_price_multiplier` should be in a range [0.001, 1000.0]".into(),
-                ),
-            });
+#[derive(Deserialize)]
+struct MapDifficultySettingsIntermediate {
+    pub recipe_difficulty: DifficultySetting,
+    pub technology_difficulty: DifficultySetting,
+    #[serde(default = "default_1_0_f64")]
+    pub technology_price_multiplier: f64, // Default: 1.0 // Must be >= 0.001 and <= 1000.0
+    pub research_queue_setting: Option<ResearchQueueSetting>,
+}
+
+fn default_1_0_f64() -> f64 {
+    1.0
+}
+
+#[derive(Debug, Clone, Copy, Error)]
+enum MapDifficultySettingsCheckError {
+    #[error("`technology_price_multiplier` should be in a range [0.001, 1000.0], got {0}")]
+    TechnologyPriceMultiplier(f64),
+}
+
+impl TryFrom<MapDifficultySettingsIntermediate> for MapDifficultySettings {
+    type Error = MapDifficultySettingsCheckError;
+
+    fn try_from(value: MapDifficultySettingsIntermediate) -> Result<Self, Self::Error> {
+        let MapDifficultySettingsIntermediate {
+            recipe_difficulty,
+            technology_difficulty,
+            technology_price_multiplier,
+            research_queue_setting,
+        } = value;
+
+        if technology_price_multiplier < 0.001 || technology_price_multiplier > 1000.0 {
+            return Err(MapDifficultySettingsCheckError::TechnologyPriceMultiplier(
+                technology_price_multiplier,
+            ));
         }
-        Ok(())
+
+        Ok(Self {
+            recipe_difficulty,
+            technology_difficulty,
+            technology_price_multiplier,
+            research_queue_setting,
+        })
     }
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
 pub enum MouseCursorType {
-    SystemCursor(SystemCursor),
+    SystemCursor { system_cursor: SystemCursor },
     CustomCursor(CustomCursor),
 }
 
-impl<'lua> PrototypeFromLua<'lua> for MouseCursorType {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        lua: &'lua Lua,
-        data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        if let Value::Table(table) = &value {
-            if let Some(s) = table.get::<_, Option<String>>("system_cursor")? {
-                Ok(Self::SystemCursor(
-                    s.parse().map_err(mlua::Error::external)?,
-                ))
-            } else {
-                Ok(Self::CustomCursor(CustomCursor::prototype_from_lua(
-                    value, lua, data_table,
-                )?))
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: value.type_name(),
-                to: "MouseCursor",
-                message: Some("Expected table".into()),
-            })
-        }
-    }
-}
-
 /// <https://wiki.factorio.com/Prototype/MouseCursor#system_cursor>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum SystemCursor {
     Arrow,
     IBeam,
@@ -752,7 +791,7 @@ pub enum SystemCursor {
 }
 
 /// <https://wiki.factorio.com/Prototype/MouseCursor>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct CustomCursor {
     pub filename: FileName,
     pub hot_pixel_x: i16,
@@ -761,112 +800,126 @@ pub struct CustomCursor {
 
 // Make different constructors for variants with different field names, like `icon_tintable` in https://wiki.factorio.com/Prototype/ItemWithEntityData
 /// <https://wiki.factorio.com/Types/IconSpecification>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
 pub enum IconSpecification {
-    Icon(IconSpec),
     Icons(IconsSpec),
-}
-
-impl<'lua> PrototypeFromLua<'lua> for IconSpecification {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        lua: &'lua Lua,
-        data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        if let Value::Table(table) = &value {
-            if table.contains_key("icons")? {
-                Ok(Self::Icons(IconsSpec::prototype_from_lua(
-                    value, lua, data_table,
-                )?))
-            } else {
-                Ok(Self::Icon(IconSpec::prototype_from_lua(
-                    value, lua, data_table,
-                )?))
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: value.type_name(),
-                to: "Iconspecification",
-                message: Some("Expected table".into()),
-            })
-        }
-    }
+    Icon(IconSpec),
 }
 
 /// <https://wiki.factorio.com/Types/IconSpecification#Prototype_properties:_Option_2>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct IconSpec {
     pub icon: FileName,
     pub icon_size: i16,
-    #[default(0)]
+    #[serde(default)]
     pub icon_mipmaps: u8, // Default: 0
 }
 
 /// <https://wiki.factorio.com/Types/IconSpecification#Prototype_properties:_Option_1>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(try_from = "IconsSpecIntermediate")]
 pub struct IconsSpec {
     pub icons: Vec<IconData>,
     // icon_size omitted here, it will be copied to each IconData
     pub icon_mipmaps: u8, // Default: 0
 }
 
-impl<'lua> PrototypeFromLua<'lua> for IconsSpec {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        lua: &'lua Lua,
-        data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        if let Value::Table(table) = &value {
-            let mut icons: Vec<IconData> = table.get_prot("icons", lua, data_table)?;
-            let icon_mipmaps = table.get::<_, Option<u8>>("icon_mipmaps")?.unwrap_or(0);
-            let mut flag = false;
-            for icon in &icons {
-                flag = flag || icon.icon_size.is_none();
-            }
-            if flag {
-                let icon_size: SpriteSizeType = table.get("icon_size")?;
-                for mut icon in &mut icons {
-                    icon.icon_size = Some(icon_size)
-                }
-            };
-            Ok(Self {
-                icons,
-                icon_mipmaps,
-            })
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: value.type_name(),
-                to: "IconsSpec",
-                message: Some(
-                    "expected table. If you see this error message, something has gone VERY wrong"
-                        .into(),
-                ),
-            })
-        }
+#[derive(Deserialize)]
+struct IconsSpecIntermediate {
+    icons: Vec<IconDataIntermediate>,
+    icon_size: Option<i16>,
+    #[serde(default)]
+    icon_mipmaps: u8,
+}
+
+#[derive(Debug, Clone, Copy, Error)]
+enum IconsSpecCheckError {
+    #[error("`icon_size` must be set if not all items of `icons` contain it, `icon_size` not found at index {index}")]
+    MissingIconSize { index: usize },
+}
+
+impl TryFrom<IconsSpecIntermediate> for IconsSpec {
+    type Error = IconsSpecCheckError;
+
+    fn try_from(value: IconsSpecIntermediate) -> Result<Self, Self::Error> {
+        let IconsSpecIntermediate {
+            icons,
+            icon_size,
+            icon_mipmaps,
+        } = value;
+
+        Ok(Self {
+            icons: icons
+                .into_iter()
+                .enumerate()
+                .map(|(i, idi)| {
+                    let IconDataIntermediate {
+                        icon,
+                        icon_size: int_icon_size,
+                        tint,
+                        shift,
+                        scale,
+                        icon_mipmaps,
+                    } = idi;
+                    Result::<_, Self::Error>::Ok(IconData {
+                        icon,
+                        icon_size: int_icon_size.map(|v| Ok(v)).unwrap_or_else(|| {
+                            int_icon_size
+                                .ok_or_else(|| IconsSpecCheckError::MissingIconSize { index: i })
+                        })?,
+                        tint,
+                        shift,
+                        scale,
+                        icon_mipmaps,
+                    })
+                })
+                .collect::<Result<_, _>>()?,
+            icon_mipmaps,
+        })
     }
 }
 
 /// <https://wiki.factorio.com/Types/IconData>
-#[derive(Debug, Clone, PrototypeFromLua)]
-pub struct IconData {
+#[derive(Deserialize)]
+struct IconDataIntermediate {
     pub icon: FileName,
     pub icon_size: Option<i16>, // Copied from `icon_size` from prototype
-    #[default(Color(0.0, 0.0, 0.0, 1.0))]
+    #[serde(default)]
     pub tint: Color, // Default: (0, 0, 0 , 1)
-    #[default(Factorio2DVector(0.0, 0.0))]
+    #[serde(default)]
     pub shift: Factorio2DVector, // Default: (0, 0)
-    #[default(1.0)]
+    #[serde(default = "default_1_0_f64")]
     pub scale: f64, // Default: 1
-    #[default(0)]
+    #[serde(default)]
     pub icon_mipmaps: u8, // Default: 0
+}
+
+#[derive(Debug, Clone)]
+pub struct IconData {
+    pub icon: FileName,
+    pub icon_size: i16,          // Copied from `icon_size` from prototype
+    pub tint: Color,             // Default: (0, 0, 0 , 1)
+    pub shift: Factorio2DVector, // Default: (0, 0)
+    pub scale: f64,              // Default: 1
+    pub icon_mipmaps: u8,        // Default: 0
 }
 
 // TODO: fmt::Display
 /// Input data is converted to J/tick or Joule
 /// J/s (Joule/second) is not supported, as I can't find any uses and it's equvalent to W (Watt)
 /// <https://wiki.factorio.com/Types/Energy>
-#[derive(Debug, Clone, PartialEq, PartialOrd, Copy)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Copy, Deserialize)]
+#[serde(try_from = "String")]
 pub struct Energy(pub f64); // I don't know which type factorio uses internally, so I will use this
+
+impl TryFrom<String> for Energy {
+    type Error = <Energy as FromStr>::Err;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        value.parse()
+    }
+}
 
 impl Energy {
     fn get_multiplier(multiplier_char: char) -> Option<f64> {
@@ -919,8 +972,6 @@ impl FromStr for Energy {
     }
 }
 
-prot_from_str!(Energy);
-
 #[test]
 fn energy_parse() {
     assert_eq!(Energy(1e3), Energy::from_str("1kJ").unwrap());
@@ -933,101 +984,65 @@ fn energy_parse() {
     assert!(Energy::from_str("").is_err())
 }
 
-/// <https://wiki.factorio.com/Types/ProductPrototype>
-#[derive(Debug, Clone)]
+/// <https://wiki.factorio.com/Prototype/ProduceAchievement#item_product>
+/// <https://wiki.factorio.com/Prototype/ProducePerHourAchievement#item_product>
+#[derive(Debug, Clone, Deserialize)]
 pub enum ProductType {
+    #[serde(rename = "item_product")]
     Item(String),
+    #[serde(rename = "fluid_product")]
     Fluid(String),
 }
 
-impl<'lua> PrototypeFromLua<'lua> for ProductType {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        _lua: &'lua Lua,
-        _data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        if let Value::Table(table) = &value {
-            if let Some(name) = table.get::<_, Option<String>>("item_product")? {
-                Ok(Self::Item(name))
-            } else if let Some(name) = table.get::<_, Option<String>>("fluid_product")? {
-                Ok(Self::Fluid(name))
-            } else {
-                Err(mlua::Error::FromLuaConversionError {
-                    from: value.type_name(),
-                    to: "ProductType",
-                    message: Some("`item_product` or `fluid_product` must be defined".into()),
-                })
-            }
-        } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: value.type_name(),
-                to: "ProductType",
-                message: Some("expected table".into()),
-            })
-        }
-    }
-}
-
 /// <https://wiki.factorio.com/Prototype/ResearchAchievement>
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(from = "ResearchTargetIntermediate")]
 pub enum ResearchTarget {
     All,
     Technology(String),
 }
 
-impl<'lua> PrototypeFromLua<'lua> for ResearchTarget {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        _lua: &'lua Lua,
-        _data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        if let Value::Table(table) = &value {
-            if table
-                .get::<_, Option<bool>>("research_all")?
-                .unwrap_or(false)
-            {
-                Ok(Self::All)
-            } else {
-                Ok(Self::Technology(
-                    table
-                        .get::<_, Option<String>>("technology")?
-                        .unwrap_or_else(|| String::from("")),
-                ))
-            }
+#[derive(Deserialize)]
+struct ResearchTargetIntermediate {
+    #[serde(default)]
+    technology: String,
+    #[serde(default)]
+    research_all: bool,
+}
+
+impl From<ResearchTargetIntermediate> for ResearchTarget {
+    fn from(value: ResearchTargetIntermediate) -> Self {
+        if value.research_all {
+            Self::All
         } else {
-            Err(mlua::Error::FromLuaConversionError {
-                from: value.type_name(),
-                to: "ResearchTarget",
-                message: Some("expected table".into()),
-            })
+            Self::Technology(value.technology)
         }
     }
 }
 
 /// <https://wiki.factorio.com/Prototype/AutoplaceControl#category>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum AutoplaceControlCategory {
     Resource,
     Terrain,
     Enemy,
 }
 
-prot_from_str!(AutoplaceControlCategory);
-
 /// <https://wiki.factorio.com/Prototype/CustomInput#consuming>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum ConsumingType {
     None,
     GameOnly,
 }
 
-prot_from_str!(ConsumingType);
-
 /// <https://wiki.factorio.com/Prototype/CustomInput#action>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum CustomInputAction {
     Lua,
     SpawnItem,
@@ -1036,10 +1051,8 @@ pub enum CustomInputAction {
     ToggleEquipmentMovementBonus,
 }
 
-prot_from_str!(CustomInputAction);
-
 /// <https://wiki.factorio.com/Types/CollisionMask>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, Default)]
 pub struct CollisionMask(pub(crate) u64);
 
 impl CollisionMask {
@@ -1109,70 +1122,8 @@ impl<T: AsRef<str>> FromIterator<T> for CollisionMask {
     fn from_iter<I: IntoIterator<Item = T>>(layers: I) -> Self {
         let mut result = Self(0);
         for layer in layers {
-            match layer.as_ref() {
-                "ground-tile" => result |= Self::GROUND_TILE,
-                "water-tile" => result |= Self::WATER_TILE,
-                "resource-layer" => result |= Self::RESOURCE_LAYER,
-                "doodad-layer" => result |= Self::DOODAD_LAYER,
-                "floor-layer" => result |= Self::FLOOR_LAYER,
-                "item-layer" => result |= Self::ITEM_LAYER,
-                "ghost-layer" => result |= Self::GHOST_LAYER,
-                "object-layer" => result |= Self::OBJECT_LAYER,
-                "player-layer" => result |= Self::PLAYER_LAYER,
-                "train-layer" => result |= Self::TRAIN_LAYER,
-                "rail-layer" => result |= Self::RAIL_LAYER,
-                "transport-belt-layer" => result |= Self::TRANSPORT_BELT_LAYER,
-                // These 3 are flags
-                "not-colliding-with-itself" => result |= Self::NOT_COLLIDING_WITH_ITSELF,
-                "consider-tile-transitions" => result |= Self::CONSIDER_TILE_TRANSITIONS,
-                "colliding-with-tiles-only" => result |= Self::COLLIDING_WITH_TILES_ONLY,
-                // I love vim
-                // https://vim.fandom.com/wiki/Increasing_or_decreasing_numbers
-                // https://vim.fandom.com/wiki/Macros
-                "layer-13" => result |= Self::LAYER_13,
-                "layer-14" => result |= Self::LAYER_14,
-                "layer-15" => result |= Self::LAYER_15,
-                "layer-16" => result |= Self::LAYER_16,
-                "layer-17" => result |= Self::LAYER_17,
-                "layer-18" => result |= Self::LAYER_18,
-                "layer-19" => result |= Self::LAYER_19,
-                "layer-20" => result |= Self::LAYER_20,
-                "layer-21" => result |= Self::LAYER_21,
-                "layer-22" => result |= Self::LAYER_22,
-                "layer-23" => result |= Self::LAYER_23,
-                "layer-24" => result |= Self::LAYER_24,
-                "layer-25" => result |= Self::LAYER_25,
-                "layer-26" => result |= Self::LAYER_26,
-                "layer-27" => result |= Self::LAYER_27,
-                "layer-28" => result |= Self::LAYER_28,
-                "layer-29" => result |= Self::LAYER_29,
-                "layer-30" => result |= Self::LAYER_30,
-                "layer-31" => result |= Self::LAYER_31,
-                "layer-32" => result |= Self::LAYER_32,
-                "layer-33" => result |= Self::LAYER_33,
-                "layer-34" => result |= Self::LAYER_34,
-                "layer-35" => result |= Self::LAYER_35,
-                "layer-36" => result |= Self::LAYER_36,
-                "layer-37" => result |= Self::LAYER_37,
-                "layer-38" => result |= Self::LAYER_38,
-                "layer-39" => result |= Self::LAYER_39,
-                "layer-40" => result |= Self::LAYER_40,
-                "layer-41" => result |= Self::LAYER_41,
-                "layer-42" => result |= Self::LAYER_42,
-                "layer-43" => result |= Self::LAYER_43,
-                "layer-44" => result |= Self::LAYER_44,
-                "layer-45" => result |= Self::LAYER_45,
-                "layer-46" => result |= Self::LAYER_46,
-                "layer-47" => result |= Self::LAYER_47,
-                "layer-48" => result |= Self::LAYER_48,
-                "layer-49" => result |= Self::LAYER_49,
-                "layer-50" => result |= Self::LAYER_50,
-                "layer-51" => result |= Self::LAYER_51,
-                "layer-52" => result |= Self::LAYER_52,
-                "layer-53" => result |= Self::LAYER_53,
-                "layer-54" => result |= Self::LAYER_54,
-                "layer-55" => result |= Self::LAYER_55,
-                _ => {}
+            if let Ok(layer_parsed) = layer.as_ref().parse() {
+                result |= layer_parsed;
             }
         }
         result
@@ -1181,8 +1132,85 @@ impl<T: AsRef<str>> FromIterator<T> for CollisionMask {
 
 impl CollisionMask {
     pub fn without_flags(&self) -> Self {
-        // FIXME: removes layer-N
         Self(self.0 & (Self::NOT_COLLIDING_WITH_ITSELF.0 - 1))
+    }
+}
+
+#[derive(Debug, Clone, Error)]
+enum CollisionMaskParseError {
+    #[error("Invalid layer name: \"{0}\"")]
+    InvalidLayerName(String),
+}
+
+impl FromStr for CollisionMask {
+    type Err = CollisionMaskParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "ground-tile" => Self::GROUND_TILE,
+            "water-tile" => Self::WATER_TILE,
+            "resource-layer" => Self::RESOURCE_LAYER,
+            "doodad-layer" => Self::DOODAD_LAYER,
+            "floor-layer" => Self::FLOOR_LAYER,
+            "item-layer" => Self::ITEM_LAYER,
+            "ghost-layer" => Self::GHOST_LAYER,
+            "object-layer" => Self::OBJECT_LAYER,
+            "player-layer" => Self::PLAYER_LAYER,
+            "train-layer" => Self::TRAIN_LAYER,
+            "rail-layer" => Self::RAIL_LAYER,
+            "transport-belt-layer" => Self::TRANSPORT_BELT_LAYER,
+            // These 3 are flags
+            "not-colliding-with-itself" => Self::NOT_COLLIDING_WITH_ITSELF,
+            "consider-tile-transitions" => Self::CONSIDER_TILE_TRANSITIONS,
+            "colliding-with-tiles-only" => Self::COLLIDING_WITH_TILES_ONLY,
+            // I love vim
+            // https://vim.fandom.com/wiki/Increasing_or_decreasing_numbers
+            // https://vim.fandom.com/wiki/Macros
+            "layer-13" => Self::LAYER_13,
+            "layer-14" => Self::LAYER_14,
+            "layer-15" => Self::LAYER_15,
+            "layer-16" => Self::LAYER_16,
+            "layer-17" => Self::LAYER_17,
+            "layer-18" => Self::LAYER_18,
+            "layer-19" => Self::LAYER_19,
+            "layer-20" => Self::LAYER_20,
+            "layer-21" => Self::LAYER_21,
+            "layer-22" => Self::LAYER_22,
+            "layer-23" => Self::LAYER_23,
+            "layer-24" => Self::LAYER_24,
+            "layer-25" => Self::LAYER_25,
+            "layer-26" => Self::LAYER_26,
+            "layer-27" => Self::LAYER_27,
+            "layer-28" => Self::LAYER_28,
+            "layer-29" => Self::LAYER_29,
+            "layer-30" => Self::LAYER_30,
+            "layer-31" => Self::LAYER_31,
+            "layer-32" => Self::LAYER_32,
+            "layer-33" => Self::LAYER_33,
+            "layer-34" => Self::LAYER_34,
+            "layer-35" => Self::LAYER_35,
+            "layer-36" => Self::LAYER_36,
+            "layer-37" => Self::LAYER_37,
+            "layer-38" => Self::LAYER_38,
+            "layer-39" => Self::LAYER_39,
+            "layer-40" => Self::LAYER_40,
+            "layer-41" => Self::LAYER_41,
+            "layer-42" => Self::LAYER_42,
+            "layer-43" => Self::LAYER_43,
+            "layer-44" => Self::LAYER_44,
+            "layer-45" => Self::LAYER_45,
+            "layer-46" => Self::LAYER_46,
+            "layer-47" => Self::LAYER_47,
+            "layer-48" => Self::LAYER_48,
+            "layer-49" => Self::LAYER_49,
+            "layer-50" => Self::LAYER_50,
+            "layer-51" => Self::LAYER_51,
+            "layer-52" => Self::LAYER_52,
+            "layer-53" => Self::LAYER_53,
+            "layer-54" => Self::LAYER_54,
+            "layer-55" => Self::LAYER_55,
+            _ => return Err(CollisionMaskParseError::InvalidLayerName(s.to_string())),
+        })
     }
 }
 
@@ -1409,19 +1437,40 @@ impl BitXorAssign for CollisionMask {
     }
 }
 
-impl<'lua> PrototypeFromLua<'lua> for CollisionMask {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        lua: &'lua Lua,
-        _data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        let str_array = lua.unpack::<Vec<String>>(value)?;
-        Ok(Self::from_iter(str_array))
+struct CollisionMaskVisitor;
+
+impl<'de> Visitor<'de> for CollisionMaskVisitor {
+    type Value = CollisionMask;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("A sequence of strings")
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: de::SeqAccess<'de>,
+    {
+        let mut result = CollisionMask::default();
+        while let Some(layer) = seq.next_element::<&str>()? {
+            if let Ok(layer_parsed) = layer.parse() {
+                result |= layer_parsed;
+            }
+        }
+        Ok(result)
+    }
+}
+
+impl<'de> Deserialize<'de> for CollisionMask {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_seq(CollisionMaskVisitor)
     }
 }
 
 /// <https://wiki.factorio.com/Types/EntityPrototypeFlags>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, Hash, Default)]
 pub struct EntityPrototypeFlags(pub(crate) u32);
 
 impl EntityPrototypeFlags {
@@ -1452,47 +1501,65 @@ impl EntityPrototypeFlags {
     pub const NOT_IN_KILL_STATISTICS: Self = Self(1 << 24);
     pub const NOT_IT_MADE_IN: Self = Self(1 << 25);
     pub const ALL: Self = Self((1 << 26) - 1);
+    pub const NONE: Self = Self(0);
 }
 
 impl<T: AsRef<str>> FromIterator<T> for EntityPrototypeFlags {
     fn from_iter<I: IntoIterator<Item = T>>(flags: I) -> Self {
         let mut result = Self(0);
         for flag in flags {
-            match flag.as_ref() {
-                "not-rotatable" => result |= Self::NOT_ROTATABLE,
-                "placeable-player" => result |= Self::PLACEABLE_PLAYER,
-                "placeable-neutral" => result |= Self::PLACEABLE_NEUTRAL,
-                "placeable-enemy" => result |= Self::PLACEABLE_ENEMY,
-                "placeable-off-grid" => result |= Self::PLACEABLE_OFF_GRID,
-                "player-creation" => result |= Self::PLAYER_CREATION,
-                "building-direction-8-way" => result |= Self::BUILDING_DIRECTION_8_WAY,
-                "filter-directions" => result |= Self::FILTER_DIRECTIONS,
-                "fast-replaceable-no-build-while-moving" => {
-                    result |= Self::FAST_REPLACEABLE_NO_BUILD_WHILE_MOVING
-                }
-                "breaths-air" => result |= Self::BREATHS_AIR,
-                "not-repairable" => result |= Self::NOT_REPAIRABLE,
-                "not-on-map" => result |= Self::NOT_ON_MAP,
-                "not-blueprintable" => result |= Self::NOT_BLUEPRINTABLE,
-                "not-deconstructable" => result |= Self::NOT_DECONSTRUCTABLE,
-                "hidden" => result |= Self::HIDDEN,
-                "hide-alt-info" => result |= Self::HIDE_ALT_INFO,
-                "fast-replaceable-no-cross-type-while-moving" => {
-                    result |= Self::FAST_REPLACEABLE_NO_CROSS_TYPE_WHILE_MOVING
-                }
-                "no-gap-fill-while-building" => result |= Self::NO_GAR_FILL_WHILE_BUILDING,
-                "not-flammable" => result |= Self::NOT_FLAMMABLE,
-                "no-automated-item-removal" => result |= Self::NO_AUTOMATED_ITEM_REMOVAL,
-                "no-automated-item-insertion" => result |= Self::NO_AUTOMATED_ITEM_INSERTION,
-                "no-copy-paste" => result |= Self::NO_COPY_PASTE,
-                "not-selectable-in-game" => result |= Self::NOT_SELECTABLE_IN_GAME,
-                "not-upgradable" => result |= Self::NOT_UPGRADABLE,
-                "not-in-kill-statistics" => result |= Self::NOT_IN_KILL_STATISTICS,
-                "not-in-made-in" => result |= Self::NOT_IT_MADE_IN,
-                _ => {}
+            if let Ok(flag_parsed) = flag.as_ref().parse() {
+                result |= flag_parsed;
             }
         }
         result
+    }
+}
+
+#[derive(Debug, Clone, Error)]
+pub enum EntityPrototypeFlagsParseError {
+    #[error("Invalid entity prototype flag name: \"{0}\"")]
+    InvalidFlag(String),
+}
+
+impl FromStr for EntityPrototypeFlags {
+    type Err = EntityPrototypeFlagsParseError;
+
+    /// Parses just one flag, used in a loop in [`FromIterator`] implementation
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "not-rotatable" => Self::NOT_ROTATABLE,
+            "placeable-player" => Self::PLACEABLE_PLAYER,
+            "placeable-neutral" => Self::PLACEABLE_NEUTRAL,
+            "placeable-enemy" => Self::PLACEABLE_ENEMY,
+            "placeable-off-grid" => Self::PLACEABLE_OFF_GRID,
+            "player-creation" => Self::PLAYER_CREATION,
+            "building-direction-8-way" => Self::BUILDING_DIRECTION_8_WAY,
+            "filter-directions" => Self::FILTER_DIRECTIONS,
+            "fast-replaceable-no-build-while-moving" => {
+                Self::FAST_REPLACEABLE_NO_BUILD_WHILE_MOVING
+            }
+            "breaths-air" => Self::BREATHS_AIR,
+            "not-repairable" => Self::NOT_REPAIRABLE,
+            "not-on-map" => Self::NOT_ON_MAP,
+            "not-blueprintable" => Self::NOT_BLUEPRINTABLE,
+            "not-deconstructable" => Self::NOT_DECONSTRUCTABLE,
+            "hidden" => Self::HIDDEN,
+            "hide-alt-info" => Self::HIDE_ALT_INFO,
+            "fast-replaceable-no-cross-type-while-moving" => {
+                Self::FAST_REPLACEABLE_NO_CROSS_TYPE_WHILE_MOVING
+            }
+            "no-gap-fill-while-building" => Self::NO_GAR_FILL_WHILE_BUILDING,
+            "not-flammable" => Self::NOT_FLAMMABLE,
+            "no-automated-item-removal" => Self::NO_AUTOMATED_ITEM_REMOVAL,
+            "no-automated-item-insertion" => Self::NO_AUTOMATED_ITEM_INSERTION,
+            "no-copy-paste" => Self::NO_COPY_PASTE,
+            "not-selectable-in-game" => Self::NOT_SELECTABLE_IN_GAME,
+            "not-upgradable" => Self::NOT_UPGRADABLE,
+            "not-in-kill-statistics" => Self::NOT_IN_KILL_STATISTICS,
+            "not-in-made-in" => Self::NOT_IT_MADE_IN,
+            _ => return Err(EntityPrototypeFlagsParseError::InvalidFlag(s.to_string())),
+        })
     }
 }
 
@@ -1538,83 +1605,60 @@ impl BitXorAssign for EntityPrototypeFlags {
     }
 }
 
-impl<'lua> PrototypeFromLua<'lua> for EntityPrototypeFlags {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        lua: &'lua Lua,
-        _data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        let flag_arr = lua.unpack::<Vec<String>>(value)?;
-        Ok(Self::from_iter(flag_arr))
+struct EntityPrototypeFlagsVsitior;
+
+impl<'de> Visitor<'de> for EntityPrototypeFlagsVsitior {
+    type Value = EntityPrototypeFlags;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("A sequence of strings")
+    }
+
+    fn visit_seq<A>(self, seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: de::SeqAccess<'de>,
+    {
+        let mut result = EntityPrototypeFlags::default();
+        while let Some(flag) = seq.next_element::<&str>()? {
+            if let Ok(flag_parsed) = flag.parse() {
+                result |= flag_parsed;
+            }
+        }
+        Ok(result)
+    }
+}
+
+impl<'de> Deserialize<'de> for EntityPrototypeFlags {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_seq(EntityPrototypeFlagsVsitior)
     }
 }
 
 /// <https://wiki.factorio.com/Types/DamagePrototype>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct DamagePrototype {
     pub amount: f32,
-    #[rename("type")]
-    pub r#type: String, // Name of Damage type
+    #[serde(rename = "type")]
+    pub damage_type: String, // Name of Damage type
 }
 
 /// <https://wiki.factorio.com/Types/DamageTypeFilters>
-#[derive(Debug, Clone)]
+#[serde_as]
+#[derive(Debug, Clone, Deserialize)]
 pub struct DamageTypeFilters {
+    #[serde_with(as = "serde_with::OneOrMany::<_>")]
     types: Vec<String>, // If String, converted to Vec<String> with one element // Name of DamageType prototype
-    whitelist: bool,    // Default: false
-}
-
-impl<'lua> PrototypeFromLua<'lua> for DamageTypeFilters {
-    fn prototype_from_lua(
-        value: Value<'lua>,
-        _lua: &'lua Lua,
-        _data_table: &mut DataTable,
-    ) -> LuaResult<Self> {
-        let type_name = value.type_name();
-        match value {
-            mlua::Value::String(s) => Ok(Self {
-                types: vec![s.to_str()?.to_string()],
-                whitelist: false,
-            }),
-            mlua::Value::Table(t) => {
-                if let Some(v) = t.get::<_, Option<mlua::Value>>("types")? {
-                    let types = match v {
-                        mlua::Value::String(s) => vec![s.to_str()?.to_string()],
-                        mlua::Value::Table(t) => t
-                            .sequence_values::<String>()
-                            .collect::<LuaResult<Vec<String>>>()?,
-                        _ => {
-                            return Err(mlua::Error::FromLuaConversionError {
-                                from: v.type_name(),
-                                to: "DamageTypeFilters.types",
-                                message: Some("Expected table or a string".into()),
-                            })
-                        }
-                    };
-                    let whitelist = t.get::<_, Option<bool>>("whitelist")?.unwrap_or(false);
-                    Ok(Self { types, whitelist })
-                } else {
-                    let types = t
-                        .sequence_values::<String>()
-                        .collect::<LuaResult<Vec<String>>>()?;
-                    Ok(Self {
-                        types,
-                        whitelist: false,
-                    })
-                }
-            }
-            _ => Err(mlua::Error::FromLuaConversionError {
-                from: type_name,
-                to: "DamageTypeFilters",
-                message: Some("expected either a string, a table or an array".into()),
-            }),
-        }
-    }
+    #[serde(default)]
+    whitelist: bool, // Default: false
 }
 
 /// <https://wiki.factorio.com/Types/ForceCondition>
-#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum ForceCondition {
     All,
     Enemy,
@@ -1625,25 +1669,21 @@ pub enum ForceCondition {
     NotSame,
 }
 
-prot_from_str!(ForceCondition);
-
 /// <https://wiki.factorio.com/Types/AreaTriggerItem#collision_mode>
-#[derive(Debug, Clone, Copy, Eq, PartialEq, EnumString, AsRefStr)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, EnumString, AsRefStr, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum CollisionMode {
     DistanceFromCollisionBox,
     DistanceFromCenter,
 }
 
-prot_from_str!(CollisionMode);
-
 /// <https://wiki.factorio.com/Types/MinableProperties>
-#[derive(Debug, Clone, PrototypeFromLua)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct MinableProperties {
     pub mining_time: f64,
-    #[use_self_vec]
-    pub results: Vec<ProductPrototype>,
-    #[default(0_f64)]
+    pub results: ProductResults,
+    #[serde(default)]
     pub fluid_amount: f64, // Default: 0
     pub mining_particle: Option<String>, // Name of Prototype/Particle
     pub required_fluid: Option<String>,  // Name of Prototype/Fluid
@@ -1653,6 +1693,15 @@ pub struct MinableProperties {
     //count: u16, // Default: 1
     pub mining_trigger: Option<Trigger>,
 }
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
+pub enum ProductResults {
+    Result(ProductPrototype),
+    Results { results: Vec<ProductPrototype> },
+}
+
+compile_error!("Continue from here");
 
 /// <https://wiki.factorio.com/Types/ProductPrototype>
 #[derive(Debug, Clone)]
@@ -2233,11 +2282,11 @@ pub struct HeatConnection {
 pub struct FluidBox {
     pub pipe_connections: Vec<PipeConnectionDefinition>, // Max: 256
     #[default(1_f64)]
-    pub base_area: f64,            // Default: 1 // Must be > 0
+    pub base_area: f64,             // Default: 1 // Must be > 0
     #[default(0_f64)]
-    pub base_level: f64,           // Default: 0
+    pub base_level: f64,            // Default: 0
     #[default(1_f64)]
-    pub height: f64,               // Default: 1 // Must be > 0
+    pub height: f64,                // Default: 1 // Must be > 0
     pub filter: Option<String>,                          // Name of Prototype/Fluid
     #[default(RenderLayer::Object)]
     pub render_layer: RenderLayer, // Default: "object"
@@ -3357,11 +3406,11 @@ pub enum ModifierPrototypeType {
 /// <https://wiki.factorio.com/Types/SimulationDefinition>
 #[derive(Debug, Clone, PrototypeFromLua)]
 pub struct SimulationDefinition {
-    pub save: Option<FileName>,
-    pub init_file: Option<FileName>,
+    pub save: Option<FileName<SaveFileType>>,
+    pub init_file: Option<FileName<ScriptFileType>>,
     #[default("")]
     pub init: String, // Default: "" // Only loaded if `init_file` is not present
-    pub update_file: Option<FileName>,
+    pub update_file: Option<FileName<ScriptFileType>>,
     #[default("")]
     pub update: String, // Default: "" // Only loaded if `update_file` is not present
     #[default(0_u32)]

@@ -7,15 +7,6 @@ pub mod additional_types;
 pub mod prototype_type;
 mod utility;
 
-pub use abstract_prototypes::*;
-pub use utility::*;
-
-use additional_types::*;
-use factorio_lib_rs_derive::{
-    prot_from_lua_blanket, Base, DataTableAccessable, ModSetting, Prototype, PrototypeFromLua,
-};
-use mlua::prelude::*;
-use prototype_type::PrototypeType;
 use std::{
     collections::HashMap,
     fmt,
@@ -23,7 +14,16 @@ use std::{
     marker::PhantomData,
     rc::{Rc, Weak},
 };
+
+pub use abstract_prototypes::*;
+use additional_types::*;
+use factorio_prototypes_macros::{
+    prot_from_lua_blanket, Base, DataTableAccessable, ModSetting, Prototype, PrototypeFromLua,
+};
+//use mlua::prelude::*;
+use prototype_type::PrototypeType;
 use thiserror::Error;
+pub use utility::*;
 
 #[cfg(feature = "concepts")]
 use crate::concepts::LocalisedString;
@@ -4743,7 +4743,6 @@ pub struct FuelCategory {
     prototype_base: PrototypeBaseSpec,
 }
 
-// Documentation is confusing, not deriving PrototypeBase because it's probably the intended way
 /// <https://wiki.factorio.com/Prototype/GuiStyle>
 #[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable)]
 #[data_table(gui_style)]

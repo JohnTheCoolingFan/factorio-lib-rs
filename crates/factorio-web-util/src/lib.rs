@@ -2,8 +2,8 @@
 //!
 //! This module provides functions and structs to simplify interaction with Factorio Web API
 
-use crate::data_structs::{FactorioVersion, InfoJson};
 use const_format::concatcp;
+use factorio_data_structs::{FactorioVersion, InfoJson};
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use strum::Display;

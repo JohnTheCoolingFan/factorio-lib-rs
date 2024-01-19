@@ -1,5 +1,5 @@
 [package]
-name = "factorio-lib-rs-derive"
+name = "factorio-prototypes-macros"
 version = "0.1.0"
 edition = "2021"
 

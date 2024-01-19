@@ -3,7 +3,7 @@ use serde::Deserialize;
 use serde_with::serde_as;
 use thiserror::Error;
 
-use super::FileName;
+use super::{FileName, SoundFileType};
 
 /// <https://wiki.factorio.com/Types/LayeredSound>
 #[derive(Debug, Clone, Deserialize)]
@@ -64,7 +64,7 @@ pub struct SoundAggregation {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(try_from = "SoundVariationIntermediate")]
 pub struct SoundVariation {
-    pub filename: FileName,
+    pub filename: FileName<SoundFileType>,
     pub volume: f32,
     pub preload: Option<bool>, // Strange that this doesn't have a default
     pub speed: SoundVariationSpeed,
@@ -72,7 +72,7 @@ pub struct SoundVariation {
 
 #[derive(Deserialize)]
 struct SoundVariationIntermediate {
-    pub filename: FileName,
+    pub filename: FileName<SoundFileType>,
     #[serde(default = "default_from_i8::<f32, 1>")]
     pub volume: f32,
     pub preload: Option<bool>, // Strange that this doesn't have a default

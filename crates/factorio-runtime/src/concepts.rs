@@ -1,11 +1,6 @@
+use std::{collections::HashMap, fmt, io::Read, ops::Index, rc::Rc};
+
 use ini::Ini;
-#[cfg(feature = "lua")]
-use mlua::prelude::LuaResult;
-use std::collections::HashMap;
-use std::fmt;
-use std::io::Read;
-use std::ops::Index;
-use std::rc::Rc;
 use thiserror::Error;
 
 // Unfinished
@@ -116,7 +111,7 @@ impl fmt::Display for LocalisedString {
                 let mut temp_str = s.to_string();
                 for i in 1..self.parameters.len() {
                     // Search for substituion spots
-                    if matches!(temp_str.as_str().find(&format!("__{i}__")), Some(_)) {
+                    if temp_str.as_str().contains(&format!("__{i}__")) {
                         temp_str = temp_str.as_str().replace(
                             format!("__{i}__").as_str(),
                             match &self.parameters[i - 1] {

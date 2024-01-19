@@ -1,14 +1,16 @@
-use super::additional_types::{
-    Animation, BoxSpecification, Color, DaytimeColorLookupTable, Factorio2DVector, FileName,
-    SimulationDefinition, Sound, Sprite, TriggerTargetMask,
-};
-use super::LocalisedString;
-use crate::prototypes::{Prototype, PrototypeBase, PrototypeBaseSpec, PrototypeType};
-use factorio_lib_rs_derive::DataTableAccessable;
+use std::{collections::HashMap, fmt::Display};
+
+use factorio_prototypes_macros::DataTableAccessable;
 use serde::Deserialize;
-use std::collections::HashMap;
-use std::fmt::Display;
 use thiserror::Error;
+
+use super::{
+    additional_types::{
+        Animation, BoxSpecification, Color, DaytimeColorLookupTable, Factorio2DVector, FileName,
+        SimulationDefinition, Sound, Sprite, TriggerTargetMask,
+    },
+    LocalisedString, Prototype, PrototypeBase, PrototypeBaseSpec, PrototypeType,
+};
 
 /// <https://wiki.factorio.com/Prototype/UtilityConstants>
 #[derive(Debug, Clone, Prototype, PrototypeBase!, DataTableAccessable, Deserialize)]
