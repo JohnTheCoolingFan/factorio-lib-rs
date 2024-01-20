@@ -52,8 +52,8 @@ impl FromStr for ModDependency {
                     Some(mtch) => mtch.as_str().to_string(),
                     None => return Err(ModDependencyErr::NameIsUnparsable(input.into())),
                 },
-                version_req: match [captures.name("version_req"), captures.name("version")] {
-                    [Some(req_match), Some(version_match)] => {
+                version_req: match (captures.name("version_req"), captures.name("version")) {
+                    (Some(req_match), Some(version_match)) => {
                         let version_str = version_match.as_str();
                         #[allow(unstable_name_collisions)]
                         let sanitized = version_str
