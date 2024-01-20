@@ -104,6 +104,18 @@ pub enum ModDependencyType {
     Required,
 }
 
+impl ModDependencyType {
+    pub fn prefix(self) -> Option<&'static str> {
+        match self {
+            Self::Required => None,
+            Self::Optional => Some("?"),
+            Self::OptionalHidden => Some("(?)"),
+            Self::Incompatible => Some("!"),
+            Self::NoLoadOrder => Some("~"),
+        }
+    }
+}
+
 pub type ModDependencyResult = Result<Vec<ModDependency>, ModDependencyErr>;
 
 // enum for states of a mod (enabled or disabled)
