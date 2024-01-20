@@ -128,17 +128,13 @@ impl PartialOrd for Mod {
         if self.name == other.name {
             return None;
         }
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Mod {
-    fn cmp(&self, other: &Self) -> Ordering {
-        if self.has_dependency(&other.name) {
-            Ordering::Greater
-        } else {
-            natural_only_alnum_cmp(&self.name, &other.name)
-        }
+        Some({
+            if self.has_dependency(&other.name) {
+                Ordering::Greater
+            } else {
+                natural_only_alnum_cmp(&self.name, &other.name)
+            }
+        })
     }
 }
 
