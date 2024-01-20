@@ -1,18 +1,18 @@
+use std::{
+    cmp::Ordering,
+    ffi::OsStr,
+    fmt::{self, Display, Formatter},
+    fs::DirEntry,
+    path::PathBuf,
+    str::FromStr,
+};
+
 use itertools::Itertools;
 use lexical_sort::natural_only_alnum_cmp;
 use once_cell::sync::OnceCell;
 use regex::Regex;
-use semver::Version;
-use semver::VersionReq;
+use semver::{Version, VersionReq};
 use serde::{Deserialize, Serialize};
-use std::cmp::Ordering;
-use std::ffi::OsStr;
-use std::fs::DirEntry;
-use std::{
-    fmt::{self, Display, Formatter},
-    path::PathBuf,
-    str::FromStr,
-};
 use thiserror::Error;
 
 // Credit for the most part goes to raiguard's factorio_mod_manager
@@ -212,26 +212,17 @@ pub struct ModVersion {
     pub version: Version,
 }
 
-// impls for comparing mod versions
 impl PartialOrd for ModVersion {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.version.partial_cmp(&other.version)
     }
 }
 
-impl Ord for ModVersion {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.version.cmp(&other.version)
-    }
-}
-
 impl PartialEq for ModVersion {
     fn eq(&self, other: &Self) -> bool {
-        self.version == other.version
+        self.version.eq(&other.version)
     }
 }
-
-impl Eq for ModVersion {}
 
 // Structs for deserializing json files
 #[derive(Deserialize, Debug)]
