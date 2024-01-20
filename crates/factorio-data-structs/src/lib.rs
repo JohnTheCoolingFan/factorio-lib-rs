@@ -49,11 +49,13 @@ impl FromStr for ModDependency {
                     Some(str) => return Err(ModDependencyErr::UnknownModifier(str.to_string())),
                 },
                 name: match captures.name("name") {
-                    Some(mtch) => mtch.as_str().to_string(),
+                    Some(name_match) => name_match.as_str().to_owned(),
                     None => return Err(ModDependencyErr::NameIsUnparsable(input.into())),
                 },
-                version_req: match (captures.name("version_req"), captures.name("version")) {
-                    (Some(req_match), Some(version_match)) => {
+                version_req: captures
+                    .name("version_req")
+                    .zip(captures.name("version"))
+                    .map(|(req_match, version_match)| {
                         let version_str = version_match.as_str();
                         #[allow(unstable_name_collisions)]
                         let sanitized = version_str
@@ -66,27 +68,31 @@ impl FromStr for ModDependency {
                                     })?
                                     .to_string())
                             })
-                            .intersperse(Ok(".".to_string()))
+                            .intersperse_with(|| Ok(".".to_string()))
                             .collect::<Result<String, ModDependencyErr>>()?;
                         let mut version_req = String::new();
                         version_req.push_str(req_match.as_str());
                         version_req.push(' ');
                         version_req.push_str(&sanitized);
 
-                        match VersionReq::parse(&version_req) {
-                            Ok(version_req) => Some(version_req),
-                            Err(_) => {
-                                return Err(ModDependencyErr::InvalidVersionReq(
-                                    req_match.as_str().to_string(),
-                                ))
-                            }
-                        }
-                    }
-                    _ => None,
-                },
+                        VersionReq::parse(&version_req).map_err(ModDependencyErr::from)
+                    })
+                    .transpose()?,
             })
         }
     }
+}
+
+#[derive(Debug, Error)]
+pub enum ModDependencyErr {
+    #[error("Invalid dependency string: `{0}`")]
+    InvalidDependencyString(String),
+    #[error("Invalid dependency version requirement: `{0}`")]
+    InvalidVersionReq(#[from] semver::Error),
+    #[error("Dependency name could not be parsed: `{0}`")]
+    NameIsUnparsable(String),
+    #[error("Unknown dependency modifier: `{0}`")]
+    UnknownModifier(String),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -255,18 +261,6 @@ pub struct ModListJson {
 pub struct ModListJsonMod {
     pub name: String,
     pub enabled: bool,
-}
-
-#[derive(Clone, Debug, Error)]
-pub enum ModDependencyErr {
-    #[error("Invalid dependency string: `{0}`")]
-    InvalidDependencyString(String),
-    #[error("Invalid dependency version requirement: `{0}`")]
-    InvalidVersionReq(String),
-    #[error("Dependency name could not be parsed: `{0}`")]
-    NameIsUnparsable(String),
-    #[error("Unknown dependency modifier: `{0}`")]
-    UnknownModifier(String),
 }
 
 #[allow(non_camel_case_types)]
