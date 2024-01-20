@@ -20,6 +20,7 @@ use thiserror::Error;
 // https://github.com/raiguard/factorio_mod_manager
 
 const MOD_DEPENDENCY_REGEX: &str = r"^(?:(?P<type>[!?~]|\(\?\)) *)?(?P<name>(?: *[a-zA-Z0-9_-]+)+(?: *$)?)(?: *(?P<version_req>[<>=]=?) *(?P<version>(?:\d+\.){1,2}\d+))?$";
+static DEP_STRING_REGEX: OnceCell<Regex> = OnceCell::new();
 
 #[derive(Debug, Clone, PartialEq, Eq, DeserializeFromStr)]
 pub struct ModDependency {
@@ -33,7 +34,6 @@ impl FromStr for ModDependency {
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         {
-            static DEP_STRING_REGEX: OnceCell<Regex> = OnceCell::new();
             let captures = DEP_STRING_REGEX
                 .get_or_init(|| Regex::new(MOD_DEPENDENCY_REGEX).unwrap())
                 .captures(input)
