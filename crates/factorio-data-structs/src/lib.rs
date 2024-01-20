@@ -40,7 +40,7 @@ impl FromStr for ModDependency {
                 .ok_or_else(|| ModDependencyErr::InvalidDependencyString(input.into()))?;
 
             Ok(ModDependency {
-                dep_type: match captures.name("type").map(|mtch| mtch.as_str()) {
+                dep_type: match captures.name("type").map(|type_match| type_match.as_str()) {
                     None => ModDependencyType::Required,
                     Some("!") => ModDependencyType::Incompatible,
                     Some("~") => ModDependencyType::NoLoadOrder,
