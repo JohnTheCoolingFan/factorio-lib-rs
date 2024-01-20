@@ -5,11 +5,11 @@ use std::{
     fs::DirEntry,
     path::PathBuf,
     str::FromStr,
+    sync::OnceLock,
 };
 
 use itertools::Itertools;
 use lexical_sort::natural_only_alnum_cmp;
-use once_cell::sync::OnceCell;
 use regex::Regex;
 use semver::{Version, VersionReq};
 use serde::{Deserialize, Serialize};
@@ -20,7 +20,7 @@ use thiserror::Error;
 // https://github.com/raiguard/factorio_mod_manager
 
 const MOD_DEPENDENCY_REGEX: &str = r"^(?:(?P<type>[!?~]|\(\?\)) *)?(?P<name>(?: *[a-zA-Z0-9_-]+)+(?: *$)?)(?: *(?P<version_req>[<>=]=?) *(?P<version>(?:\d+\.){1,2}\d+))?$";
-static DEP_STRING_REGEX: OnceCell<Regex> = OnceCell::new();
+static DEP_STRING_REGEX: OnceLock<Regex> = OnceLock::new();
 
 #[derive(Debug, Clone, PartialEq, Eq, DeserializeFromStr)]
 pub struct ModDependency {
