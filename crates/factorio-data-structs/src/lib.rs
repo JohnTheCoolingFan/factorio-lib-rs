@@ -332,13 +332,8 @@ impl Display for FactorioVersion {
 }
 
 #[derive(Debug, Error)]
+#[error("Incorrect factorio version: {0}")]
 pub struct FactorioVersionParseError(String);
-
-impl Display for FactorioVersionParseError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Incorrect factorio version string: \"{}\"", self.0)
-    }
-}
 
 #[derive(Debug, Error)]
 pub enum ModDataErr {
