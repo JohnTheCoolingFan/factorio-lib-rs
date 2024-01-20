@@ -10,6 +10,7 @@ thiserror = { workspace = true }
 regex = { workspace = true }
 semver = { workspace = true }
 serde = { workspace = true }
+serde_with = { workspace = true }
 itertools = { version = "0.10" }
 lexical-sort = { version = "0.3" }
 once_cell = { version = "1.10" }

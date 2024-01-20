@@ -13,6 +13,7 @@ use once_cell::sync::OnceCell;
 use regex::Regex;
 use semver::{Version, VersionReq};
 use serde::{Deserialize, Serialize};
+use serde_with::DeserializeFromStr;
 use thiserror::Error;
 
 // Credit for the most part goes to raiguard's factorio_mod_manager
@@ -20,76 +21,71 @@ use thiserror::Error;
 
 const MOD_DEPENDENCY_REGEX: &str = r"^(?:(?P<type>[!?~]|\(\?\)) *)?(?P<name>(?: *[a-zA-Z0-9_-]+)+(?: *$)?)(?: *(?P<version_req>[<>=]=?) *(?P<version>(?:\d+\.){1,2}\d+))?$";
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(try_from = "String")]
+#[derive(Debug, Clone, PartialEq, Eq, DeserializeFromStr)]
 pub struct ModDependency {
     pub dep_type: ModDependencyType,
     pub name: String,
     pub version_req: Option<VersionReq>,
 }
 
-impl ModDependency {
-    pub fn new(input: &str) -> Result<Self, ModDependencyErr> {
-        static DEP_STRING_REGEX: OnceCell<Regex> = OnceCell::new();
-        let captures = DEP_STRING_REGEX
-            .get_or_init(|| Regex::new(MOD_DEPENDENCY_REGEX).unwrap())
-            .captures(input)
-            .ok_or_else(|| ModDependencyErr::InvalidDependencyString(input.into()))?;
+impl FromStr for ModDependency {
+    type Err = ModDependencyErr;
 
-        Ok(Self {
-            dep_type: match captures.name("type").map(|mtch| mtch.as_str()) {
-                None => ModDependencyType::Required,
-                Some("!") => ModDependencyType::Incompatible,
-                Some("~") => ModDependencyType::NoLoadOrder,
-                Some("?") => ModDependencyType::Optional,
-                Some("(?)") => ModDependencyType::OptionalHidden,
-                Some(str) => return Err(ModDependencyErr::UnknownModifier(str.to_string())),
-            },
-            name: match captures.name("name") {
-                Some(mtch) => mtch.as_str().to_string(),
-                None => return Err(ModDependencyErr::NameIsUnparsable(input.into())),
-            },
-            version_req: match [captures.name("version_req"), captures.name("version")] {
-                [Some(req_match), Some(version_match)] => {
-                    let version_str = version_match.as_str();
-                    #[allow(unstable_name_collisions)]
-                    let sanitized = version_str
-                        .split('.')
-                        .map(|sub| {
-                            Ok(sub
-                                .parse::<usize>()
-                                .map_err(|_| {
-                                    ModDependencyErr::InvalidDependencyString(input.into())
-                                })?
-                                .to_string())
-                        })
-                        .intersperse(Ok(".".to_string()))
-                        .collect::<Result<String, ModDependencyErr>>()?;
-                    let mut version_req = String::new();
-                    version_req.push_str(req_match.as_str());
-                    version_req.push(' ');
-                    version_req.push_str(&sanitized);
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        {
+            static DEP_STRING_REGEX: OnceCell<Regex> = OnceCell::new();
+            let captures = DEP_STRING_REGEX
+                .get_or_init(|| Regex::new(MOD_DEPENDENCY_REGEX).unwrap())
+                .captures(input)
+                .ok_or_else(|| ModDependencyErr::InvalidDependencyString(input.into()))?;
 
-                    match VersionReq::parse(&version_req) {
-                        Ok(version_req) => Some(version_req),
-                        Err(_) => {
-                            return Err(ModDependencyErr::InvalidVersionReq(
-                                req_match.as_str().to_string(),
-                            ))
+            Ok(ModDependency {
+                dep_type: match captures.name("type").map(|mtch| mtch.as_str()) {
+                    None => ModDependencyType::Required,
+                    Some("!") => ModDependencyType::Incompatible,
+                    Some("~") => ModDependencyType::NoLoadOrder,
+                    Some("?") => ModDependencyType::Optional,
+                    Some("(?)") => ModDependencyType::OptionalHidden,
+                    Some(str) => return Err(ModDependencyErr::UnknownModifier(str.to_string())),
+                },
+                name: match captures.name("name") {
+                    Some(mtch) => mtch.as_str().to_string(),
+                    None => return Err(ModDependencyErr::NameIsUnparsable(input.into())),
+                },
+                version_req: match [captures.name("version_req"), captures.name("version")] {
+                    [Some(req_match), Some(version_match)] => {
+                        let version_str = version_match.as_str();
+                        #[allow(unstable_name_collisions)]
+                        let sanitized = version_str
+                            .split('.')
+                            .map(|sub| {
+                                Ok(sub
+                                    .parse::<usize>()
+                                    .map_err(|_| {
+                                        ModDependencyErr::InvalidDependencyString(input.into())
+                                    })?
+                                    .to_string())
+                            })
+                            .intersperse(Ok(".".to_string()))
+                            .collect::<Result<String, ModDependencyErr>>()?;
+                        let mut version_req = String::new();
+                        version_req.push_str(req_match.as_str());
+                        version_req.push(' ');
+                        version_req.push_str(&sanitized);
+
+                        match VersionReq::parse(&version_req) {
+                            Ok(version_req) => Some(version_req),
+                            Err(_) => {
+                                return Err(ModDependencyErr::InvalidVersionReq(
+                                    req_match.as_str().to_string(),
+                                ))
+                            }
                         }
                     }
-                }
-                _ => None,
-            },
-        })
-    }
-}
-
-impl TryFrom<String> for ModDependency {
-    type Error = ModDependencyErr;
-
-    fn try_from(s: String) -> Result<Self, Self::Error> {
-        Self::new(&s)
+                    _ => None,
+                },
+            })
+        }
     }
 }
 
